@@ -460,10 +460,14 @@ Push가 완료되지 않은 경우:
 
 1. GitHub docs Repository
 2. README
-3. MASTER_SPEC CURRENT
-4. UPDATE
-5. CHANGELOG
-6. Archive
+3. AI_PROJECT_OPERATION_MANUAL_RELEASE
+4. AI_SESSION_START_PROTOCOL
+5. MASTER_SPEC Reference Index
+6. 필요한 SUBPART
+7. 필요한 경우 CURRENT Canonical
+8. UPDATE
+9. CHANGELOG
+10. Archive
 
 ### GitHub docs Repository
 
@@ -491,13 +495,56 @@ README는 docs repository의 입구 문서이다.
 - ARCHIVE 정책
 - 새 대화 시작 시 참조 순서
 
-### MASTER_SPEC CURRENT
+### AI_PROJECT_OPERATION_MANUAL_RELEASE
 
-`00_CANONICAL/CURRENT`는 현재 기준 MASTER_SPEC를 확인하는 위치이다.
+AI_PROJECT_OPERATION_MANUAL_RELEASE는 AI 협업과 프로젝트 운영 절차의 기준 문서이다.
 
 원칙:
 
-- 최신 `MASTER_SPEC_CANONICAL_*.txt`를 구조와 정책 기준으로 사용한다.
+- ChatGPT와 Codex의 역할 분리를 확인한다.
+- GitHub Source of Truth 원칙을 확인한다.
+- 새 세션 시작 전 금지사항과 보고 형식을 확인한다.
+
+### AI_SESSION_START_PROTOCOL
+
+AI_SESSION_START_PROTOCOL은 새 AI 세션을 시작할 때 따라야 하는 표준 절차이다.
+
+원칙:
+
+- README 이후 실제 세션 시작 절차를 확인한다.
+- Reference Index와 필요한 SUBPART 확인 절차를 따른다.
+- CURRENT Canonical은 원본 검증 또는 Reference 충돌 시 확인한다.
+
+### MASTER_SPEC Reference Index
+
+`00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`는 AI가 최신 MASTER_SPEC를 부분 참조하기 위한 우선 진입점이다.
+
+원칙:
+
+- AI 일반 참조는 Reference Edition을 우선한다.
+- 필요한 섹션이 들어 있는 SUBPART를 먼저 확인한다.
+- Legacy PART는 SUBPART로 부족한 경우에만 보조 참조한다.
+- MASTER_SPEC CURRENT는 공식 원본 Source of Truth로 유지한다.
+
+### 필요한 SUBPART
+
+SUBPART는 AI가 읽기 쉬운 작은 단위의 MASTER_SPEC Reference 문서이다.
+
+원칙:
+
+- 작업 주제와 관련된 SUBPART를 우선 확인한다.
+- SUBPART는 원문을 요약하거나 생략하지 않은 참조용 분할본이다.
+- SUBPART와 CURRENT Canonical이 충돌하면 CURRENT Canonical을 원본으로 확인한다.
+
+### 필요한 경우 CURRENT Canonical
+
+`00_CANONICAL/CURRENT`는 공식 MASTER_SPEC 원본 Source of Truth이다.
+
+원칙:
+
+- 최신 `MASTER_SPEC_CANONICAL_*.txt`는 공식 원본으로 유지한다.
+- AI 일반 참조는 Reference Edition을 우선한다.
+- 원본 검증, Reference 충돌, 세부 원문 확인이 필요할 때 CURRENT Canonical을 확인한다.
 - 기존 Canonical은 덮어쓰지 않는다.
 - 새 반영은 새 Canonical 생성 또는 UPDATE 후보 생성으로 관리한다.
 
@@ -554,7 +601,11 @@ AI_PROJECT_OPERATION_MANUAL_RELEASE
 ↓
 AI_SESSION_START_PROTOCOL
 ↓
-MASTER_SPEC CURRENT
+MASTER_SPEC REFERENCE INDEX
+↓
+필요한 SUBPART
+↓
+필요 시 CURRENT Canonical
 ↓
 UPDATE INBOX
 ↓
@@ -565,15 +616,15 @@ CHANGELOG
 현재 금지선 확인
 ↓
 작업 범위 확인
-↓
-구현 시작
 ```
 
 Recovery 완료 조건:
 
 - 현재 구현 위치를 이전 세션과 동일하게 설명할 수 있다.
 - 다음 구현 작업을 명확하게 특정할 수 있다.
-- MASTER_SPEC 최신 날짜를 확인했다.
+- MASTER_SPEC Reference Index를 확인했다.
+- 필요한 SUBPART를 확인했다.
+- 필요 시 CURRENT Canonical 원본 검증 여부를 확인했다.
 - UPDATE 존재 여부를 확인했다.
 - CHANGELOG 최신 여부를 확인했다.
 - 테스트 기준을 확인했다.

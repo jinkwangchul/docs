@@ -42,7 +42,11 @@ AI_PROJECT_OPERATION_MANUAL_RELEASE
 ↓
 AI_SESSION_START_PROTOCOL
 ↓
-MASTER_SPEC CURRENT
+MASTER_SPEC REFERENCE INDEX
+↓
+필요한 SUBPART
+↓
+필요 시 CURRENT Canonical
 ↓
 UPDATE INBOX
 ↓
@@ -53,8 +57,6 @@ CHANGELOG
 현재 금지선 확인
 ↓
 작업 범위 확인
-↓
-구현 시작
 ```
 
 ## 4. 단계별 확인 기준
@@ -105,27 +107,56 @@ GitHub docs Repository가 최신 Source of Truth인지 확인한다.
 
 - GitHub docs 확인 절차
 - README 확인 절차
-- MASTER_SPEC CURRENT 확인 절차
+- MASTER_SPEC REFERENCE INDEX 확인 절차
+- 필요한 SUBPART 확인 절차
+- 필요 시 CURRENT Canonical 원본 검증 절차
 - UPDATE/INBOX 확인 절차
 - CHANGELOG 확인 절차
 - 작업 범위 결정 절차
 
-### 5. MASTER_SPEC CURRENT
+### 5. MASTER_SPEC REFERENCE INDEX
 
-`00_CANONICAL/CURRENT`의 최신 `MASTER_SPEC_CANONICAL_*.txt`를 확인한다.
+`00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`를 확인한다.
 
 확인 항목:
 
-- MASTER_SPEC 최신 날짜
-- 최신 Canonical 파일명
+- Reference Edition 구조
+- PART와 SUBPART 목록
+- 이번 작업에 필요한 SUBPART 위치
+- 29.6, 29.7 등 주요 섹션 위치
+- Reference Edition과 CURRENT Canonical의 관계
+
+MASTER_SPEC는 추측하지 않는다.
+
+### 6. 필요한 SUBPART
+
+작업 주제와 관련된 SUBPART를 확인한다.
+
+확인 항목:
+
+- 필요한 섹션이 포함된 SUBPART
+- SUBPART의 원문 범위
 - 현재 구현 단계
 - 현재 미연결 계층
 - 테스트 기준
 - 금지선
 
-MASTER_SPEC는 추측하지 않는다.
+SUBPART를 확인하지 않고 CURRENT Canonical 전체 파일만 우선하지 않는다.
 
-### 6. UPDATE INBOX
+### 7. 필요 시 CURRENT Canonical
+
+`00_CANONICAL/CURRENT`의 최신 `MASTER_SPEC_CANONICAL_*.txt`는 공식 원본 Source of Truth로 유지한다.
+
+확인 항목:
+
+- Reference Edition 원본 검증 필요 여부
+- Reference 문서 충돌 여부
+- 전체 원문 확인 필요 여부
+- 최신 Canonical 파일명
+
+CURRENT Canonical은 원본 검증 또는 Reference 충돌 시 확인한다.
+
+### 8. UPDATE INBOX
 
 `10_UPDATE/INBOX`의 미병합 UPDATE 문서를 확인한다.
 
@@ -138,7 +169,7 @@ MASTER_SPEC는 추측하지 않는다.
 
 UPDATE는 무시하지 않는다.
 
-### 7. CHANGELOG
+### 9. CHANGELOG
 
 `00_CANONICAL/CHANGELOG`의 최신 CHANGELOG를 확인한다.
 
@@ -152,7 +183,7 @@ UPDATE는 무시하지 않는다.
 
 CHANGELOG 확인은 생략하지 않는다.
 
-### 8. 현재 구현 위치 확인
+### 10. 현재 구현 위치 확인
 
 현재 구현 위치를 문서와 실제 프로젝트 기준으로 확인한다.
 
@@ -167,7 +198,7 @@ CHANGELOG 확인은 생략하지 않는다.
 - queue write 가능 여부
 - SendOrder/Kiwoom/GUI 연결 여부
 
-### 9. 현재 금지선 확인
+### 11. 현재 금지선 확인
 
 작업 시작 전 금지선을 다시 확인한다.
 
@@ -182,7 +213,7 @@ CHANGELOG 확인은 생략하지 않는다.
 - Queue Commit 금지 여부
 - Git commit/push 금지 여부
 
-### 10. 작업 범위 확인
+### 12. 작업 범위 확인
 
 현재 작업 범위를 명확히 확정한다.
 
@@ -196,7 +227,7 @@ CHANGELOG 확인은 생략하지 않는다.
 - UPDATE 생성 필요 여부
 - CHANGELOG 생성 필요 여부
 
-### 11. 구현 시작
+### 13. 구현 시작
 
 Recovery가 완료된 뒤에만 구현 또는 문서 작업을 시작한다.
 
@@ -211,7 +242,9 @@ Recovery가 완료된 뒤에만 구현 또는 문서 작업을 시작한다.
 
 Recovery 시 반드시 확인한다.
 
-- MASTER_SPEC 최신 날짜
+- MASTER_SPEC REFERENCE INDEX
+- 필요한 SUBPART
+- 필요 시 CURRENT Canonical 원본 검증 여부
 - UPDATE 존재 여부
 - CHANGELOG 최신 여부
 - 테스트 기준
@@ -227,7 +260,9 @@ Recovery는 다음 조건을 만족할 때 완료된다.
 
 - 현재 구현 위치를 이전 세션과 동일하게 설명할 수 있다.
 - 다음 구현 작업을 명확하게 특정할 수 있다.
-- 최신 MASTER_SPEC 파일명을 말할 수 있다.
+- MASTER_SPEC Reference Index 확인 여부를 말할 수 있다.
+- 필요한 SUBPART 확인 여부를 말할 수 있다.
+- 필요 시 CURRENT Canonical 원본 검증 여부를 말할 수 있다.
 - 미병합 UPDATE 존재 여부를 말할 수 있다.
 - 최신 CHANGELOG 확인 여부를 말할 수 있다.
 - 현재 금지선을 말할 수 있다.
@@ -260,7 +295,9 @@ Recovery 중 금지:
 □ README 확인
 □ AI_PROJECT_OPERATION_MANUAL_RELEASE 최신본 확인
 □ AI_SESSION_START_PROTOCOL 확인
-□ MASTER_SPEC CURRENT 최신 날짜 확인
+□ MASTER_SPEC REFERENCE INDEX 확인
+□ 필요한 SUBPART 확인
+□ 필요 시 CURRENT Canonical 원본 검증
 □ UPDATE INBOX 존재 여부 확인
 □ CHANGELOG 최신 여부 확인
 □ 테스트 기준 확인
@@ -271,4 +308,3 @@ Recovery 중 금지:
 □ Recovery 완료 조건 충족 확인
 □ 구현 또는 문서 작업 시작
 ```
-

@@ -8,7 +8,9 @@
 
 - docs 프로젝트 문서 작업
 - kiwoom_auto 구현 작업을 시작하기 전 문서 기준 확인
-- MASTER_SPEC Canonical 확인
+- MASTER_SPEC Reference Index 확인
+- 필요한 SUBPART 확인
+- 필요 시 MASTER_SPEC Canonical 원본 검증
 - UPDATE/INBOX 확인
 - CHANGELOG 확인
 - 작업 범위 결정
@@ -54,17 +56,38 @@
 - GitHub Source of Truth 원칙을 확인한다.
 - 금지사항과 보고 형식을 확인한다.
 
-### 4. CURRENT 최신 MASTER_SPEC 확인
+### 4. MASTER_SPEC REFERENCE INDEX 확인
 
-`00_CANONICAL/CURRENT`의 최신 `MASTER_SPEC_CANONICAL_*.txt`를 확인한다.
+`00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`를 확인한다.
 
 확인 기준:
 
-- 파일명 날짜가 가장 최신인 문서를 우선한다.
-- 같은 날짜가 여러 개이면 주제 범위와 LastWriteTime을 보조 기준으로 확인한다.
-- 최신 MASTER_SPEC를 현재 정책과 구조의 기준으로 사용한다.
+- Reference Edition의 PART와 SUBPART 구조를 확인한다.
+- 이번 작업에 필요한 섹션이 어느 SUBPART에 있는지 확인한다.
+- AI 일반 참조는 CURRENT Canonical 전체 파일보다 Reference Index를 우선한다.
 
-### 5. UPDATE/INBOX 확인
+### 5. 필요한 SUBPART 확인
+
+작업 주제와 관련된 SUBPART를 확인한다.
+
+확인 기준:
+
+- 필요한 섹션이 포함된 SUBPART를 우선 확인한다.
+- SUBPART는 원문을 요약하거나 생략하지 않은 AI 참조용 분할본으로 본다.
+- 필요한 경우 Legacy PART를 보조 참조한다.
+
+### 6. 필요 시 CURRENT Canonical 확인
+
+`00_CANONICAL/CURRENT`의 최신 `MASTER_SPEC_CANONICAL_*.txt`는 공식 원본 Source of Truth로 유지한다.
+
+확인 기준:
+
+- Reference Edition과 원본 검증이 필요한 경우 확인한다.
+- Reference 문서 간 충돌이 있는 경우 CURRENT Canonical을 확인한다.
+- 전체 원문 확인이 필요한 경우에만 CURRENT Canonical을 확인한다.
+- AI 일반 참조는 Reference Edition을 우선한다.
+
+### 7. UPDATE/INBOX 확인
 
 `10_UPDATE/INBOX`를 확인하여 미병합 UPDATE 문서가 있는지 확인한다.
 
@@ -75,7 +98,7 @@
 - 병합 완료 여부
 - 이번 작업과 충돌하는 UPDATE 존재 여부
 
-### 6. CHANGELOG 확인
+### 8. CHANGELOG 확인
 
 `00_CANONICAL/CHANGELOG`의 최신 CHANGELOG를 확인한다.
 
@@ -87,7 +110,7 @@
 - 테스트 현황
 - 금지선 유지 여부
 
-### 7. 현재 구현 위치 확인
+### 9. 현재 구현 위치 확인
 
 구현 작업을 시작해야 하는 경우 현재 구현 위치를 확인한다.
 
@@ -98,7 +121,7 @@
 - kiwoom_auto 작업이면 GitHub 최신 코드와 MASTER_SPEC 기준을 비교한다.
 - 현재 구현 계층, 미연결 계층, 금지 계층을 확인한다.
 
-### 8. 이번 작업 범위 결정
+### 10. 이번 작업 범위 결정
 
 작업 범위를 시작 전에 고정한다.
 
@@ -111,7 +134,7 @@
 - 테스트 범위를 정한다.
 - Git 작업 여부를 사용자 승인 기준으로 분리한다.
 
-### 9. 구현 시작
+### 11. 구현 시작
 
 구현 또는 문서 작업은 범위가 확정된 뒤 시작한다.
 
@@ -122,7 +145,7 @@
 - runtime, rules.json, GUI, ExecutionController(real), SendOrder는 명시 지시 없이는 수정하지 않는다.
 - 문서 작업 중에는 kiwoom_auto를 수정하지 않는다.
 
-### 10. 작업 종료 후 UPDATE 생성 여부 확인
+### 12. 작업 종료 후 UPDATE 생성 여부 확인
 
 작업 종료 후 UPDATE 생성이 필요한지 확인한다.
 
@@ -141,7 +164,9 @@ UPDATE가 필요하면 `10_UPDATE/INBOX`에 신규 UPDATE 문서를 생성한다
 □ GitHub docs 최신 상태 확인
 □ README 확인
 □ AI_PROJECT_OPERATION_MANUAL_RELEASE 최신 확인
-□ CURRENT 최신 MASTER_SPEC 확인
+□ MASTER_SPEC REFERENCE INDEX 확인
+□ 필요한 SUBPART 확인
+□ 필요 시 CURRENT Canonical 원본 검증
 □ UPDATE/INBOX 확인
 □ CHANGELOG 확인
 □ 현재 구현 위치 확인
@@ -162,4 +187,3 @@ UPDATE가 필요하면 `10_UPDATE/INBOX`에 신규 UPDATE 문서를 생성한다
 - Git push 금지
 - 파일 삭제 금지
 - 압축파일 생성 금지
-
