@@ -1,0 +1,70 @@
+STEP32_루틴지정창_MACD설정버튼_연결후보검증파일_생성보고_v2026-06-19
+
+작성 목적:
+본 문서는 STEP31에서 생성한 gui_routine_assign_window 연결 후보가
+최소한 import/창 생성 단계에서 깨지지 않는지 검증하기 위한 테스트 파일 생성 결과를 기록한다.
+
+------------------------------------------------------------
+1. 생성 파일
+------------------------------------------------------------
+
+생성 파일:
+- test_routine_assign_window_step32.py
+
+검증 대상:
+- gui_routine_assign_window.py
+- gui_macd_routine_settings_dialog.py
+
+------------------------------------------------------------
+2. 실행 전 배치
+------------------------------------------------------------
+
+프로젝트 루트에 아래 파일을 배치한다.
+
+1.
+gui_macd_routine_settings_dialog_STEP29.py
+→ gui_macd_routine_settings_dialog.py
+
+2.
+gui_routine_assign_window_STEP31_add_macd_settings_button.py
+→ gui_routine_assign_window.py
+
+3.
+test_routine_assign_window_step32.py
+
+------------------------------------------------------------
+3. 실행 명령
+------------------------------------------------------------
+
+python test_routine_assign_window_step32.py
+
+------------------------------------------------------------
+4. 검증 항목
+------------------------------------------------------------
+
+- RoutineAssignWindow import 가능
+- RoutineAssignWindow 객체 생성 가능
+- btn_routine_settings 존재
+- open_selected_routine_settings 메서드 존재
+- 메서드 callable 확인
+
+------------------------------------------------------------
+5. 기대 출력
+------------------------------------------------------------
+
+[OK] btn_routine_settings 존재
+[OK] open_selected_routine_settings 존재
+[OK] RoutineAssignWindow 생성 가능
+[OK] STEP32 루틴지정창 MACD 설정 버튼 연결 후보 검증 통과
+
+------------------------------------------------------------
+6. 금지 확인
+------------------------------------------------------------
+
+본 STEP32에서 수행하지 않은 것:
+- HOLD 추가 없음
+- CANCEL 구현 없음
+- BUY 확장 없음
+- 실주문 연결 없음
+- rules.json 저장 없음
+- 기존 파일 직접 수정 없음

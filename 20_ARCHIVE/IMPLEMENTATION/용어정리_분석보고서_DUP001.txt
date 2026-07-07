@@ -1,0 +1,68 @@
+
+용어 정리 분석 결과
+
+현재 문제
+---------
+'등록해제'라는 단어가 서로 다른 의미로 사용되고 있음.
+
+1. 종목관리(stocks)
+- 종목 등록
+- 종목 삭제(archive 이동)
+
+2. 루틴관리
+- 루틴 지정
+- 루틴 해제
+
+현재 혼용 사례
+-------------
+gui_stock_register_window.py
+gui_force_unregister_dialog.py
+
+이 두 파일은 실제로는 종목 삭제 기능인데
+UI에는 '등록해제'로 표시됨.
+
+권장 변경
+---------
+종목관리 영역
+
+기존:
+- 등록해제
+- 즉시 등록해제
+- 등록해제 불가
+- 등록해제 실행
+
+변경:
+- 종목 삭제
+- 즉시 삭제 가능
+- 삭제 불가
+- 삭제 실행
+
+루틴관리 영역
+
+유지:
+- 루틴 지정
+- 루틴 해제
+- 루틴 해제 가능
+- 루틴 해제 불가
+
+주의
+----
+gui_auto_trade_unregister.py
+gui_schedule_window.py
+
+이 영역은 실제 의미가
+'자동매매 등록해제'인지
+'종목 삭제'인지
+추가 판정 후 변경해야 함.
+
+우선순위
+--------
+1순위
+- gui_stock_register_window.py
+- gui_force_unregister_dialog.py
+
+2순위
+- gui_auto_trade_unregister.py
+- gui_schedule_window.py
+
+기능 변경 없이 UI 문구만 변경 가능.

@@ -1,0 +1,224 @@
+MASTER_SPEC_추가갱신_ADAPTER_READY_미사용정책_2026-07-03
+
+작성 목적
+- 본 문서는 주문 파이프라인 Preview 단계 이후, REAL_READY 다음 단계에서 ADAPTER_READY를 공식 주문 상태로 사용할지 여부를 검토한 결과를 MASTER_SPEC에 반영하기 위한 추가 갱신자료이다.
+- 결론은 ADAPTER_READY를 공식 상태로 사용하지 않는 것이다.
+- Adapter Request Preview는 상태 전이가 아니라 메모리 검토 결과로만 유지한다.
+
+==================================================
+1. 결론
+==================================================
+
+ADAPTER_READY는 공식 주문 상태로 사용하지 않는다.
+
+공식 흐름은 다음과 같이 고정한다.
+
+REAL_READY
+  ↓ Adapter Request Preview
+REAL_READY 유지
+  ↓ 최종 실행 승인/호출 시
+ORDER_QUEUED
+  ↓ SendOrder 결과
+DONE / ERROR
+
+즉 Adapter Request Preview는 order_queue.json의 status를 변경하지 않는다.
+
+==================================================
+2. ADAPTER_READY를 공식 상태로 사용하지 않는 이유
+==================================================
+
+1. REAL_READY와 역할이 겹친다.
+- REAL_READY는 이미 Real Preflight를 통과한 상태이다.
+- 이 상태는 실주문 직전 검토 가능 상태를 의미한다.
+- Adapter Request Preview는 REAL_READY 상태에서 요청 dict를 미리 확인하는 기능일 뿐이다.
+- 따라서 ADAPTER_READY를 별도 상태로 만들면 REAL_READY와 의미가 중복된다.
+
+2. 실주문 직전 단계가 과도하게 세분화된다.
+- REAL_READY 이후는 실주문 위험 구간이다.
+- 이 구간에서 상태값이 늘어나면 운영자가 현재 상태를 잘못 해석할 수 있다.
+- ADAPTER_READY가 있으면 “주문 준비 완료”처럼 오해될 수 있다.
+
+3. 파일 상태 변경이 불필요하다.
+- Adapter Preview는 메모리 dict 생성만으로 충분하다.
+- order_queue.json에 상태를 반영할 필요가 없다.
+- 파일 변경 없는 preview가 더 안전하다.
+
+4. 기존 real_order_executor_stub.py의 ADAPTER_READY 전이는 위험하다.
+- SendOrder는 호출하지 않더라도 queue 파일 상태를 REAL_READY -> ADAPTER_READY로 변경한다.
+- 자동 연결 시 실주문은 아니더라도 상태가 진행된 것처럼 보인다.
+- 따라서 real_order_executor_stub.py는 자동 연결하지 않는다.
+
+==================================================
+3. Adapter Request Preview 정책
+==================================================
+
+Adapter Request Preview는 상태값이 아니다.
+
+정책:
+- REAL_READY order 1건만 preview 대상이다.
+- build_kiwoom_order_request_preview_for_order(order_id, queue_path=None, guard_path=None)를 통해 메모리 dict만 생성한다.
+- send_order_stub() 호출 금지.
+- SendOrder 호출 금지.
+- order_queue.json 수정 금지.
+- status 변경 금지.
+- ADAPTER_READY 생성 금지.
+- 반환값에는 not_saved=True, send_order_called=False, send_order_stub_called=False를 명시한다.
+
+Preview 결과는 운영자/개발자 검토용이다.
+
+==================================================
+4. REAL_READY 유지 정책
+==================================================
+
+REAL_READY는 Adapter Preview 이후에도 그대로 유지한다.
+
+의미:
+- Real Preflight 통과.
+- Adapter Request Preview 가능.
+- 아직 SendOrder 아님.
+- 아직 ORDER_QUEUED 아님.
+- 아직 DONE 아님.
+
+REAL_READY 상태의 order는 아래 조건을 만족해야 다음 단계 검토가 가능하다.
+
+- status == REAL_READY
+- execution_enabled == true
+- real_trade_enabled == true
+- operator_confirmed == true
+- kiwoom_logged_in == true
+- account_selected == true
+- account_no 존재
+- quantity > 0
+- side가 BUY 또는 SELL
+- order_type/hoga 확정
+- 중복 주문 방지 lock 통과
+
+단, 이 조건들은 SendOrder 직전 조건이며 현재 단계에서 자동 연결하지 않는다.
+
+==================================================
+5. ORDER_QUEUED 정책
+==================================================
+
+ORDER_QUEUED는 실제 SendOrder 직전 또는 SendOrder 요청 등록 상태로만 사용한다.
+
+정책:
+- REAL_READY -> ORDER_QUEUED 자동 전환 금지.
+- Adapter Preview만으로 ORDER_QUEUED 전환 금지.
+- ORDER_QUEUED는 별도 최종 실행 함수/버튼에서만 생성 가능하다.
+- 최종 실행 전에는 guard와 중복 주문 방지 검사를 다시 수행해야 한다.
+- ORDER_QUEUED 이후에만 SendOrder 결과에 따라 DONE/ERROR 전이가 가능하다.
+
+==================================================
+6. SendOrder 전 최종 조건
+==================================================
+
+SendOrder는 아래 조건을 모두 만족하기 전까지 호출 금지이다.
+
+1. order.status == REAL_READY
+2. order.execution_enabled == true
+3. real_trade_guard.real_trade_enabled == true
+4. real_trade_guard.operator_confirmed == true
+5. real_trade_guard.kiwoom_logged_in == true
+6. real_trade_guard.account_selected == true
+7. real_trade_guard.account_no 존재
+8. quantity > 0
+9. side in BUY/SELL
+10. order_type 확정
+11. hoga 확정
+12. 중복 주문 방지 lock 통과
+13. 최종 실행 주체가 명확함
+14. GUI/운영자 승인 또는 명시 호출 존재
+
+현재 단계에서는 이 조건 검토만 하며 SendOrder 구현은 금지한다.
+
+==================================================
+7. real_order_executor_stub.py 처리 정책
+==================================================
+
+real_order_executor_stub.py는 자동 연결하지 않는다.
+
+이유:
+- REAL_READY를 읽어 adapter stub을 호출할 수 있다.
+- SendOrder는 호출하지 않지만 queue 상태를 ADAPTER_READY로 변경할 수 있다.
+- ADAPTER_READY는 공식 상태로 사용하지 않기로 결정했으므로 자동 연결 금지이다.
+
+허용:
+- 별도 분석 대상.
+- 기존 코드 보존.
+- 자동 Timer/GUI 연결 금지.
+
+금지:
+- REAL_READY -> ADAPTER_READY 자동 실행.
+- Timer Tick에서 호출.
+- GUI 버튼으로 직접 호출.
+- SendOrder 대체 경로로 사용.
+
+==================================================
+8. 공식 주문 파이프라인 반영
+==================================================
+
+최신 공식 파이프라인은 다음과 같다.
+
+PENDING
+  ↓ Approval Engine
+APPROVED / BLOCKED
+  ↓ Operation Policy Gate 단건
+EXECUTABLE / BLOCKED_POLICY
+  ↓ Real Preflight 단건
+REAL_READY / BLOCKED_REAL
+  ↓ Adapter Request Preview
+REAL_READY 유지
+  ↓ 최종 실행 승인 시
+ORDER_QUEUED
+  ↓ SendOrder 결과
+DONE / ERROR
+
+ADAPTER_READY는 공식 흐름에서 제외한다.
+
+==================================================
+9. 구현 금지사항
+==================================================
+
+현재 단계에서 금지:
+
+- ADAPTER_READY 상태 생성
+- REAL_READY -> ADAPTER_READY 전이
+- real_order_executor_stub 자동 연결
+- SendOrder 호출
+- send_order_stub 호출
+- order_executor 연결
+- kiwoom_order_adapter 실제 전송 연결
+- Timer/GUI 자동 실행 연결
+- execution_enabled=true 자동 전환
+- operator_confirmed=true 자동 설정
+- ORDER_QUEUED 자동 생성
+- DONE/ERROR 자동 전이
+
+==================================================
+10. 다음 작업 후보
+==================================================
+
+다음에 진행 가능한 안전 작업은 다음 중 하나이다.
+
+1. hoga/order_type 매핑 설계 분석
+2. Adapter Request Preview 결과 필드 검증
+3. SendOrder 전 guard 체크리스트 문서화
+4. 중복 주문 방지 order id lock 설계
+5. GUI 주문후보 목록/수동 승인 다이얼로그 설계
+6. ORDER_QUEUED 상태 생성 주체 설계
+
+단, 이 중 어느 것도 자동 실주문 연결로 진행하면 안 된다.
+
+==================================================
+최종 결론
+==================================================
+
+ADAPTER_READY는 공식 상태로 사용하지 않는다.
+
+Adapter Request Preview는 파일 상태가 아니라 메모리 검토 결과이다.
+
+REAL_READY는 preview 이후에도 유지한다.
+
+ORDER_QUEUED는 실제 SendOrder 직전/요청 등록 상태로만 사용한다.
+
+SendOrder 구현은 별도 승인, guard, order_type/hoga, 중복 방지 lock 설계 이후에만 검토한다.

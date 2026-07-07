@@ -1,0 +1,174 @@
+# AutoTradeSettingWindow 남은 메서드 점검
+
+- 파일: gui_auto_trade_setting_window(5).py
+- 전체 라인 수: 2,961
+- AutoTradeSettingWindow 메서드 수: 86
+
+## 큰 메서드 TOP 20
+
+- load_selected_routine_stocks: 431줄 (1893-2323)
+- confirm_stop_targets_once: 65줄 (2663-2727)
+- save_selected_manual_ats_state: 59줄 (1566-1624)
+- __init__: 53줄 (1093-1145)
+- _setup_ui: 51줄 (1147-1197)
+- toggle_selected_manual_override_flag: 51줄 (1723-1773)
+- open_selected_manual_ats_settings_dialog: 44줄 (1626-1669)
+- _setup_stock_table: 42줄 (1224-1265)
+- reset_selected_manual_override: 42줄 (1775-1816)
+- split_start_targets: 37줄 (2568-2604)
+- mark_review_required: 34줄 (2369-2402)
+- show_auto_trade_result_dialog: 34줄 (2729-2762)
+- load_routine_table: 32줄 (1818-1849)
+- split_stop_targets: 32줄 (2606-2637)
+- sort_stock_table_by_column: 30줄 (1332-1361)
+- show_selected_ats_immediate_sell_placeholder: 30줄 (1678-1707)
+- _apply_stock_table_column_widths: 26줄 (1267-1292)
+- pre_start_review_check: 25줄 (2343-2367)
+- _setup_routine_table: 24줄 (1199-1222)
+- on_stock_table_item_double_clicked: 24줄 (1492-1515)
+
+## 전체 메서드 목록
+
+- __init__: 53줄 (1093-1145)
+- _setup_ui: 51줄 (1147-1197)
+- _setup_routine_table: 24줄 (1199-1222)
+- _setup_stock_table: 42줄 (1224-1265)
+- _apply_stock_table_column_widths: 26줄 (1267-1292)
+- _connect_events: 17줄 (1294-1310)
+- sort_routine_table_by_column: 19줄 (1312-1330)
+- sort_stock_table_by_column: 30줄 (1332-1361)
+- apply_auto_trade_table_sorts: 6줄 (1363-1368)
+- refresh_all: 20줄 (1370-1389)
+- current_time_policy_minute_key: 2줄 (1391-1392)
+- current_runtime_file_signature: 2줄 (1394-1395)
+- on_runtime_file_timer_tick: 2줄 (1397-1398)
+- on_time_policy_timer_tick: 2줄 (1400-1401)
+- closeEvent: 11줄 (1403-1413)
+- capture_stock_table_view_state: 17줄 (1415-1431)
+- restore_stock_table_view_state: 17줄 (1433-1449)
+- reset_runtime_statuses_on_window_start: 3줄 (1451-1453)
+- selected_stock_rows: 2줄 (1455-1456)
+- has_selected_stock: 2줄 (1458-1459)
+- has_single_selected_stock: 2줄 (1461-1462)
+- update_action_buttons: 12줄 (1464-1475)
+- on_stock_selection_changed: 2줄 (1477-1478)
+- operation_stock_dir_from_row: 11줄 (1480-1490)
+- on_stock_table_item_double_clicked: 24줄 (1492-1515)
+- ensure_context_row_selected: 2줄 (1517-1518)
+- select_all_current_routine_stocks: 2줄 (1520-1521)
+- clear_current_routine_stock_selection: 2줄 (1523-1524)
+- on_stock_table_context_menu: 2줄 (1526-1527)
+- open_selected_individual_liquidation_settings: 2줄 (1529-1530)
+- individual_liquidation_status_text: 8줄 (1532-1539)
+- save_selected_individual_liquidation_settings: 2줄 (1541-1542)
+- selected_manual_ats_state: 21줄 (1544-1564)
+- save_selected_manual_ats_state: 59줄 (1566-1624)
+- open_selected_manual_ats_settings_dialog: 44줄 (1626-1669)
+- set_selected_manual_ats_flag: 6줄 (1671-1676)
+- show_selected_ats_immediate_sell_placeholder: 30줄 (1678-1707)
+- selected_operation_mode_set: 13줄 (1709-1721)
+- toggle_selected_manual_override_flag: 51줄 (1723-1773)
+- reset_selected_manual_override: 42줄 (1775-1816)
+- load_routine_table: 32줄 (1818-1849)
+- current_selected_routine_name: 11줄 (1851-1861)
+- current_selected_routine_dir: 19줄 (1863-1881)
+- restore_routine_selection: 6줄 (1883-1888)
+- on_routine_selection_changed: 2줄 (1890-1891)
+- load_selected_routine_stocks: 431줄 (1893-2323)
+- selected_stock_dir: 2줄 (2325-2326)
+- selected_stock_info: 2줄 (2328-2329)
+- selected_stock_infos: 2줄 (2331-2332)
+- int_state_value: 5줄 (2334-2338)
+- resume_status_after_pause: 2줄 (2340-2341)
+- pre_start_review_check: 25줄 (2343-2367)
+- mark_review_required: 34줄 (2369-2402)
+- update_stock_status: 18줄 (2404-2421)
+- operation_policy_protected_status: 2줄 (2423-2424)
+- recalculate_stock_status_by_operation_policy: 18줄 (2426-2443)
+- recalculate_all_status_by_operation_policy: 12줄 (2444-2455)
+- update_stock_operation_mode: 16줄 (2456-2471)
+- unregister_selected_auto_trade_stocks: 2줄 (2473-2474)
+- statusBar_message: 8줄 (2476-2483)
+- open_operation_environment_settings: 6줄 (2486-2491)
+- open_selected_stock_policy_settings: 10줄 (2493-2502)
+- set_global_schedule_time: 3줄 (2504-2506)
+- open_schedule_trade_management_window: 4줄 (2508-2511)
+- set_selected_individual_schedule_time: 23줄 (2513-2535)
+- reset_selected_schedule_to_global: 14줄 (2537-2550)
+- set_selected_schedule_operation_mode: 2줄 (2552-2553)
+- set_selected_operation_mode: 6줄 (2555-2560)
+- set_selected_stocks_buy_end: 2줄 (2562-2563)
+- run_current_routine_stability_check: 2줄 (2565-2566)
+- split_start_targets: 37줄 (2568-2604)
+- split_stop_targets: 32줄 (2606-2637)
+- stop_risk_parts: 12줄 (2639-2650)
+- stop_warning_items: 10줄 (2652-2661)
+- confirm_stop_targets_once: 65줄 (2663-2727)
+- show_auto_trade_result_dialog: 34줄 (2729-2762)
+- start_selected_auto_trades: 2줄 (2764-2765)
+- apply_selected_early_close_default: 2줄 (2768-2769)
+- apply_selected_early_close_profit_loss: 2줄 (2771-2772)
+- apply_selected_early_close: 19줄 (2774-2792)
+- stop_selected_auto_trades: 2줄 (2793-2794)
+- open_review_required_window: 2줄 (2796-2797)
+- statusBarMessage: 14줄 (2799-2812)
+- open_order_status_window: 2줄 (2814-2815)
+- open_log_view_window: 2줄 (2817-2818)
+- show_deferred_message: 2줄 (2820-2821)
+
+## 후보 그룹 요약
+
+- 테이블/목록 로딩: 18개 / 약 721줄
+  - load_selected_routine_stocks: 431줄
+  - _setup_stock_table: 42줄
+  - load_routine_table: 32줄
+  - sort_stock_table_by_column: 30줄
+  - _apply_stock_table_column_widths: 26줄
+  - _setup_routine_table: 24줄
+  - on_stock_table_item_double_clicked: 24줄
+  - refresh_all: 20줄
+- 수동/ATS/운영설정: 22개 / 약 386줄
+  - save_selected_manual_ats_state: 59줄
+  - toggle_selected_manual_override_flag: 51줄
+  - open_selected_manual_ats_settings_dialog: 44줄
+  - reset_selected_manual_override: 42줄
+  - show_selected_ats_immediate_sell_placeholder: 30줄
+  - set_selected_individual_schedule_time: 23줄
+  - selected_manual_ats_state: 21줄
+  - recalculate_stock_status_by_operation_policy: 18줄
+- 종목등록/루틴: 15개 / 약 72줄
+  - current_selected_routine_dir: 19줄
+  - update_stock_status: 18줄
+  - current_selected_routine_name: 11줄
+  - has_selected_stock: 2줄
+  - has_single_selected_stock: 2줄
+  - on_stock_selection_changed: 2줄
+  - select_all_current_routine_stocks: 2줄
+  - clear_current_routine_stock_selection: 2줄
+- 검토/안정성/상태: 9개 / 약 98줄
+  - mark_review_required: 34줄
+  - pre_start_review_check: 25줄
+  - statusBarMessage: 14줄
+  - individual_liquidation_status_text: 8줄
+  - statusBar_message: 8줄
+  - reset_runtime_statuses_on_window_start: 3줄
+  - resume_status_after_pause: 2줄
+  - open_review_required_window: 2줄
+- 주문/로그/청산: 8개 / 약 74줄
+  - show_auto_trade_result_dialog: 34줄
+  - apply_selected_early_close: 19줄
+  - closeEvent: 11줄
+  - open_selected_individual_liquidation_settings: 2줄
+  - save_selected_individual_liquidation_settings: 2줄
+  - apply_selected_early_close_default: 2줄
+  - apply_selected_early_close_profit_loss: 2줄
+  - open_log_view_window: 2줄
+- 기타 UI: 14개 / 약 294줄
+  - confirm_stop_targets_once: 65줄
+  - __init__: 53줄
+  - _setup_ui: 51줄
+  - split_start_targets: 37줄
+  - split_stop_targets: 32줄
+  - _connect_events: 17줄
+  - update_action_buttons: 12줄
+  - stop_risk_parts: 12줄

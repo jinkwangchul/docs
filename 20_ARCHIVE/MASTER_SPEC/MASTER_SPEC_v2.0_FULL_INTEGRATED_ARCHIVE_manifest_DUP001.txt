@@ -1,0 +1,29 @@
+MASTER_SPEC v2.0 FULL INTEGRATED ARCHIVE - 포함 파일 매니페스트
+생성일시: 2026-06-11 12:17:00
+
+포함 파일:
+01. MASTER_SPEC_v1.1_vs_v1.2_변경점(4).md | 515 lines | 4,914 chars
+02. MASTER_SPEC_v1.1_윈도우창버전_키움자동매매(5).txt | 2,313 lines | 24,482 chars
+03. MASTER_SPEC_v1.2_structure_phase2(6).txt | 1,289 lines | 12,357 chars
+04. MASTER_SPEC_v1.2_갱신메모_v2026_06_07(5).txt | 103 lines | 1,138 chars
+05. MASTER_SPEC_v1.3_2026-06-08(4).txt | 69 lines | 587 chars
+06. MASTER_SPEC_v1.4_2026-06-09(4).txt | 59 lines | 657 chars
+07. MASTER_SPEC_v1.4_2026-06-09(5).txt | 59 lines | 657 chars
+08. MASTER_SPEC_v1.4_2026-06-09(6).txt | 59 lines | 657 chars
+09. MASTER_SPEC_v1.5_2026-06-11_통합갱신본(1).txt | 252 lines | 3,155 chars
+10. MASTER_SPEC_v1.5_2026-06-11_통합갱신본.txt | 252 lines | 3,155 chars
+11. MASTER_ADDENDUM_v2026-06-10_ATS정책(1).txt | 55 lines | 409 chars
+12. MASTER_ADDENDUM_v2026-06-10_ATS정책(2).txt | 55 lines | 409 chars
+13. MASTER_ADDENDUM_v2026-06-10_ATS정책(3).txt | 55 lines | 409 chars
+14. MASTER_ADDENDUM_v2026-06-11_구조개선_최신확정(1).txt | 61 lines | 1,146 chars
+15. MASTER_ADDENDUM_v2026-06-11_구조개선_최신확정.txt | 61 lines | 1,146 chars
+16. MASTER_SPEC(4).txt | 3 lines | 101 chars
+17. MASTER_SPEC_업데이트_2026-06-07(3).md | 61 lines | 478 chars
+
+출력 파일:
+MASTER_SPEC_v2.0_FULL_INTEGRATED_ARCHIVE_2026-06-11.txt
+
+방식:
+- 기존 문서 원문 전체를 파일별 섹션으로 보존
+- 앞부분에 최신 기준 요약과 적용 우선순위 제공
+- 방금 생성된 부실 축약본 v2.0_통합최종본은 제외

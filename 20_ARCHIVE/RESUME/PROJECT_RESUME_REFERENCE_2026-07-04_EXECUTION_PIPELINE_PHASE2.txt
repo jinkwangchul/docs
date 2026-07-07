@@ -1,0 +1,305 @@
+PROJECT_RESUME_REFERENCE_2026-07-04_EXECUTION_PIPELINE_PHASE2
+용도: 다음 대화창/코덱스 작업재개 참조 문서
+기준: MASTER_SPEC_CANONICAL_READABLE_2026-07-04.txt를 유일 기준으로 유지
+압축파일: kiwoom_auto (37)(1).zip은 읽기 전용 참조 자료. 압축 생성/수정 금지.
+
+============================================================
+1. 현재 작업의 큰 목적
+============================================================
+키움 자동매매 프로젝트에서 실제 SendOrder 호출 전/후 실행 체인을 Preview / Review / Commit 구조로 분리했다.
+모든 단계는 독립 서비스로 구현되며, write 가능 계층만 명시 path + 수동 confirmation + stale snapshot + backup + atomic write를 사용한다.
+
+현재 실제 Kiwoom SendOrder/dynamicCall/OnReceiveChejanData는 연결하지 않았다.
+현재 GUI/Timer/자동 루프도 실제 SendOrder 또는 Chejan 처리와 연결하지 않았다.
+
+============================================================
+2. 현재 전체 체인
+============================================================
+Signal
+→ Candidate
+→ Approval
+→ Operation Policy
+→ Execution Enable
+→ REAL Ready
+→ Execution Preview
+→ Queue Preview
+→ Queue Commit
+→ Record Review
+→ Kiwoom Request Preview
+→ Final Send Gate
+→ SendOrder Entrypoint
+→ Result Recorder
+→ Result Review
+→ Chejan Normalizer
+→ Chejan Review
+→ Chejan Recorder
+→ Execution Fill Recorder
+→ Position Update
+→ Order Fill State Review
+→ Order Fill State Commit [다음 작업]
+
+============================================================
+3. 현재 완료된 파일/서비스별 책임
+============================================================
+
+execution_enable_service.py
+- EXECUTABLE order의 execution_enabled 수동 활성화 Preview/Commit.
+- Commit 성공 시 execution_enabled=True, status는 EXECUTABLE 유지.
+- REAL_READY 생성 금지.
+- SendOrder 금지.
+
+real_order_preflight_service.py
+- EXECUTABLE + execution_enabled=True order의 REAL_READY 수동 점검 Preview/Commit.
+- Commit 성공 시 REAL_READY.
+- Execution Preview 자동 호출 금지.
+- SendOrder 금지.
+
+execution_preview_service.py
+- REAL_READY order를 대상으로 Preview/Approval/Candidate/Queue Pending/Queue Writer Dry-Run 결과 생성.
+- report에 Approval/Candidate/Queue Pending/Queue Writer Dry-Run 표시 가능.
+- write 없음.
+
+execution_queue_pending_service.py
+- Candidate 이후 Queue Writer에 넘길 pending 후보 생성.
+- ORDER_QUEUED 생성 아님.
+
+execution_queue_writer.py
+- preview_execution_queue_write(...): ORDER_QUEUED record preview만 생성.
+- commit_execution_queue_write(...): 명시 queue_path에만 ORDER_QUEUED append.
+- actual SendOrder 없음.
+
+execution_queue_commit_service.py
+- GUI 수동 Queue 저장 버튼이 호출하는 wrapper.
+- runtime path 사용 시 manual_runtime_queue_write_confirmed 필요.
+- Preview 버튼과 분리.
+
+order_queued_review_service.py
+- ORDER_QUEUED record 구조와 execution_request 정합성 검토.
+- next_stage: SEND_ORDER_REQUEST_PREVIEW_REQUIRED.
+- write 없음.
+
+kiwoom_send_order_preview_service.py
+- Kiwoom SendOrder 요청 후보 dict preview.
+- Kiwoom 숫자 코드 매핑 없음.
+- SendOrder 없음.
+- next_stage: FINAL_SEND_GATE_REQUIRED.
+
+final_send_gate_service.py
+- SendOrder EntryPoint 직전 최종 수동 Gate.
+- current guard, account, stale snapshot, final confirmation 확인.
+- next_stage: SEND_ORDER_ENTRYPOINT_REQUIRED.
+- SendOrder 없음.
+
+send_order_entrypoint.py
+- 단일 SendOrder 진입점 구조.
+- 현재는 mock broker adapter send_order(request)만 호출.
+- 실제 Kiwoom adapter/dynamicCall 없음.
+- runtime write 없음.
+
+send_order_result_recorder.py
+- EntryPoint 성공 result를 명시 queue_path의 record에 기록.
+- send_order_called=True 기록.
+- EntryPoint 재호출 없음.
+- SendOrder 없음.
+
+send_order_result_review_service.py
+- SendOrder 결과 기록이 queue record에 일관되게 남았는지 검토.
+- 체결 확인 아님.
+- next_stage: CHEJAN_OR_EXECUTION_EVENT_REQUIRED.
+
+chejan_event_normalizer.py
+- Kiwoom raw Chejan event를 내부 표준 event로 변환.
+- request_hash/lock_id/execution_id 추정 금지.
+- write 없음.
+
+chejan_event_review_service.py
+- normalized Chejan event와 order record 연결 가능성 검토.
+- PARTIAL/FULL fill이면 FILL_RECORD_REQUIRED.
+- 접수/거부/취소 계열이면 CHEJAN_EVENT_RECORD_REQUIRED.
+- write 없음.
+
+chejan_event_recorder.py
+- Chejan review 통과 event를 order_queue record chejan_events 배열에 기록.
+- broker_order_no 보강 가능.
+- status 변경 없음.
+- fills/positions 생성 없음.
+
+execution_fill_recorder.py
+- PARTIAL_FILL/FULL_FILL만 fills.json에 기록.
+- 명시 fill_path 필수.
+- positions/order_queue 수정 없음.
+- next_stage: POSITION_UPDATE_REQUIRED.
+
+position_update_service.py
+- fill_record 기반 positions.json 갱신.
+- BUY: 신규/기존 position 반영, 평균단가 계산.
+- SELL: 수량 감소, 초과 차단, 0주면 CLOSED.
+- 실현손익 계산 없음.
+- order_queue 수정 없음.
+- next_stage: ORDER_FILL_STATE_REVIEW_REQUIRED.
+
+order_fill_state_service.py
+- Position Update 이후 order_queue 체결 상태 후보 review.
+- PARTIAL_FILL → PARTIALLY_FILLED 후보.
+- FULL_FILL → FILLED 후보.
+- 아직 commit/write 없음.
+- next_stage: ORDER_FILL_STATE_COMMIT_REQUIRED.
+
+============================================================
+4. GUI 상태
+============================================================
+현재 GUI 수동 버튼 흐름:
+
+수동 실주문 후보 활성화
+→ REAL_READY 수동 점검
+→ Execution Preview
+→ 수동 Queue 저장
+
+각 버튼은 독립 동작한다.
+- 수동 실주문 후보 활성화: execution_enabled=True만 수행.
+- REAL_READY 수동 점검: REAL_READY 전환만 수행.
+- Execution Preview: preview/report만 수행.
+- 수동 Queue 저장: Preview 결과 기반 ORDER_QUEUED 저장만 수행.
+
+자동 호출 금지:
+- REAL_READY 성공 후 Execution Preview 자동 호출 없음.
+- Execution Preview 성공 후 Queue 저장 자동 호출 없음.
+- Queue 저장 후 SendOrder 자동 호출 없음.
+
+============================================================
+5. 현재 runtime 상태
+============================================================
+현재 runtime/order_queue.json에는 실제 수동 체인 검증 가능한 order가 없다.
+- orders count: 1
+- status: PENDING
+- side: SELL
+- quantity: 0
+- candidate_status: NO_HOLDING_QTY
+- execution_enabled: False
+- REAL_READY 없음
+- EXECUTABLE 없음
+- runtime/real_trade_guard.json 없음
+
+따라서 실제 runtime 수동 실행 체인은 현재 차단된다.
+실제 검증은 temp fixture 기반 통합 테스트로 수행했다.
+
+============================================================
+6. 통합 테스트로 검증된 체인
+============================================================
+Temp queue 기반 통합 테스트에서 다음 흐름 검증 완료.
+
+BUY CANDIDATE_READY PENDING
+→ APPROVED
+→ EXECUTABLE
+→ execution_enabled=True
+→ REAL_READY
+→ Execution Preview
+→ Approval
+→ Candidate
+→ Queue Pending
+→ Queue Writer Dry-Run
+
+이후 SendOrder 전/후 및 Chejan/Fill/Position/Order Fill State Review 계층은 각각 단위 테스트로 검증.
+
+============================================================
+7. 금지선
+============================================================
+다음 금지선은 다음 창에서도 유지한다.
+
+- runtime 기본 경로 자동 접근 금지.
+- 명시 path 없이 write 금지.
+- Preview에서 write 금지.
+- Review에서 write 금지.
+- SendOrder 자동호출 금지.
+- GUI 버튼 간 자동 호출 금지.
+- Timer/자동 루프 연결 금지.
+- 실제 Kiwoom SendOrder/dynamicCall 연결 금지.
+- 실제 OnReceiveChejanData 연결 금지.
+- fills/positions/order_queue 자동 연쇄 갱신 금지.
+- status 변경은 Commit 계층에서만.
+- 모든 write는 backup + stale snapshot + atomic write.
+- 압축파일 생성 금지.
+
+============================================================
+8. 다음 작업: Order Fill State Commit
+============================================================
+다음 구현 대상:
+- order_fill_state_service.py
+- tests/test_order_fill_state_service.py
+
+추가할 함수 후보:
+commit_order_fill_state(
+    order_fill_state_review_result,
+    queue_path,
+    queue_snapshot=None,
+    context=None,
+    backup=True,
+)
+
+목표:
+- review_order_fill_state(...) 성공 결과만 입력 허용.
+- 명시 queue_path의 대상 order record에 체결 상태 반영.
+- PARTIAL_FILL → status PARTIALLY_FILLED.
+- FULL_FILL → status FILLED.
+- next_stage: ORDER_LIFECYCLE_REVIEW_REQUIRED.
+
+필수 조건 후보:
+- order_fill_state_review_ok == True
+- next_stage == ORDER_FILL_STATE_COMMIT_REQUIRED
+- context.manual_order_fill_state_commit_confirmed == True
+- queue_path 명시 필수
+- 대상 order 존재
+- order_id/order_queued_id/request_hash/lock_id/execution_id/fill_id 일치
+- status 전이 허용:
+  - ORDER_QUEUED → PARTIALLY_FILLED
+  - ORDER_QUEUED → FILLED
+  - PARTIALLY_FILLED → FILLED
+- 이미 FILLED이면 차단
+- stale snapshot 차단
+
+기록 필드 후보:
+- status
+- fill_state
+- last_fill_id
+- last_fill_at
+- last_fill_quantity
+- last_fill_price
+- total_filled_quantity
+- remaining_quantity
+- fill_event_count
+- position_update_applied=True
+- position_update_stage
+- position_id
+- order_fill_state_updated_at
+- filled_at [FULL_FILL일 때]
+- updated_at
+
+금지:
+- fills.json 수정 금지.
+- positions.json 수정 금지.
+- SendOrder 재호출 금지.
+- Chejan 실제 연결 금지.
+- GUI/Timer 연결 금지.
+
+============================================================
+9. 테스트 최신 기준
+============================================================
+최신 전체 unittest: 643 tests OK.
+py_compile 통과.
+runtime/order_queue.json SHA256 변경 없음.
+rules.json SHA256 변경 없음.
+runtime/fills.json 미생성.
+runtime/positions.json 미생성.
+
+============================================================
+10. 압축파일 참고
+============================================================
+첨부 압축파일:
+kiwoom_auto (37)(1).zip
+
+분석 결과:
+- 프로젝트 전체 압축본.
+- 약 4,732개 항목.
+- .git, .codex, .agents, 소스/테스트/runtime 일부 포함.
+- 읽기 전용 참조용으로 사용.
+- 압축파일 생성/수정 금지.

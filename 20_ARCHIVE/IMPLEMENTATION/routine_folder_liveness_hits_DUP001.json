@@ -1,0 +1,955 @@
+{
+  "hits": {
+    "_MACD매매루틴": [
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 257,
+        "text": "예: _MACD매매루틴 -> MACD매매루틴"
+      },
+      {
+        "file": "gui_auto_trade_runtime.py",
+        "line": 160,
+        "text": "과거 _MACD매매루틴, _등록확인폴더 잔재가 아니라 중앙 종목 상태를 기준으로 동작한다."
+      },
+      {
+        "file": "gui_auto_trade_setting_window.py",
+        "line": 350,
+        "text": "예: _MACD매매루틴 -> MACD매매루틴"
+      },
+      {
+        "file": "gui_review_required_window.py",
+        "line": 82,
+        "text": "예: _MACD매매루틴 -> MACD매매루틴"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 251,
+        "text": "예: _MACD매매루틴 -> MACD매매루틴"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 257,
+        "text": "예: _MACD매매루틴 -> MACD매매루틴"
+      },
+      {
+        "file": "make_sample_orders.py",
+        "line": 11,
+        "text": "_MACD매매루틴/035420_NAVER/orders.json"
+      },
+      {
+        "file": "make_sample_orders.py",
+        "line": 33,
+        "text": "TARGET_STOCK_DIR = PROJECT_ROOT / \"_MACD매매루틴\" / \"035420_NAVER\""
+      },
+      {
+        "file": "make_sample_orders_multi_day.py",
+        "line": 11,
+        "text": "_MACD매매루틴/035420_NAVER/orders.json"
+      },
+      {
+        "file": "make_sample_orders_multi_day.py",
+        "line": 29,
+        "text": "TARGET_STOCK_DIR = PROJECT_ROOT / \"_MACD매매루틴\" / \"035420_NAVER\""
+      },
+      {
+        "file": "make_sample_orders_multi_day_with_fee.py",
+        "line": 11,
+        "text": "_MACD매매루틴/035420_NAVER/orders.json"
+      },
+      {
+        "file": "make_sample_orders_multi_day_with_fee.py",
+        "line": 28,
+        "text": "TARGET_STOCK_DIR = PROJECT_ROOT / \"_MACD매매루틴\" / \"035420_NAVER\""
+      }
+    ],
+    "_등록확인폴더": [
+      {
+        "file": "gui_auto_trade_runtime.py",
+        "line": 160,
+        "text": "과거 _MACD매매루틴, _등록확인폴더 잔재가 아니라 중앙 종목 상태를 기준으로 동작한다."
+      }
+    ],
+    "budget.json": [
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 13,
+        "text": "- budget.json 이 있는 폴더만 루틴으로 인정"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 239,
+        "text": "- budget.json 이 있는 폴더만 루틴으로 인정"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 247,
+        "text": "and (path / \"budget.json\").exists()"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 1271,
+        "text": "_ 로 시작하고 budget.json 이 있는 폴더만 루틴으로 인정한다."
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 1280,
+        "text": "budget_path = routine_dir / \"budget.json\""
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 6804,
+        "text": "budget = read_json_dict(routine_dir / \"budget.json\")"
+      },
+      {
+        "file": "gui_auto_trade_setting_window.py",
+        "line": 332,
+        "text": "- budget.json 이 있는 폴더만 루틴으로 인정"
+      },
+      {
+        "file": "gui_auto_trade_setting_window.py",
+        "line": 340,
+        "text": "and (path / \"budget.json\").exists()"
+      },
+      {
+        "file": "gui_auto_trade_setting_window.py",
+        "line": 1320,
+        "text": "budget = read_json_dict(routine_dir / \"budget.json\")"
+      },
+      {
+        "file": "gui_integrity_check_window.py",
+        "line": 80,
+        "text": "(\"budget_json\", \"budget.json 검증\"),"
+      },
+      {
+        "file": "gui_main_table_loader.py",
+        "line": 144,
+        "text": "\"\"\"budget.json이 있는 루틴 폴더를 메인 좌측 루틴표에 표시한다."
+      },
+      {
+        "file": "gui_main_table_loader.py",
+        "line": 157,
+        "text": "budget_path = routine_dir / \"budget.json\""
+      },
+      {
+        "file": "gui_review_required_window.py",
+        "line": 64,
+        "text": "- budget.json 이 있는 폴더만 루틴으로 인정"
+      },
+      {
+        "file": "gui_review_required_window.py",
+        "line": 72,
+        "text": "and (path / \"budget.json\").exists()"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 13,
+        "text": "- budget.json 이 있는 폴더만 루틴으로 인정"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 233,
+        "text": "- budget.json 이 있는 폴더만 루틴으로 인정"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 241,
+        "text": "and (path / \"budget.json\").exists()"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 820,
+        "text": "_ 로 시작하고 budget.json 이 있는 폴더만 루틴으로 인정한다."
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 829,
+        "text": "budget_path = routine_dir / \"budget.json\""
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 3853,
+        "text": "budget = read_json_dict(routine_dir / \"budget.json\")"
+      },
+      {
+        "file": "gui_stock_register_window.py",
+        "line": 13,
+        "text": "- budget.json 이 있는 폴더만 루틴으로 인정"
+      },
+      {
+        "file": "gui_windows.py",
+        "line": 13,
+        "text": "- budget.json 이 있는 폴더만 루틴으로 인정"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 13,
+        "text": "- budget.json 이 있는 폴더만 루틴으로 인정"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 239,
+        "text": "- budget.json 이 있는 폴더만 루틴으로 인정"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 247,
+        "text": "and (path / \"budget.json\").exists()"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 1271,
+        "text": "_ 로 시작하고 budget.json 이 있는 폴더만 루틴으로 인정한다."
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 1280,
+        "text": "budget_path = routine_dir / \"budget.json\""
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 6621,
+        "text": "budget = read_json_dict(routine_dir / \"budget.json\")"
+      },
+      {
+        "file": "integrity_checker.py",
+        "line": 115,
+        "text": "and (path / \"budget.json\").exists()"
+      },
+      {
+        "file": "integrity_checker.py",
+        "line": 276,
+        "text": "f\"_{routine_name}/budget.json 확인\","
+      },
+      {
+        "file": "integrity_checker.py",
+        "line": 291,
+        "text": "budget_path = routine_dir / \"budget.json\""
+      },
+      {
+        "file": "integrity_checker.py",
+        "line": 298,
+        "text": "\"budget.json 오류\","
+      },
+      {
+        "file": "registry_migratio/stock_registry_step1_analyzer.py",
+        "line": 74,
+        "text": "# 현재 프로젝트는 budget.json이 없는 등록확인폴더도 사실상 루틴/분류 폴더로 쓰인다."
+      },
+      {
+        "file": "stock_migration_to_central_stocks.py",
+        "line": 66,
+        "text": "# budget.json이 있는 폴더를 루틴 폴더로 본다."
+      },
+      {
+        "file": "stock_migration_to_central_stocks.py",
+        "line": 67,
+        "text": "return (path / \"budget.json\").exists()"
+      }
+    ],
+    "get_routine_dirs": [
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 231,
+        "text": "def get_routine_dirs() -> list[Path]:"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 607,
+        "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 917,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 1273,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 1428,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 2796,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 3064,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 3099,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 4471,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 4946,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 6798,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 7641,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 8939,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 9014,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_auto_trade_setting_window.py",
+        "line": 324,
+        "text": "def get_routine_dirs() -> list[Path]:"
+      },
+      {
+        "file": "gui_auto_trade_setting_window.py",
+        "line": 425,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_auto_trade_setting_window.py",
+        "line": 1314,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "gui_auto_trade_status_ops.py",
+        "line": 76,
+        "text": "def get_routine_dirs() -> list[Path]:"
+      },
+      {
+        "file": "gui_auto_trade_status_ops.py",
+        "line": 327,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_global_review_required_window.py",
+        "line": 40,
+        "text": "get_routine_dirs,"
+      },
+      {
+        "file": "gui_global_review_required_window.py",
+        "line": 66,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_global_review_required_window.py",
+        "line": 541,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_main_table_loader.py",
+        "line": 41,
+        "text": "get_routine_dirs,"
+      },
+      {
+        "file": "gui_main_table_loader.py",
+        "line": 149,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "gui_review_required_window.py",
+        "line": 56,
+        "text": "def get_routine_dirs() -> list[Path]:"
+      },
+      {
+        "file": "gui_review_required_window.py",
+        "line": 402,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_review_required_window.py",
+        "line": 872,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_routine_assign_window.py",
+        "line": 79,
+        "text": "get_routine_dirs,"
+      },
+      {
+        "file": "gui_routine_assign_window.py",
+        "line": 93,
+        "text": "for path in get_routine_dirs():"
+      },
+      {
+        "file": "gui_routine_assign_window.py",
+        "line": 612,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "gui_routine_assign_window.py",
+        "line": 880,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_routine_assign_window.py",
+        "line": 915,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 225,
+        "text": "def get_routine_dirs() -> list[Path]:"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 554,
+        "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 822,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 877,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 1704,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 1972,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 2007,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 2535,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 3695,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 3847,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 4316,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 5167,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 5239,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_stock_register_window.py",
+        "line": 243,
+        "text": "get_routine_dirs,"
+      },
+      {
+        "file": "gui_stock_register_window.py",
+        "line": 353,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_windows.py",
+        "line": 61,
+        "text": "get_routine_dirs,"
+      },
+      {
+        "file": "gui_windows.py",
+        "line": 89,
+        "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_windows.py",
+        "line": 336,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 231,
+        "text": "def get_routine_dirs() -> list[Path]:"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 607,
+        "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 917,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 1273,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 1428,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 2613,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 2881,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 2916,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 4288,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 4763,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 6615,
+        "text": "routine_dirs = get_routine_dirs()"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 7450,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 8748,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 8823,
+        "text": "for routine_dir in get_routine_dirs():"
+      },
+      {
+        "file": "integrity_checker.py",
+        "line": 108,
+        "text": "def get_routine_dirs(project_root: Path) -> list[Path]:"
+      },
+      {
+        "file": "integrity_checker.py",
+        "line": 179,
+        "text": "routine_dirs = get_routine_dirs(project_root)"
+      }
+    ],
+    "routine_display_name": [
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 254,
+        "text": "def routine_display_name(routine_dir: Path) -> str:"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 607,
+        "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 918,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 1278,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 1440,
+        "text": "return routine_display_name(stock_dir.parent)"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 2806,
+        "text": "display_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 3064,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 3099,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 4472,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 6803,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 8940,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 8990,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "docs/gui_windows(160).py",
+        "line": 9015,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_auto_trade_runtime.py",
+        "line": 64,
+        "text": "def _routine_display_name_from_dir(routine_dir: Path) -> str:"
+      },
+      {
+        "file": "gui_auto_trade_runtime.py",
+        "line": 162,
+        "text": "routine_name = _routine_display_name_from_dir(routine_dir)"
+      },
+      {
+        "file": "gui_auto_trade_setting_window.py",
+        "line": 347,
+        "text": "def routine_display_name(routine_dir: Path) -> str:"
+      },
+      {
+        "file": "gui_auto_trade_setting_window.py",
+        "line": 426,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_auto_trade_setting_window.py",
+        "line": 1319,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_auto_trade_setting_window.py",
+        "line": 1930,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_global_review_required_window.py",
+        "line": 45,
+        "text": "routine_display_name,"
+      },
+      {
+        "file": "gui_global_review_required_window.py",
+        "line": 67,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_main_table_loader.py",
+        "line": 43,
+        "text": "routine_display_name,"
+      },
+      {
+        "file": "gui_main_table_loader.py",
+        "line": 155,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_review_required_window.py",
+        "line": 79,
+        "text": "def routine_display_name(routine_dir: Path) -> str:"
+      },
+      {
+        "file": "gui_review_required_window.py",
+        "line": 403,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_routine_assign_window.py",
+        "line": 83,
+        "text": "routine_display_name,"
+      },
+      {
+        "file": "gui_routine_assign_window.py",
+        "line": 94,
+        "text": "if routine_display_name(path) == routine_name:"
+      },
+      {
+        "file": "gui_routine_assign_window.py",
+        "line": 622,
+        "text": "display_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_routine_assign_window.py",
+        "line": 880,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_routine_assign_window.py",
+        "line": 915,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 248,
+        "text": "def routine_display_name(routine_dir: Path) -> str:"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 554,
+        "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 827,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 889,
+        "text": "return routine_display_name(stock_dir.parent)"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 1714,
+        "text": "display_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 1972,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 2007,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 2536,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 3852,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 5168,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 5218,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_schedule_window.py",
+        "line": 5240,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_stock_register_window.py",
+        "line": 262,
+        "text": "routine_display_name,"
+      },
+      {
+        "file": "gui_stock_register_window.py",
+        "line": 354,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_windows.py",
+        "line": 66,
+        "text": "routine_display_name,"
+      },
+      {
+        "file": "gui_windows.py",
+        "line": 89,
+        "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_windows.py",
+        "line": 348,
+        "text": "return routine_display_name(stock_dir.parent)"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 254,
+        "text": "def routine_display_name(routine_dir: Path) -> str:"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 607,
+        "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 918,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 1278,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 1440,
+        "text": "return routine_display_name(stock_dir.parent)"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 2623,
+        "text": "display_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 2881,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 2916,
+        "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 4289,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 6620,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 8749,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 8799,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+        "line": 8824,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      },
+      {
+        "file": "integrity_checker.py",
+        "line": 104,
+        "text": "def routine_display_name(routine_dir: Path) -> str:"
+      },
+      {
+        "file": "integrity_checker.py",
+        "line": 180,
+        "text": "routine_by_name = {routine_display_name(path): path for path in routine_dirs}"
+      },
+      {
+        "file": "integrity_checker.py",
+        "line": 288,
+        "text": "routine_name = routine_display_name(routine_dir)"
+      }
+    ]
+  },
+  "routine_like_dirs": [
+    {
+      "name": "_deleted_stocks",
+      "has_budget_json": false,
+      "stock_dir_count": 1,
+      "stock_dir_sample": [
+        "20260602_131559"
+      ]
+    },
+    {
+      "name": "_MACD매매루틴",
+      "has_budget_json": true,
+      "stock_dir_count": 20,
+      "stock_dir_sample": [
+        "000660_SK하이닉스",
+        "003550_LG",
+        "005380_현대차",
+        "005930_삼성전자",
+        "006400_삼성SDI",
+        "012330_현대모비스",
+        "028260_삼성물산",
+        "035420_NAVER",
+        "035720_카카오",
+        "051910_LG화학"
+      ]
+    },
+    {
+      "name": "_recovery_backup",
+      "has_budget_json": false,
+      "stock_dir_count": 0,
+      "stock_dir_sample": []
+    },
+    {
+      "name": "__pycache__",
+      "has_budget_json": false,
+      "stock_dir_count": 0,
+      "stock_dir_sample": []
+    },
+    {
+      "name": "_등록확인폴더",
+      "has_budget_json": true,
+      "stock_dir_count": 18,
+      "stock_dir_sample": [
+        "000660_SK하이닉스",
+        "003550_LG",
+        "005380_현대차",
+        "005930_삼성전자",
+        "006400_삼성SDI",
+        "012330_현대모비스",
+        "028260_삼성물산",
+        "035420_NAVER",
+        "035720_카카오",
+        "051910_LG화학"
+      ]
+    }
+  ]
+}

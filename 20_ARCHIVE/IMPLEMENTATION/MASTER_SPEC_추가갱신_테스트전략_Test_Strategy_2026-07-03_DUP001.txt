@@ -1,0 +1,73 @@
+MASTER_SPEC_추가갱신_테스트전략_Test_Strategy_2026-07-03
+
+목적
+- 구현 단계별 테스트 전략을 표준화하여 회귀 오류와 실주문 위험을 최소화한다.
+
+1. 테스트 계층
+Level 1 : 단위(Unit)
+- 함수 단위 검증
+- 임시(Runtime) 데이터 사용
+
+Level 2 : 통합(Integration)
+- Controller ↔ Engine ↔ Runtime 연계
+- 실제 Runtime 파일은 사용하지 않음
+
+Level 3 : 회귀(Regression)
+- 기존 테스트 전체 재실행
+- 기존 기능 영향 여부 확인
+
+Level 4 : 운영 검증(Pre-Production)
+- Preview만 수행
+- SendOrder 금지
+- 실계좌 변경 금지
+
+2. 단계별 테스트
+Candidate
+□ order_candidate 생성
+□ order_intent
+□ order_provenance
+
+Approval
+□ APPROVED
+□ BLOCKED
+
+Policy
+□ EXECUTABLE
+□ BLOCKED_POLICY
+
+Preflight
+□ REAL_READY
+□ BLOCKED_REAL
+
+Adapter Preview
+□ Preview 생성
+□ Queue 변경 없음
+
+Execution(향후)
+□ Lock
+□ Request Hash
+□ Final Guard
+□ ORDER_QUEUED
+
+Fill(향후)
+□ Chejan
+□ Position
+□ Audit
+
+3. 회귀 원칙
+- 새 기능마다 기존 테스트 전체 수행
+- 실패 시 원인 확인 전 추가 구현 금지
+
+4. 안전 원칙
+- SendOrder 호출 금지
+- execution_enabled 자동 변경 금지
+- 운영 Runtime 직접 수정 금지
+
+5. 완료 기준
+- 단위 테스트 통과
+- 회귀 테스트 통과
+- Runtime 부작용 없음
+- 문서 갱신 완료
+
+최종 원칙
+모든 구현은 테스트가 먼저이며, 테스트 없이 완료 판정을 하지 않는다.

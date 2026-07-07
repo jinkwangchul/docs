@@ -1,0 +1,18 @@
+MASTER_SPEC_CHANGELOG_2026-07-03
+
+- docs/마스터스펙정리 전체 하위 폴더를 재귀 스캔했다.
+- txt, md, py, json, csv 파일을 우선 분석 대상으로 삼았다.
+- zip 및 기타 바이너리/임시/캐시 성격 파일은 본문 통합 대상에서 제외하고 색인에만 기록했다.
+- MASTER_SPEC, 작업재개요약, 갱신문서, 대화히스토리, 구현로그/검증보고, 운영정책 성격 문서를 후보 분류했다.
+- 파일명 날짜, 문서 내부 날짜, 수정시각, 내용 구체성 기준으로 최신성 점수를 부여했다.
+- 정규화 해시 기반으로 완전 중복 문단을 병합했다.
+- HOLD, AND NOT/OR NOT, 마감/청산, 무결성검사/안정성검사, MACD/지표추종매매, 시작 컬럼/현황 용어 충돌 후보를 별도 기록했다.
+- 최종 기준 통합본, 색인, 중복 보고서, 충돌 보고서, 변경 로그, 사용 안내 문서를 txt로만 생성했다.
+
+생성 파일
+- MASTER_SPEC_CANONICAL_2026-07-03.txt
+- MASTER_SPEC_INDEX_2026-07-03.txt
+- MASTER_SPEC_DEDUP_REPORT_2026-07-03.txt
+- MASTER_SPEC_CONFLICTS_2026-07-03.txt
+- MASTER_SPEC_CHANGELOG_2026-07-03.txt
+- README_CANONICAL_USAGE.txt

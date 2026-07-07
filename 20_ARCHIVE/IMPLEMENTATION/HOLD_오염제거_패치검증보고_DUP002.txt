@@ -1,0 +1,6 @@
+signal_result.py: syntax=OK, HOLD occurrences=0, RoutineSignal_HOLD=0
+macd_signal_engine.py: syntax=OK, HOLD occurrences=0, RoutineSignal_HOLD=0
+routine.py: syntax=OK, HOLD occurrences=0, RoutineSignal_HOLD=0
+routine_macd_engine.py: syntax=OK, HOLD occurrences=0, RoutineSignal_HOLD=0
+test_macd_routine_step1.py: syntax=OK, HOLD occurrences=0, RoutineSignal_HOLD=0
+test_macd_routine_step2.py: syntax=OK, HOLD occurrences=0, RoutineSignal_HOLD=0

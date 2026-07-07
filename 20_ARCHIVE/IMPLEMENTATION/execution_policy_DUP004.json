@@ -1,0 +1,121 @@
+{
+  "version": "1.2",
+  "policy_type": "execution_policy",
+  "description": "메인 우선권을 명확히 반영한 공통 실행정책 v4.",
+  "authority_model": {
+    "stock_is_center": true,
+    "main_policy_is_superior": true,
+    "routine_is_advisor": true,
+    "routine_signal_is_proposal": true,
+    "main_decision_is_required": true,
+    "main_execution_is_required": true
+  },
+  "main_gate": {
+    "enabled": true,
+    "common_checks": [
+      "stock_operation_state",
+      "time_policy",
+      "budget_policy",
+      "holding_status",
+      "unfilled_order_status",
+      "review_required",
+      "server_data_reliability",
+      "closing_policy_phase"
+    ],
+    "on_rejected_signal": "ignore_and_log"
+  },
+  "closing_policy_phase": {
+    "states": [
+      "normal_trading",
+      "closing_waiting_final_sell",
+      "final_sell_order_accepted",
+      "liquidation_or_review"
+    ],
+    "normal_trading": {
+      "buy_allowed": true,
+      "sell_allowed": true,
+      "cancel_allowed": true
+    },
+    "closing_waiting_final_sell": {
+      "buy_allowed": true,
+      "sell_allowed": true,
+      "cancel_allowed": true,
+      "description": "조기/자동마감 진입 후 마지막 SELL 신호를 기다리는 상태. 즉시 BUY 금지가 아니다."
+    },
+    "final_sell_order_accepted": {
+      "buy_allowed": false,
+      "sell_allowed": false,
+      "cancel_allowed": true,
+      "description": "마지막 SELL 주문 접수 후 그날 루틴 매매는 종료된다."
+    },
+    "liquidation_or_review": {
+      "buy_allowed": false,
+      "sell_allowed": false,
+      "cancel_allowed": "system_only"
+    }
+  },
+  "order_basis": {
+    "buy_default_basis": "amount",
+    "sell_default_basis": "holding_quantity",
+    "support_quantity_order": true,
+    "support_amount_order": true,
+    "support_holding_quantity_order": true
+  },
+  "order_price_type": {
+    "default_buy_price_type": "current_price",
+    "default_sell_price_type": "current_price",
+    "supported_types": [
+      "market_price",
+      "current_price",
+      "limit_price",
+      "quote_price"
+    ]
+  },
+  "quote_data_usage": {
+    "enabled": true,
+    "source": "kiwoom_server_quote_data",
+    "max_quote_depth": 10,
+    "use_quote_quantity_for_reference": true,
+    "quote_quantity_is_reference_only": true
+  },
+  "signal_set_record": {
+    "enabled": true,
+    "record_signal_id": true,
+    "record_signal_type": true,
+    "record_main_signal_price": true,
+    "record_main_signal_time": true,
+    "reference_price_is_fixed_during_signal_set": true,
+    "description": "BUY PLAN 대신 signal_set 또는 signal_execution_context 사용. 메인 승인 전에는 계획이 아니라 제안 묶음."
+  },
+  "fill_tracking": {
+    "enabled": true,
+    "track_partial_fill": true,
+    "track_remaining_quantity": true,
+    "track_remaining_budget": true,
+    "partial_fill_is_not_failure": true
+  },
+  "retry": {
+    "enabled": true,
+    "max_retry_count": 3,
+    "retry_interval_seconds": 1,
+    "retry_target_buy": "remaining_budget",
+    "retry_target_sell": "remaining_quantity",
+    "on_retry_exhausted": "review_required"
+  },
+  "average_price_reference": {
+    "primary_source": "kiwoom_server_average_price",
+    "internal_average_price_usage": "validation_only",
+    "mismatch_action": "review_required"
+  },
+  "logging": {
+    "enabled": true,
+    "log_signal_received": true,
+    "log_main_gate_decision": true,
+    "log_order_create": true,
+    "log_fill_update": true,
+    "log_cancel_signal": true,
+    "log_cancel_action": true,
+    "log_retry_order": true,
+    "log_ignored_signal": true
+  }
+}

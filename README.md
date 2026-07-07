@@ -1,0 +1,124 @@
+# Docs Repository
+
+This repository is the official documentation source of truth
+for the Kiwoom Auto Trading Project.
+
+Every implementation session begins with
+AI_SESSION_START_PROTOCOL.md.
+
+이 저장소는 `kiwoom_auto` 프로젝트의 문서 Source of Truth를 장기 운영하기 위한 docs 전용 저장소이다.
+
+이 저장소는 구현 코드 저장소가 아니다. Python 코드, runtime, rules.json, 실제 주문 실행 파일은 이 저장소에서 수정하지 않는다.
+
+## 목적
+
+- MASTER_SPEC Canonical을 기준 문서로 관리한다.
+- CHANGELOG로 Canonical 변경 이력을 보존한다.
+- UPDATE 문서로 신규 변경 후보를 수집한다.
+- 운영 매뉴얼과 docs 운영 표준으로 ChatGPT/Codex 협업 절차를 고정한다.
+- ARCHIVE와 REPORTS를 통해 과거 문서와 관리 보고서를 보존한다.
+
+## 기본 구조
+
+```text
+docs/
+  00_CANONICAL/
+    CURRENT/
+    CHANGELOG/
+    TRACE/
+    OPEN_ISSUES/
+  10_UPDATE/
+    INBOX/
+    MERGED/
+    TEMPLATE/
+  20_ARCHIVE/
+  30_REPORTS/
+  90_TEMP/
+```
+
+## MASTER_SPEC 운영 방식
+
+MASTER_SPEC는 `00_CANONICAL/CURRENT`의 최신 `MASTER_SPEC_CANONICAL_*.txt`를 기준으로 한다.
+
+운영 원칙:
+
+- 기존 Canonical은 덮어쓰지 않는다.
+- 갱신 시 새 Canonical 파일을 생성한다.
+- 기존 내용을 임의 삭제하거나 축약하지 않는다.
+- 실제 구현된 내용만 Canonical에 반영한다.
+- CHANGELOG를 통해 변경 이력을 남긴다.
+
+## CURRENT 사용법
+
+`00_CANONICAL/CURRENT`는 현재 프로젝트를 바로 재개하는 데 필요한 최신 기준 문서만 두는 영역이다.
+
+CURRENT 기준:
+
+- 최신 MASTER_SPEC Canonical
+- 최신 작업재개요약
+- 최신 운영 기준 문서
+- Canonical 사용 안내
+
+오래된 CURRENT 문서는 삭제하지 않고 ARCHIVE 이동 후보로 분류한다.
+
+## UPDATE 사용법
+
+신규 변경 후보는 `10_UPDATE/INBOX`에 둔다.
+
+권장 파일명:
+
+```text
+UPDATE_YYYYMMDD_주제.txt
+```
+
+운영 흐름:
+
+```text
+UPDATE 생성
+↓
+10_UPDATE/INBOX 저장
+↓
+Codex가 Canonical 병합
+↓
+새 MASTER_SPEC Canonical 생성
+↓
+병합 완료 UPDATE는 MERGED 이동 후보
+```
+
+## CHANGELOG 정책
+
+CHANGELOG는 `00_CANONICAL/CHANGELOG`에 보관한다.
+
+정책:
+
+- 기존 CHANGELOG를 수정하지 않는다.
+- 새 변경은 새 날짜 또는 새 주제 CHANGELOG로 작성한다.
+- 추가 섹션, 병합 위치, 테스트 현황, 금지선 유지 여부를 기록한다.
+
+## ARCHIVE 정책
+
+`20_ARCHIVE`는 기존 문서를 보존하는 장기 보관 영역이다.
+
+정책:
+
+- 삭제보다 ARCHIVE 이동을 우선한다.
+- 중복 의심 파일도 해시 비교와 사용자 승인 전에는 삭제하지 않는다.
+- 압축 원본은 Git 포함보다 로컬 보관 또는 별도 release/storage 사용을 권장한다.
+
+## 새 대화 시작 시 참조 순서
+
+1. `00_CANONICAL/CURRENT` 최신 MASTER_SPEC
+2. `AI_PROJECT_OPERATION_MANUAL_RELEASE` 최신본
+3. `DOCS_FOLDER_OPERATION_STANDARD` 최신본
+4. 최신 작업재개요약
+5. 최신 CHANGELOG
+6. `10_UPDATE/INBOX`의 미병합 UPDATE 문서
+7. 필요한 경우 `20_ARCHIVE`
+8. 필요한 경우 `90_TEMP`
+
+## GitHub 운영 원칙
+
+- GitHub 최신 docs 저장소를 문서 Source of Truth로 사용한다.
+- commit/push는 사용자 승인 후 수행한다.
+- 백업 zip, TEMP, 로컬 캐시는 Git 포함을 피한다.
+- 문서 변경과 구현 코드 변경은 분리한다.

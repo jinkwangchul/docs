@@ -1,0 +1,602 @@
+MASTER_SPEC_추가갱신_Architecture_Dependency_Map_2026-07-03
+
+작성 목적
+- 본 문서는 키움 자동매매 프로젝트의 주요 모듈 간 의존성 방향, 허용 호출, 금지 호출, 책임 경계를 정의하기 위한 MASTER_SPEC 추가 갱신자료이다.
+- 지금까지 Process Flow, Order Lifecycle, Controller Layer, Runtime Data Model, order_intent, order_provenance가 정리되었다.
+- 본 문서는 이 구조들이 코드상에서 서로 잘못 호출되거나 책임이 섞이지 않도록 하기 위한 최상위 아키텍처 의존성 기준이다.
+- 현재 단계에서 코드 수정, 리팩토링, Controller 구현, SendOrder 연결은 하지 않는다.
+
+==================================================
+1. 최상위 의존성 원칙
+==================================================
+
+1. 의존성은 위에서 아래로만 흐른다.
+2. 하위 모듈은 상위 모듈을 호출하지 않는다.
+3. 판단 모듈은 실행 모듈을 호출하지 않는다.
+4. Preview 모듈은 파일 상태를 변경하지 않는다.
+5. Adapter Preview는 SendOrder를 호출하지 않는다.
+6. Engine은 GUI를 알면 안 된다.
+7. GUI/Timer는 장기적으로 Controller만 호출한다.
+8. Controller는 판단 로직을 직접 구현하지 않고, 기존 Engine/Policy/Preflight 모듈을 호출한다.
+9. 실주문은 ExecutionController 이후에만 가능하다.
+10. SendOrder는 KiwoomOrderExecutor만 호출할 수 있다.
+
+==================================================
+2. 권장 계층 구조
+==================================================
+
+Layer 0. GUI / Timer / CLI
+- 사용자 조작, 타이머, 수동 실행 진입점.
+
+Layer 1. Controller Layer
+- 호출 순서 관리.
+- SignalController
+- OrderCandidateController
+- ApprovalController
+- OperationPolicyController
+- RealPreflightController
+- AdapterPreviewController
+- ExecutionController
+- FillEventController
+- RecoveryController
+
+Layer 2. Domain Engine / Gate / Policy
+- routine_signal_probe
+- order_candidate_engine
+- order_approval_engine
+- operation_policy_gate
+- real_order_preflight
+- kiwoom_order_adapter preview
+
+Layer 3. Runtime Storage
+- routine_signals.json
+- order_queue.json
+- real_trade_guard.json
+- candles.json
+- latest_price.json
+- 향후 order_locks.json, order_executions.json, fills.json 등
+
+Layer 4. External API Boundary
+- Kiwoom OpenAPI
+- SendOrder
+- Chejan/Event
+- TR 조회
+
+의존 방향:
+GUI/Timer/CLI
+  ↓
+Controller
+  ↓
+Domain Engine / Gate / Policy
+  ↓
+Runtime Storage
+  ↓
+External API Boundary, 단 Execution 계층만 접근 가능
+
+==================================================
+3. 공식 호출 흐름
+==================================================
+
+현재 Preview 단계 공식 흐름:
+
+Timer / Manual Trigger
+  ↓
+SignalController, 향후
+  ↓
+routine_signal_probe
+  ↓
+routine_signal_queue
+  ↓
+OrderCandidateController, 향후
+  ↓
+order_queue.signal_to_order_candidate
+  ↓
+order_candidate_engine.build_order_candidate
+  ↓
+ApprovalController, 향후
+  ↓
+order_approval_engine.apply_order_approval_to_queue
+  ↓
+OperationPolicyController, 향후
+  ↓
+operation_policy_gate.apply_operation_policy_gate_for_order
+  ↓
+RealPreflightController, 향후
+  ↓
+real_order_preflight.apply_real_order_preflight_for_order
+  ↓
+AdapterPreviewController, 향후
+  ↓
+kiwoom_order_adapter.build_kiwoom_order_request_preview_for_order
+  ↓
+REAL_READY 유지
+
+금지:
+- Adapter Preview 이후 ADAPTER_READY 생성 금지.
+- Adapter Preview가 ExecutionController를 호출 금지.
+- Preflight가 Adapter/Executor를 호출 금지.
+- Approval이 Policy/Preflight를 직접 호출 금지.
+- order_candidate_engine이 Approval/Preflight/Adapter를 호출 금지.
+
+==================================================
+4. GUI / Timer / CLI 의존성 규칙
+==================================================
+
+허용:
+- 사용자의 명시 행동 수신.
+- Timer Tick 발생.
+- Controller 호출.
+- 상태 요약 표시.
+- Runtime reader를 통한 읽기 전용 표시.
+
+금지:
+- Domain Engine을 직접 다단계 호출하는 구조의 확대.
+- SendOrder 직접 호출.
+- order_queue 상태 직접 조작.
+- execution_enabled=true 직접 변경, 별도 승인 설계 전까지.
+- operator_confirmed=true 직접 변경, 별도 guard UI 설계 전까지.
+- REAL_READY -> ORDER_QUEUED 자동 전환.
+- KiwoomOrderExecutor 직접 호출.
+
+현재 예외/과도기:
+- 기존 gui_auto_trade_timer.py는 signal_probe_only 흐름에서 consumer/order_queue/approval 일부를 직접 호출할 수 있다.
+- 장기적으로 Controller Layer를 통해 호출하도록 전환 권장.
+- 기존 구조는 즉시 대규모 변경하지 않는다.
+
+==================================================
+5. Controller Layer 의존성 규칙
+==================================================
+
+Controller 공통 허용:
+- 하위 Domain Engine/Gate/Policy 호출.
+- Runtime 파일 경로 전달.
+- 단건/수동/자동 호출 경계 관리.
+- 결과 summary 구성.
+
+Controller 공통 금지:
+- 판단 로직 직접 재구현.
+- 하위 모듈의 책임을 침범.
+- SendOrder 직접 호출, ExecutionController 제외.
+- 새 상태값 임의 생성.
+- Runtime schema 임의 변경.
+
+SignalController
+허용:
+- routine_signal_probe 호출.
+- routine_signal_queue enqueue 흐름 관리.
+금지:
+- order_queue 생성.
+- Approval/Policy/Preflight 호출.
+- SendOrder 호출.
+
+OrderCandidateController
+허용:
+- order_queue.signal_to_order_candidate 호출.
+- order_candidate_engine 호출 흐름 관리.
+금지:
+- Approval 판정.
+- EXECUTABLE/REAL_READY 생성.
+- hoga/order_type 확정.
+- SendOrder 호출.
+
+ApprovalController
+허용:
+- order_approval_engine.apply_order_approval_to_queue 호출.
+금지:
+- OperationPolicyGate 호출 자동 연결, 별도 단계 전까지.
+- Preflight 호출.
+- SendOrder 호출.
+- execution_enabled 변경.
+
+OperationPolicyController
+허용:
+- operation_policy_gate.apply_operation_policy_gate_for_order 호출.
+금지:
+- 일괄 승격 기본값.
+- Preflight 자동 호출.
+- execution_enabled 변경.
+- SendOrder 호출.
+
+RealPreflightController
+허용:
+- real_order_preflight.apply_real_order_preflight_for_order 호출.
+금지:
+- Adapter 자동 호출.
+- ORDER_QUEUED 생성.
+- SendOrder 호출.
+- operator_confirmed 변경.
+
+AdapterPreviewController
+허용:
+- kiwoom_order_adapter.build_kiwoom_order_request_preview_for_order 호출.
+금지:
+- send_order_stub 호출.
+- SendOrder 호출.
+- ADAPTER_READY 생성.
+- order_queue status 변경.
+
+ExecutionController
+허용, 향후:
+- REAL_READY -> ORDER_QUEUED 전이.
+- 중복주문 lock 확인.
+- 최종 guard 확인.
+- KiwoomOrderExecutor 호출.
+금지, 현재:
+- 구현 금지.
+- Timer 자동 연결 금지.
+- execution_enabled 자동 true 전환 금지.
+
+FillEventController
+허용, 향후:
+- 키움 체결 이벤트 수신 후 order lifecycle 반영.
+금지, 현재:
+- 구현 금지.
+- 이벤트 없이 FILLED/CANCELLED 처리 금지.
+
+RecoveryController
+허용, 향후:
+- 재시작/긴급정지 해제 후 runtime 관계 검증.
+금지, 현재:
+- 불명확 상태 자동 정상 처리 금지.
+
+==================================================
+6. routine_signal_probe / routine_signal_queue
+==================================================
+
+routine_signal_probe 허용:
+- candles.json 읽기.
+- routine evaluate 호출.
+- BUY/SELL/CANCEL 신호 생성.
+- routine_signal_queue에 enqueue.
+
+routine_signal_probe 금지:
+- order_queue 생성.
+- order_candidate_engine 호출.
+- Approval/Policy/Preflight 호출.
+- execution_enabled=true 설정.
+- SendOrder 호출.
+
+routine_signal_queue 허용:
+- signal_record 생성/저장.
+- PENDING/BLOCKED/PREVIEWED 등 signal queue 상태 관리, 기존 정책 범위.
+- signal id 발급.
+
+routine_signal_queue 금지:
+- order candidate 생성.
+- order_queue status 변경.
+- Kiwoom API 호출.
+- SendOrder 호출.
+
+==================================================
+7. order_candidate_engine
+==================================================
+
+허용:
+- signal/config/state/latest_price 기반 BUY/SELL 후보 산출.
+- quantity/amount/price/candidate_status 계산.
+- order_intent 진단 필드 생성.
+- execution_enabled=false 유지.
+
+금지:
+- rules.json 직접 읽기.
+- indicator_follow_ui_state 직접 읽기.
+- GUI 참조.
+- real_trade_guard 읽기.
+- Approval/Policy/Preflight 호출.
+- hoga/order_type 확정.
+- source_ui_path 추정.
+- setting_a/b/c 추정.
+- SendOrder 호출.
+- order_queue 파일 직접 저장, 책임 분리 필요.
+
+의존 가능:
+- 입력으로 받은 signal/config/state/price dict.
+- 순수 helper.
+
+의존 금지:
+- PyQt GUI.
+- Kiwoom API.
+- Timer.
+- Adapter/Executor.
+
+==================================================
+8. order_queue
+==================================================
+
+허용:
+- signal_to_order_candidate.
+- order_candidate_engine 호출.
+- order_provenance 추가.
+- order_intent 포함 후보 저장.
+- order_queue.json 읽기/쓰기, 후보 생성 범위.
+
+금지:
+- Approval 결과 직접 판정.
+- Operation Policy 직접 판정.
+- Preflight 직접 판정.
+- SendOrder 호출.
+- execution_enabled=true 변경.
+- hoga/order_type 임의 확정.
+- ADAPTER_READY 생성.
+- ORDER_QUEUED 자동 생성.
+
+의존 가능:
+- order_candidate_engine.
+- routine signal record.
+
+의존 금지:
+- real_order_preflight.
+- kiwoom_order_adapter.
+- order_executor.
+- Kiwoom API.
+
+==================================================
+9. order_approval_engine
+==================================================
+
+허용:
+- PENDING order 후보 품질 검토.
+- PENDING -> APPROVED.
+- PENDING -> BLOCKED.
+- 수량/가격/금액/보유수량 등 기본 후보 품질 판정.
+
+금지:
+- APPROVED -> EXECUTABLE.
+- Real Preflight 호출.
+- order_intent unresolved를 실주문 차단으로 임의 사용, 정책 확정 전까지.
+- execution_enabled 변경.
+- SendOrder 호출.
+- GUI 호출.
+- Kiwoom API 호출.
+
+의존 가능:
+- order_queue.json.
+- order dict.
+
+의존 금지:
+- operation_policy_gate 직접 호출.
+- real_order_preflight 직접 호출.
+- adapter/executor.
+
+==================================================
+10. operation_policy_gate
+==================================================
+
+허용:
+- APPROVED 단건 order 검토.
+- APPROVED -> EXECUTABLE.
+- APPROVED -> BLOCKED_POLICY.
+- operation policy 기준 확인.
+
+금지:
+- PENDING 직접 승인.
+- EXECUTABLE 이후 Preflight 자동 호출.
+- execution_enabled=true 변경.
+- operator_confirmed 변경.
+- SendOrder 호출.
+- GUI 직접 호출.
+- 일괄 승격 기본 연결.
+
+의존 가능:
+- order_queue.json.
+- operation policy, 향후.
+- order dict.
+
+의존 금지:
+- real_order_preflight 자동 호출.
+- adapter/executor.
+
+==================================================
+11. real_order_preflight
+==================================================
+
+허용:
+- EXECUTABLE 단건 order 검토.
+- EXECUTABLE -> REAL_READY.
+- EXECUTABLE -> BLOCKED_REAL.
+- real_trade_guard 읽기.
+- execution_enabled, operator_confirmed, account, login, quantity 등 최종 차단 조건 확인.
+
+금지:
+- guard 자동 true 설정.
+- execution_enabled true 설정.
+- Adapter 호출.
+- Executor 호출.
+- SendOrder 호출.
+- ORDER_QUEUED 생성.
+- REAL_READY 이후 상태 전이.
+
+의존 가능:
+- order_queue.json.
+- real_trade_guard.json.
+- order dict.
+
+의존 금지:
+- kiwoom_order_adapter.
+- order_executor.
+- GUI.
+
+==================================================
+12. kiwoom_order_adapter
+==================================================
+
+허용:
+- REAL_READY order를 기반으로 request_preview dict 생성.
+- build_kiwoom_order_request 호출.
+- side/code/quantity/price/account_no 등 요청 필드 구성.
+- hoga/order_type은 확정 전 UNDECIDED 유지 가능.
+
+금지:
+- SendOrder 호출.
+- send_order_stub 호출, preview helper에서는 금지.
+- order_queue.json status 변경.
+- ADAPTER_READY 생성.
+- ORDER_QUEUED 생성.
+- execution_enabled 변경.
+- operator_confirmed 변경.
+
+의존 가능:
+- order dict.
+- guard dict/path.
+- 순수 request builder.
+
+의존 금지:
+- order_executor 자동 호출.
+- Kiwoom API 직접 호출, 현재 단계.
+- GUI/Timer.
+
+==================================================
+13. order_executor / real_order_executor_stub
+==================================================
+
+order_executor.py 현재 상태:
+- 현재 order_queue 실행기가 아님.
+- DryRunOrderExecutor는 order_manager dry-run callable 성격.
+- KiwoomOrderExecutor는 NotImplementedError.
+
+허용, 현재:
+- 구조 분석.
+- dry-run 범위 유지.
+
+금지:
+- KiwoomOrderExecutor 구현.
+- SendOrder 구현.
+- Timer/GUI 자동 연결.
+- REAL_READY 자동 처리.
+
+real_order_executor_stub.py:
+- SendOrder는 호출하지 않지만 REAL_READY -> ADAPTER_READY로 queue 파일 변경 가능.
+- ADAPTER_READY는 공식 상태로 사용하지 않으므로 자동 연결 금지.
+
+금지:
+- real_order_executor_stub 자동 실행.
+- Timer/GUI 연결.
+- ADAPTER_READY 전이 사용.
+
+==================================================
+14. Kiwoom API Boundary
+==================================================
+
+허용 주체, 향후:
+- KiwoomOrderExecutor만 SendOrder 호출 가능.
+- FillEventController만 체결 이벤트를 lifecycle에 반영 가능.
+- KiwoomApi Wrapper는 API 호출 래핑 역할.
+
+금지:
+- Domain Engine이 Kiwoom API 직접 호출.
+- order_candidate_engine/order_queue/approval/preflight/adapter preview가 SendOrder 호출.
+- GUI가 SendOrder 직접 호출.
+- Timer가 SendOrder 직접 호출.
+
+==================================================
+15. Runtime Storage 의존성
+==================================================
+
+허용:
+- 각 모듈은 자기 책임 파일만 최소 접근.
+- reader는 읽기 전용 summary 제공.
+- writer는 명확한 상태 전이 책임을 가진 모듈만 수행.
+
+금지:
+- 여러 모듈이 같은 status를 임의 변경.
+- 하위 모듈이 상위 상태를 변경.
+- preview 함수가 파일 저장.
+- unrelated 파일 동시 변경.
+
+권장:
+- 상태 전이마다 from_status/to_status 기록.
+- 향후 audit_log 도입.
+- order_id/source_signal_id/execution_id 관계 보존.
+
+==================================================
+16. 금지 의존성 목록
+==================================================
+
+절대 금지 의존성:
+- order_candidate_engine -> SendOrder
+- order_candidate_engine -> GUI
+- order_candidate_engine -> real_trade_guard
+- order_queue -> Preflight
+- order_queue -> Adapter
+- order_queue -> Executor
+- order_approval_engine -> Preflight
+- order_approval_engine -> SendOrder
+- operation_policy_gate -> SendOrder
+- real_order_preflight -> Adapter
+- real_order_preflight -> Executor
+- kiwoom_order_adapter preview -> order_queue status write
+- Adapter Preview -> ADAPTER_READY
+- Timer -> SendOrder
+- GUI -> SendOrder 직접 호출
+- FillEvent 없는 상태에서 FILLED 전이
+
+==================================================
+17. 허용 의존성 목록
+==================================================
+
+허용 의존성:
+- routine_signal_probe -> routine evaluate
+- routine_signal_probe -> routine_signal_queue
+- order_queue -> order_candidate_engine
+- routine_signal_consumer -> order_queue, 현재 과도기
+- order_approval_engine -> order_queue
+- operation_policy_gate -> order_queue
+- real_order_preflight -> order_queue + real_trade_guard
+- kiwoom_order_adapter preview -> order_queue read + guard read
+- Controller -> 각 하위 모듈
+- GUI/Timer -> Controller, 장기 목표
+
+==================================================
+18. 향후 리팩토링 방향
+==================================================
+
+1단계:
+- 현재 구조 유지.
+- 의존성 문서 기준으로 신규 작업 검토.
+
+2단계:
+- Controller Layer 실제 파일 도입 여부 검토.
+- Timer/GUI의 직접 호출을 Controller 호출로 점진 전환.
+
+3단계:
+- ExecutionController 설계.
+- order_lock_manager 설계.
+- hoga/order_type resolved mapper 설계.
+
+4단계:
+- SendOrder Boundary 단일화.
+- KiwoomOrderExecutor만 SendOrder 호출.
+
+5단계:
+- FillEventController로 체결 이벤트 반영.
+
+==================================================
+19. 코드 리뷰 기준
+==================================================
+
+향후 코드 수정 시 반드시 확인:
+
+1. 이 모듈이 호출해도 되는 대상인가?
+2. 이 모듈이 변경해도 되는 status인가?
+3. Preview 함수가 파일을 저장하지 않는가?
+4. 실행 판단과 메타데이터가 섞이지 않았는가?
+5. 하위 모듈이 상위 모듈을 호출하지 않는가?
+6. SendOrder 접근 경로가 하나로 제한되는가?
+7. execution_enabled/operator_confirmed를 임의 변경하지 않는가?
+8. source_ui_path/setting_a/b/c를 추정하지 않는가?
+9. 새 상태값이 문서 승인 없이 추가되지 않았는가?
+10. Timer/GUI 자동 연결이 실주문 위험을 만들지 않는가?
+
+==================================================
+20. 최종 결론
+==================================================
+
+Architecture Dependency Map은 프로젝트의 최상위 구조 안전장치이다.
+
+Process Flow는 실행 순서를 설명하고,
+Runtime Data Model은 데이터 관계를 설명하며,
+Controller Layer는 호출 책임을 설명한다.
+
+Dependency Map은 각 모듈이 누구를 호출할 수 있고 누구를 호출하면 안 되는지 고정한다.
+
+앞으로 SendOrder, 체결 이벤트, 취소/정정, 복구 기능을 구현할 때 이 문서를 기준으로 의존성 위반 여부를 먼저 검토해야 한다.

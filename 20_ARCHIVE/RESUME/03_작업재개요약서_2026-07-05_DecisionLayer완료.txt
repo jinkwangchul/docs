@@ -1,0 +1,36 @@
+작업재개요약서 (Decision Layer 완료 기준)
+
+작성일: 2026-07-05
+
+현재 완료 상태
+
+-   Rule Approval Pipeline: Preview, Approval, Commit, Rollback,
+    Dry-run, Stable Hash, Deep Compare 완료
+-   Rule Mapper: Bar, BUY OCR, RSI, MACD Position, 이동평균, 가격비교,
+    Bollinger, SELL MACD Condition C 완료
+-   Condition Engine: BUY/SELL 평가, AND/OR/NOT, Group OR, BUY/SELL
+    우선순위 완료
+-   CANCEL: Reserved(주문관리 계층 예정)
+-   RoutineSignal / Preview / Probe 완료
+-   Market Snapshot 표준 Schema 및 Validation 완료
+-   Signal Decision / Policy / Orchestrator 완료
+-   Queue Candidate / Queue Gate 완료(Execution 미연결)
+
+Pipeline
+
+Market Snapshot → Routine Signal Probe → RoutineSignal →
+RoutineSignalPreview → Signal Decision → Signal Policies → Policy
+Orchestrator → Signal Queue Candidate → Signal Queue Gate → (Execution
+미연결)
+
+검증
+
+-   py_compile 통과
+-   전체 unittest: 1002 OK
+-   Queue/Runtime/Execution/SendOrder 미연결
+-   rules.json 변경 없음
+
+다음 단계
+
+Execution Layer - Queue - Dispatcher - Order Request - SendOrder -
+Runtime 연동

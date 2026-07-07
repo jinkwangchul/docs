@@ -1,0 +1,137 @@
+{
+  "version": "1.2",
+  "policy_type": "buy_policy",
+  "description": "BUY 실행정책 v4: 루틴은 신호/제안, 메인은 최종 승인/집행.",
+  "authority_boundary": {
+    "routine_role": "signal_advisor",
+    "main_role": "final_decision_and_execution",
+    "routine_signal_is_not_order": true,
+    "main_must_approve_before_order": true
+  },
+  "closing_policy_rule": {
+    "early_or_auto_close_is_not_immediate_buy_ban": true,
+    "buy_allowed_until_final_sell_order_accepted": true,
+    "after_final_sell_order_accepted_buy_blocked": true,
+    "description": "조기/자동마감 진입은 즉시 BUY 금지가 아니라 마지막 SELL 신호를 기다리는 상태다. 마지막 SELL 주문 접수 후에는 BUY/SELL 모두 차단한다."
+  },
+  "buy_execution_axis": {
+    "price_axis": "single_price",
+    "time_axis": "single_point",
+    "available_price_axis": [
+      "single_price",
+      "multi_quote"
+    ],
+    "available_time_axis": [
+      "single_point",
+      "multi_point"
+    ]
+  },
+  "reference": {
+    "main_signal_price": {
+      "source": "current_price_at_main_buy_signal",
+      "fixed_during_signal_set": true
+    },
+    "average_price": {
+      "source": "kiwoom_server_average_price",
+      "use_internal_average_price_for_validation": true
+    }
+  },
+  "main_gate_required": {
+    "enabled": true,
+    "checks": [
+      "stock_operation_state",
+      "time_policy",
+      "budget_policy",
+      "review_required",
+      "server_balance",
+      "unfilled_order_status",
+      "closing_policy_phase"
+    ]
+  },
+  "single_price": {
+    "enabled": true,
+    "order_price_type": "current_price",
+    "order_basis": "amount"
+  },
+  "multi_quote": {
+    "enabled": false,
+    "quote_side": "buy",
+    "quote_levels": [
+      1,
+      3,
+      5
+    ],
+    "budget_distribution_percent": [
+      40,
+      30,
+      30
+    ],
+    "order_basis": "amount",
+    "purpose": "가격의 종축 배치. 순간 파동 속 체결 효율 제고."
+  },
+  "single_point": {
+    "enabled": true,
+    "trigger": "main_buy_signal"
+  },
+  "multi_point": {
+    "enabled": false,
+    "reference_price": "main_signal_price",
+    "mode": "interval_compare",
+    "available_modes": [
+      "fixed_time_split",
+      "interval_compare",
+      "time_window_price_condition"
+    ],
+    "common_limits": {
+      "max_rounds": 5,
+      "total_time_limit_minutes": 15,
+      "round_budget_distribution_percent": [
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "requires_main_approval_each_round": true,
+      "stop_when_budget_exhausted": true,
+      "stop_when_sell_signal_occurs": true
+    },
+    "fixed_time_split": {
+      "enabled": false,
+      "split_count": 5,
+      "total_time_minutes": 10,
+      "interval_minutes": 2,
+      "price_filter": {
+        "enabled": false,
+        "basis": "main_signal_price",
+        "operator": "current_price_lte_reference_percent",
+        "percent": 0.0
+      }
+    },
+    "interval_compare": {
+      "enabled": true,
+      "compare_interval": {
+        "type": "minute",
+        "minutes": 3,
+        "candles": null
+      },
+      "condition": {
+        "basis": "main_signal_price",
+        "operator": "current_price_lte_reference_percent",
+        "percent": 0.0
+      },
+      "max_compare_count": 5
+    },
+    "time_window_price_condition": {
+      "enabled": false,
+      "time_limit_minutes": 15,
+      "condition": {
+        "basis": "main_signal_price",
+        "operator": "current_price_lte_reference_percent",
+        "percent": -2.0
+      },
+      "max_buy_count": 10,
+      "cooldown_between_orders_seconds": 10
+    }
+  }
+}

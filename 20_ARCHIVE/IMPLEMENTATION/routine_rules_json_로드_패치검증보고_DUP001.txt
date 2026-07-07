@@ -1,0 +1,5 @@
+routine.py rules.json 로드 패치
+syntax=OK
+교체방법: 이 파일을 routines/MACD매매루틴/routine.py 로 이름 변경 교체
+load_order=context.routine_config -> context.rules -> rules.json -> DEFAULT_MACD_ROUTINE_CONFIG
+HOLD occurrences=0

@@ -1,0 +1,73 @@
+STEP37_메인관제창_루틴표_MACD설정창연결후보_생성보고_v2026-06-19
+
+작성 목적:
+본 문서는 MACD 설정창 진입 위치를 루틴지정창이 아니라
+메인 관제창 왼쪽 '등록된 자동매매 루틴' 표로 변경하기 위한 후보 패치 생성 결과를 기록한다.
+
+------------------------------------------------------------
+1. 생성 파일
+------------------------------------------------------------
+
+1) gui_windows_STEP37_open_macd_settings_from_main_routine_table.py
+- 적용 대상: gui_windows.py
+- 메인 관제창 routine_table 행 더블클릭 시 MACD 설정창 호출
+
+2) test_main_routine_settings_step37.py
+- MainWindow 생성 및 연결 메서드 존재 확인용 테스트
+
+------------------------------------------------------------
+2. 변경 내용
+------------------------------------------------------------
+
+추가 이벤트:
+- self.routine_table.itemDoubleClicked.connect(self.open_routine_settings_from_main_table)
+
+추가 메서드:
+- open_routine_settings_from_main_table
+
+동작:
+1. 더블클릭한 행의 루틴명 확인
+2. 루틴 폴더 확인
+3. MACD매매루틴인지 확인
+4. rules.json 확인
+5. gui_macd_routine_settings_dialog.py 지연 import
+6. MacdRoutineSettingsDialog 실행
+
+------------------------------------------------------------
+3. 적용 전 복구 필요
+------------------------------------------------------------
+
+직전 STEP31에서 루틴지정창에 붙인 버튼은 위치가 잘못되었으므로 복구 권장:
+
+copy gui_routine_assign_window_BACKUP_before_STEP31.py gui_routine_assign_window.py
+
+그 후 STEP37 적용:
+
+copy gui_windows.py gui_windows_BACKUP_before_STEP37.py
+copy gui_windows_STEP37_open_macd_settings_from_main_routine_table.py gui_windows.py
+
+------------------------------------------------------------
+4. 테스트
+------------------------------------------------------------
+
+python test_main_routine_settings_step37.py
+python gui_main.py
+
+수동 확인:
+- 메인창 왼쪽 등록된 자동매매 루틴에서 MACD매매루틴 행 더블클릭
+- MACD 설정창 표시 확인
+- 저장 버튼 비활성 확인
+- HOLD 항목 없음 확인
+- CANCEL 실행 버튼 없음 확인
+
+------------------------------------------------------------
+5. 금지 확인
+------------------------------------------------------------
+
+본 STEP37에서 수행하지 않은 것:
+- rules.json 저장 없음
+- HOLD 추가 없음
+- CANCEL 구현 없음
+- BUY 확장 없음
+- 실주문 연결 없음
+- 루틴지정창 추가 변경 없음

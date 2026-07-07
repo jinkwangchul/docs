@@ -1,0 +1,37 @@
+프로젝트 참조도 분석 보고서
+============================================================
+
+[_MACD매매루틴]
+참조 파일 수: 9
+- kiwoom_auto/gui_auto_trade_runtime.py
+- kiwoom_auto/gui_auto_trade_setting_window.py
+- kiwoom_auto/gui_review_required_window.py
+- kiwoom_auto/gui_schedule_window.py
+- kiwoom_auto/gui_windows_149_manual_ats_status_policy_fix.py
+- kiwoom_auto/make_sample_orders.py
+- kiwoom_auto/make_sample_orders_multi_day.py
+- kiwoom_auto/make_sample_orders_multi_day_with_fee.py
+- kiwoom_auto/docs/gui_windows(160).py
+
+[_등록확인폴더]
+참조 파일 수: 1
+- kiwoom_auto/gui_auto_trade_runtime.py
+
+[stock_migration_]
+참조 파일 수: 2
+- kiwoom_auto/stock_migration_to_central_stocks.py
+- kiwoom_auto/registry_migratio/stock_migration_dry_run.py
+
+[registry_migration]
+참조 파일 수: 1
+- kiwoom_auto/registry_migratio/stock_migration_dry_run.py
+
+[gui_windows_149]
+참조 파일 수: 1
+- kiwoom_auto/gui_windows_149_manual_ats_status_policy_fix.py
+
+권장 분류
+- 유지: stocks, review_required, auto_trade_settings
+- 보관 후보: _MACD매매루틴, _등록확인폴더
+- 폐기 후보: stock_migration_* , registry_migration_* (참조 없을 경우)
+- 고위험 보류: gui_windows_149 계열

@@ -1,0 +1,48 @@
+{
+  "version": "1.0",
+  "policy_type": "cancel_policy",
+  "cancel_identity": {
+    "routine_cancel": "signal",
+    "main_cancel": "action"
+  },
+  "buy_cancel": {
+    "enabled": true,
+    "target": "unfilled_buy_orders",
+    "trigger": {
+      "time_limit_enabled": true,
+      "time_limit_seconds": 10,
+      "candle_limit_enabled": true,
+      "candle_limit_count": 1,
+      "price_escape_enabled": false
+    },
+    "partial_fill": {
+      "allow_partial_fill": true,
+      "cancel_remaining_only": true
+    },
+    "after_cancel": {
+      "action": "re_buy",
+      "target": "remaining_budget",
+      "max_retry_count": 3
+    }
+  },
+  "sell_cancel": {
+    "enabled": true,
+    "target": "unfilled_sell_orders",
+    "trigger": {
+      "time_limit_enabled": true,
+      "time_limit_seconds": 10,
+      "candle_limit_enabled": true,
+      "candle_limit_count": 1,
+      "price_escape_enabled": false
+    },
+    "partial_fill": {
+      "allow_partial_fill": true,
+      "cancel_remaining_only": true
+    },
+    "after_cancel": {
+      "action": "re_sell",
+      "target": "remaining_quantity",
+      "max_retry_count": 3
+    }
+  }
+}

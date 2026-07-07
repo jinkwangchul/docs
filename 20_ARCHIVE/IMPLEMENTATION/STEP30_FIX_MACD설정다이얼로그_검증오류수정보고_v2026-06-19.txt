@@ -1,0 +1,40 @@
+STEP30_FIX_MACD설정다이얼로그_검증오류수정보고_v2026-06-19
+
+발생 오류:
+- test_macd_settings_dialog_step30.py 실행 중 AssertionError 발생
+- 메시지: HOLD must not appear in preview
+
+원인:
+- 기존 테스트가 preview 텍스트 전체에서 "HOLD" 문자열을 단순 검색했다.
+- 그러나 STEP29 다이얼로그는 "HOLD 없음", "HOLD/CANCEL 구현 없음" 같은 금지 안내문을 표시한다.
+- 이는 HOLD 공식 신호 구현이 아니라 오염 방지 문구다.
+- 따라서 기존 테스트는 금지 안내문까지 오염으로 오판한 과잉검사다.
+
+PyQt5 폰트 경고:
+- QFontDatabase 경고는 치명 오류가 아니다.
+- 테스트 실패 원인은 폰트가 아니라 HOLD 문자열 단순검사다.
+
+수정 내용:
+- preview_text 단순 문자열 검사 제거
+- preview_text를 JSON으로 파싱
+- SIGNAL / ORDER_SIGNAL / ROUTINE_SIGNAL 값이 HOLD인지 확인
+- ALLOWED_ORDER_SIGNALS / SIGNALS 안에 HOLD가 공식 신호로 들어갔는지 확인
+- rules.json 원본도 같은 방식으로 검사
+- "HOLD 없음" 같은 설명 문구는 허용
+
+생성 파일:
+- test_macd_settings_dialog_step30_fix.py
+
+사용 방법:
+1. 기존 test_macd_settings_dialog_step30.py는 보관
+2. 수정본을 프로젝트 루트에 배치
+3. 실행:
+   python test_macd_settings_dialog_step30_fix.py
+
+주의:
+- gui_macd_routine_settings_dialog.py는 수정하지 않는다.
+- rules.json은 수정하지 않는다.
+- HOLD 공식 신호는 계속 금지다.
+- CANCEL 구현 없음.
+- BUY 확장 없음.
+- 실주문 연결 없음.

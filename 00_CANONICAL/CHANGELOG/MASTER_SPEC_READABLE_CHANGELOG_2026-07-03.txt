@@ -1,0 +1,32 @@
+MASTER_SPEC_READABLE_CHANGELOG_2026-07-03
+
+이번 2차 재구성에서 바뀐 점
+- 전체 docs 폴더를 다시 스캔하지 않고 1차 Canonical 출력 6개만 입력으로 사용했다.
+- MASTER_SPEC_CANONICAL_2026-07-03.txt의 반복 메타데이터를 본문에서 제거했다.
+- 출처 추적 정보는 MASTER_SPEC_TRACE_APPENDIX_2026-07-03.txt로 분리했다.
+- 충돌/확인 필요/보류 항목은 MASTER_SPEC_OPEN_ISSUES_2026-07-03.txt로 분리했다.
+- 1차 문서집/색인형 통합 구조를 정책 -> 구조 -> 구현 -> 검증 -> 남은 작업 흐름으로 재배열했다.
+- Dedup 해시 상세와 전체 스캔 색인 목록은 읽기용 본문에서 제외하고 부록/기존 보고서 참조로 돌렸다.
+
+1차 Canonical 대비 개선점
+- 본문에서 [출처], [기준일], [수정시각], [분류] 줄을 제거해 읽기 흐름을 개선했다.
+- 주문 파이프라인, Runtime 데이터 모델, 전체 아키텍처 원칙을 별도 주제로 분리했다.
+- 기존 25개 목차를 권장 29개 목차로 확장했다.
+- 최우선 기준을 문서 시작부와 금지사항 섹션에 유지했다.
+- 충돌 후보를 본문에서 임의 삭제하지 않고 별도 파일로 추적 가능하게 했다.
+
+입력 파일 크기
+- MASTER_SPEC_CANONICAL_2026-07-03.txt: 4952273 bytes
+- MASTER_SPEC_INDEX_2026-07-03.txt: 220538 bytes
+- MASTER_SPEC_CONFLICTS_2026-07-03.txt: 769303 bytes
+- MASTER_SPEC_DEDUP_REPORT_2026-07-03.txt: 3580388 bytes
+- MASTER_SPEC_CHANGELOG_2026-07-03.txt: 1180 bytes
+- README_CANONICAL_USAGE.txt: 1302 bytes
+
+생성 파일
+- MASTER_SPEC_CANONICAL_READABLE_2026-07-03.txt
+- MASTER_SPEC_TRACE_APPENDIX_2026-07-03.txt
+- MASTER_SPEC_OPEN_ISSUES_2026-07-03.txt
+- MASTER_SPEC_READABLE_CHANGELOG_2026-07-03.txt
+
+남은 확인 필요 항목 수: 1041

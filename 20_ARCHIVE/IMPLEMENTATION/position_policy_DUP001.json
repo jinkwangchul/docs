@@ -1,0 +1,143 @@
+{
+  "version": "1.0",
+  "policy_type": "position_policy",
+  "description": "연속 BUY/SELL 신호를 거치며 포지션을 어떻게 키우고 줄일지 정하는 루틴 전술 정책 초안.",
+  "authority_boundary": {
+    "main_engine_role": "entry_budget_and_risk_limit_provider",
+    "routine_position_policy_role": "tactical_position_builder",
+    "main_owns": [
+      "global_initial_entry_budget",
+      "stock_initial_entry_budget",
+      "routine_or_stock_total_budget_limit",
+      "time_policy",
+      "closing_policy",
+      "liquidation_policy",
+      "review_required_policy",
+      "final_order_approval"
+    ],
+    "routine_owns": [
+      "how_to_use_initial_entry_budget",
+      "continuous_buy_signal_handling",
+      "position_round_increment",
+      "x2_x3_scaling",
+      "active_buy_strategy",
+      "average_price_based_additional_buy",
+      "sell_reset_rule"
+    ]
+  },
+  "initial_entry_budget": {
+    "source": "main_engine",
+    "description": "최초진입 예산은 메인엔진의 전역/개별 설정에서 제공한다. 루틴은 이 한도 안에서 사용방식을 결정한다.",
+    "use_mode": "routine_tactical_allocation",
+    "routine_can_exceed_main_budget": false
+  },
+  "continuous_buy_signal": {
+    "enabled": true,
+    "description": "보유 중 BUY 신호가 반복 발생할 때 포지션을 확대할지 판단한다.",
+    "default_action": "increase_position_round",
+    "available_actions": [
+      "ignore",
+      "increase_position_round",
+      "merge_into_existing_signal_set",
+      "create_new_signal_set",
+      "active_buy_mode"
+    ],
+    "preferred_default": "increase_position_round"
+  },
+  "position_round": {
+    "enabled": true,
+    "round_basis": "accepted_buy_signal_count",
+    "max_rounds": 10,
+    "reset_on": [
+      "full_sell_completed",
+      "position_closed",
+      "manual_reset",
+      "review_required",
+      "new_trading_day"
+    ],
+    "do_not_reset_on": [
+      "partial_fill",
+      "cancel_and_rebuy",
+      "same_signal_set_retry"
+    ]
+  },
+  "budget_scaling": {
+    "enabled": false,
+    "mode": "fixed_multiplier",
+    "available_modes": [
+      "fixed_multiplier",
+      "step_table",
+      "user_defined"
+    ],
+    "fixed_multiplier": {
+      "multiplier": 3.0,
+      "description": "연속 BUY 회차 증가 시 직전 회차 대비 X3 예산을 제안한다. 메인 예산한도 초과 불가."
+    },
+    "step_table": {
+      "enabled": false,
+      "round_budget_ratio_percent": [
+        10,
+        10,
+        15,
+        15,
+        20,
+        30
+      ]
+    },
+    "user_defined": {
+      "enabled": false,
+      "round_budget_amount": []
+    },
+    "cap": {
+      "respect_main_total_budget_limit": true,
+      "respect_stock_budget_limit": true,
+      "respect_remaining_cash": true
+    }
+  },
+  "active_buy": {
+    "enabled": false,
+    "description": "매수 실패 후속 또는 포지션 보정 목적의 능동매수. V1에서는 보류/비활성 기본.",
+    "trigger_candidates": [
+      "buy_signal_repeated",
+      "position_under_target",
+      "current_price_below_average_price_percent",
+      "signal_set_incomplete"
+    ],
+    "reference": {
+      "average_price_source": "kiwoom_server_average_price",
+      "current_price_source": "main_engine_current_price"
+    }
+  },
+  "average_price_additional_buy": {
+    "enabled": false,
+    "description": "전체 평단과 현재가 비교를 이용한 추가매수 조건. 다중지점 실행조건과는 별도 계층이다.",
+    "basis": "kiwoom_server_average_price",
+    "condition": {
+      "operator": "current_price_lte_average_price_percent",
+      "percent": -2.0
+    },
+    "use_as": "position_expansion_condition"
+  },
+  "signal_set_relation": {
+    "single_buy_signal_execution": "buy_policy",
+    "multiple_buy_signal_position_strategy": "position_policy",
+    "unfilled_order_response": "cancel_policy",
+    "description": "buy_policy는 BUY 신호 1건의 실행방식이고, position_policy는 여러 BUY 신호를 거친 포지션 확대 전략이다."
+  },
+  "sell_interaction": {
+    "sell_signal_action": "follow_sell_policy",
+    "full_sell_completed_resets_position_round": true,
+    "partial_sell_does_not_always_reset_round": true,
+    "reset_policy_requires_later_confirmation": true
+  },
+  "main_gate": {
+    "every_position_expansion_requires_main_approval": true,
+    "on_main_reject": "ignore_and_log",
+    "on_budget_limit": "clip_to_allowed_budget_or_reject",
+    "on_time_policy_block": "reject_signal",
+    "on_closing_waiting_final_sell": {
+      "buy_signal_allowed_until_final_sell_order_accepted": true,
+      "requires_main_approval": true
+    }
+  }
+}

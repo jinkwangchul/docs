@@ -1,0 +1,10 @@
+rules.json v0.2 SELL 신호 구조 갱신
+
+변경:
+- sell.signal_logic 추가: OR/AND 선택용
+- sell.signals.macd_sell 추가: MACD OSC TURN_DOWN
+- sell.signals.profit_rate_sell 추가: 수익률 SELL, 기본 비활성
+- sell.filters 추가: RSI/이평/가격비교 필터 예약
+- 수익률 SELL은 구현 확정이 아니라 같은 레벨 독립신호 후보로 구조만 반영
+
+코드 변경 없음.

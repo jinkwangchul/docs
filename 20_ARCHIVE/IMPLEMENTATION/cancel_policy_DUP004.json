@@ -1,0 +1,66 @@
+{
+  "version": "1.2",
+  "policy_type": "cancel_policy",
+  "description": "루틴 CANCEL은 제안 신호, 메인 CANCEL은 실제 주문취소 행동.",
+  "authority_boundary": {
+    "routine_cancel_role": "cancel_signal_advice",
+    "main_cancel_role": "order_cancel_action",
+    "main_must_approve_before_cancel": true
+  },
+  "cancel_identity": {
+    "routine_cancel": "signal",
+    "main_cancel": "action",
+    "system_cancel_has_priority": true
+  },
+  "default_principle": {
+    "unfilled_is_not_immediate_failure": true,
+    "prefer_time_or_candle_limit_over_price_escape": true,
+    "cancel_remaining_only": true,
+    "partial_fill_is_valid": true
+  },
+  "system_priority": {
+    "review_required_blocks_routine_cancel": true,
+    "liquidation_or_system_close_can_force_system_cancel": true,
+    "system_cancel_has_priority_over_routine_cancel": true
+  },
+  "buy_cancel": {
+    "enabled": true,
+    "target": "unfilled_buy_orders",
+    "trigger": {
+      "time_limit_enabled": true,
+      "time_limit_seconds": 10,
+      "candle_limit_enabled": true,
+      "candle_limit_count": 1,
+      "price_escape_enabled": false
+    },
+    "partial_fill": {
+      "allow_partial_fill": true,
+      "cancel_remaining_only": true
+    },
+    "after_cancel": {
+      "action": "re_buy",
+      "target": "remaining_budget",
+      "max_retry_count": 3
+    }
+  },
+  "sell_cancel": {
+    "enabled": true,
+    "target": "unfilled_sell_orders",
+    "trigger": {
+      "time_limit_enabled": true,
+      "time_limit_seconds": 10,
+      "candle_limit_enabled": true,
+      "candle_limit_count": 1,
+      "price_escape_enabled": false
+    },
+    "partial_fill": {
+      "allow_partial_fill": true,
+      "cancel_remaining_only": true
+    },
+    "after_cancel": {
+      "action": "re_sell",
+      "target": "remaining_quantity",
+      "max_retry_count": 3
+    }
+  }
+}

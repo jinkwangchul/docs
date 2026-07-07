@@ -1,0 +1,25 @@
+STEP41B_구성단일중심_UI_수정보고_v2026-06-19
+
+수정 목적:
+- 사용자가 지적한 창 폭 부족 문제 수정
+- 매수/매도 탭 제거
+- 구성 탭 중심 컨트롤 패널 방향 유지
+
+수정 내용:
+1. 창 크기 확대
+   - 기존 820x620
+   - 변경 1180x760
+
+2. 공식 탭 정리
+   - 유지: 구성, 고급, 검증
+   - 제거: 매수, 매도
+   - 제거: 법전 문구
+
+3. 호환 유지
+   - 기존 _populate_fields()가 참조하는 buy/sell 위젯은 생성하되 공식 탭에 노출하지 않음
+   - rules.json 저장 없음
+   - 저장 버튼 비활성 유지
+
+적용:
+copy gui_macd_routine_settings_dialog_STEP41B_overview_only_wide.py gui_macd_routine_settings_dialog.py
+python test_macd_settings_dialog_step41b_overview_only.py

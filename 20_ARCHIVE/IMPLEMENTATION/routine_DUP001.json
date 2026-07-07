@@ -1,0 +1,20 @@
+{
+  "version": "1.1",
+  "routine_name": "MACD매매루틴",
+  "routine_type": "technical_signal_routine",
+  "description": "MACD 오실레이터 추세전환을 중심으로 BUY/SELL/CANCEL 신호를 제안하는 루틴 패키지 초안",
+  "entry_point": "main_controller.json",
+  "policy_files": {
+    "main_controller": "main_controller.json",
+    "rules": "rules.json",
+    "buy_policy": "buy_policy.json",
+    "sell_policy": "sell_policy.json",
+    "cancel_policy": "cancel_policy.json",
+    "execution_policy": "execution_policy.json",
+    "position_policy": "position_policy.json"
+  },
+  "authority": {
+    "routine_is_advisor": true,
+    "main_part_is_final_decision_maker": true
+  }
+}

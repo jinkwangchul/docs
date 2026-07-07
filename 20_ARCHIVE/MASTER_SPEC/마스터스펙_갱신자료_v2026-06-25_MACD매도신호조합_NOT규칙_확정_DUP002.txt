@@ -1,0 +1,193 @@
+마스터스펙_갱신자료_v2026-06-25_MACD매도신호조합_NOT규칙_확정
+
+1. 반영 대상
+- 키움 자동매매 프로젝트
+- MACD매매루틴
+- gui_macd_routine_settings_dialog.py
+- 구성 탭 > 매도설정 > 신호검출조건조합
+- 신호검출조건 A/B/C
+
+2. 매도신호 구성 방향
+기존 OCR 중심 신호 설계에서 벗어나, A/B/C 독립 조건그룹을 조합하는 구조로 확장한다.
+A는 OCR/가격필터/RSI, B는 가격박스 중심 가격행동, C는 MACD/배열 계열 조건으로 역할을 나눈다.
+가격박스는 매도신호 검출의 핵심 후보로 유지한다.
+
+3. 신호검출조건 A
+- OCR 추세 감지
+- 주문가/현재가/평단가 기반 가격필터
+- RSI
+OCR은 고정 주신호가 아니며, 가격필터 단독 사용 가능성을 열어둔다.
+
+4. 신호검출조건 B
+- 가격박스 [상향/하향] [0.1]% [이상/이하]
+- 주문가/현재가/평단가 기반 가격신호
+B는 OCR과 동일 레벨의 독립 신호검출조건이다.
+
+5. 신호검출조건 C
+- MACD선/시그널선 조건
+- 이평 배열 조건
+C는 MACD/배열 계열 조건그룹이다.
+
+6. 신호검출조건조합 UI
+권장 버튼:
+- A
+- B
+- C
+- and
+- or
+- not
+- ()
+- 지움
+
+제거 확정:
+- ← 백스페이스
+- 개별 ( 버튼
+- 개별 ) 버튼
+- and/or/not 통합 순환 버튼
+
+수식 입력창:
+- QLineEdit
+- 가운데 정렬
+- 굵은 글씨
+- 폭 약 260px 전후
+- 예시: (A and B) or C
+
+7. NOT 최종 정의
+본 프로젝트의 NOT은 일반 프로그래밍식 단항 NOT이 아니다.
+NOT은 해당 조건 상황을 제외하는 프로젝트 전용 조합토큰이다.
+
+대표:
+A AND B NOT C
+= A 조건을 만족하고
+= B 조건을 만족하고
+= C 조건 상황은 제외한다.
+
+마스터스펙 반영 필수 문장:
+"본 프로젝트의 신호검출조건조합에서 NOT은 일반 프로그래밍식 단항 NOT이 아니며, AND NOT/OR NOT 형태는 금지한다. NOT은 A AND B NOT C처럼 조건 사이에 배치되어 뒤 조건을 제외하는 조합 토큰으로 사용한다."
+
+8. 허용 수식
+- A
+- B
+- C
+- A AND B
+- A OR B
+- A NOT B
+- A AND B AND C
+- A AND B OR C
+- A AND B NOT C
+- A OR B AND C
+- A OR B OR C
+- A OR B NOT C
+- (A AND B) OR C
+- (A OR B) AND C
+- (A AND B) NOT C
+- A AND (B OR C)
+- A OR (B AND C)
+- A NOT (B OR C)
+
+9. 금지 수식
+연산자 시작:
+- AND A
+- OR A
+- NOT A
+
+연산자 종료:
+- A AND
+- A OR
+- A NOT
+- (A AND)
+- (C OR)
+
+연산자 연속:
+- A AND OR B
+- A OR AND B
+- A AND NOT B
+- A OR NOT B
+- A NOT AND B
+- A NOT OR B
+- AND NOT
+- OR NOT
+- NOT AND
+- NOT OR
+
+조건 중복:
+- A AND A
+- A OR A
+- A AND (B OR A)
+- C NOT C
+
+괄호 오류:
+- (A AND
+- A OR)
+- (C OR)
+- ((A AND B)
+- A AND B)
+
+10. 입력기 구현 규칙
+_append_sell_expr(token):
+- 첫 입력은 A/B/C/( 만 가능.
+- AND/OR/NOT/)은 첫 입력 금지.
+- A/B/C는 수식 내 1회만 허용.
+- A/B/C 뒤에는 AND/OR/NOT/)만 허용.
+- AND/OR/NOT 뒤에는 A/B/C/(만 허용.
+- AND/OR/NOT 뒤 AND/OR/NOT 금지.
+- ( 뒤에는 A/B/C/(만 허용.
+- ) 뒤에는 AND/OR/NOT/)만 허용.
+- 최종 수식은 A/B/C 또는 )로 끝나야 한다.
+- A/B/C가 모두 사용된 후에는 마지막에 연산자를 더 붙이지 못한다.
+- 마지막 토큰이 연산자인 상태에서 다른 연산자를 누르는 경우에는 추가가 아니라 교체만 허용할 수 있다.
+- 단, AND NOT/OR NOT 패턴은 절대 생성되면 안 된다.
+
+11. 괄호 구현 규칙
+() 버튼은 선택영역 토글 기능만 수행한다.
+- 정상 선택영역이면 괄호 추가.
+- 이미 괄호로 감싸진 정상 선택영역이면 괄호 제거.
+- 비정상 선택영역이면 무시.
+
+정상 fragment:
+- A
+- A AND B
+- A OR B
+- A NOT B
+- A AND B NOT C
+
+비정상 fragment:
+- A AND
+- A OR
+- A NOT
+- AND B
+- OR B
+- NOT B
+- A AND NOT B
+- A OR NOT B
+- C OR
+- C NOT
+
+검사 항목:
+- 첫 토큰이 연산자면 금지.
+- 마지막 토큰이 연산자면 금지.
+- 연속 연산자 금지.
+- 괄호 균형 오류 금지.
+- A/B/C 중복 금지.
+
+12. 백스페이스 정책
+백스페이스 버튼은 제거한다.
+이유:
+- 수식이 짧다.
+- A/B/C 3조건만 사용한다.
+- 지움 후 재입력이 더 단순하고 안전하다.
+지움 버튼은 전체 초기화만 수행한다.
+
+13. 작업 중 오류 재발 방지
+- NOT을 일반 단항 NOT으로 해석하지 말 것.
+- A AND NOT B를 정상으로 처리하지 말 것.
+- AND NOT/OR NOT 절대 금지.
+- 연산자 통합 버튼 재도입 금지.
+- 백스페이스 재도입 금지.
+- 괄호 생성 전 fragment 검증 필수.
+- 매도설정 상단 조합부 외 영역 임의 수정 금지.
+
+14. 결론
+매도신호 조합 UI는 A/B/C 조건그룹과 AND/OR/NOT 조합토큰으로 구성한다.
+NOT은 뒤 조건 제외 토큰이며, 프로젝트 문법에서 AND NOT/OR NOT은 금지한다.
+다음 구현은 이 규칙을 코드에 강제하는 작업이다.

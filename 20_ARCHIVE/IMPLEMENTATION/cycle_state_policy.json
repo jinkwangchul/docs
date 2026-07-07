@@ -1,0 +1,205 @@
+{
+  "version": "1.0",
+  "policy_type": "cycle_state_policy",
+  "description": "메인 종목 운영상태와 루틴 내부 Cycle State를 분리하고, 상호 허용/차단 관계를 정의하는 정책 초안.",
+  "authority_boundary": {
+    "main_operation_state_is_user_visible": true,
+    "cycle_state_is_internal_routine_runtime": true,
+    "main_operation_state_has_priority": true,
+    "routine_cycle_cannot_override_main_state": true
+  },
+  "main_operation_states": {
+    "watch_wait": {
+      "label": "감시/대기",
+      "description": "종목은 운영 준비 상태. 신규 BUY 신호를 받을 수 있음."
+    },
+    "trading": {
+      "label": "매수/매도",
+      "description": "정상 루틴 매매 진행 상태."
+    },
+    "early_close": {
+      "label": "조기마감",
+      "description": "마지막 SELL 신호를 기다리는 마감 상태. 즉시 BUY 금지가 아니라 마지막 SELL 주문 접수 전까지 루틴 신호를 허용할 수 있음."
+    },
+    "auto_close": {
+      "label": "자동마감",
+      "description": "시간정책에 따라 마지막 SELL 신호를 기다리는 마감 상태."
+    },
+    "liquidation": {
+      "label": "청산",
+      "description": "보유 정리 중심 상태. 루틴 신규 BUY는 불가."
+    },
+    "review": {
+      "label": "검토관리",
+      "description": "운영자가 확인해야 하는 예외 상태. 루틴 자동신호는 차단."
+    }
+  },
+  "cycle_states": {
+    "READY": {
+      "description": "루틴이 신규 BUY 신호를 받을 준비 상태.",
+      "new_buy_allowed": true,
+      "new_sell_allowed": false
+    },
+    "RUNNING": {
+      "description": "BUY 이후 포지션 구축/운영 중. 연속 BUY와 최초 유효 SELL을 받을 수 있음.",
+      "new_buy_allowed": true,
+      "new_sell_allowed": true
+    },
+    "EXITING": {
+      "description": "최초 유효 SELL 이후 Exit Strategy 진행 중.",
+      "new_buy_allowed": false,
+      "new_sell_allowed": "as_exit_condition_only"
+    },
+    "RESETTING": {
+      "description": "Exit Strategy 이후 서버 보유/미체결/불일치 여부를 확인하며 다음 Cycle 준비 중.",
+      "new_buy_allowed": false,
+      "new_sell_allowed": false
+    },
+    "READY_AFTER_RESET": {
+      "description": "Reset Complete 후 다음 BUY 허용 상태. 구현상 READY와 병합 가능.",
+      "new_buy_allowed": true,
+      "new_sell_allowed": false
+    },
+    "TROUBLE": {
+      "description": "Reset 실패, 서버/프로그램 불일치, 매도 실패 등 예외 상태.",
+      "new_buy_allowed": false,
+      "new_sell_allowed": false
+    }
+  },
+  "state_mapping": {
+    "watch_wait": {
+      "allowed_cycle_states": [
+        "READY",
+        "READY_AFTER_RESET"
+      ],
+      "blocked_cycle_states": [
+        "RUNNING",
+        "EXITING",
+        "RESETTING",
+        "TROUBLE"
+      ],
+      "description": "감시/대기는 원칙적으로 신규 Cycle 대기상태다."
+    },
+    "trading": {
+      "allowed_cycle_states": [
+        "READY",
+        "RUNNING",
+        "EXITING",
+        "RESETTING",
+        "READY_AFTER_RESET"
+      ],
+      "blocked_cycle_states": [
+        "TROUBLE"
+      ],
+      "description": "정상 매수/매도 운영상태. 루틴 Cycle이 실제로 움직일 수 있는 기본 상태."
+    },
+    "early_close": {
+      "allowed_cycle_states": [
+        "RUNNING",
+        "EXITING",
+        "RESETTING"
+      ],
+      "blocked_cycle_states": [
+        "READY_AFTER_RESET"
+      ],
+      "description": "조기마감은 마지막 SELL 대기 및 종료절차 상태. 마지막 SELL 주문 접수 전까지 RUNNING 가능, 이후 EXITING/RESETTING으로 진행."
+    },
+    "auto_close": {
+      "allowed_cycle_states": [
+        "RUNNING",
+        "EXITING",
+        "RESETTING"
+      ],
+      "blocked_cycle_states": [
+        "READY_AFTER_RESET"
+      ],
+      "description": "자동마감은 시간정책에 따른 마지막 SELL 대기 및 종료절차 상태."
+    },
+    "liquidation": {
+      "allowed_cycle_states": [
+        "RESETTING",
+        "TROUBLE"
+      ],
+      "blocked_cycle_states": [
+        "READY",
+        "RUNNING",
+        "EXITING",
+        "READY_AFTER_RESET"
+      ],
+      "description": "청산 상태에서는 루틴의 신규 BUY/SELL Cycle이 아니라 메인 청산정책이 우선한다."
+    },
+    "review": {
+      "allowed_cycle_states": [
+        "TROUBLE"
+      ],
+      "blocked_cycle_states": [
+        "READY",
+        "RUNNING",
+        "EXITING",
+        "RESETTING",
+        "READY_AFTER_RESET"
+      ],
+      "description": "검토관리 상태에서는 루틴 자동 실행을 차단한다."
+    }
+  },
+  "cycle_transitions": {
+    "READY": {
+      "on_valid_buy_approved_by_main": "RUNNING",
+      "on_main_close_without_position": "READY",
+      "on_review_required": "TROUBLE"
+    },
+    "RUNNING": {
+      "on_valid_buy_approved_by_main": "RUNNING",
+      "on_valid_sell_approved_by_main": "EXITING",
+      "on_early_or_auto_close": "RUNNING",
+      "on_review_required": "TROUBLE"
+    },
+    "EXITING": {
+      "on_exit_strategy_completed": "RESETTING",
+      "on_subsequent_sell_signal": "EXITING",
+      "on_buy_signal": "EXITING",
+      "on_exit_failure": "TROUBLE"
+    },
+    "RESETTING": {
+      "on_reset_complete": "READY_AFTER_RESET",
+      "on_reset_failed": "TROUBLE",
+      "on_server_mismatch": "TROUBLE"
+    },
+    "READY_AFTER_RESET": {
+      "on_new_buy_approved_by_main": "RUNNING",
+      "on_new_trading_cycle_wait": "READY"
+    },
+    "TROUBLE": {
+      "on_operator_review_return": "READY",
+      "on_operator_send_to_review": "TROUBLE"
+    }
+  },
+  "reset_complete_conditions": {
+    "server_holding_quantity_zero": true,
+    "unfilled_buy_quantity_zero": true,
+    "unfilled_sell_quantity_zero": true,
+    "server_program_data_match": true,
+    "order_state_clean": true,
+    "description": "SELL 주문 접수나 Exit Strategy 종료만으로 Reset Complete가 아니다. 서버 기준으로 보유/미체결/불일치가 정리되어야 한다."
+  },
+  "reset_failed_conditions": {
+    "holding_quantity_remaining_after_exit": true,
+    "unfilled_order_remaining_after_retry": true,
+    "cancel_or_resell_retry_exhausted": true,
+    "server_program_data_mismatch": true,
+    "unknown_order_state": true
+  },
+  "exit_signal_handling": {
+    "first_valid_sell": "cycle_exit_start",
+    "subsequent_sell_during_exiting": "exit_strategy_condition_event",
+    "buy_during_exiting": "ignore_and_log_by_default",
+    "description": "EXITING 중 추가 SELL은 새 Cycle 종료신호가 아니라 Exit Strategy 조건 이벤트로 사용할 수 있다."
+  },
+  "logging": {
+    "log_cycle_state_change": true,
+    "log_main_operation_state_change": true,
+    "log_state_mapping_decision": true,
+    "log_reset_complete_check": true,
+    "log_reset_failed_reason": true
+  }
+}

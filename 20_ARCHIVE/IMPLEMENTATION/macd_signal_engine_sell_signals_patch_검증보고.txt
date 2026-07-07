@@ -1,0 +1,6 @@
+macd_signal_engine.py SELL 구조 호환 패치
+syntax=OK
+지원: sell.signals.macd_sell.groups 우선
+호환: 기존 sell.groups 유지
+profit_rate_sell: 구조만 예약, 아직 평가 안 함
+HOLD occurrences=0

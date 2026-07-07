@@ -1,0 +1,158 @@
+{
+  "version": "1.2",
+  "policy_type": "position_policy",
+  "description": "가격제한 정책과 추가진입 트리거 정책을 분리한 Position Policy v10 초안.",
+  "core_principle": {
+    "buy_signal_is_independent_event": true,
+    "buy_signal_count_is_not_entry_count": true,
+    "entry_count_increases_only_when_actual_buy_is_accepted": true,
+    "skipped_buy_does_not_increase_entry_count": true,
+    "partial_fill_counts_as_actual_entry": true,
+    "price_limit_disabled_means_mechanical_buy_on_signal": true
+  },
+  "position_scaling": {
+    "basis": "amount",
+    "available_basis": [
+      "amount",
+      "quantity"
+    ],
+    "mode": "multiplier",
+    "available_modes": [
+      "fixed",
+      "linear_by_entry_count",
+      "multiplier",
+      "user_defined_sequence"
+    ],
+    "multiplier": {
+      "enabled": true,
+      "value": 3.0,
+      "example_amounts": [
+        1000000,
+        3000000,
+        9000000,
+        27000000
+      ]
+    },
+    "description": "진입 예산/수량 증가 규칙. 가격조건과 별개다."
+  },
+  "price_limit_policy": {
+    "enabled": false,
+    "mode": "disabled",
+    "available_modes": [
+      "disabled",
+      "first_buy_upper_guard",
+      "first_buy_lower_guard",
+      "first_buy_range_guard",
+      "custom_first_buy_range"
+    ],
+    "disabled": {
+      "meaning": "BUY 신호 발생 시 가격제한 검사 없이 기계적으로 BUY 검토",
+      "current_price_limit_check": false
+    },
+    "first_buy_upper_guard": {
+      "meaning": "최초 실제 BUY 현재가 이하에서만 추가 BUY 허용",
+      "condition": "current_price <= first_actual_buy_price"
+    },
+    "first_buy_lower_guard": {
+      "meaning": "최초 실제 BUY 현재가 이상에서만 추가 BUY 허용",
+      "condition": "current_price >= first_actual_buy_price"
+    },
+    "first_buy_range_guard": {
+      "meaning": "최초 실제 BUY 현재가 기준 상승/하락 범위 안에서만 추가 BUY 허용",
+      "up_limit_percent": 20.0,
+      "down_limit_percent": 20.0,
+      "condition": "first_actual_buy_price*(1-down%) <= current_price <= first_actual_buy_price*(1+up%)"
+    },
+    "custom_first_buy_range": {
+      "meaning": "상승/하락 제한 비율을 사용자가 별도 입력",
+      "up_limit_percent_user_input": true,
+      "down_limit_percent_user_input": true
+    }
+  },
+  "additional_entry_trigger_policy": {
+    "enabled": false,
+    "mode": "disabled",
+    "available_modes": [
+      "disabled",
+      "last_buy_down_percent",
+      "last_buy_up_percent",
+      "last_buy_bidirectional_percent"
+    ],
+    "disabled": {
+      "meaning": "직전 BUY 기준 추가진입 트리거 검사 없음"
+    },
+    "last_buy_down_percent": {
+      "enabled": false,
+      "fixed_percent": 10.0,
+      "condition": "current_price <= last_actual_buy_price * (1 - fixed_percent/100)",
+      "meaning": "직전 실제 BUY 현재가 대비 n% 이하일 때 추가 BUY 허용"
+    },
+    "last_buy_up_percent": {
+      "enabled": false,
+      "fixed_percent": 10.0,
+      "condition": "current_price >= last_actual_buy_price * (1 + fixed_percent/100)",
+      "meaning": "직전 실제 BUY 현재가 대비 n% 이상일 때 추가 BUY 허용"
+    },
+    "last_buy_bidirectional_percent": {
+      "enabled": false,
+      "up_percent": 10.0,
+      "down_percent": 10.0,
+      "condition": "current_price >= last_actual_buy_price*(1+up%) OR current_price <= last_actual_buy_price*(1-down%)",
+      "meaning": "직전 실제 BUY 현재가 기준 상승/하락 양방향 변동률 도달 시 추가 BUY 허용"
+    }
+  },
+  "combined_evaluation": {
+    "logic": "price_limit_policy AND additional_entry_trigger_policy",
+    "disabled_policy_handling": "disabled policy is treated as pass",
+    "examples": [
+      {
+        "case": "가격제한 비활성 + 트리거 비활성",
+        "result": "BUY 신호마다 메인 승인 후 기계적 BUY"
+      },
+      {
+        "case": "최초 BUY 상한 + 직전 BUY -10%",
+        "result": "최초 BUY 가격 이하이면서 직전 실제 BUY 대비 10% 이상 하락해야 추가 BUY"
+      },
+      {
+        "case": "최초 BUY 하한 + 직전 BUY +10%",
+        "result": "최초 BUY 가격 이상이면서 직전 실제 BUY 대비 10% 이상 상승해야 추가 BUY"
+      },
+      {
+        "case": "최초 BUY 양방향 범위 + 직전 BUY 양방향 변동률",
+        "result": "정해진 전체 가격범위 안에서 직전 BUY 대비 상승/하락 변동률 조건을 만족할 때 추가 BUY"
+      }
+    ]
+  },
+  "buy_signal_evaluation_flow": [
+    "BUY signal received",
+    "if no actual entry exists: request main approval for initial entry",
+    "if actual entry exists: evaluate price_limit_policy",
+    "evaluate additional_entry_trigger_policy",
+    "if any enabled policy fails: skip BUY and do not increase actual entry count",
+    "if policies pass: calculate next entry amount/quantity by position_scaling",
+    "request main approval",
+    "if main approved: execute BUY and increase actual_entry_count",
+    "update last_actual_buy_price after accepted actual BUY"
+  ],
+  "skip_policy": {
+    "skipped_signal_increases_entry_count": false,
+    "skipped_signal_is_logged": true,
+    "skip_reasons": [
+      "price_limit_policy_failed",
+      "additional_entry_trigger_policy_failed",
+      "main_gate_rejected",
+      "time_policy_blocked",
+      "review_required"
+    ]
+  },
+  "average_price_reference": {
+    "server_average_price_is_primary": true,
+    "internal_average_price_is_validation_only": true,
+    "average_price_is_not_default_entry_trigger_basis": true
+  },
+  "main_gate": {
+    "every_actual_entry_requires_main_approval": true,
+    "routine_can_suggest_amount_or_quantity_but_cannot_execute": true,
+    "main_can_clip_or_reject_by_budget_policy": true
+  }
+}

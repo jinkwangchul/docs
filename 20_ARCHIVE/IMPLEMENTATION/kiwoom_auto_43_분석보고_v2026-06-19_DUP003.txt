@@ -1,0 +1,286 @@
+kiwoom_auto_43_분석보고_v2026-06-19
+
+분석 대상:
+- kiwoom_auto (43).zip
+
+분석 목적:
+- 현재 압축본 기준 STEP23~STEP35 산출물 적용 상태 확인
+- PyQt5 관련 검증 가능/불가능 범위 확인
+- 다음 작업 판단
+
+------------------------------------------------------------
+1. 압축본 전체 상태
+------------------------------------------------------------
+
+압축본 내 파일 수:
+- 1523개
+
+주요 확인 파일:
+- engines/macd_signal_engine.py
+- routines/MACD매매루틴/routine.py
+- routines/MACD매매루틴/rules.json
+- gui_macd_routine_settings_dialog.py
+- gui_macd_routine_settings_dialog_STEP29.py
+- gui_routine_assign_window.py
+- gui_routine_assign_window_STEP31_add_macd_settings_button.py
+- test_macd_settings_dialog_step30.py
+- test_routine_assign_window_step32.py
+- test_sell_profit_rate_signal_logic_step23.py
+
+------------------------------------------------------------
+2. STEP23 적용 상태
+------------------------------------------------------------
+
+확인 결과:
+- engines/macd_signal_engine.py는 context 인자를 받는 STEP23 구조가 적용되어 있음.
+- evaluate_macd_routine(candles, config=None, context=None) 형태 확인.
+- profit_rate_sell 평가 로직 존재.
+- sell.signal_logic OR/AND 결합 로직 존재.
+- routines/MACD매매루틴/routine.py에서 evaluate_macd_routine(candles, config, context) 호출 확인.
+
+실행 확인:
+- test_sell_profit_rate_signal_logic_step23.py 실행 성공.
+- OR profit only 통과.
+- AND both pass 통과.
+- AND profit fail 통과.
+- no holding 통과.
+
+판정:
+- STEP23은 현재 압축본에 적용된 상태로 판단 가능.
+
+주의:
+- engines/macd_signal_engine.py 내부에 "HOLD/CANCEL 등 신규 신호를 만들지 않는다"라는 금지 주석 형태의 HOLD 문자열은 존재함.
+- 이는 공식 신호 구현이 아니라 금지 문구임.
+
+------------------------------------------------------------
+3. rules.json 상태
+------------------------------------------------------------
+
+확인 파일:
+- routines/MACD매매루틴/rules.json
+
+확인 내용:
+- rules_version: 0.2.0
+- sell.signal_logic: OR
+- sell.signals.macd_sell 존재
+- sell.signals.profit_rate_sell 존재
+- profit_rate_sell.enabled: false
+- profit_rate_sell.profit_rate_percent: null
+- basis: average_price
+- principle.signal_only: true
+- principle.execution_enabled: false
+
+판정:
+- rules.json은 v0.2 구조 상태.
+- STEP23 엔진은 구현 완료지만 rules.json 자체는 v0.3 참고 초안으로 교체되지 않았음.
+- 현재까지 원칙대로 실제 rules.json 교체는 하지 않은 상태로 보임.
+
+------------------------------------------------------------
+4. STEP29 다이얼로그 적용 상태
+------------------------------------------------------------
+
+확인 파일:
+- gui_macd_routine_settings_dialog.py
+- gui_macd_routine_settings_dialog_STEP29.py
+
+확인 결과:
+- gui_macd_routine_settings_dialog.py가 압축본에 존재함.
+- STEP29 초안 다이얼로그 내용이 실제 파일명으로도 들어가 있음.
+- 별도 STEP29 후보 파일도 함께 존재함.
+
+기능 상태:
+- rules.json 읽기
+- 기본설정 / BUY / SELL / 확장예정 / 미리보기 탭 구성
+- 저장 버튼 비활성
+- BUY 잠금
+- SELL 표시
+- 확장예정 설명
+- rules.json 저장 없음
+
+주의:
+- 파일 내 HOLD 문자열은 금지/주의/미리보기 제한 문구로 존재함.
+- 공식 HOLD 신호 구현은 발견되지 않음.
+- test_macd_settings_dialog_step30.py의 미리보기에서 HOLD 문자열이 없어야 한다는 검증은 실제 GUI 실행 시 문구 구성에 따라 재확인 필요.
+
+판정:
+- STEP29 다이얼로그 파일은 현재 압축본에 이미 들어가 있음.
+- 단, 실제 GUI 실행 검증은 이 환경에서 PyQt5 부재로 수행하지 못함.
+
+------------------------------------------------------------
+5. STEP31 루틴지정창 연결 상태
+------------------------------------------------------------
+
+확인 파일:
+- gui_routine_assign_window.py
+- gui_routine_assign_window_STEP31_add_macd_settings_button.py
+
+현재 실제 gui_routine_assign_window.py:
+- btn_routine_settings 없음.
+- open_selected_routine_settings 없음.
+- 즉, 실제 루틴지정창에는 아직 "루틴 설정" 버튼 연결이 적용되지 않음.
+
+후보 파일 gui_routine_assign_window_STEP31_add_macd_settings_button.py:
+- btn_routine_settings 존재.
+- open_selected_routine_settings 존재.
+- STEP31 연결 후보가 별도 파일로 존재함.
+
+정적 구조 확인:
+- 현재 실제 gui_routine_assign_window.py에는 selected_routine_for_detail 메서드 존재.
+- checked_routines 메서드 존재.
+- btn_apply, btn_unassign, btn_close 구조 존재.
+- routine_header_layout 위치 존재.
+- 따라서 STEP31 후보가 붙을 수 있는 구조적 앵커는 실제 파일에 존재함.
+
+판정:
+- STEP31은 실제 적용 전 상태.
+- 후보 파일은 존재하므로 사용자가 교체하면 연결 적용 가능성이 높음.
+- 그러나 실제 적용 전 백업 필수.
+
+------------------------------------------------------------
+6. STEP30/STEP32 테스트 상태
+------------------------------------------------------------
+
+확인 파일:
+- test_macd_settings_dialog_step30.py 존재
+- test_routine_assign_window_step32.py 존재
+
+이 환경에서 실행 결과:
+- PyQt5 미설치로 실행 불가.
+- ModuleNotFoundError: No module named 'PyQt5'
+
+중요:
+- 이는 사용자의 PC 문제가 아니라 현재 분석 환경의 문제.
+- 사용자의 PC에는 이전 확인 기준 PyQt5 5.15.11 / PyQt5-Qt5 5.15.2가 설치되어 있었음.
+- 따라서 실제 GUI 테스트는 사용자 PC에서 해야 함.
+
+정적 검증:
+- python -m py_compile 기준:
+  - engines/macd_signal_engine.py
+  - routines/MACD매매루틴/routine.py
+  - gui_routine_assign_window.py
+  - gui_routine_assign_window_STEP31_add_macd_settings_button.py
+  - gui_macd_routine_settings_dialog.py
+  - test_macd_settings_dialog_step30.py
+  - test_routine_assign_window_step32.py
+  문법 컴파일 통과.
+
+판정:
+- 문법 오류는 현재 확인되지 않음.
+- GUI 런타임 검증은 사용자 PC 필요.
+
+------------------------------------------------------------
+7. STEP34/STEP35 스크립트 상태
+------------------------------------------------------------
+
+확인 결과:
+- apply_STEP29_STEP32_macd_settings_ui.ps1 없음.
+- rollback_STEP34_macd_settings_ui.ps1 없음.
+- run_STEP35_macd_settings_ui_tests.ps1 없음.
+
+판정:
+- STEP34/STEP35 PowerShell 스크립트는 현재 압축본에 포함되어 있지 않음.
+- 적용/검증 자동화 스크립트는 아직 프로젝트 폴더에 반영되지 않은 상태로 보임.
+
+------------------------------------------------------------
+8. 현재 압축본의 실제 진행 상태 요약
+------------------------------------------------------------
+
+적용됨:
+- STEP23 엔진/routine context 구조
+- STEP23 테스트 파일
+- STEP29 MACD 설정 다이얼로그 파일
+- STEP30/STEP32 테스트 파일
+
+후보로만 존재:
+- STEP31 루틴지정창 연결 후보 파일
+
+미적용:
+- 실제 gui_routine_assign_window.py에 "루틴 설정" 버튼 연결
+- STEP34 적용 스크립트
+- STEP35 검증 스크립트
+- rules.json v0.3 교체
+
+검증됨:
+- STEP23 테스트 실행 통과
+- 주요 파일 문법 컴파일 통과
+
+미검증:
+- PyQt5 GUI 실제 실행
+- STEP30 테스트
+- STEP32 테스트
+- gui_main.py 화면 동작
+- 루틴지정창에서 MACD 설정창 열기
+
+------------------------------------------------------------
+9. 다음 작업 판단
+------------------------------------------------------------
+
+현재 바로 추가 구현을 진행하면 안 됨.
+
+이유:
+- STEP31은 아직 실제 적용되지 않았음.
+- PyQt GUI 실행 검증이 아직 없음.
+- 현재 필요한 것은 신규 기능 추가가 아니라 적용 여부 결정과 사용자 PC 테스트임.
+
+권장 다음 순서:
+
+1. 사용자가 실제 프로젝트 폴더에서 STEP30 테스트 실행
+   python test_macd_settings_dialog_step30.py
+
+2. STEP31 후보를 실제 적용할지 결정
+   - 적용 시 gui_routine_assign_window.py 백업 필수
+   - 후보 파일을 gui_routine_assign_window.py로 교체
+
+3. STEP32 테스트 실행
+   python test_routine_assign_window_step32.py
+
+4. gui_main.py 실행
+   python gui_main.py
+
+5. 루틴지정창에서 MACD매매루틴 선택 후 루틴 설정 버튼 확인
+
+------------------------------------------------------------
+10. 가장 안전한 선택지
+------------------------------------------------------------
+
+선택지 A:
+- STEP31 후보를 적용하지 않고 먼저 STEP29 다이얼로그 독립 테스트만 실행
+- 가장 안전
+- 기존 GUI 영향 없음
+
+선택지 B:
+- STEP31 후보 적용 후 STEP32까지 진행
+- 루틴지정창에 버튼 연결 확인 가능
+- 백업 필수
+
+현재 추천:
+- A 먼저.
+- 즉, gui_macd_routine_settings_dialog.py는 이미 있으므로
+  python test_macd_settings_dialog_step30.py
+  먼저 실행.
+- 이게 통과하면 STEP31 적용 여부를 다시 판단.
+
+------------------------------------------------------------
+11. 금지 확인
+------------------------------------------------------------
+
+현재 압축본 기준 계속 지켜야 할 금지:
+- HOLD 공식 신호 재도입 금지
+- CANCEL 구현 금지
+- BUY 확장 구현 금지
+- rules.json 저장 기능 활성화 금지
+- execution_enabled true 변경 금지
+- 실주문 연결 금지
+- Kiwoom SendOrder 연결 금지
+
+------------------------------------------------------------
+12. 최종 결론
+------------------------------------------------------------
+
+kiwoom_auto (43).zip 기준 결론:
+
+- STEP23은 적용 및 테스트 가능 상태다.
+- STEP29 다이얼로그 파일은 이미 프로젝트에 들어가 있다.
+- STEP31 루틴지정창 연결은 아직 실제 파일에는 적용되지 않았고 후보 파일로만 존재한다.
+- 현재 추가 구현보다 사용자 PC에서 PyQt5 기반 STEP30 독립 테스트가 우선이다.
+- STEP30 통과 후 STEP31 후보 적용 여부를 결정하는 것이 가장 안전하다.

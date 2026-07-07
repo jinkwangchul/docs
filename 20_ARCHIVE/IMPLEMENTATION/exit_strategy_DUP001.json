@@ -1,0 +1,207 @@
+{
+  "version": "1.0",
+  "policy_type": "exit_strategy",
+  "description": "SELL 이후 포지션 종료/분할매도/재SELL/마지막 청산 방식을 정의하는 루틴 종속 Exit Strategy 초안.",
+  "authority_boundary": {
+    "routine_exit_strategy_role": "exit_execution_strategy_advisor",
+    "main_engine_role": "final_approval_and_order_execution",
+    "main_approval_required_for_each_exit_order": true,
+    "routine_can_execute_order": false
+  },
+  "default_mode": {
+    "name": "immediate_full_exit_with_multi_quote_resell",
+    "target": "position_quantity_zero",
+    "quantity_mode": "full_exit",
+    "price_mode": "multi_quote",
+    "resell_enabled": true
+  },
+  "sell_trigger_interpretation": {
+    "first_valid_sell": {
+      "meaning": "cycle_exit_start",
+      "description": "최초 유효 SELL은 현재 자동매매 1싸이클 종료 선언이며 Exit Strategy를 시작한다."
+    },
+    "subsequent_sell_during_exit": {
+      "meaning": "exit_strategy_condition_event",
+      "can_be_used_as_condition": true,
+      "description": "Exit Strategy 진행 중 추가 SELL은 새 SELL Trigger가 아니라 분할매도/추가매도 조건 이벤트로 활용 가능하다."
+    },
+    "buy_during_exit": {
+      "meaning": "ignored_or_logged_by_default",
+      "description": "Exit Strategy 진행 중 BUY는 기본적으로 신규 싸이클 시작 신호로 취급하지 않는다."
+    }
+  },
+  "quantity_strategy": {
+    "mode": "full_exit",
+    "available_modes": [
+      "full_exit",
+      "split_exit"
+    ],
+    "full_exit": {
+      "enabled": true,
+      "target_quantity_percent": 100
+    },
+    "split_exit": {
+      "enabled": false,
+      "split_count_user_input": true,
+      "split_ratios_user_input": true,
+      "split_ratios_percent": [
+        50,
+        30,
+        20
+      ],
+      "validate_sum_100_percent": true,
+      "last_split_uses_remaining_quantity": true,
+      "per_split_individual_condition": false,
+      "description": "분할횟수와 분할비율은 사용자 입력. 회차별 개별 조건은 두지 않고 Exit Strategy 공통조건을 적용한다."
+    }
+  },
+  "price_strategy": {
+    "default_price_basis": "recalculated_current_price",
+    "recalculate_current_price_on_each_resell": true,
+    "available_price_modes": [
+      "single_current_price",
+      "market_price",
+      "multi_quote",
+      "limit_price"
+    ],
+    "multi_quote": {
+      "enabled_by_default": true,
+      "quote_side": "sell",
+      "quote_offsets_from_current_price": [
+        -2,
+        -1,
+        0,
+        1,
+        2
+      ],
+      "quantity_distribution_percent": [
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "user_editable": true
+    }
+  },
+  "resell_policy": {
+    "enabled": true,
+    "target": "remaining_quantity",
+    "available_modes": [
+      "within_time_n_times",
+      "interval_n_times",
+      "price_condition_from_first_sell_price",
+      "condition_combination"
+    ],
+    "mode": "condition_combination",
+    "within_time_n_times": {
+      "enabled": true,
+      "time_window_seconds": 60,
+      "max_resell_count": 3
+    },
+    "interval_n_times": {
+      "enabled": false,
+      "interval_seconds": 10,
+      "max_resell_count": 3
+    },
+    "price_condition_from_first_sell_price": {
+      "enabled": false,
+      "reference_price": "first_valid_sell_current_price",
+      "conditions": [
+        {
+          "operator": "current_price_gte_reference_percent",
+          "percent": 0.0
+        },
+        {
+          "operator": "current_price_lte_reference_percent",
+          "percent": -0.5
+        }
+      ]
+    },
+    "condition_combination": {
+      "enabled": true,
+      "operator": "or",
+      "conditions": [
+        "within_time_n_times",
+        "interval_n_times",
+        "price_condition_from_first_sell_price",
+        "subsequent_sell_signal",
+        "moving_average_slope_drop",
+        "profit_rate_drop"
+      ]
+    },
+    "last_resell_action": {
+      "enabled": true,
+      "trigger": "last_resell_attempt_or_time_expired",
+      "action": "sell_remaining_quantity",
+      "price_mode": "market_price",
+      "available_price_modes": [
+        "market_price",
+        "current_price",
+        "multi_quote"
+      ]
+    }
+  },
+  "trend_filter_conditions": {
+    "enabled": false,
+    "moving_average_uptrend": {
+      "enabled": false,
+      "ma_period": 20,
+      "condition": "ma_slope_positive"
+    },
+    "moving_average_slope_drop": {
+      "enabled": false,
+      "ma_period": 20,
+      "drop_ratio_percent": 30,
+      "action": "force_sell_remaining_quantity"
+    },
+    "aligned_moving_average": {
+      "enabled": false,
+      "periods": [
+        5,
+        20,
+        60
+      ],
+      "condition": "bullish_alignment"
+    }
+  },
+  "profit_conditions": {
+    "enabled": false,
+    "profit_rate_above_percent": {
+      "enabled": false,
+      "percent": 3.0,
+      "action": "allow_split_exit"
+    },
+    "profit_rate_drop_percent": {
+      "enabled": false,
+      "percent": 1.0,
+      "action": "force_sell_remaining_quantity"
+    }
+  },
+  "exit_state": {
+    "states": [
+      "not_started",
+      "exiting",
+      "waiting_next_exit_condition",
+      "reselling",
+      "resetting",
+      "completed",
+      "trouble"
+    ],
+    "default_flow": [
+      "not_started",
+      "exiting",
+      "reselling",
+      "resetting",
+      "completed"
+    ],
+    "on_failure": "trouble"
+  },
+  "safety_and_validation": {
+    "default_is_safe_but_options_are_open": true,
+    "warn_on_complex_condition_combination": true,
+    "log_all_exit_decisions": true,
+    "backtest_required_for_complex_exit_strategy": true,
+    "main_gate_can_reject_any_exit_order": true
+  }
+}

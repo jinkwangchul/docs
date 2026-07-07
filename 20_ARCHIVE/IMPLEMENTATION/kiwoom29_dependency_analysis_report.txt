@@ -1,0 +1,320 @@
+kiwoom_auto (29) 기초종목.txt 잔존 의존성 분석 보고서
+======================================================================
+핵심 판정: 중앙 stocks 구조는 주 운영 기준으로 동작 중이나, 기초종목.txt/구 루틴폴더 직접 접근 잔재가 아직 여러 실행 경로에 남아 있음.
+
+
+## 즉시 수정 우선
+- gui_stock_register_window.py: BASE_STOCK_PATH:1, read_base_stocks:3, update_base_stock_routines:2, stock_runtime_dir_for_routine:3, assigned_runtime_dirs_for_stock:2, get_routine_dirs:2
+- gui_review_required_window.py: 기초종목.txt:4, BASE_STOCK_PATH:7, update_base_stock_routines:2, get_routine_dirs:3, iterdir():2
+- gui_global_review_required_window.py: 기초종목.txt:3, BASE_STOCK_PATH:4, update_base_stock_routines:2, get_routine_dirs:3
+- gui_integrity_check_window.py: 기초종목.txt:2, BASE_STOCK_PATH:2
+- gui_auto_trade_unregister.py: 기초종목.txt:5, BASE_STOCK_PATH:1, update_base_stock_routines:6
+- gui_routine_policy.py: 기초종목.txt:2, stock_runtime_dir_for_routine:2
+- gui_windows.py: 기초종목.txt:2, BASE_STOCK_PATH:4, append_base_stock:1, get_routine_dirs:3
+
+## 중앙화 완료/문구정리 중심
+- gui_base_stock_service.py: 기초종목.txt:10, BASE_STOCK_PATH:1, read_base_stocks:5, update_base_stock_routines:3
+- gui_stock_data.py: 기초종목.txt:9, BASE_STOCK_PATH:1, append_base_stock:1, remove_base_stock:1, read_base_stocks:4, stock_runtime_dir_for_routine:2, assigned_runtime_dirs_for_stock:1
+- stock_repository.py: 기초종목.txt:1, read_base_stocks:4, update_base_stock_routines:2, iterdir():2
+- gui_main_table_loader.py: read_base_stocks:5, stock_runtime_dir_for_routine:3, get_routine_dirs:2
+- gui_search_stock_register_dialog.py: append_base_stock:2, read_base_stocks:3
+- gui_routine_assign_window.py: 기초종목.txt:7, read_base_stocks:5, update_base_stock_routines:3, get_routine_dirs:5
+- gui_auto_trade_setting_window.py: 기초종목.txt:4, read_base_stocks:2, update_base_stock_routines:1, stock_runtime_dir_for_routine:1, get_routine_dirs:3, iterdir():1
+
+## 실행 경로 확인 후 보류
+- gui_schedule_window.py: 기초종목.txt:36, BASE_STOCK_PATH:13, append_base_stock:1, read_base_stocks:9, update_base_stock_routines:5, stock_runtime_dir_for_routine:3, get_routine_dirs:13, iterdir():3
+- gui_windows_149_manual_ats_status_policy_fix.py: 기초종목.txt:38, BASE_STOCK_PATH:16, append_base_stock:1, read_base_stocks:10, update_base_stock_routines:6, stock_runtime_dir_for_routine:4, get_routine_dirs:14, iterdir():3
+- docs/gui_windows(160).py: 기초종목.txt:38, BASE_STOCK_PATH:16, append_base_stock:1, read_base_stocks:10, update_base_stock_routines:6, stock_runtime_dir_for_routine:4, get_routine_dirs:14, iterdir():3
+- registry_migratio/stock_repository.py: 기초종목.txt:6, BASE_STOCK_PATH:1, read_base_stocks:6, stock_runtime_dir_for_routine:1, iterdir():2
+- registry_migratio/stock_migration_dry_run.py: iterdir():2
+- registry_migratio/stock_registry_step1_analyzer.py: 기초종목.txt:3, read_base_stocks:2, iterdir():3
+
+## 테스트/샘플 구형 경로
+- make_sample_orders.py: PROJECT_ROOT / "_:1
+- make_sample_orders_multi_day.py: PROJECT_ROOT / "_:1
+- make_sample_orders_multi_day_with_fee.py: PROJECT_ROOT / "_:1
+- stock_migration_to_central_stocks.py: 기초종목.txt:2, iterdir():2
+- integrity_checker.py: 기초종목.txt:8, read_base_stocks:2, get_routine_dirs:2, iterdir():2
+
+## 파일별 주요 발견
+
+### docs/gui_windows(160).py
+발견: 기초종목.txt:38, BASE_STOCK_PATH:16, append_base_stock:1, read_base_stocks:10, update_base_stock_routines:6, stock_runtime_dir_for_routine:4, get_routine_dirs:14, iterdir():3
+L74: stock_runtime_dir_for_routine,
+L176: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L231: def get_routine_dirs() -> list[Path]:
+L242: path for path in PROJECT_ROOT.iterdir()
+L440: 기초종목.txt 에 이미 저장된 종목 1행의 표시용 검증 상태를 반환한다.
+L477: 기초종목.txt 활성 루틴은 종목당 1개만 허용한다.
+L480: 활성 연결은 기초종목.txt의 첫 번째 유효 루틴 1개만 사용한다.
+L494: 기존 기초종목.txt에 루틴이 여러 개 저장되어 있으면 첫 번째 루틴만 남긴다.
+L499: - 자동매매설정 창은 기초종목.txt의 단일 루틴 연결만 표시한다.
+L501: if not BASE_STOCK_PATH.exists():
+...외 80개
+
+### gui_auto_trade_setting_window.py
+발견: 기초종목.txt:4, read_base_stocks:2, update_base_stock_routines:1, stock_runtime_dir_for_routine:1, get_routine_dirs:3, iterdir():1
+L61: from gui_stock_data import active_routine_for_stock, stock_runtime_dir_for_routine
+L146: read_base_stocks,
+L148: update_base_stock_routines,
+L324: def get_routine_dirs() -> list[Path]:
+L335: path for path in PROJECT_ROOT.iterdir()
+L425: for routine_dir in get_routine_dirs():
+L1314: routine_dirs = get_routine_dirs()
+L1894: 기초종목.txt 기준 종목-루틴 연결 정보를 반환한다.
+L1897: 기초종목.txt 에 실제 연결된 종목만 표시한다.
+L1900: for stock in read_base_stocks():
+...외 2개
+
+### gui_auto_trade_unregister.py
+발견: 기초종목.txt:5, BASE_STOCK_PATH:1, update_base_stock_routines:6
+L42: from gui_base_stock_service import update_base_stock_routines as update_base_stock_routines_from_service
+L45: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L78: def update_base_stock_routines(code: str, name: str, routines: list[str]) -> bool:
+L82: 중앙 종목관리 개편 이후 이 파일 안에서 기초종목.txt를 직접 수정하지 않는다.
+L83: gui_base_stock_service.update_base_stock_routines()로 위임하여
+L85: - 아직 stocks/가 없으면 기존 기초종목.txt fallback
+L88: return bool(update_base_stock_routines_from_service(code, name, routines))
+L309: - 기초종목.txt의 루틴 연결만 제거한다. 종목 자체는 기초종목에 남긴다.
+L383: if update_base_stock_routines(code, name, []):
+L400: QMessageBox.information(window, "등록해제 없음", "기초종목.txt에서 등록해제할 종목을 찾지 못했습니다.")
+
+### gui_base_stock_service.py
+발견: 기초종목.txt:10, BASE_STOCK_PATH:1, read_base_stocks:5, update_base_stock_routines:3
+L29: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L113: 기초종목.txt 에 이미 저장된 종목 1행의 표시용 검증 상태를 반환한다.
+L149: 기초종목.txt 활성 루틴은 종목당 1개만 허용한다.
+L152: 활성 연결은 기초종목.txt의 첫 번째 유효 루틴 1개만 사용한다.
+L166: 과거 기초종목.txt 단일 루틴 보정 함수.
+L178: 1차 안전장치: stocks/ 종목폴더가 없으면 기존 기초종목.txt 로직을 유지한다.
+L188: def _read_base_stocks_from_central_repository_if_available() -> list[dict[str, object]] | None:
+L195: return stock_repository_factory().read_base_stocks_compatible()
+L200: def _update_base_stock_routines_in_central_repository_if_available(
+L210: - None: 중앙 repository 미사용, 기존 기초종목.txt fallback 필요
+...외 8개
+
+### gui_global_review_required_window.py
+발견: 기초종목.txt:3, BASE_STOCK_PATH:4, update_base_stock_routines:2, get_routine_dirs:3
+L40: get_routine_dirs,
+L46: update_base_stock_routines,
+L51: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L66: for routine_dir in get_routine_dirs():
+L469: update_base_stock_routines(code, name, [])
+L480: append_changelog("UPDATE", "기초종목.txt/state.json", f"검토관리 미지정 전환: {changed}개")
+L524: if BASE_STOCK_PATH.exists():
+L526: for raw_line in BASE_STOCK_PATH.read_text(encoding="utf-8").splitlines():
+L532: BASE_STOCK_PATH.write_text(
+L541: for routine_dir in get_routine_dirs():
+...외 1개
+
+### gui_integrity_check_window.py
+발견: 기초종목.txt:2, BASE_STOCK_PATH:2
+L38: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L72: ("base_duplicate", "기초종목.txt 중복 검증"),
+L193: BASE_STOCK_PATH,
+
+### gui_main_table_loader.py
+발견: read_base_stocks:5, stock_runtime_dir_for_routine:3, get_routine_dirs:2
+L24: from gui_stock_data import stock_runtime_dir_for_routine
+L41: get_routine_dirs,
+L45: from gui_base_stock_service import read_base_stocks
+L97: read_base_stocks() 표준 반환값에서 종목의 루틴명 목록을 추출한다.
+L120: for stock in read_base_stocks():
+L130: stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)
+L147: 중앙 종목관리(read_base_stocks -> stocks/config.json) 기준으로 계산한다.
+L149: routine_dirs = get_routine_dirs()
+L204: for stock in read_base_stocks():
+L218: stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)
+
+### gui_review_required_window.py
+발견: 기초종목.txt:4, BASE_STOCK_PATH:7, update_base_stock_routines:2, get_routine_dirs:3, iterdir():2
+L52: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L56: def get_routine_dirs() -> list[Path]:
+L67: path for path in PROJECT_ROOT.iterdir()
+L177: def update_base_stock_routines(code: str, name: str, routines: list[str]) -> bool:
+L179: 기초종목.txt 의 특정 종목 행에 루틴 목록을 반영한다.
+L181: if not BASE_STOCK_PATH.exists():
+L184: lines = BASE_STOCK_PATH.read_text(encoding="utf-8").splitlines()
+L206: BASE_STOCK_PATH.write_text(
+L229: child for child in routine_dir.iterdir()
+L402: for routine_dir in get_routine_dirs():
+...외 7개
+
+### gui_routine_assign_window.py
+발견: 기초종목.txt:7, read_base_stocks:5, update_base_stock_routines:3, get_routine_dirs:5
+L79: get_routine_dirs,
+L82: read_base_stocks,
+L84: update_base_stock_routines,
+L93: for path in get_routine_dirs():
+L202: - 기초종목.txt 등록 종목 중 루틴 변경이 가능한 종목만 좌측에 표시한다.
+L508: stocks = read_base_stocks()
+L612: routine_dirs = get_routine_dirs()
+L656: stocks = read_base_stocks()
+L880: routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}
+L915: routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}
+...외 10개
+
+### gui_routine_policy.py
+발견: 기초종목.txt:2, stock_runtime_dir_for_routine:2
+L12: from gui_stock_data import base_stock_routines_for_stock, stock_runtime_dir_for_routine
+L98: 루틴 해제는 종목 자체는 유지하고 기초종목.txt의 루틴명만 제거한다.
+L103: return False, "", ["기초종목.txt에서 종목을 찾지 못했습니다."]
+L109: stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)
+
+### gui_schedule_window.py
+발견: 기초종목.txt:36, BASE_STOCK_PATH:13, append_base_stock:1, read_base_stocks:9, update_base_stock_routines:5, stock_runtime_dir_for_routine:3, get_routine_dirs:13, iterdir():3
+L72: stock_runtime_dir_for_routine,
+L171: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L225: def get_routine_dirs() -> list[Path]:
+L236: path for path in PROJECT_ROOT.iterdir()
+L387: 기초종목.txt 에 이미 저장된 종목 1행의 표시용 검증 상태를 반환한다.
+L424: 기초종목.txt 활성 루틴은 종목당 1개만 허용한다.
+L427: 활성 연결은 기초종목.txt의 첫 번째 유효 루틴 1개만 사용한다.
+L441: 기존 기초종목.txt에 루틴이 여러 개 저장되어 있으면 첫 번째 루틴만 남긴다.
+L446: - 자동매매설정 창은 기초종목.txt의 단일 루틴 연결만 표시한다.
+L448: if not BASE_STOCK_PATH.exists():
+...외 71개
+
+### gui_search_stock_register_dialog.py
+발견: append_base_stock:2, read_base_stocks:3
+L31: append_base_stock,
+L35: read_base_stocks,
+L180: base_stocks = read_base_stocks()
+L266: base_stocks = read_base_stocks()
+L312: append_base_stock(code, name)
+
+### gui_stock_data.py
+발견: 기초종목.txt:9, BASE_STOCK_PATH:1, append_base_stock:1, remove_base_stock:1, read_base_stocks:4, stock_runtime_dir_for_routine:2, assigned_runtime_dirs_for_stock:1
+L26: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L99: 기초종목.txt 활성 루틴은 종목당 1개만 허용한다.
+L119: 기초종목.txt 에 저장된 종목 1행의 표시용 검증 상태를 반환한다.
+L150: def _read_base_stocks_from_central_repository_if_available() -> list[dict[str, object]] | None:
+L156: - 그러면 기존 기초종목.txt 로직이 그대로 동작한다.
+L166: return repo.read_base_stocks_compatible()
+L195: - None: 중앙 repository 미사용, 기존 기초종목.txt fallback 필요
+L214: def append_base_stock(code: str, name: str) -> bool:
+L219: - 과거에는 기초종목.txt에 종목을 추가했다.
+L240: def remove_base_stock(code: str, name: str) -> bool:
+...외 8개
+
+### gui_stock_register_window.py
+발견: BASE_STOCK_PATH:1, read_base_stocks:3, update_base_stock_routines:2, stock_runtime_dir_for_routine:3, assigned_runtime_dirs_for_stock:2, get_routine_dirs:2
+L75: assigned_runtime_dirs_for_stock,
+L76: stock_runtime_dir_for_routine,
+L243: get_routine_dirs,
+L256: read_base_stocks,
+L266: update_base_stock_routines,
+L273: BASE_STOCK_PATH = PROJECT_ROOT / "중앙 종목관리"
+L324: stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)
+L353: for routine_dir in get_routine_dirs():
+L376: return assigned_runtime_dirs_for_stock(code, name)
+L576: stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)
+...외 3개
+
+### gui_windows.py
+발견: 기초종목.txt:2, BASE_STOCK_PATH:4, append_base_stock:1, get_routine_dirs:3
+L61: get_routine_dirs,
+L71: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L74: def append_base_stock(code: str, name: str) -> None:
+L76: 기초종목.txt 에 종목 1개를 추가한다.
+L78: existing_text = BASE_STOCK_PATH.read_text(encoding="utf-8") if BASE_STOCK_PATH.exists() else ""
+L81: with BASE_STOCK_PATH.open("a", encoding="utf-8") as file:
+L89: return {routine_display_name(path): path for path in get_routine_dirs()}
+L336: for routine_dir in get_routine_dirs():
+
+### gui_windows_149_manual_ats_status_policy_fix.py
+발견: 기초종목.txt:38, BASE_STOCK_PATH:16, append_base_stock:1, read_base_stocks:10, update_base_stock_routines:6, stock_runtime_dir_for_routine:4, get_routine_dirs:14, iterdir():3
+L74: stock_runtime_dir_for_routine,
+L176: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L231: def get_routine_dirs() -> list[Path]:
+L242: path for path in PROJECT_ROOT.iterdir()
+L440: 기초종목.txt 에 이미 저장된 종목 1행의 표시용 검증 상태를 반환한다.
+L477: 기초종목.txt 활성 루틴은 종목당 1개만 허용한다.
+L480: 활성 연결은 기초종목.txt의 첫 번째 유효 루틴 1개만 사용한다.
+L494: 기존 기초종목.txt에 루틴이 여러 개 저장되어 있으면 첫 번째 루틴만 남긴다.
+L499: - 자동매매설정 창은 기초종목.txt의 단일 루틴 연결만 표시한다.
+L501: if not BASE_STOCK_PATH.exists():
+...외 80개
+
+### integrity_checker.py
+발견: 기초종목.txt:8, read_base_stocks:2, get_routine_dirs:2, iterdir():2
+L66: def read_base_stocks_for_check(base_stock_path: Path) -> list[dict[str, object]]:
+L108: def get_routine_dirs(project_root: Path) -> list[Path]:
+L110: path for path in project_root.iterdir()
+L176: base_stocks = read_base_stocks_for_check(base_stock_path)
+L179: routine_dirs = get_routine_dirs(project_root)
+L195: f"기초종목.txt {line_no}행",
+L207: f"기초종목.txt {line_no}행",
+L219: f"기초종목.txt {line_no}행",
+L231: f"기초종목.txt {line_no}행",
+L242: f"기초종목.txt {line_no}행",
+...외 4개
+
+### make_sample_orders.py
+발견: PROJECT_ROOT / "_:1
+L33: TARGET_STOCK_DIR = PROJECT_ROOT / "_MACD매매루틴" / "035420_NAVER"
+
+### make_sample_orders_multi_day.py
+발견: PROJECT_ROOT / "_:1
+L29: TARGET_STOCK_DIR = PROJECT_ROOT / "_MACD매매루틴" / "035420_NAVER"
+
+### make_sample_orders_multi_day_with_fee.py
+발견: PROJECT_ROOT / "_:1
+L28: TARGET_STOCK_DIR = PROJECT_ROOT / "_MACD매매루틴" / "035420_NAVER"
+
+### registry_migratio/stock_migration_dry_run.py
+발견: iterdir():2
+L38: routine_dirs = [p for p in project_root.iterdir() if p.is_dir() and p.name.startswith("_") and not p.name.startswith("__")]
+L41: for stock_dir in routine_dir.iterdir():
+
+### registry_migratio/stock_registry_step1_analyzer.py
+발견: 기초종목.txt:3, read_base_stocks:2, iterdir():3
+L7: - 기초종목.txt, 루틴폴더의 종목폴더, state/config/orders/logs 존재 여부를 수집한다.
+L28: BASE_STOCK_FILENAMES = ["기초종목.txt", "기초종목등록.txt"]
+L76: return any(child.is_dir() and STOCK_DIR_PATTERN.match(child.name) for child in path.iterdir())
+L94: def read_base_stocks(root: Path) -> dict[str, dict[str, str]]:
+L126: for routine_dir in sorted([p for p in root.iterdir() if is_routine_folder(p)]):
+L128: for stock_dir in sorted([p for p in routine_dir.iterdir() if p.is_dir()]):
+L176: base_stocks = read_base_stocks(root)
+L269: lines.append("4. 아직 종목폴더 이동 또는 기초종목.txt 삭제는 하지 않는다.")
+
+### registry_migratio/stock_repository.py
+발견: 기초종목.txt:6, BASE_STOCK_PATH:1, read_base_stocks:6, stock_runtime_dir_for_routine:1, iterdir():2
+L8: - 기초종목.txt 의존을 줄이고, 최종적으로 stocks/ 중앙 종목폴더 구조로 이동하기 위한
+L45: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L115: 기존 read_base_stocks() 사용처와 호환되는 형태.
+L135: - 아직 마이그레이션 전이면 기초종목.txt를 fallback으로 읽을 수 있게 한다.
+L142: self.base_stock_path = self.project_root / "기초종목.txt"
+L145: return self.stocks_dir.exists() and any(self.stocks_dir.iterdir())
+L151: [path for path in self.stocks_dir.iterdir() if path.is_dir()],
+L206: 기존 기초종목.txt fallback reader.
+L248: 중앙 stocks/ 우선, 없으면 기존 기초종목.txt fallback.
+L255: def read_base_stocks_compatible(self) -> list[dict[str, Any]]:
+...외 5개
+
+### stock_migration_to_central_stocks.py
+발견: 기초종목.txt:2, iterdir():2
+L16: - 기존 기초종목.txt도 삭제하지 않는다.
+L166: for routine_dir in sorted(project_root.iterdir(), key=lambda p: p.name):
+L170: for child in sorted(routine_dir.iterdir(), key=lambda p: p.name):
+L272: lines.append("기초종목.txt 삭제: 안 함")
+
+### stock_repository.py
+발견: 기초종목.txt:1, read_base_stocks:4, update_base_stock_routines:2, iterdir():2
+L8: - 기초종목.txt 제거와 stocks/ 중앙 종목폴더 일원화를 위한 단일 접근 레이어.
+L9: - 1차 적용에서는 기존 기능을 깨지 않기 위해 gui_stock_data.read_base_stocks()가
+L121: return any(path.is_dir() for path in self.stocks_dir.iterdir())
+L127: [path for path in self.stocks_dir.iterdir() if path.is_dir()],
+L179: def read_base_stocks_compatible(self) -> list[dict[str, Any]]:
+L291: def read_base_stocks_from_repository() -> list[dict[str, Any]]:
+L292: return repository().read_base_stocks_compatible()
+L296: def update_base_stock_routines_in_repository(code: str, name: str, routines: list[str]) -> bool:
+L298: 기존 update_base_stock_routines() 교체 후보 함수.
+
+## 권장 순서
+1. gui_stock_register_window.py의 선택 종목 삭제/BASE_STOCK_PATH 잔재 정리
+2. gui_review_required_window.py / gui_global_review_required_window.py 검토관리 이동·복귀·삭제 경로 중앙 stocks 기준화
+3. gui_integrity_check_window.py와 integrity_checker.py를 중앙 stocks 검증 기준으로 재작성
+4. gui_auto_trade_unregister.py, gui_routine_policy.py의 문구와 fallback 잔재 정리
+5. gui_windows.py 내 append_base_stock/BASE_STOCK_PATH 잔재 제거 또는 stock_repository 위임
+6. docs/registry_migratio/샘플 스크립트는 실행 경로가 아니면 보류 또는 archive

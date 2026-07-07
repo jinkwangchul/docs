@@ -1,0 +1,75 @@
+MASTER_SPEC 누락보강 137
+주제 : JSON Schema 및 데이터 규격 표준 (신규)
+
+※ 본 문서는 기존 01~136과 중복되지 않으며 프로젝트에서 사용하는 JSON 기반
+데이터의 구조와 규격을 표준화하기 위한 설계 문서이다.
+
+1. 목적
+모든 JSON 데이터의 구조를 일관되게 정의하여 호환성, 유지보수성 및
+데이터 무결성을 확보한다.
+
+2. 적용 대상
+- routine.json
+- rules.json
+- state.json
+- orders.json
+- config.json
+- profile.json
+- runtime.json
+- 기타 JSON 기반 설정 파일
+
+3. 공통 구조
+- schema_version
+- created_at
+- updated_at
+- object_type
+- data
+- metadata
+
+4. Schema 관리
+- 버전 명시
+- 필수 필드 정의
+- 선택 필드 정의
+- Deprecated 필드 관리
+- 호환성 규칙
+
+5. 데이터 규격
+- 자료형 통일
+- 날짜/시간 형식 통일
+- 코드 체계 통일
+- Enum 정의
+- 기본값 규칙
+
+6. 검증 절차
+① JSON 문법 검사
+② Schema 검증
+③ 데이터 무결성 검사
+④ 버전 호환성 검사
+⑤ 참조 관계 검사
+
+7. 마이그레이션
+- 구버전 자동 변환
+- 신규 필드 기본값 적용
+- Deprecated 필드 제거
+- 변경 이력 기록
+
+8. 오류 처리
+- Schema 불일치
+- 필수 필드 누락
+- 잘못된 자료형
+- 지원하지 않는 버전
+- Validation 실패
+
+9. 향후 확장
+- JSON Schema 자동 생성
+- 시각적 Schema 편집기
+- 자동 문서 생성
+- API Schema 공유
+
+10. 구현 원칙
+- 모든 JSON은 동일한 Schema 관리 정책을 따른다.
+- Schema 변경 시 하위 호환성을 우선 고려한다.
+- Schema와 Validation은 함께 관리한다.
+
+반영 원칙
+본 문서는 JSON Schema 및 데이터 규격 표준을 신규 정의한 설계 문서이다.

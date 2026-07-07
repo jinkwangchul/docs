@@ -1,0 +1,187 @@
+작업재개요약서_v2026-06-25_MACD매도신호조합_UI_NOT규칙_확정
+
+대상: 키움 자동매매 / MACD매매루틴 설정창 / gui_macd_routine_settings_dialog.py
+현재 작업 위치: 구성 탭 > 매도설정 > 신호검출조건조합 입력부
+
+1. 다음 창 시작 기준
+- 압축파일 금지. 결과물은 개별 .py/.txt 파일로 제공.
+- 임의 수정 금지. 매수설정/매수방식/평단관리/미체결정책/완료정책을 건드리지 말 것.
+- 최신 기준 파일은 사용자가 다시 올리는 파일을 우선한다.
+- 직전 기준 파일명 계열: gui_macd_routine_settings_dialog(102).py
+- 다음 창에서는 sell_header_row, sell_signal_expr_line, _append_sell_expr, _wrap_selected_sell_expr, 버튼 생성부만 먼저 분석한다.
+
+2. 현재 UI 구조
+매도설정 상단 구성:
+- 매도설정 |
+- 신호검출조건조합 :
+- 수식 입력창 QLineEdit
+- 버튼: A / B / C / and / or / not / () / 지움
+- 백스페이스 ← 버튼은 제거 확정.
+- and/or/not 통합 순환 버튼은 폐기. 3개 버튼으로 유지.
+
+3. 신호검출조건 A/B/C 역할
+A: OCR 추세 감지 + 주문가/현재가/평단가 가격필터 + RSI.
+- OCR 고정 주신호가 아니다.
+- 가격필터는 OCR 보조로도 쓰고 단독 전체 가격필터로도 쓸 수 있다.
+
+B: 가격박스 중심 독립 가격 신호그룹.
+- 첫 줄: 가격박스 [상향/하향] [0.1]% [이상/이하]
+- B는 OCR과 동일 레벨의 독립 신호검출조건이다.
+- 가격박스만으로 매도신호를 잡을 가능성 검토 중.
+
+C: MACD/배열 계열 조건그룹.
+- MACD선/시그널선 조건
+- 이평 배열 조건
+
+4. 핵심 확정: NOT 의미
+사용자 확정 규칙:
+- NOT은 해당 조건 상황을 제외하는 연산자로 쓴다.
+- 프로젝트 어디에서도 AND NOT, OR NOT 수식은 절대 금지.
+- A AND B NOT C = A이고 B이고 C가 아닌 것.
+- 동일 레벨로 보라.
+- NOT은 일반 프로그래밍식 단항 NOT으로 해석하지 않는다.
+
+정확한 의미:
+A AND B NOT C
+= A 조건 만족
+= B 조건 만족
+= C 조건은 제외
+
+금지:
+- A AND NOT B
+- A OR NOT B
+- AND NOT
+- OR NOT
+- NOT AND
+- NOT OR
+- NOT A
+- A AND NOT
+- A OR NOT
+
+허용:
+- A
+- B
+- C
+- A AND B
+- A OR B
+- A NOT B
+- A AND B NOT C
+- A OR B NOT C
+- A AND B OR C
+- (A AND B) OR C
+- (A OR B) NOT C
+- A AND (B OR C)
+- A NOT (B OR C)
+
+5. 입력 규칙
+토큰:
+- 조건: A/B/C
+- 조합토큰: AND/OR/NOT
+- 괄호: ( )
+
+시작 가능:
+- A/B/C/(
+시작 금지:
+- AND/OR/NOT/)
+
+A/B/C 뒤 가능:
+- AND/OR/NOT/)
+A/B/C 뒤 금지:
+- A/B/C/(
+
+AND/OR/NOT 뒤 가능:
+- A/B/C/(
+AND/OR/NOT 뒤 금지:
+- AND/OR/NOT/)
+
+( 뒤 가능:
+- A/B/C/(
+( 뒤 금지:
+- AND/OR/NOT/)
+
+) 뒤 가능:
+- AND/OR/NOT/)
+) 뒤 금지:
+- A/B/C/(
+
+최종 수식의 마지막 토큰:
+- A/B/C 또는 )만 가능.
+- AND/OR/NOT으로 끝나는 상태는 금지.
+- 예: A AND, A OR, A NOT, (C OR) 금지.
+
+6. 중복 조건 규칙
+- A/B/C는 수식 내 각각 1회만 허용한다.
+금지:
+- A AND A
+- A OR A
+- A AND (B OR A)
+- C NOT C
+
+7. 괄호 버튼 규칙
+- () 버튼 하나만 사용.
+- 선택영역이 정상 수식 조각이면 괄호 추가.
+- 선택영역 전체가 이미 괄호로 감싸져 있으면 바깥 괄호 한 쌍 제거.
+- 선택영역이 비정상 조각이면 아무 동작도 하지 않는다.
+
+괄호 생성 허용:
+- A
+- A AND B
+- A OR B
+- A NOT B
+- A AND B NOT C
+
+괄호 생성 금지:
+- A AND
+- A OR
+- A NOT
+- AND B
+- OR B
+- NOT B
+- A AND NOT B
+- A OR NOT B
+- C OR
+- C NOT
+- 연산자 연속 포함 선택영역
+- 시작 또는 끝이 연산자인 선택영역
+
+실제 오류 사례:
+- (C or) not (A and B)
+원인:
+- C or 처럼 연산자로 끝나는 조각에 괄호가 생성됨.
+해결:
+- _wrap_selected_sell_expr에서 선택영역 첫/끝 토큰, 연속연산자, 괄호 균형 검사 필수.
+
+8. 백스페이스 제거
+- ← 버튼 제거 확정.
+- _backspace_sell_expr 제거.
+- 실수하면 지움 버튼으로 전체 초기화.
+- 지움 버튼은 self.sell_signal_expr_line.clear()만 수행.
+
+9. 연산자 통합 버튼 폐기
+- and/or/not 순환 통합 버튼 시도는 폐기.
+- 입력 상태와 표시 상태가 꼬였고 NOT 규칙 해석 오류를 키웠다.
+- 다음 창에서는 A/B/C/and/or/not/()/지움 버튼 구조로 고정.
+
+10. 다음 구현 순서
+1) 사용자가 최신 파일 업로드.
+2) 매도설정 상단 조합부만 분석.
+3) 버튼 구성 확인: A / B / C / and / or / not / () / 지움.
+4) _append_sell_expr 재작성:
+   - A/B/C 중복 금지
+   - 첫 토큰 연산자 금지
+   - 조건 뒤 조건 금지
+   - 연산자 뒤 연산자 금지
+   - 마지막 토큰 연산자 방지
+   - AND NOT/OR NOT 패턴 금지
+   - NOT은 뒤 조건 제외 토큰으로 처리
+5) _wrap_selected_sell_expr 재작성:
+   - 선택영역 정상 fragment 검사 후 괄호 토글.
+6) py_compile 확인 후 개별 .py 파일 제공.
+
+11. 절대 금지
+- A AND NOT B를 정상이라고 설명하지 말 것.
+- NOT을 일반 프로그래밍 단항 NOT으로 해석하지 말 것.
+- 연산자 통합 버튼 재제안 금지.
+- 백스페이스 재구현 금지.
+- 매수설정 임의 수정 금지.
+- 압축파일 생성 금지.

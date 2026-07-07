@@ -1,0 +1,94 @@
+{
+  "version": "1.1",
+  "policy_type": "position_policy",
+  "description": "BUY 신호 수와 실제 진입 회차를 분리하고, 고정비율 조건으로 추가진입을 제어하는 Position Policy 수정안.",
+  "core_principle": {
+    "buy_signal_is_independent_event": true,
+    "buy_signal_count_is_not_entry_count": true,
+    "entry_count_increases_only_when_actual_buy_is_accepted": true,
+    "skipped_buy_does_not_increase_entry_count": true,
+    "partial_fill_counts_as_actual_entry": true
+  },
+  "initial_entry": {
+    "budget_source": "main_engine_initial_entry_budget",
+    "initial_buy_price_source": "current_price_at_first_actual_buy",
+    "initial_buy_price_is_upper_guard": true,
+    "description": "최초 실제 BUY 현재가는 이후 추가 BUY 가격의 상한 기준이다."
+  },
+  "position_scaling": {
+    "basis": "amount",
+    "available_basis": [
+      "amount",
+      "quantity"
+    ],
+    "mode": "multiplier",
+    "available_modes": [
+      "fixed",
+      "linear_by_entry_count",
+      "multiplier",
+      "user_defined_sequence"
+    ],
+    "multiplier": {
+      "enabled": true,
+      "value": 3.0,
+      "example_amounts": [
+        1000000,
+        3000000,
+        9000000,
+        27000000
+      ]
+    }
+  },
+  "additional_entry_price_rule": {
+    "enabled": true,
+    "fixed_drop_ratio_percent": 10.0,
+    "comparison_targets": {
+      "upper_guard": "first_actual_buy_price",
+      "step_reference": "last_actual_buy_price"
+    },
+    "condition": {
+      "must_be_lte_first_actual_buy_price": true,
+      "must_be_lte_last_actual_buy_price_minus_fixed_ratio": true
+    },
+    "formula_description": "추가 BUY 허용조건 = 현재가 <= 최초 실제 BUY 현재가 AND 현재가 <= 직전 실제 BUY 현재가 × (1 - 고정비율)",
+    "example": {
+      "fixed_drop_ratio_percent": 10.0,
+      "first_actual_buy_price": 10000,
+      "first_entry_budget": 1000000,
+      "first_entry_quantity": 100,
+      "buy_signal_at_9500": "skip",
+      "buy_signal_at_8500": "accepted_as_second_actual_entry",
+      "second_entry_budget": 3000000,
+      "second_entry_quantity_floor": 352,
+      "average_price_after_second_entry": 8831.86
+    },
+    "description": "회차별 비율 테이블이 아니다. 고정비율 하나를 사용하고, 비교대상은 최초 실제 BUY 현재가와 직전 실제 BUY 현재가다."
+  },
+  "buy_signal_evaluation_flow": [
+    "BUY signal received",
+    "if no actual entry exists: evaluate main gate and initial entry",
+    "if actual entry exists: compare current price with first_actual_buy_price upper guard",
+    "compare current price with last_actual_buy_price minus fixed_drop_ratio_percent",
+    "if condition fails: skip signal and keep next actual entry count unchanged",
+    "if condition passes: calculate next entry amount by position_scaling",
+    "request main approval",
+    "if main approved: execute buy and increase actual_entry_count",
+    "if partial fill: count as actual entry and record partial fill",
+    "update last_actual_buy_price after accepted actual buy"
+  ],
+  "skip_policy": {
+    "skipped_signal_increases_entry_count": false,
+    "skipped_signal_is_logged": true
+  },
+  "average_price_reference": {
+    "server_average_price_is_primary": true,
+    "internal_average_price_is_validation_only": true,
+    "average_price_is_not_entry_price_rule_basis": true,
+    "description": "추가진입 가격조건은 평단이 아니라 최초/직전 실제 BUY 현재가 기준이다."
+  },
+  "main_gate": {
+    "every_actual_entry_requires_main_approval": true,
+    "routine_can_suggest_amount_but_cannot_execute": true,
+    "main_can_clip_or_reject_by_budget_policy": true
+  }
+}

@@ -1,0 +1,236 @@
+문서 유형: MASTER_SPEC 갱신 후보
+작성일: 2026-07-07
+주제: Rule Apply Preview Execution Preview Controller
+
+1. 작업명
+
+Rule Apply Preview Execution Preview Controller 갱신 후보
+
+2. 반영 대상 파일
+
+- rule_apply_preview_execution_order_adapter.py
+- rule_apply_preview_execution_preview_controller.py
+
+3. MASTER_SPEC 반영 목적
+
+Rule Apply Preview 결과를 Execution Preview 계층으로 넘기기 위한 preview-only controller hook 구조를 MASTER_SPEC에 반영한다.
+
+이번 갱신 후보는 Rule Apply Preview 이후 단계에서 Execution Preview / Queue Pending Preview / Queue Write Preview를 연결하는 미리보기 전용 흐름을 문서화하기 위한 것이다.
+
+4. 신규 구조
+
+4.1 Rule Apply Preview Execution Order Adapter
+
+대상 파일:
+
+- rule_apply_preview_execution_order_adapter.py
+
+역할:
+
+- Rule Apply Preview 결과를 Execution Preview 계층에서 사용할 수 있는 주문 후보 입력 형태로 변환한다.
+- rule apply 결과와 execution preview 입력 사이의 adapter 역할만 수행한다.
+- runtime write, queue write, Queue Commit, SendOrder, Kiwoom 호출을 수행하지 않는다.
+
+책임:
+
+- Rule Apply Preview 결과 수신
+- Execution Preview용 order candidate 구성
+- Queue Pending Preview 입력 구성에 필요한 필드 정리
+- Queue Write Preview 입력 구성에 필요한 필드 정리
+- READY / BLOCKED / INVALID 상태 판정에 필요한 입력 정규화
+
+금지사항:
+
+- runtime 파일 write 금지
+- queue 파일 write 금지
+- Queue Commit 금지
+- SendOrder 호출 금지
+- Kiwoom 호출 금지
+- GUI 연결 금지
+- rules.json 변경 금지
+
+4.2 Rule Apply Preview Execution Preview Controller
+
+대상 파일:
+
+- rule_apply_preview_execution_preview_controller.py
+
+역할:
+
+- Rule Apply Preview에서 생성된 결과를 Execution Preview 흐름으로 연결하는 preview-only controller이다.
+- `preview_execution_from_rule_apply_preview(...)` 진입점을 제공한다.
+- Execution Preview / Queue Pending Preview / Queue Write Preview를 연결하되 실제 write나 commit은 수행하지 않는다.
+
+책임:
+
+- Rule Apply Preview 결과 수신
+- adapter를 통한 Execution Preview 입력 구성
+- Execution Preview 호출
+- Queue Pending Preview 호출
+- Queue Write Preview 호출
+- READY / BLOCKED / INVALID 상태 반환
+- preview-only 결과를 호출자에게 반환
+
+금지사항:
+
+- runtime write 없음
+- queue write 없음
+- Queue Commit 없음
+- SendOrder 없음
+- Kiwoom 없음
+- GUI 연결 없음
+- rules.json 변경 없음
+
+5. 신규 진입점
+
+함수:
+
+- `preview_execution_from_rule_apply_preview(...)`
+
+역할:
+
+- Rule Apply Preview 결과를 입력으로 받아 Execution Preview 관련 미리보기 흐름을 실행한다.
+- 실제 실행, 실제 queue enqueue, 실제 runtime 기록, 실제 주문 호출 없이 preview 결과만 생성한다.
+
+호출 흐름:
+
+Rule Apply Preview
+↓
+preview_execution_from_rule_apply_preview(...)
+↓
+Rule Apply Preview Execution Order Adapter
+↓
+Execution Preview
+↓
+Queue Pending Preview
+↓
+Queue Write Preview
+↓
+READY / BLOCKED / INVALID
+
+6. 상태 기준
+
+6.1 READY
+
+READY는 Rule Apply Preview 결과가 Execution Preview 입력으로 변환 가능하고, Execution Preview / Queue Pending Preview / Queue Write Preview의 preview-only 검토를 통과한 상태이다.
+
+READY는 실제 queue write 또는 runtime write 완료를 의미하지 않는다.
+
+READY에서 수행하지 않는 일:
+
+- Queue Commit
+- runtime write
+- queue write
+- SendOrder
+- Kiwoom 호출
+- GUI 반영
+
+6.2 BLOCKED
+
+BLOCKED는 입력은 해석 가능하지만 Execution Preview 또는 Queue Preview 단계에서 정책상 진행할 수 없는 사유가 확인된 상태이다.
+
+BLOCKED는 실패가 아니라 preview-only 검토 결과이다.
+
+BLOCKED에는 차단 사유가 포함되어야 한다.
+
+6.3 INVALID
+
+INVALID는 Rule Apply Preview 결과가 Execution Preview 입력으로 사용할 수 없는 상태이다.
+
+INVALID 기준:
+
+- 필수 입력 누락
+- order candidate 구성 불가
+- preview 입력 계약 불일치
+- 상태 판정에 필요한 identity 또는 필드 누락
+
+INVALID에서도 runtime write, queue write, Queue Commit, SendOrder, Kiwoom 호출은 수행하지 않는다.
+
+7. Preview-only Controller Hook 정책
+
+Rule Apply Preview Execution Preview Controller는 preview-only hook이다.
+
+정책:
+
+- controller는 preview 결과를 연결하고 반환한다.
+- controller는 실제 실행 계층을 호출하지 않는다.
+- controller는 runtime 파일을 쓰지 않는다.
+- controller는 queue 파일을 쓰지 않는다.
+- controller는 Queue Commit을 수행하지 않는다.
+- controller는 SendOrder를 호출하지 않는다.
+- controller는 Kiwoom API를 호출하지 않는다.
+- controller는 GUI 버튼 또는 GUI dialog와 연결하지 않는다.
+- controller는 rules.json을 변경하지 않는다.
+
+8. Execution Preview / Queue Pending Preview / Queue Write Preview 연결
+
+연결 범위:
+
+- Execution Preview 연결 완료
+- Queue Pending Preview 연결 완료
+- Queue Write Preview 연결 완료
+
+연결 의미:
+
+- 연결은 preview-only 호출 흐름 연결을 의미한다.
+- 연결은 실제 queue 저장을 의미하지 않는다.
+- 연결은 실제 runtime 기록을 의미하지 않는다.
+- 연결은 실제 Queue Commit을 의미하지 않는다.
+- 연결은 실제 SendOrder 준비 완료를 의미하지 않는다.
+
+9. 금지선 유지
+
+이번 구조에서 유지된 금지선:
+
+- runtime write 없음
+- queue write 없음
+- Queue Commit 없음
+- SendOrder 없음
+- Kiwoom 없음
+- GUI 연결 없음
+- rules.json 변경 없음
+
+10. MASTER_SPEC 삽입 후보 위치
+
+삽입 후보:
+
+- Execution Preview Pipeline 관련 섹션
+- Rule Apply Preview / Rule Approval Pipeline 이후 preview 연결 섹션
+- Queue Pending Preview 및 Queue Write Preview 정책 섹션
+- preview-only controller hook 정책 섹션
+
+반영 방식:
+
+- 기존 MASTER_SPEC Canonical은 직접 수정하지 않는다.
+- 본 문서는 향후 Canonical 갱신 시 병합 후보로 사용한다.
+- 중복 문장은 병합 시 제거하되 의미가 다른 정책은 유지한다.
+
+11. 테스트 현황
+
+테스트 결과:
+
+- 전체 테스트 2249 OK
+
+기록 기준:
+
+- 이번 갱신 후보는 테스트 결과를 MASTER_SPEC 반영 후보로 기록한다.
+- 테스트 결과는 Rule Apply Preview Execution Preview Controller 구조가 preview-only 금지선을 유지하는 기준으로 함께 기록한다.
+
+12. 실제 프로젝트 영향
+
+이번 문서는 MASTER_SPEC 갱신 후보 문서이다.
+
+이번 문서 작성으로 수행하지 않은 일:
+
+- 기존 MASTER_SPEC Canonical 수정 없음
+- Python 코드 수정 없음
+- runtime 수정 없음
+- queue 파일 수정 없음
+- rules.json 수정 없음
+- GUI 연결 없음
+- Queue Commit 없음
+- SendOrder 없음
+- Kiwoom 호출 없음
+- Git 작업 없음
+- 압축파일 생성 없음
+

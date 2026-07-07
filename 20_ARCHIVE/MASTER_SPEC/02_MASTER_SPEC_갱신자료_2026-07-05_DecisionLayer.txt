@@ -1,0 +1,30 @@
+MASTER_SPEC 갱신자료
+
+신규 확정
+
+-   Decision Layer 추가
+-   Time/Operation/Routine/Stock/Emergency/Budget/Duplicate/Cooldown/Delay
+    Policy
+-   Policy Orchestrator
+-   Signal Queue Candidate
+-   Signal Queue Gate
+
+Snapshot 계약
+
+symbol timeframe candles current_price indicators(rsi, macd, signal, ma,
+bollinger)
+
+bars/ohlcv는 candles로 정규화.
+
+Signal
+
+BUY SELL None CANCEL은 Reserved.
+
+현재 구조
+
+Market Snapshot → Probe → RoutineSignal → Preview → Decision → Policy →
+Orchestrator → Queue Candidate → Queue Gate → Execution(미구현)
+
+검증
+
+전체 unittest 1002 OK

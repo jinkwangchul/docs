@@ -1,0 +1,172 @@
+{
+  "version": "1.0",
+  "policy_type": "main_controller",
+  "description": "루틴 메인부 컨트롤러 초안. BUY/SELL/CANCEL 신호 조합과 Signal Set 실행 흐름을 관리하되, 실제 주문 권한은 메인파트에 둔다.",
+  "authority_boundary": {
+    "main_part_role": "stock_day_operation_manager",
+    "routine_main_controller_role": "routine_execution_strategy_manager",
+    "routine_signal_part_role": "buy_sell_cancel_signal_detector",
+    "order_execution_role": "main_order_executor",
+    "routine_controller_can_request": true,
+    "routine_controller_can_execute_order": false,
+    "main_approval_required_for_every_order": true
+  },
+  "unit_of_control": {
+    "main_part_unit": "stock_day_operation_plan",
+    "routine_controller_unit": "signal_set",
+    "signal_part_unit": "individual_signal",
+    "order_part_unit": "order"
+  },
+  "signal_set": {
+    "definition": "최초 BUY 또는 SELL 신호 발생 시 생성되는 실행 묶음. 메인 승인 전에는 주문계획이 아니라 실행 제안 묶음이다.",
+    "reference_price": "current_price_at_first_main_signal",
+    "reference_time": "time_at_first_main_signal",
+    "reference_candle": "candle_at_first_main_signal",
+    "signal_recheck_during_execution": false,
+    "default_signal_persistence": "fixed_until_signal_set_end",
+    "description": "신호 발생 후 다중지점/다중호가/CANCEL 진행 중에는 원 신호 조건을 매 회차 재검사하지 않는다."
+  },
+  "signal_set_types": {
+    "buy_signal_set": {
+      "starts_on": "BUY",
+      "uses": [
+        "buy_policy",
+        "cancel_policy",
+        "execution_policy"
+      ],
+      "ends_on": [
+        "budget_exhausted",
+        "max_rounds_reached",
+        "time_limit_reached",
+        "SELL_signal_accepted_by_main",
+        "cancel_retry_exhausted",
+        "main_rejected_by_policy",
+        "system_interrupt"
+      ]
+    },
+    "sell_signal_set": {
+      "starts_on": "SELL",
+      "uses": [
+        "sell_policy",
+        "cancel_policy",
+        "execution_policy"
+      ],
+      "ends_on": [
+        "position_closed",
+        "max_rounds_reached",
+        "time_limit_reached",
+        "BUY_signal_accepted_by_main",
+        "cancel_retry_exhausted",
+        "main_rejected_by_policy",
+        "system_interrupt"
+      ]
+    }
+  },
+  "routine_signal_flow": {
+    "BUY": {
+      "meaning": "포지션 구축 또는 확대 제안",
+      "creates_signal_set": "buy_signal_set",
+      "requires_main_gate": true
+    },
+    "SELL": {
+      "meaning": "포지션 축소 또는 청산 제안",
+      "creates_signal_set": "sell_signal_set",
+      "requires_main_gate": true
+    },
+    "CANCEL": {
+      "meaning": "미체결 주문 정리 제안",
+      "creates_signal_set": false,
+      "requires_main_gate": true,
+      "main_action_if_approved": "cancel_remaining_order"
+    }
+  },
+  "execution_strategy_composition": {
+    "price_axis": [
+      "single_price",
+      "multi_quote"
+    ],
+    "time_axis": [
+      "single_point",
+      "multi_point"
+    ],
+    "supported_combinations": [
+      "single_price + single_point",
+      "single_price + multi_point",
+      "multi_quote + single_point",
+      "multi_quote + multi_point"
+    ],
+    "strategy_files": {
+      "buy": "buy_policy.json",
+      "sell": "sell_policy.json",
+      "cancel": "cancel_policy.json",
+      "execution": "execution_policy.json"
+    }
+  },
+  "closing_policy_interaction": {
+    "early_or_auto_close_is_not_immediate_buy_ban": true,
+    "phase": {
+      "normal_trading": {
+        "buy_signal_allowed": true,
+        "sell_signal_allowed": true,
+        "cancel_signal_allowed": true
+      },
+      "closing_waiting_final_sell": {
+        "buy_signal_allowed": true,
+        "sell_signal_allowed": true,
+        "cancel_signal_allowed": true,
+        "description": "마감정책 진입 후 마지막 SELL 주문 접수 전까지는 BUY/SELL 신호를 허용한다."
+      },
+      "final_sell_order_accepted": {
+        "buy_signal_allowed": false,
+        "sell_signal_allowed": false,
+        "cancel_signal_allowed": true,
+        "description": "마지막 SELL 주문 접수 후에는 그날 루틴 매매를 종료한다."
+      },
+      "liquidation_or_review": {
+        "buy_signal_allowed": false,
+        "sell_signal_allowed": false,
+        "cancel_signal_allowed": "system_only"
+      }
+    }
+  },
+  "main_gate_request": {
+    "request_fields": [
+      "stock_code",
+      "routine_name",
+      "signal_type",
+      "signal_set_id",
+      "reference_price",
+      "requested_action",
+      "requested_budget_or_quantity",
+      "price_axis",
+      "time_axis",
+      "order_price_type",
+      "reason"
+    ],
+    "main_response_fields": [
+      "approved",
+      "rejection_reason",
+      "approved_budget_or_quantity",
+      "order_id",
+      "system_state",
+      "closing_policy_phase"
+    ]
+  },
+  "runtime_context_record": {
+    "enabled": true,
+    "location": "runtime/routine_contexts/",
+    "record_signal_set": true,
+    "record_main_gate_result": true,
+    "record_order_result": true,
+    "record_cancel_retry": true,
+    "record_reference_price": true,
+    "record_remaining_budget_or_quantity": true
+  },
+  "safety_priority": {
+    "main_policy_overrides_routine": true,
+    "review_required_blocks_routine": true,
+    "emergency_stop_blocks_routine": true,
+    "server_data_mismatch_goes_review": true,
+    "system_interrupt_ends_signal_set": true
+  }
+}

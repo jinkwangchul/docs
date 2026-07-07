@@ -1,0 +1,46 @@
+STEP23 profit_rate_sell + sell.signal_logic 패치 검증보고
+
+적용 대상:
+- engines/macd_signal_engine.py
+- routines/MACD매매루틴/routine.py
+- test_sell_profit_rate_signal_logic_step23.py 신규
+
+구현 범위:
+1. profit_rate_sell 실제 평가 추가
+   - 기준: 평단 대비 현재가 수익률
+   - 계산: ((현재가 - 평단) / 평단) * 100
+   - 조건: profit_rate_percent 또는 target_profit_rate 이상
+   - 보유수량 정보가 있고 0 이하이면 평가 안 함
+   - 평단 없음/0 이하이면 평가 안 함
+   - 현재가 없음/0 이하이면 평가 안 함
+
+2. sell.signal_logic 실제 결합 추가
+   - OR: macd_sell 또는 profit_rate_sell 중 하나 통과 시 SELL
+   - AND: 활성화된 SELL 신호가 모두 통과해야 SELL
+   - 활성 SELL 신호가 없으면 SELL 없음
+
+3. context 전달 추가
+   - routine.py에서 evaluate_macd_routine(candles, config, context)로 전달
+   - 기존 evaluate_macd_routine(candles, config) 호출도 유지 가능
+
+검증:
+- python3 -m py_compile 통과
+- python3 test_sell_profit_rate_signal_logic_step23.py 통과
+
+검증 케이스:
+- OR + profit_rate_sell 단독 SELL 통과
+- AND + macd_sell/profit_rate_sell 둘 다 통과 시 SELL
+- AND + profit_rate_sell 실패 시 SELL 없음
+- 보유수량 0일 때 profit_rate_sell 단독 SELL 없음
+
+안전 확인:
+- HOLD 생성 없음
+- CANCEL 생성 없음
+- 주문 실행 없음
+- 큐 저장 없음
+- execution_enabled 변경 없음
+
+주의:
+- rules.json 기본값은 profit_rate_sell.enabled=false 상태 유지
+- 실전 주문 실행과 Kiwoom SendOrder 연결은 포함하지 않음
+- CANCEL, 평단 기반 지속매수, 능동매수, UI 작업은 본 STEP23 범위 밖

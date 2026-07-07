@@ -1,0 +1,78 @@
+# 루틴 정책 초안 v8 - cycle_state_policy 추가
+
+핵심 추가:
+- 메인 종목 운영상태와 루틴 내부 Cycle State를 분리한다.
+- 메인 운영상태가 우선권을 가진다.
+- Cycle State는 루틴 내부 런타임 상태이며, 사용자 표시 상태가 아니다.
+- SELL은 Cycle 종료 선언이고, Reset Complete는 서버 기준 정리 완료 확인이다.
+
+1. 메인 운영상태
+
+사용자에게 보이는 종목 운영 상태:
+- 감시/대기
+- 매수/매도
+- 조기마감
+- 자동마감
+- 청산
+- 검토관리
+
+2. 루틴 Cycle State
+
+루틴 내부 상태:
+- READY
+- RUNNING
+- EXITING
+- RESETTING
+- READY_AFTER_RESET
+- TROUBLE
+
+3. 기본 흐름
+
+READY
+→ BUY 승인
+→ RUNNING
+→ 최초 유효 SELL 승인
+→ EXITING
+→ Exit Strategy 완료
+→ RESETTING
+→ Reset Complete
+→ READY_AFTER_RESET 또는 READY
+
+4. Reset Complete 조건
+
+다음 조건이 모두 만족되어야 다음 Cycle이 가능하다.
+- 서버 보유수량 0
+- 미체결 BUY 0
+- 미체결 SELL 0
+- 서버/프로그램 정보 불일치 없음
+- 주문상태 정리 완료
+
+5. Reset 실패
+
+다음은 TROUBLE 후보:
+- 보유수량 남음
+- 미체결 남음
+- CANCEL/재SELL 횟수 초과
+- 서버/프로그램 불일치
+- 주문상태 불명
+
+6. 마감정책과의 관계
+
+조기마감/자동마감은 즉시 BUY 금지가 아니다.
+마지막 SELL 대기 상태로 볼 수 있으며, 마지막 SELL 주문 접수 이후 EXITING/RESETTING으로 이동한다.
+
+7. EXITING 중 신호 처리
+
+최초 유효 SELL:
+- Cycle 종료 선언
+
+EXITING 중 추가 SELL:
+- 새 SELL Trigger가 아니라 Exit Strategy 조건 이벤트로 사용 가능
+
+EXITING 중 BUY:
+- 기본적으로 무시 및 로그
+
+8. 원칙
+
+메인 운영상태 > 루틴 Cycle State
+루틴 Cycle State는 메인 정책을 이길 수 없다.

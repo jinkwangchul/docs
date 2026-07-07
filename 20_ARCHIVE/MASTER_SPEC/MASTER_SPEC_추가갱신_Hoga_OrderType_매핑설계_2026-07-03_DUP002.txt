@@ -1,0 +1,103 @@
+MASTER_SPEC_추가갱신_Hoga_OrderType_매핑설계_2026-07-03
+
+목적
+- 본 문서는 주문 후보(order_candidate) 단계에서 실제 키움 주문 파라미터(order_type, hoga)를 언제, 어떻게 확정할 것인지에 대한 기준을 정의한다.
+- 현재 단계에서는 매핑 규칙만 정의하며 코드 구현은 하지 않는다.
+
+1. 기본 원칙
+- order_candidate 단계에서는 order_type/hoga를 확정하지 않는다.
+- order_intent에는 의도만 기록한다.
+- 실제 확정은 ExecutionController 직전에서만 수행한다.
+
+2. 단계별 상태
+
+Signal
+→ Candidate
+    order_type = 미확정
+    hoga = 미확정
+
+Approval
+→ 변경 없음
+
+Policy
+→ 변경 없음
+
+Preflight
+→ 변경 없음
+
+Adapter Preview
+→ Preview 값만 생성
+→ 저장 금지
+
+ExecutionController
+→ 최종 매핑
+→ order_type 확정
+→ hoga 확정
+
+3. 매핑 책임
+
+order_candidate_engine
+- 주문 의도 생성
+- 확정 금지
+
+order_intent
+- 주문 방식 설명
+- 확정 금지
+
+Adapter Preview
+- Preview 생성
+- 저장 금지
+
+ExecutionController
+- 최종 결정
+- Execution Request에 반영
+
+KiwoomOrderExecutor
+- 이미 확정된 값을 사용만 한다.
+- 자체 판단 금지.
+
+4. 입력 후보
+
+향후 참조 가능
+- indicator_follow_ui_state
+- rules.json
+- routine 설정
+- 계좌 정책
+- 주문 정책
+- 종목 상태
+
+현재는 읽지 않는다.
+
+5. 금지
+
+- GUI 직접 참조
+- Combo 문자열을 직접 사용
+- Candidate 단계 확정
+- Approval 단계 확정
+- Policy 단계 확정
+- Preflight 단계 확정
+- Adapter Preview 결과를 실제 주문값으로 사용
+- ExecutionController 이전 저장
+
+6. 완료 조건
+
+ExecutionController 진입 시
+
+- order_type 확정
+- hoga 확정
+- order_intent.unresolved == false
+
+이후에만 ORDER_QUEUED 생성 가능.
+
+7. 향후 구현 순서
+
+1. UI 옵션 정리
+2. rules.json 저장 규격 확정
+3. 매핑 테이블 작성
+4. ExecutionController Mapper 구현
+5. Adapter Preview와 동일 결과 검증
+6. SendOrder 연결
+
+최종 원칙
+
+order_type/hoga는 프로젝트 전체에서 단 한 곳(ExecutionController Mapper)에서만 확정한다.

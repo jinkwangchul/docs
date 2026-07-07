@@ -1,0 +1,233 @@
+STEP25_rules_json_v0.3_구조점검보고_v2026-06-19
+
+작성 목적:
+본 문서는 STEP23 profit_rate_sell + sell.signal_logic 검증 완료 및 STEP24 BUY 구조점검 이후,
+MACD매매루틴 rules.json의 v0.3 구조 방향을 점검하기 위한 문서이다.
+
+본 문서는 실제 rules.json 교체 파일이 아니다.
+본 문서는 코드 패치가 아니다.
+본 문서는 UI 진입 전 설정 구조 확인 자료이다.
+
+------------------------------------------------------------
+1. 기준 문서 및 직전 상태
+------------------------------------------------------------
+
+기준 흐름:
+- STEP21: rules.json 자동 로드 검증 완료
+- STEP22: sell.signals.macd_sell 구조 검증 완료
+- STEP23: sell.signals.profit_rate_sell 실제 평가 완료
+- STEP23: sell.signal_logic OR/AND 결합 완료
+- STEP24: BUY 구조는 즉시 구현하지 않고 UI/B안에서 확정하기로 점검
+
+기존 v0.2 상태:
+- sell.signal_logic 구조 예약
+- sell.signals.macd_sell 구조 추가
+- sell.signals.profit_rate_sell 구조 예약
+- profit_rate_sell은 당시 실제 평가 미구현
+- signal_logic도 당시 실제 결합 미구현
+
+STEP23 이후 변경된 판정:
+- profit_rate_sell은 더 이상 단순 예약이 아니라 실제 평가 완료 항목
+- sell.signal_logic OR/AND도 실제 결합 완료 항목
+- 기준은 평단 대비 현재가 수익률
+- 평단/현재가/보유수량은 config가 아니라 context로 전달
+
+------------------------------------------------------------
+2. v0.3으로 반영 가능한 확정 항목
+------------------------------------------------------------
+
+rules.json v0.3에서 반영 가능한 항목:
+
+1. sell.signal_logic
+- 값: OR 또는 AND
+- 의미:
+  OR = 활성화된 SELL 신호 후보 중 하나라도 통과하면 SELL
+  AND = 활성화된 SELL 신호 후보가 모두 통과해야 SELL
+
+2. sell.signals.macd_sell
+- 기존 STEP22 구조 유지
+- groups 기반 조건 평가 유지
+- 기존 sell.groups 호환 유지 대상
+
+3. sell.signals.profit_rate_sell
+- STEP23에서 실제 평가 완료
+- enabled=false 기본값 유지 가능
+- 기준: 평단 대비 현재가 수익률
+- 상태값은 context에서 읽는다
+- 보유 없음, 평단 없음/0 이하, 현재가 없음/0 이하는 평가 제외
+
+4. context 분리 원칙
+- config/rules.json: 전략 설정값
+- context: 현재 종목 상태값
+- 평단/현재가/보유수량을 rules.json에 저장하지 않는다
+
+------------------------------------------------------------
+3. v0.3에서 보존해야 할 기본 원칙
+------------------------------------------------------------
+
+보존:
+- HOLD 없음
+- 비신호는 signal=None
+- BUY/SELL만 공식 주문 신호로 유지
+- execution_enabled=false 기본 유지
+- signal_only=true 유지
+- 실주문 연결 없음
+- Kiwoom SendOrder 연결 없음
+- CANCEL은 본 v0.3에서 구현하지 않음
+- UI 변경 없음
+- BUY 구조 임의 확장 없음
+
+------------------------------------------------------------
+4. v0.3 SELL 권장 구조
+------------------------------------------------------------
+
+권장 구조:
+
+sell:
+  enabled: true
+  signal_logic: "OR"
+  signals:
+    macd_sell:
+      enabled: true
+      delay_bar: 1
+      groups_logic: "OR"
+      groups: [...]
+    profit_rate_sell:
+      enabled: false
+      target_profit_rate: 3.0
+      profit_rate_percent: 3.0
+      basis: "average_price"
+      context_fields:
+        avg_price: ["avg_price", "average_price", "평단"]
+        current_price: ["current_price", "price", "현재가"]
+        holding_qty: ["holding_qty", "qty", "보유수량"]
+
+주의:
+- target_profit_rate와 profit_rate_percent는 호환 목적상 둘 다 허용 가능
+- 실제 엔진이 둘 중 어떤 키를 우선하는지는 STEP23 코드 기준을 따른다
+- 기본값은 enabled=false가 안전
+- basis는 average_price로 고정하는 것이 현재 확정 기준과 맞다
+
+------------------------------------------------------------
+5. BUY 영역 점검
+------------------------------------------------------------
+
+BUY는 v0.3에서 무리하게 SELL과 대칭 구조로 확정하지 않는다.
+
+이유:
+- BUY는 단순 진입이 아니라 평단 중심, 포지션 구축, 지속매수, 다중매수, 능동매수, CANCEL 개념과 연결된다.
+- 사용자 발언 기준으로 UI 들어가면서 B안을 진행하기로 했다.
+- 따라서 BUY 확장은 UI/B안에서 별도 확정 후 rules.json v0.4 또는 그 이후에서 반영하는 것이 안전하다.
+
+v0.3에서 BUY는 기존 구조 유지 권장:
+buy:
+  enabled: true
+  delay_bar: 1
+  groups: [...]
+
+임의 추가 금지:
+- buy.signal_logic
+- buy.signals.macd_buy
+- buy.signals.active_buy
+- buy.signals.average_price_buy
+- buy.signals.cancel
+- buy.position_policy
+- buy.multi_buy
+- buy.rebuy
+- buy.failure_policy
+
+위 항목은 사용자와 개념 확정 전까지 예약 문서에도 과도하게 넣지 않는 것이 안전하다.
+
+------------------------------------------------------------
+6. CANCEL 영역 점검
+------------------------------------------------------------
+
+CANCEL은 v0.3에서 구현하지 않는다.
+
+현재 정리:
+- 메인 CANCEL = 실제 주문취소 행동
+- 루틴 CANCEL = 신호/제안으로 재정립 가능성이 있으나, 아직 이번 v0.3 반영 대상 아님
+
+주의:
+- 기존 MASTER_SPEC 갱신반영문에는 CANCEL이 루틴 공식 신호가 아니라고 정리된 부분이 있다.
+- 이후 대화에서 루틴 CANCEL은 직접 행동이 아니라 BUY/SELL 사이클 내부의 신호라는 방향이 다시 확인되었다.
+- 따라서 CANCEL은 추후 별도 개념정리와 마스터스펙 재반영이 필요하다.
+- v0.3에서 CANCEL을 넣으면 혼선 재발 위험이 크다.
+
+------------------------------------------------------------
+7. v0.3 초안 사용 위치
+------------------------------------------------------------
+
+v0.3은 실제 적용본이라기보다 다음 작업의 기준 자료로 사용한다.
+
+사용 가능:
+- UI 설계 전 설정 항목 점검
+- SELL 설정 UI 항목 도출
+- MASTER_SPEC 갱신자료 작성
+- 다음 창 작업재개요약 보강
+
+사용 금지:
+- 기존 rules.json 즉시 교체
+- BUY 구조 확장 근거로 사용
+- CANCEL 구현 근거로 사용
+- 실주문 연결 근거로 사용
+
+------------------------------------------------------------
+8. rules.json v0.3 초안 적용 여부
+------------------------------------------------------------
+
+현재 판단:
+- 실제 rules.json 교체는 하지 않는다.
+- v0.3 초안은 참고용/검토용으로만 작성한다.
+- 사용자가 승인하면 별도 적용본 rules.json 파일을 생성한다.
+
+이유:
+- rules.json은 실제 루틴 실행 설정 파일이다.
+- 현재 단계에서 잘못 교체하면 기존 검증 상태가 흔들릴 수 있다.
+- BUY/CANCEL/UI가 아직 정식 반영 전이다.
+
+------------------------------------------------------------
+9. 다음 작업 후보
+------------------------------------------------------------
+
+STEP25 이후 후보:
+
+1. MACD 설정 UI 항목 목록화
+   - SELL: macd_sell, profit_rate_sell, signal_logic
+   - BUY: 기존 구조 표시, 확장 예약
+   - 보류: 다중매수, 평단 중심, 지속매수, CANCEL
+
+2. MASTER_SPEC 갱신반영문 추가 작성
+   - STEP23 완료
+   - STEP24 BUY 구조점검
+   - STEP25 rules.json v0.3 점검
+   - CANCEL 개념 재주의 항목
+
+3. rules.json v0.3 실제 적용본 생성
+   - 단, 사용자 승인 후
+
+------------------------------------------------------------
+10. 최종 판단
+------------------------------------------------------------
+
+STEP25 결론:
+
+- rules.json v0.3의 핵심은 SELL 계층 최신화다.
+- STEP23 완료로 profit_rate_sell과 sell.signal_logic은 실제 구현 완료 항목으로 승격한다.
+- BUY는 현재 구조 유지가 안전하다.
+- CANCEL은 본 v0.3에서 제외한다.
+- 실제 rules.json 교체는 하지 않는다.
+- 다음 단계는 UI 항목 목록화 또는 MASTER_SPEC 추가갱신이 적절하다.
+
+------------------------------------------------------------
+11. 금지 확인
+------------------------------------------------------------
+
+본 STEP25에서 수행하지 않은 것:
+- 코드 수정 없음
+- rules.json 교체 없음
+- HOLD 추가 없음
+- CANCEL 구현 없음
+- BUY 확장 없음
+- UI 변경 없음
+- 실주문 연결 없음

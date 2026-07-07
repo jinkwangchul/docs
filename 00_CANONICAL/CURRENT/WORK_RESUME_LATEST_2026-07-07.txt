@@ -1,0 +1,39 @@
+﻿WORK_RESUME_LATEST_2026-07-04
+
+기준 출처: 작업재개요약_execution_preview_gui_수동검증_2026-07-03.txt
+현재 시작 기준: Execution Preview Phase 1 + GUI 수동 검증 연결 완료
+
+1. 현재 완료 판정
+- Execution Preview 계층 1차 구축 완료.
+- GUI 수동 Execution Preview 버튼 1차 연결 완료.
+- REAL_READY order_id 입력 기반 Preview 수동 검증 흐름 확인.
+- Reporter text를 읽기 전용 다이얼로그로 표시하는 흐름 확인.
+
+2. 유지해야 할 불변 상태
+- SendOrder 미연결.
+- ORDER_QUEUED 미생성.
+- runtime 파일 생성/수정 없음.
+- runtime/order_queue.json 수정 없음.
+- routines/지표추종매매/rules.json 수정 없음.
+- status 변경 없음.
+- execution_enabled 변경 없음.
+- 자동 실행 연결 없음.
+
+3. 검증 상태
+- python -m unittest discover -s tests 통과.
+- 전체 134 tests 통과.
+- runtime/order_queue.json SHA256 해시 동일.
+- routines/지표추종매매/rules.json SHA256 해시 동일.
+- runtime 파일 목록/크기/수정시각 동일.
+
+4. 다음 작업 후보
+- GUI 버튼 연결 회귀 검증 강화.
+- Preview 결과 표시 개선.
+
+5. 다음 작업 금지선
+- SendOrder 호출 또는 연결 금지.
+- ORDER_QUEUED 생성 완료처럼 기록 금지.
+- order_queue.json status 변경 금지.
+- runtime/order_locks.json, runtime/order_executions.json, runtime/fills.json, runtime/positions.json 생성 금지.
+- execution_enabled/operator_confirmed/real_trade_guard 자동 변경 금지.
+- GUI 버튼 또는 Timer를 자동 실행 루프에 연결 금지.

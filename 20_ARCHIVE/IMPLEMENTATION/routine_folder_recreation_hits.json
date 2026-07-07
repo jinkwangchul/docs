@@ -1,0 +1,947 @@
+[
+  {
+    "file": "archive_legacy_routine_stock_dirs.py",
+    "line": 114,
+    "text": "target.parent.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 74,
+    "text": "stock_runtime_dir_for_routine,"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 116,
+    "text": "ensure_stock_runtime_files,"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 231,
+    "text": "def get_routine_dirs() -> list[Path]:"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 350,
+    "text": "logs_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 607,
+    "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 917,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 1273,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 1280,
+    "text": "budget_path = routine_dir / \"budget.json\""
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 1342,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name) if routine_name else None"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 1428,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 2796,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 3064,
+    "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 3099,
+    "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 3189,
+    "text": "stock_dir = routine_dir / f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 3372,
+    "text": "selected_routine_name, selected_routine_dir = selected_routines[0]"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 3400,
+    "text": "stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 4471,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 4946,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 4947,
+    "text": "stock_dir = routine_dir / f\"{code}_{name}\""
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 6148,
+    "text": "if self.current_selected_routine_dir() is None and self.routine_table.rowCount() > 0:"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 6162,
+    "text": "routine_dir = self.current_selected_routine_dir()"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 6798,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 6804,
+    "text": "budget = read_json_dict(routine_dir / \"budget.json\")"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 6842,
+    "text": "def current_selected_routine_dir(self) -> Path | None:"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 6873,
+    "text": "routine_dir = self.current_selected_routine_dir()"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 7641,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 8049,
+    "text": "routine_dir = self.current_selected_routine_dir()"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 8910,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 8939,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 8944,
+    "text": "stock_dir = routine_dir / f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 9010,
+    "text": "stock_folder_name = f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 9014,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 9018,
+    "text": "stock_dir = routine_dir / stock_folder_name"
+  },
+  {
+    "file": "docs/gui_windows(160).py",
+    "line": 9326,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "gui_auto_trade_ats_ops.py",
+    "line": 31,
+    "text": "logs_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "gui_auto_trade_close.py",
+    "line": 56,
+    "text": "logs_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "gui_auto_trade_review_ops.py",
+    "line": 77,
+    "text": "routine_dir = window.current_selected_routine_dir()"
+  },
+  {
+    "file": "gui_auto_trade_setting_window.py",
+    "line": 61,
+    "text": "from gui_stock_data import active_routine_for_stock, stock_runtime_dir_for_routine"
+  },
+  {
+    "file": "gui_auto_trade_setting_window.py",
+    "line": 102,
+    "text": "ensure_stock_runtime_files,"
+  },
+  {
+    "file": "gui_auto_trade_setting_window.py",
+    "line": 324,
+    "text": "def get_routine_dirs() -> list[Path]:"
+  },
+  {
+    "file": "gui_auto_trade_setting_window.py",
+    "line": 390,
+    "text": "logs_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "gui_auto_trade_setting_window.py",
+    "line": 425,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_auto_trade_setting_window.py",
+    "line": 1016,
+    "text": "if self.current_selected_routine_dir() is None and self.routine_table.rowCount() > 0:"
+  },
+  {
+    "file": "gui_auto_trade_setting_window.py",
+    "line": 1314,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "gui_auto_trade_setting_window.py",
+    "line": 1320,
+    "text": "budget = read_json_dict(routine_dir / \"budget.json\")"
+  },
+  {
+    "file": "gui_auto_trade_setting_window.py",
+    "line": 1358,
+    "text": "def current_selected_routine_dir(self) -> Path | None:"
+  },
+  {
+    "file": "gui_auto_trade_status_ops.py",
+    "line": 65,
+    "text": "logs_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "gui_auto_trade_status_ops.py",
+    "line": 76,
+    "text": "def get_routine_dirs() -> list[Path]:"
+  },
+  {
+    "file": "gui_auto_trade_status_ops.py",
+    "line": 327,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_auto_trade_table_loader.py",
+    "line": 99,
+    "text": "routine_dir = window.current_selected_routine_dir()"
+  },
+  {
+    "file": "gui_auto_trade_timer.py",
+    "line": 38,
+    "text": "routine_dir = window.current_selected_routine_dir()"
+  },
+  {
+    "file": "gui_auto_trade_unregister.py",
+    "line": 68,
+    "text": "logs_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "gui_blocked_report_window.py",
+    "line": 99,
+    "text": "BLOCKED_ACTION_REPORT_DIR.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "gui_config_utils.py",
+    "line": 87,
+    "text": "def ensure_stock_runtime_files(routine_dir: Path, code: str, name: str) -> Path:"
+  },
+  {
+    "file": "gui_config_utils.py",
+    "line": 92,
+    "text": "stock_folder_name = f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "gui_config_utils.py",
+    "line": 93,
+    "text": "stock_dir = routine_dir / stock_folder_name"
+  },
+  {
+    "file": "gui_config_utils.py",
+    "line": 94,
+    "text": "stock_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "gui_config_utils.py",
+    "line": 99,
+    "text": "(stock_dir / \"logs\").mkdir(exist_ok=True)"
+  },
+  {
+    "file": "gui_global_review_required_window.py",
+    "line": 40,
+    "text": "get_routine_dirs,"
+  },
+  {
+    "file": "gui_global_review_required_window.py",
+    "line": 66,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_global_review_required_window.py",
+    "line": 541,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_global_review_required_window.py",
+    "line": 542,
+    "text": "stock_dir = routine_dir / f\"{code}_{name}\""
+  },
+  {
+    "file": "gui_main_table_loader.py",
+    "line": 24,
+    "text": "from gui_stock_data import stock_runtime_dir_for_routine"
+  },
+  {
+    "file": "gui_main_table_loader.py",
+    "line": 41,
+    "text": "get_routine_dirs,"
+  },
+  {
+    "file": "gui_main_table_loader.py",
+    "line": 130,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "gui_main_table_loader.py",
+    "line": 149,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "gui_main_table_loader.py",
+    "line": 157,
+    "text": "budget_path = routine_dir / \"budget.json\""
+  },
+  {
+    "file": "gui_main_table_loader.py",
+    "line": 218,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "gui_review_required_window.py",
+    "line": 56,
+    "text": "def get_routine_dirs() -> list[Path]:"
+  },
+  {
+    "file": "gui_review_required_window.py",
+    "line": 167,
+    "text": "logs_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "gui_review_required_window.py",
+    "line": 402,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_review_required_window.py",
+    "line": 872,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_review_required_window.py",
+    "line": 873,
+    "text": "stock_dir = routine_dir / f\"{code}_{name}\""
+  },
+  {
+    "file": "gui_routine_assign_window.py",
+    "line": 43,
+    "text": "from gui_config_utils import default_config, ensure_stock_runtime_files"
+  },
+  {
+    "file": "gui_routine_assign_window.py",
+    "line": 79,
+    "text": "get_routine_dirs,"
+  },
+  {
+    "file": "gui_routine_assign_window.py",
+    "line": 93,
+    "text": "for path in get_routine_dirs():"
+  },
+  {
+    "file": "gui_routine_assign_window.py",
+    "line": 101,
+    "text": "stock_dir = routine_dir / f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "gui_routine_assign_window.py",
+    "line": 612,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "gui_routine_assign_window.py",
+    "line": 880,
+    "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "gui_routine_assign_window.py",
+    "line": 915,
+    "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "gui_routine_assign_window.py",
+    "line": 1005,
+    "text": "stock_dir = routine_dir / f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "gui_routine_assign_window.py",
+    "line": 1188,
+    "text": "selected_routine_name, selected_routine_dir = selected_routines[0]"
+  },
+  {
+    "file": "gui_routine_assign_window.py",
+    "line": 1226,
+    "text": "stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)"
+  },
+  {
+    "file": "gui_routine_guard.py",
+    "line": 12,
+    "text": "from gui_stock_data import active_routine_for_stock, stock_runtime_dir_for_routine"
+  },
+  {
+    "file": "gui_routine_guard.py",
+    "line": 23,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name) if routine_name else None"
+  },
+  {
+    "file": "gui_routine_policy.py",
+    "line": 12,
+    "text": "from gui_stock_data import base_stock_routines_for_stock, stock_runtime_dir_for_routine"
+  },
+  {
+    "file": "gui_routine_policy.py",
+    "line": 109,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "gui_routine_service.py",
+    "line": 17,
+    "text": "assigned_runtime_dirs_for_stock,"
+  },
+  {
+    "file": "gui_routine_service.py",
+    "line": 73,
+    "text": "assigned = assigned_runtime_dirs_for_stock(code, name)"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 72,
+    "text": "stock_runtime_dir_for_routine,"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 110,
+    "text": "ensure_stock_runtime_files,"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 225,
+    "text": "def get_routine_dirs() -> list[Path]:"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 297,
+    "text": "logs_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 554,
+    "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 822,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 829,
+    "text": "budget_path = routine_dir / \"budget.json\""
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 877,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 1704,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 1972,
+    "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 2007,
+    "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 2097,
+    "text": "stock_dir = routine_dir / f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 2280,
+    "text": "selected_routine_name, selected_routine_dir = selected_routines[0]"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 2308,
+    "text": "stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 2535,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 3573,
+    "text": "if self.current_selected_routine_dir() is None and self.routine_table.rowCount() > 0:"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 3695,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 3847,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 3853,
+    "text": "budget = read_json_dict(routine_dir / \"budget.json\")"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 3891,
+    "text": "def current_selected_routine_dir(self) -> Path | None:"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 3922,
+    "text": "routine_dir = self.current_selected_routine_dir()"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 4316,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 4726,
+    "text": "routine_dir = self.current_selected_routine_dir()"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 5138,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 5167,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 5172,
+    "text": "stock_dir = routine_dir / f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 5235,
+    "text": "stock_folder_name = f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 5239,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 5243,
+    "text": "stock_dir = routine_dir / stock_folder_name"
+  },
+  {
+    "file": "gui_schedule_window.py",
+    "line": 5552,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "gui_stock_data.py",
+    "line": 323,
+    "text": "def stock_runtime_dir_for_routine(routine_name: str, code: str, name: str) -> Path | None:"
+  },
+  {
+    "file": "gui_stock_data.py",
+    "line": 352,
+    "text": "def assigned_runtime_dirs_for_stock(code: str, name: str) -> list[tuple[str, Path]]:"
+  },
+  {
+    "file": "gui_stock_data.py",
+    "line": 365,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "gui_stock_data.py",
+    "line": 379,
+    "text": "stock_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "gui_stock_register_window.py",
+    "line": 75,
+    "text": "assigned_runtime_dirs_for_stock,"
+  },
+  {
+    "file": "gui_stock_register_window.py",
+    "line": 76,
+    "text": "stock_runtime_dir_for_routine,"
+  },
+  {
+    "file": "gui_stock_register_window.py",
+    "line": 118,
+    "text": "ensure_stock_runtime_files,"
+  },
+  {
+    "file": "gui_stock_register_window.py",
+    "line": 243,
+    "text": "get_routine_dirs,"
+  },
+  {
+    "file": "gui_stock_register_window.py",
+    "line": 324,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "gui_stock_register_window.py",
+    "line": 353,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_stock_register_window.py",
+    "line": 358,
+    "text": "stock_dir = routine_dir / f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "gui_stock_register_window.py",
+    "line": 376,
+    "text": "return assigned_runtime_dirs_for_stock(code, name)"
+  },
+  {
+    "file": "gui_stock_register_window.py",
+    "line": 576,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "gui_stock_register_window.py",
+    "line": 1098,
+    "text": "archive_root.mkdir(exist_ok=True)"
+  },
+  {
+    "file": "gui_windows.py",
+    "line": 61,
+    "text": "get_routine_dirs,"
+  },
+  {
+    "file": "gui_windows.py",
+    "line": 89,
+    "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "gui_windows.py",
+    "line": 336,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 74,
+    "text": "stock_runtime_dir_for_routine,"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 116,
+    "text": "ensure_stock_runtime_files,"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 231,
+    "text": "def get_routine_dirs() -> list[Path]:"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 350,
+    "text": "logs_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 607,
+    "text": "return {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 917,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 1273,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 1280,
+    "text": "budget_path = routine_dir / \"budget.json\""
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 1342,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name) if routine_name else None"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 1428,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 2613,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 2881,
+    "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 2916,
+    "text": "routine_dir_by_name = {routine_display_name(path): path for path in get_routine_dirs()}"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 3006,
+    "text": "stock_dir = routine_dir / f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 3189,
+    "text": "selected_routine_name, selected_routine_dir = selected_routines[0]"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 3217,
+    "text": "stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 4288,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 4763,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 4764,
+    "text": "stock_dir = routine_dir / f\"{code}_{name}\""
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 5965,
+    "text": "if self.current_selected_routine_dir() is None and self.routine_table.rowCount() > 0:"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 5979,
+    "text": "routine_dir = self.current_selected_routine_dir()"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 6615,
+    "text": "routine_dirs = get_routine_dirs()"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 6621,
+    "text": "budget = read_json_dict(routine_dir / \"budget.json\")"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 6659,
+    "text": "def current_selected_routine_dir(self) -> Path | None:"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 6690,
+    "text": "routine_dir = self.current_selected_routine_dir()"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 7450,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 7858,
+    "text": "routine_dir = self.current_selected_routine_dir()"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 8719,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 8748,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 8753,
+    "text": "stock_dir = routine_dir / f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 8819,
+    "text": "stock_folder_name = f\"{sanitize_path_part(code)}_{sanitize_path_part(name)}\""
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 8823,
+    "text": "for routine_dir in get_routine_dirs():"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 8827,
+    "text": "stock_dir = routine_dir / stock_folder_name"
+  },
+  {
+    "file": "gui_windows_149_manual_ats_status_policy_fix.py",
+    "line": 9135,
+    "text": "stock_dir = stock_runtime_dir_for_routine(routine_name, code, name)"
+  },
+  {
+    "file": "integrity_checker.py",
+    "line": 108,
+    "text": "def get_routine_dirs(project_root: Path) -> list[Path]:"
+  },
+  {
+    "file": "integrity_checker.py",
+    "line": 179,
+    "text": "routine_dirs = get_routine_dirs(project_root)"
+  },
+  {
+    "file": "integrity_checker.py",
+    "line": 291,
+    "text": "budget_path = routine_dir / \"budget.json\""
+  },
+  {
+    "file": "registry_migratio/stock_migration_dry_run.py",
+    "line": 100,
+    "text": "OUT_DIR.mkdir(exist_ok=True)"
+  },
+  {
+    "file": "registry_migratio/stock_registry_step1_analyzer.py",
+    "line": 282,
+    "text": "output_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "registry_migratio/stock_repository.py",
+    "line": 91,
+    "text": "path.parent.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "registry_migratio/stock_repository.py",
+    "line": 286,
+    "text": "path.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "registry_migratio/stock_repository.py",
+    "line": 287,
+    "text": "(path / \"logs\").mkdir(exist_ok=True)"
+  },
+  {
+    "file": "registry_migratio/stock_repository.py",
+    "line": 342,
+    "text": "기존 stock_runtime_dir_for_routine() 대체 후보 함수."
+  },
+  {
+    "file": "stock_migration_to_central_stocks.py",
+    "line": 54,
+    "text": "path.parent.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "stock_migration_to_central_stocks.py",
+    "line": 211,
+    "text": "dst.parent.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "stock_migration_to_central_stocks.py",
+    "line": 229,
+    "text": "target_file.parent.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "stock_migration_to_central_stocks.py",
+    "line": 285,
+    "text": "item.target_dir.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "stock_migration_to_central_stocks.py",
+    "line": 286,
+    "text": "(item.target_dir / \"logs\").mkdir(exist_ok=True)"
+  },
+  {
+    "file": "stock_migration_to_central_stocks.py",
+    "line": 299,
+    "text": "STOCKS_DIR.mkdir(exist_ok=True)"
+  },
+  {
+    "file": "stock_repository.py",
+    "line": 74,
+    "text": "path.parent.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "stock_repository.py",
+    "line": 245,
+    "text": "path.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "stock_repository.py",
+    "line": 246,
+    "text": "(path / \"logs\").mkdir(exist_ok=True)"
+  }
+]

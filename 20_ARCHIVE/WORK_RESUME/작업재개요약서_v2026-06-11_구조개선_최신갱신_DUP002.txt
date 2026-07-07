@@ -1,0 +1,127 @@
+작업재개요약서_v2026-06-11_구조개선_최신갱신
+
+작성시각: 2026-06-11 11:53:58
+
+현재 작업 주제:
+- 키움 자동매매 GUI 구조개선
+- gui_windows.py 대형 클래스/기능 분리
+- 자동매매설정/루틴지정/검토관리/종목등록 계열 안정화
+
+
+[2026-06-11 최신 구조개선 진행 요약]
+
+완료 확인:
+1. AutoTradeSettingWindow 계열 구조분리 진행
+   - gui_auto_trade_status_ops.py
+   - gui_auto_trade_table_loader.py
+   - gui_auto_trade_close.py
+   - gui_auto_trade_timer.py
+   - gui_auto_trade_run_control.py
+   - gui_auto_trade_review_ops.py
+   - 관련 import 누락 다수 수정 및 실행 확인
+
+2. RoutineAssignWindow 분리 완료
+   - gui_routine_assign_window.py 분리
+   - gui_routine_assign_utils.py 복구
+   - gui_centered_checkbox_delegate.py 분리
+   - gui_windows.py에서 RoutineAssignWindow / RoutineUnassignConfirmDialog import 보강
+   - 루틴 지정창 생성, 데이터 로딩, 루틴 해제, 루틴 지정 정상 확인
+
+3. 루틴 지정 가능 종목 필터 수정 완료
+   - 상단 "루틴 지정 가능 종목"에는 미등록/미지정 종목만 표시
+   - 이미 루틴 지정된 종목은 지정 실행부에서도 제외
+   - 테스트 결과: 루틴 해제 후 상단 이동 정상, 다시 지정 후 하단 연결목록 갱신 정상
+
+4. 안정성검사 메시지 용어 수정 논의
+   - "운영중 대상"은 혼동 소지가 있어 보류
+   - 임시 확정 문구: 전체검사 / 정상 종목 / 검토관리 대상 / 기분류 종목
+   - 메시지창은 당장은 패스, 추후 재검토
+
+5. 중요 UX/정책 재확인
+   - 사용자가 마우스로 선택한 행의 배경색은 상태색이 아니라 선택 하이라이트임
+   - 검정/흰색처럼 보이는 선택색을 상태 이상으로 오판하지 말 것
+   - 기존 정책: 녹색=정상, 주황=정상이나 다음 절차 없음, 회색=비활성, 빨강=데이터 신뢰 불가, 검정/선택색은 별도 판정 아님
+
+
+
+[다음 창 시작 시 우선순위]
+
+1순위: gui_windows.py 추가 구조개선
+   - 다음 분리 대상 후보:
+     A. StockRegisterWindow → gui_stock_register_window.py
+     B. OperationEnvironmentSettingsDialog → gui_operation_environment_settings_dialog.py
+     C. GlobalReviewRequiredWindow → gui_global_review_required_window.py
+
+2순위 추천:
+   - StockRegisterWindow 분리 우선
+   - 이유: 종목 등록/삭제/루틴지정 진입부가 아직 gui_windows.py에 크게 남아 있음
+   - delete_selected_stock() 등 대형 메서드가 남아 있을 가능성이 높음
+
+3순위:
+   - GlobalReviewRequiredWindow 분리
+   - 검토관리창은 현재 작동 중이나 MainWindow/긴급정지/재시작 판정과 연결되어 있으므로 조심해서 분리
+
+4순위:
+   - OperationEnvironmentSettingsDialog 분리
+   - 환경설정 UI가 크지만 이미 별도 설정창 성격이므로 분리 효과 큼
+
+[다음 창 작업 시작 원칙]
+- 절대 패치 먼저 만들지 말 것
+- 먼저 현재 파일 분석
+- 분리 대상 클래스/함수 범위 확인
+- import 순환참조 예상 목록 작성
+- 사용자가 진행 승인하면 수정본 생성
+- 결과 파일은 ZIP보다 개별 파일로 제공
+
+
+
+[반복 실수 방지]
+
+1. 함수/클래스 이동 후 반드시 import 확인
+   - NameError 패턴:
+     assigned_stock_dirs_in_routine
+     parse_stock_folder_name
+     append_stock_log
+     append_changelog
+     operation_text_and_color
+     status_after_operation_mode_change
+     RoutineUnassignConfirmDialog
+
+2. 순환참조 주의
+   - gui_windows.py ↔ gui_routine_assign_window.py 직접 상호 import 금지
+   - 공용 위젯/델리게이트는 별도 파일로 분리
+   - 예: CenteredCheckBoxDelegate → gui_centered_checkbox_delegate.py
+
+3. 파일명 덮어쓰기 실수 주의
+   - gui_routine_assign_utils.py에 window 전체 내용을 덮어쓴 문제가 있었음
+   - utils 파일은 함수만 포함해야 함
+   - window 파일은 창 클래스만 포함해야 함
+
+4. "루틴 지정 가능 종목" 정책
+   - 미등록/미지정 종목만 표시
+   - 이미 루틴 연결된 종목은 하단 연결 종목에서 관리
+   - 같은 루틴 재지정 방어 필요
+
+5. 사용자 요구
+   - 작업 결과는 가능한 개별 파일로 제공
+   - 임의 수정/삭제 금지
+   - 구현 전 방향 확인 중요
+
+
+[현재 최신 gui_windows.py 분석]
+파일: gui_windows(170).py
+전체 라인 수: 3,494
+
+클래스 현황:
+- MainWindow: 660줄 / 메서드 31개 / 350-1009
+- GlobalReviewRequiredWindow: 442줄 / 메서드 16개 / 1205-1646
+- TimeComboWidget: 33줄 / 메서드 3개 / 1663-1695
+- OperationEnvironmentSettingsDialog: 660줄 / 메서드 20개 / 1697-2356
+- StockRegisterWindow: 830줄 / 메서드 23개 / 2664-3493
+
+[다음 창에서 먼저 해야 할 질문]
+- "StockRegisterWindow부터 분리할까요?"
+- 또는 "GlobalReviewRequiredWindow부터 분리할까요?"
+
+추천 답:
+- StockRegisterWindow부터 분리

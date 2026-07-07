@@ -1,0 +1,51 @@
+구조개선_남은작업_분석서_v2026-06-11
+
+작성시각: 2026-06-11 11:53:58
+
+[현재 파일 분석]
+최신 기준 파일: gui_windows(170).py
+전체 라인 수: 3,494
+
+클래스 현황:
+- MainWindow: 660줄 / 메서드 31개 / 350-1009
+- GlobalReviewRequiredWindow: 442줄 / 메서드 16개 / 1205-1646
+- TimeComboWidget: 33줄 / 메서드 3개 / 1663-1695
+- OperationEnvironmentSettingsDialog: 660줄 / 메서드 20개 / 1697-2356
+- StockRegisterWindow: 830줄 / 메서드 23개 / 2664-3493
+
+[완료된 구조분리]
+- AutoTradeSettingWindow 관련 다수 기능 분리
+- gui_auto_trade_table_loader.py 분리 및 테스트
+- gui_auto_trade_status_ops.py 보강
+- gui_auto_trade_close.py 보강
+- gui_auto_trade_review_ops.py 보강
+- gui_auto_trade_run_control.py 보강
+- gui_auto_trade_timer.py 보강
+- RoutineAssignWindow 분리
+- CenteredCheckBoxDelegate 공용화
+- RoutineAssignUtils 복구
+
+[남은 주요 덩어리]
+1. StockRegisterWindow
+   - 종목등록설정 창
+   - 종목 등록/삭제/강제삭제/루틴지정 진입부
+   - 다음 분리 최우선 후보
+
+2. GlobalReviewRequiredWindow
+   - 검토관리 종목 통합 관리창
+   - 복귀/미지정/삭제 기능 포함
+   - MainWindow의 검토관리 버튼과 연결
+
+3. OperationEnvironmentSettingsDialog
+   - 환경설정 UI
+   - 운영시간/ATS/마감/청산 설정 포함
+   - UI 코드가 커서 별도 파일 분리 가치 높음
+
+[분리 시 주의]
+- gui_windows.py에는 MainWindow와 최소 공용 함수만 남기는 방향
+- 프로젝트 경로 상수는 중복 정의보다 별도 공용 설정 모듈로 이동 검토 가능
+- 하지만 지금은 과도한 공용화보다 창 단위 분리가 안전
+
+[다음 작업 추천]
+StockRegisterWindow 분리부터 진행.
+단, 먼저 현재 gui_windows.py에서 StockRegisterWindow 클래스 시작/끝 라인, 의존 함수, 외부 호출 지점을 분석한 뒤 진행.

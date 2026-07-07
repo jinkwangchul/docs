@@ -1,0 +1,93 @@
+MASTER_SPEC_추가갱신_Audit_Log_감사로그_설계_2026-07-03
+
+목적
+- 본 문서는 주문 파이프라인 전체의 상태 전이와 주요 의사결정을 추적하기 위한 Audit Log 기준을 정의한다.
+- Audit Log는 실행 로직이 아니라 추적·복구·검토관리·디버깅을 위한 기록 계층이다.
+
+1. 기록 대상
+- Signal 생성
+- Order Candidate 생성
+- Approval 결과
+- Operation Policy 결과
+- Real Preflight 결과
+- Adapter Preview 생성
+- ORDER_QUEUED 생성(향후)
+- Execution Request 생성(향후)
+- SendOrder 호출(향후)
+- 주문접수/체결/취소/정정 이벤트(향후)
+- Recovery 처리
+- 검토관리 이동
+
+2. 기록 원칙
+- 상태 변경 시점마다 1건 기록
+- 동일 이벤트를 중복 기록하지 않는다.
+- 로그는 상태를 변경하지 않는다.
+- 로그는 실행 판단에 사용하지 않는다.
+
+3. 권장 항목
+- log_id
+- timestamp
+- actor
+- entity_type
+- entity_id
+- action
+- from_status
+- to_status
+- reason
+- details
+- routine
+- code
+- source_signal_id
+- order_id
+- execution_id(향후)
+- request_hash(향후)
+- kiwoom_order_no(향후)
+
+4. Actor 예시
+- RoutineEngine
+- OrderCandidateEngine
+- ApprovalEngine
+- OperationPolicyGate
+- RealPreflight
+- AdapterPreview
+- ExecutionController
+- KiwoomOrderExecutor
+- FillEventController
+- RecoveryController
+- Operator
+
+5. Runtime 후보
+- runtime/audit_log.jsonl
+또는
+- logs/order_pipeline.log
+
+JSON Lines 형식을 권장한다.
+
+6. Audit Log와 검토관리
+Audit Log는 검토관리 판단 근거로 사용 가능하지만
+검토관리 자체를 자동 결정하지 않는다.
+
+7. 복구 정책
+재시작 시
+- 마지막 Audit Log
+- active Lock
+- active Execution
+- Kiwoom 상태
+를 함께 검토한다.
+
+8. 금지
+- Audit Log를 상태 저장소처럼 사용
+- Audit Log를 실행 판단에 직접 사용
+- 로그 기록 실패를 이유로 SendOrder 중단 여부를 자동 결정
+- 로그 수정으로 상태 복원
+
+9. 향후 연계
+- Runtime Entity Model
+- Execution Request
+- Request Hash
+- Order Lock
+- Review Management
+
+최종 원칙
+Audit Log는 '무슨 일이 있었는가'를 기록하며,
+'무엇을 해야 하는가'를 결정하지 않는다.

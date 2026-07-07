@@ -1,0 +1,76 @@
+﻿MASTER_SPEC_READABLE_CHANGELOG_2026-07-04
+
+이번 병합에서 바뀐 점
+- Execution Preview GUI 수동 검증 완료 내용을 기존 MASTER_SPEC 정본 체계에 새 날짜 병합본으로 반영했다.
+- 기존 2026-07-03 Canonical 문서는 수정하지 않고, 2026-07-04 정본/읽기본을 새로 생성했다.
+- 추가된 신규 섹션은 "29.1 Execution Preview Phase 1 + GUI 수동 검증 연결 완료"이다.
+- 섹션 위치는 MASTER_SPEC_CANONICAL_READABLE_2026-07-04.txt의 문서 끝 29.1 섹션이며, MASTER_SPEC_CANONICAL_2026-07-04.txt에도 동일하게 반영했다.
+
+추가된 정책
+- 현재 반영 범위는 "Execution Preview Phase 1 + GUI 수동 검증 연결 완료"까지만이다.
+- Execution Preview의 ok=True는 실제 주문 가능이 아니라 preview 입력 해소 의미이다.
+- order_lock_manager.py는 lock_key, lock_id 후보만 메모리 dict로 생성하며 runtime/order_locks.json을 생성하지 않는다.
+- order_execution_request.py는 execution request 후보 dict만 생성하며 runtime/order_executions.json 및 ORDER_QUEUED를 생성하지 않는다.
+- order_queue_reader.py는 order_queue.json을 조회 전용으로 읽고 REAL_READY가 아니면 blocked 처리한다.
+- GUI 버튼은 수동 검증용이며 자동 실행 루프, Timer, SendOrder 호출 흐름과 연결하지 않는다.
+
+추가된 Preview 계층
+- order_hoga_mapper.py: 호가 의도 preview 표준값 변환.
+- order_type_mapper.py: BUY/SELL 의도 preview 표준값 변환.
+- execution_controller.py: REAL_READY, hoga/order type preview, adapter request preview 준비 상태 확인.
+- final_execution_guard.py: 최종 실행 직전 조건을 순수 판정.
+- order_lock_manager.py: lock 후보 생성.
+- order_request_hash.py: stable request hash 후보 생성.
+- order_execution_request.py: execution request 후보 생성.
+- execution_pipeline_controller.py: Preview Pipeline 실행 및 blocked_stage 반환.
+- execution_pipeline_summary.py: GUI/로그용 summary 생성.
+- execution_preview_service.py: pipeline과 summary 통합 호출.
+- order_queue_reader.py: REAL_READY order 조회 전용 읽기.
+- execution_preview_order_service.py: order_id 기반 Preview Service.
+- execution_preview_reporter.py: 사람이 읽는 dict/text 보고 생성.
+- gui_auto_trade_setting_window.py: 수동 Execution Preview 버튼 및 읽기 전용 결과 다이얼로그 표시.
+
+GUI 변경
+- 자동매매설정 창 상단에 Execution Preview 버튼을 추가한 상태를 기록했다.
+- 사용자가 REAL_READY order_id를 입력하면 runtime/real_trade_guard.json을 읽기 전용으로 로드한다.
+- Preview 결과는 Reporter text로 변환되어 읽기 전용 다이얼로그에 표시된다.
+- 이 GUI 흐름은 실제 주문을 하지 않는다.
+
+테스트 증가
+- 이전 기준 117 tests 이후, 이번 병합 기준 전체 134 tests 통과 상태를 기록했다.
+- runtime/order_queue.json SHA256 해시 동일을 기록했다.
+- routines/지표추종매매/rules.json SHA256 해시 동일을 기록했다.
+- runtime 파일 목록/크기/수정시각 동일을 기록했다.
+
+금지선 유지
+- SendOrder 미연결.
+- ORDER_QUEUED 미생성.
+- runtime/order_queue.json 미변경.
+- routines/지표추종매매/rules.json 미변경.
+- runtime 파일 생성/수정 없음.
+- status 변경 없음.
+- execution_enabled 변경 없음.
+- 자동 실행 연결 없음.
+- Kiwoom 실제 주문 코드 매핑 없음.
+- GUI 버튼을 자동 실행 루프에 연결하지 않음.
+
+중복 제거 현황
+- 중복 제거한 문단 또는 항목 수: 41.
+- 동일 복사본 전체 문단 제외: 39개 문단.
+- 범위 초과 다음 작업 후보 제외: 2개.
+- 제외한 범위 초과 항목은 자동 파이프라인 편입 설계와 SendOrder 전 최종 설계 문서화이다.
+
+생성 파일
+- MASTER_SPEC_CHANGELOG_2026-07-04.txt
+- MASTER_SPEC_READABLE_CHANGELOG_2026-07-04.txt
+
+참조 파일
+- MASTER_SPEC_CANONICAL_READABLE_2026-07-04.txt
+- MASTER_SPEC_CANONICAL_2026-07-04.txt
+- WORK_RESUME_LATEST_2026-07-04.txt
+- MASTER_SPEC_MERGE_REPORT_execution_preview_gui_2026-07-04.txt
+
+원본 보존
+- 기존 MASTER_SPEC_CHANGELOG_2026-07-03.txt는 수정하지 않았다.
+- 기존 MASTER_SPEC_READABLE_CHANGELOG_2026-07-03.txt는 수정하지 않았다.
+- 압축파일은 생성하지 않았다.

@@ -1,0 +1,73 @@
+# 루틴 정책 초안 v5 - main_controller 추가
+
+핵심 변경:
+- main_controller.json 추가.
+- 메인파트와 루틴 메인부의 권한 경계를 명확히 한다.
+- 루틴은 BUY/SELL/CANCEL 신호와 실행전략을 제안하지만 실제 주문/취소/체결은 메인파트 승인 후에만 수행된다.
+- Signal Set은 하루 계획이 아니라 최초 BUY 또는 SELL 신호 1건에서 시작되는 실행 묶음이다.
+- 메인 승인 전에는 BUY PLAN이 아니라 Signal Execution Context 또는 Signal Set으로 부른다.
+
+1. 계층 구조
+
+Stock Day Operation Plan
+= 메인파트의 1일 종목 운영계획
+
+Routine Main Controller
+= 루틴 메인부. BUY/SELL/CANCEL 조합과 실행전략을 관리
+
+Signal Part
+= MACD, 볼린저, 엔벨로프 등 실제 신호 검출부
+
+Main Order Executor
+= 실제 주문/취소/체결 수행부
+
+2. main_controller.json 역할
+
+- BUY/SELL/CANCEL 신호 흐름 관리
+- Signal Set 생성/종료 기준 관리
+- 단일가격/다중호가 + 단일지점/다중지점 조합 연결
+- cancel_policy와 execution_policy 연결
+- 메인 게이트 요청 형식 정의
+- runtime 기록 항목 정의
+
+3. Signal Set 정의
+
+Signal Set은 최초 BUY 또는 SELL 신호 발생 시 생성되는 실행 묶음이다.
+
+예:
+BUY 신호 발생
+→ BUY Signal Set 생성
+→ 기준가 고정
+→ 다중지점/다중호가/CANCEL 진행
+→ 메인 승인 후 주문 실행
+→ 종료조건 충족 시 종료
+
+4. 신호 재검사 원칙
+
+다중지점/다중호가/CANCEL 진행 중에는 최초 신호 조건을 매 회차 재검사하지 않는다.
+이유:
+- 신호는 특정 시점의 트리거다.
+- 분할 실행이나 미체결 지연 중 원 신호 조건은 자연스럽게 이탈할 수 있다.
+- 매 회차 재검사를 하면 거래 자체가 불가능해질 수 있다.
+
+5. 마감정책 상호작용
+
+조기/자동마감은 즉시 BUY 금지가 아니다.
+마지막 SELL 주문 접수 전까지 BUY/SELL/CANCEL 신호는 허용된다.
+마지막 SELL 주문 접수 후에는 그날 루틴 매매가 종료된다.
+
+6. 파일 배치 권장
+
+routines/
+  MACD매매루틴/
+    routine.json
+    rules.json
+    main_controller.json
+    buy_policy.json
+    sell_policy.json
+    cancel_policy.json
+    execution_policy.json
+    docs/
+      policy_note.txt
+
+현재 v5는 여전히 설계 초안이며, 바로 운영 폴더에 배치하는 확정 파일은 아니다.

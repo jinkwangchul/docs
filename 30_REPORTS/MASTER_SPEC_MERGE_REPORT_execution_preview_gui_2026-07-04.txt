@@ -1,0 +1,54 @@
+﻿MASTER_SPEC_MERGE_REPORT_execution_preview_gui_2026-07-04
+작성일: 2026-07-04
+
+[입력 문서 확인]
+- 발견: 작업재개요약_execution_preview_gui_수동검증_2026-07-03.txt
+- 중복 복사본 발견: 작업재개요약_execution_preview_gui_수동검증_2026-07-03 (1).txt / SHA256 동일: True
+- 미발견: MASTER_SPEC_갱신자료_execution_preview_gui_수동검증_2026-07-03.txt
+
+[생성 산출물]
+- 병합 MASTER_SPEC 읽기본: 00_CANONICAL\CURRENT\MASTER_SPEC_CANONICAL_READABLE_2026-07-04.txt
+- 병합 MASTER_SPEC 정본: 00_CANONICAL\CURRENT\MASTER_SPEC_CANONICAL_2026-07-04.txt
+- 작업재개요약 최신본: 00_CANONICAL\CURRENT\WORK_RESUME_LATEST_2026-07-04.txt
+- 병합 보고서: 30_REPORTS\MASTER_SPEC_MERGE_REPORT_execution_preview_gui_2026-07-04.txt
+
+[변경 위치]
+- MASTER_SPEC_CANONICAL_READABLE_2026-07-04.txt: 문서 끝에 "29.1 Execution Preview Phase 1 + GUI 수동 검증 연결 완료" 섹션 추가
+- MASTER_SPEC_CANONICAL_2026-07-04.txt: 동일 병합 섹션 추가
+- WORK_RESUME_LATEST_2026-07-04.txt: 다음 작업 시작 기준 요약 생성
+
+[반영 내용 요약]
+- Execution Preview 계층 1차 구축 완료
+- GUI 수동 Execution Preview 버튼 1차 연결 완료
+- REAL_READY order_id 조회 기반 수동 Preview 검증 흐름
+- Reporter text 읽기 전용 다이얼로그 표시
+- 14개 관련 모듈의 preview 전용 책임
+- 전체 134 tests 통과
+- runtime/order_queue.json 및 routines/지표추종매매/rules.json 미변경 사실
+
+[유지한 금지/불변 조건]
+- SendOrder 미연결
+- ORDER_QUEUED 미생성
+- runtime/order_queue.json 미변경
+- routines/지표추종매매/rules.json 미변경
+- runtime 파일 생성/수정 없음
+- status 변경 없음
+- execution_enabled 변경 없음
+- 자동 실행 연결 없음
+
+[중복 제거/제외 보고]
+- 중복 제거한 문단 또는 항목 수: 41
+- 동일 복사본 전체 문단 제외: 39개 문단
+- 다음 작업 후보 중 범위 초과 항목 제외: 2개
+- 자동 파이프라인 편입 설계: REAL_READY 발생 후 자동 Preview 수행/표시/로그화는 이번 병합 범위 밖으로 제외
+- SendOrder 전 최종 설계 문서화: SendOrder 연결 관련 내용 추가 금지 원칙에 따라 제외
+
+[원본 삭제/수정 여부]
+- 원본 삭제: 없음
+- 원본 수정: 없음
+- 기존 Canonical 2026-07-03 파일 수정: 없음
+- 압축파일 생성: 없음
+
+[주의]
+- 지정된 MASTER_SPEC 갱신자료 파일은 검색 결과 발견되지 않아, 발견된 작업재개요약 문서의 MASTER_SPEC 반영 가능 내용을 기준으로 병합했다.
+- 이번 병합은 "Execution Preview Phase 1 + GUI 수동 검증 연결 완료" 범위까지만 반영했다.

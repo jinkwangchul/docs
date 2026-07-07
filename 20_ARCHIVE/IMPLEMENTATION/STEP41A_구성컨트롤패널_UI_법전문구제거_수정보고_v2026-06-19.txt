@@ -1,0 +1,20 @@
+STEP41A_구성컨트롤패널_UI_법전문구제거_수정보고_v2026-06-19
+
+수정 목적:
+STEP41 테스트에서 공식 UI 탭명에 '법전' 문구가 남아 실패한 문제를 수정한다.
+
+수정 내용:
+- 탭명: BUY 법전 -> 매수
+- 내부 제목: BUY 법전 -> 매수 구성
+- 주석 일부: BUY 법전 UI -> 매수 구성 UI
+
+유지 내용:
+- 구성 탭 유지
+- 기존 로딩 호환 위젯 유지
+- 저장 버튼 비활성 유지
+- rules.json 저장 없음
+- 실제 BUY/SELL 로직 구현 없음
+
+적용:
+copy gui_macd_routine_settings_dialog_STEP41A_overview_control_panel_no_law_word.py gui_macd_routine_settings_dialog.py
+python test_macd_settings_dialog_step41a_overview.py

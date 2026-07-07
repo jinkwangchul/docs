@@ -1,0 +1,191 @@
+MASTER_SPEC 갱신자료
+
+Rule Mapper Preview / Merge Candidate 구조 확정
+
+작성일: 2026-07-02
+
+1. 목적
+
+본 갱신은 지표추종 루틴 설정 UI와 실행 Rule 사이에 Preview/검증 계층을
+추가하면서 프로젝트 구조가 변경된 내용을 MASTER_SPEC에 반영하기 위한
+문서이다.
+
+핵심 원칙은 다음과 같다.
+
+-   UI 상태와 실행 Rule을 분리한다.
+-   UI 변경이 즉시 실행 Rule을 변경하지 않는다.
+-   실행 Rule 생성 전 Preview와 Diff 검증 단계를 둔다.
+-   운영자 검토 이후에만 실제 Rule 생성 단계로 진행한다.
+
+2. 아키텍처 변경
+
+기존
+
+UI → rules.json
+
+변경 후
+
+UI → indicator_follow_ui_state → Rule Mapper → Rule Preview → Rule Diff
+→ 운영자 검토 → (향후 승인) → Engine Rule 생성
+
+현재 구현 범위는 Preview/Diff까지이며 실제 Rule 저장 및 엔진 연결은
+구현하지 않는다.
+
+3. Rule Mapper
+
+신규 구성요소
+
+routine_rule_mapper.py
+
+주요 함수
+
+-   build_engine_rules_preview_from_ui_state()
+-   compare_engine_rules_preview()
+
+역할
+
+-   UI State를 Preview 후보로 변환
+-   기존 Rule과 Preview 차이 비교
+-   저장하지 않음
+-   실행하지 않음
+
+4. Preview 정책
+
+Replace Preview 폐기.
+
+공식 정책
+
+Merge/Add Candidate
+
+신규 Namespace
+
+indicator_follow_rule_preview
+
+mode
+
+merge_add_candidate
+
+Buy
+
+-   merge_into = buy.groups[0].conditions
+-   기존 OSC TURN_UP 존재 시 skip_existing
+-   OCR Threshold만 add_conditions 후보 생성
+
+Sell
+
+기존
+
+sell.signals.macd_sell
+
+변경 금지.
+
+새 후보
+
+sell.signals.ui_preview_condition_c_macd_sell
+
+속성
+
+-   enabled = false
+-   preview_candidate = true
+
+5. Diff 정책
+
+상태
+
+-   same
+-   changed
+-   added
+-   missing
+-   merge_candidate
+-   add_signal_candidate
+
+위험도
+
+-   low
+-   medium
+-   high
+
+현재 기준
+
+bar.bar_minutes → changed
+
+buy.groups[0].conditions → merge_candidate
+
+sell.signals.ui_preview_condition_c_macd_sell → add_signal_candidate
+
+sell.signals.macd_sell → 변경 대상 아님
+
+6. GUI 정책
+
+설정 검증 화면은 다음 정보를 표시한다.
+
+Rule Mapper Preview
+
+-   mapped_paths
+-   warnings
+-   preview_rules
+-   indicator_follow_rule_preview
+-   merge_add_candidate
+
+Rule Mapper Diff
+
+-   summary
+-   changes
+-   warnings
+-   risk
+-   current_value
+-   preview_value
+
+7. 구현 금지
+
+-   rules.json 직접 저장
+-   Preview 결과를 실행 Rule에 덮어쓰기
+-   Engine 연결
+-   기존 Rule 직접 변경
+
+8. MACD 명칭 정책
+
+확정
+
+루틴 구조 일반명
+
+-   DEFAULT_INDICATOR_FOLLOW_CONFIG
+-   evaluate_indicator_follow_routine()
+
+호환 Alias 유지
+
+-   DEFAULT_MACD_ROUTINE_CONFIG
+-   evaluate_macd_routine()
+
+routine.py는 일반명을 우선 사용한다.
+
+9. 변경 금지
+
+-   routine_macd_engine.py 파일명
+-   rules.json macd 관련 key
+-   sell.signals.macd_sell
+-   indicator_follow_ui_state macd_* key
+-   target: MACD
+-   target: OSC
+-   MACD선/시그널선
+-   기존 테스트 참조 key
+
+10. 검증 결과
+
+-   Preview 구현 완료
+-   Diff 구현 완료
+-   Merge/Add Candidate 구조 완료
+-   GUI Preview/Diff 표시 완료
+-   py_compile 통과
+-   unittest 12 tests 통과
+-   rules.json 변경 없음
+-   엔진 연결 없음
+
+11. 향후 작업
+
+1.  Preview 기반 실제 Rule 생성 설계
+2.  승인 절차 설계
+3.  Engine 연결
+4.  Alias 안정화
+5.  routine_macd_engine.py 파일명 변경 검토
+6.  rules key migration 장기 검토

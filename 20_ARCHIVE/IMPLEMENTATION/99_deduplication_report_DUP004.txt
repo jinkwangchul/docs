@@ -1,0 +1,50 @@
+﻿MASTER_SPEC deduplication report
+Generated: 2026-07-03 15:22:26
+
+==================================================
+Summary
+==================================================
+- Source TXT documents: 76
+- Exact duplicate files: 0
+- Duplicate blocks removed: 16
+
+==================================================
+Exact duplicate files
+==================================================
+- None
+
+==================================================
+Removed duplicate blocks
+==================================================
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_order_intent_미확정진단필드_2026-07-03.txt => MASTER_SPEC_추가갱신_Execution_Request_order_executions_설계_2026-07-03.txt
+  Preview: ================================================== 1. 배경 ==================================================
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_order_intent_미확정진단필드_2026-07-03.txt => MASTER_SPEC_추가갱신_Execution_Request_order_executions_설계_2026-07-03.txt
+  Preview: ================================================== 14. 최종 결론 ==================================================
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_order_provenance_주문생성이력_2026-07-03.txt => MASTER_SPEC_추가갱신_Execution_Request_order_executions_설계_2026-07-03.txt
+  Preview: ================================================== 1. 배경 ==================================================
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_order_provenance_주문생성이력_2026-07-03.txt => MASTER_SPEC_추가갱신_order_intent_미확정진단필드_2026-07-03.txt
+  Preview: 현재 단계에서는 unresolved=false를 만들지 않는다.
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_실주문실행책임_ORDER_QUEUED_주문생명주기_2026-07-03.txt => MASTER_SPEC_추가갱신_order_provenance_주문생성이력_2026-07-03.txt
+  Preview: PENDING ↓ Approval Engine APPROVED / BLOCKED ↓ Operation Policy Gate 단건 EXECUTABLE / BLOCKED_POLICY ↓ Real Preflight 단건 
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_실주문실행책임_ORDER_QUEUED_주문생명주기_2026-07-03.txt => MASTER_SPEC_추가갱신_ADAPTER_READY_미사용정책_2026-07-03.txt
+  Preview: 현재 단계에서 금지:
+- [02_Runtime_Data_Model] MASTER_SPEC_추가갱신_Runtime_Data_Model_Entity_Relationship_2026-07-03.txt => MASTER_SPEC_추가갱신_Runtime_Data_Model_Entity_Relationship_2026-07-03.txt
+  Preview: 현재 상태: - 아직 미구현.
+- [02_Runtime_Data_Model] MASTER_SPEC_추가갱신_프로젝트_모듈카탈로그_Module_Catalog_2026-07-03.txt => MASTER_SPEC_추가갱신_프로젝트_모듈카탈로그_Module_Catalog_2026-07-03.txt
+  Preview: 입력 - Controller
+- [03_Architecture] MASTER_SPEC_추가갱신_Controller_Layer_호출책임_2026-07-03.txt => MASTER_SPEC_추가갱신_Controller_Layer_호출책임_2026-07-03.txt
+  Preview: 현재 상태: - 설계만 존재. - 구현 금지.
+- [03_Architecture] MASTER_SPEC_추가갱신_Controller_Layer_호출책임_2026-07-03.txt => MASTER_SPEC_추가갱신_Controller_Layer_호출책임_2026-07-03.txt
+  Preview: 현재 상태: - 설계만 존재. - 구현 금지.
+- [03_Architecture] MASTER_SPEC_추가갱신_Controller_Layer_호출책임_2026-07-03.txt => MASTER_SPEC_추가갱신_Controller_Layer_호출책임_2026-07-03.txt
+  Preview: 현재 상태: - 설계만 존재. - 구현 금지.
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_구현추적표_Implementation_Trace_Register_2026-07-03.txt => MASTER_SPEC_추가갱신_프로젝트_검증매트릭스_Verification_Matrix_2026-07-03.txt
+  Preview: ================================================== 최종 원칙 ==================================================
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_종합평가기준_Project_Governance_Framework_2026-07-03.txt => MASTER_SPEC_추가갱신_프로젝트_완성도평가_Completion_Assessment_2026-07-03.txt
+  Preview: ================================================== 최종 결론 ==================================================
+- [90_Misc] MASTER_SPEC_추가갱신_전체아키텍처_로드맵_2026-07-03.txt => MASTER_SPEC_추가갱신_실구현_우선순위_착수계획_2026-07-03.txt
+  Preview: ================================================== 2. 구현 우선순위 ==================================================
+- [90_Misc] MASTER_SPEC_추가갱신_프로젝트_추적성매트릭스_Traceability_Matrix_2026-07-03.txt => MASTER_SPEC_추가갱신_구현단계별_완료기준_Definition_of_Done_2026-07-03.txt
+  Preview: 최종 원칙
+- [90_Misc] 고정역할정의_ChatGPT_Codex_협업기준_v2026-07-03.txt => 고정역할정의_ChatGPT_Codex_협업기준_v2026-07-03.txt
+  Preview: 주요 역할

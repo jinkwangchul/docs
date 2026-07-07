@@ -1,0 +1,112 @@
+MASTER_SPEC_추가갱신_전체아키텍처_로드맵_2026-07-03
+
+목적
+- 지금까지 설계한 문서들의 구현 순서와 상호 의존성을 하나의 로드맵으로 정리한다.
+- 본 문서는 구현 우선순위를 고정하기 위한 기준이며 코드 변경은 포함하지 않는다.
+
+==================================================
+1. 현재 완료된 설계
+==================================================
+
+[주문 파이프라인]
+- Order Lifecycle
+- Order State Machine
+- order_intent
+- order_provenance
+
+[호출 구조]
+- Controller Layer
+- Architecture Dependency Map
+- Kiwoom Boundary
+
+[데이터 구조]
+- Runtime Data Model
+- Execution Request
+- Order Lock
+- Request Hash
+- Position Model
+- Close/Liquidation Model
+
+[운영 구조]
+- Final Execution Guard
+- Review Management
+- Recovery Controller
+- Audit Log
+
+[실주문 이후]
+- Chejan / Fill Lifecycle
+
+==================================================
+2. 구현 우선순위
+==================================================
+
+1단계 (실행 준비)
+- hoga/order_type Mapper
+- order_intent resolved 규칙
+- ExecutionController 인터페이스
+
+2단계 (실행 보호)
+- order_lock_manager
+- request_hash 생성
+- Final Execution Guard 구현
+
+3단계 (실행 계층)
+- ORDER_QUEUED 생성
+- Execution Request
+- KiwoomOrderExecutor
+- SendOrder Boundary
+
+4단계 (체결 계층)
+- Chejan 수신
+- Fill 처리
+- Position 갱신
+
+5단계 (운영 계층)
+- Recovery
+- Review
+- Audit Log
+- Close History
+
+==================================================
+3. 구현 선행조건
+==================================================
+
+SendOrder 구현 전 반드시 완료되어야 하는 항목
+
+□ hoga/order_type 확정
+□ execution_enabled 정책
+□ operator_confirmed 정책
+□ Final Execution Guard
+□ Order Lock
+□ Request Hash
+□ Execution Request
+□ Kiwoom Boundary
+□ Review 정책
+□ Recovery 정책
+
+==================================================
+4. 현재 구현 금지
+==================================================
+
+- SendOrder 연결
+- ORDER_SENT 구현
+- 자동 execution_enabled=true
+- 자동 operator_confirmed=true
+- Timer 자동 실주문
+- GUI 직접 실주문
+- 체결 없이 Position 변경
+- Fill 없이 청산 완료
+
+==================================================
+5. 프로젝트 현재 위치
+==================================================
+
+현재는 '실주문 직전 아키텍처 설계 완료' 단계이다.
+
+실주문 기능은 아직 의도적으로 차단되어 있으며,
+다음 구현은 작은 단위의 안전한 기능부터 순차적으로 진행한다.
+
+최종 결론
+- 아키텍처 기반 설계는 완료 단계에 근접했다.
+- 이후부터는 설계보다 구현 비중이 점차 커진다.
+- 모든 구현은 본 로드맵의 선행조건을 만족하는 범위에서만 진행한다.

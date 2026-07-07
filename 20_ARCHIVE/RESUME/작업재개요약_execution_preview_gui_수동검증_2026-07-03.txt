@@ -1,0 +1,248 @@
+작업재개요약_execution_preview_gui_수동검증_2026-07-03
+
+작성일: 2026-07-03
+주제: Execution Preview 계층 구축 및 GUI 수동 검증 연결 완료
+
+==================================================
+1. 현재 완료 판정
+==================================================
+
+이번 단계에서 Execution Preview 계층 1차 구축과 GUI 수동 검증 연결까지 완료되었다.
+
+완료된 흐름:
+
+Routine Signal
+  -> Order Candidate
+  -> Approval
+  -> Operation Policy Gate
+  -> Real Preflight
+  -> Adapter Request Preview
+  -> Execution Preview
+  -> Execution Preview Pipeline
+  -> Summary
+  -> Service
+  -> order_queue REAL_READY 조회
+  -> order_id 기반 Preview Service
+  -> Reporter
+  -> GUI 수동 Execution Preview 버튼
+
+현재 유지 상태:
+- SendOrder 미연결
+- ORDER_QUEUED 미생성
+- runtime 파일 생성/수정 없음
+- order_queue.json 수정 없음
+- rules.json 수정 없음
+- status 변경 없음
+- execution_enabled 변경 없음
+- 자동 실행 연결 없음
+
+==================================================
+2. 이번 단계 추가/확인 파일
+==================================================
+
+1) order_hoga_mapper.py
+- map_order_hoga_preview(order)
+- order_intent의 호가 의도를 내부 표준값으로 preview 변환
+- 시장가 -> MARKET
+- 지정가/현재가 -> LIMIT
+- 미확정/빈값/알 수 없는 값 -> unresolved=True
+- Kiwoom OpenAPI 코드값 직접 매핑 없음
+
+2) order_type_mapper.py
+- map_order_type_preview(order)
+- order_intent의 매수/매도 의도를 내부 표준값으로 preview 변환
+- BUY/매수 -> BUY
+- SELL/매도 -> SELL
+- 빈값/미확정/알 수 없는 값/숫자 코드값 -> unresolved=True
+- Kiwoom 주문유형 코드 매핑 없음
+
+3) execution_controller.py
+- build_execution_preview(order, guard=None)
+- REAL_READY 상태 확인
+- Hoga Mapper 호출
+- OrderType Mapper 호출
+- guard가 dict이면 adapter request preview builder 사용 가능 여부 확인
+- ok=True는 실제 주문 가능이 아니라 preview 입력 해소 의미
+
+4) final_execution_guard.py
+- evaluate_final_execution_guard(order, guard, execution_preview)
+- 최종 실행 직전 조건을 순수 판정
+- 검사 조건:
+  - order.status == REAL_READY
+  - order.execution_enabled == true
+  - guard.operator_confirmed == true
+  - guard.real_trade_enabled == true
+  - hoga_preview.unresolved == false
+  - order_type_preview.unresolved == false
+  - execution_preview.unresolved == false
+
+5) order_lock_manager.py
+- build_order_lock_preview(order, execution_preview)
+- lock_key, lock_id 후보만 메모리 dict로 생성
+- runtime/order_locks.json 생성 또는 저장 없음
+
+6) order_request_hash.py
+- build_order_request_hash_preview(order, execution_preview, lock_preview)
+- canonical JSON 기반 SHA-256 stable hash 후보 생성
+- 필수 후보 필드:
+  - order_id
+  - source_signal_id
+  - code
+  - side/order_type
+  - quantity
+  - price
+  - hoga
+  - lock_id
+
+7) order_execution_request.py
+- build_execution_request_preview(...)
+- execution request 후보 dict만 생성
+- 정상 시 execution_id, order_id, source_signal_id, lock_id, request_hash, guard_snapshot, request_preview 포함
+- runtime/order_executions.json 생성 없음
+- ORDER_QUEUED 생성 없음
+
+8) execution_pipeline_controller.py
+- run_execution_preview_pipeline(order, guard)
+- 호출 순서:
+  1. build_execution_preview
+  2. evaluate_final_execution_guard
+  3. build_order_lock_preview
+  4. build_order_request_hash_preview
+  5. build_execution_request_preview
+- 첫 차단 지점을 blocked_stage로 반환
+- 모든 단계 결과를 pipeline dict에 포함
+
+9) execution_pipeline_summary.py
+- summarize_execution_preview_pipeline(pipeline_result)
+- GUI/로그용 요약값 추출
+- ok, blocked_stage, ready_for_execution_request, order_id, execution_id, request_hash, warnings, blocked_reasons
+
+10) execution_preview_service.py
+- preview_execution_for_order(order, guard)
+- pipeline 실행 + summary 생성을 한 번에 수행
+
+11) order_queue_reader.py
+- read_real_ready_order_by_id(order_id, queue_path=None)
+- order_queue.json에서 REAL_READY order 1건 조회
+- 조회 전용
+- status가 REAL_READY가 아니면 blocked
+
+12) execution_preview_order_service.py
+- preview_execution_for_real_ready_order(order_id, guard, queue_path=None)
+- order_id 기준 REAL_READY 조회 후 성공 시 preview_execution_for_order 호출
+- 조회 실패 또는 REAL_READY 아님이면 preview 미호출
+
+13) execution_preview_reporter.py
+- build_execution_preview_report(preview_result)
+- preview result를 사람이 읽기 쉬운 dict + text로 변환
+- 정상/조회 실패/guard 차단 결과 표시
+- blocked_reasons, warnings 포함
+
+14) gui_auto_trade_setting_window.py
+- 자동매매설정 창 상단에 Execution Preview 버튼 추가
+- 클릭 시 REAL_READY order_id 입력
+- runtime/real_trade_guard.json 읽기 전용 로드
+- preview_execution_for_real_ready_order(order_id, guard) 실행
+- build_execution_preview_report() 결과 text를 읽기 전용 다이얼로그로 표시
+- 자동 실행 연결 없음
+
+==================================================
+3. 테스트 및 검증 결과
+==================================================
+
+최종 검증:
+- python -m unittest discover -s tests 통과
+- 전체 134 tests 통과
+
+검증된 불변 조건:
+- runtime/order_queue.json SHA256 해시 동일
+- routines/지표추종매매/rules.json SHA256 해시 동일
+- runtime 파일 목록/크기/수정시각 동일
+- SendOrder 연결 없음
+- ORDER_QUEUED 생성 없음
+- runtime 파일 생성/수정 없음
+- rules.json 수정 없음
+- status 변경 없음
+- execution_enabled 변경 없음
+- 자동 실행 연결 없음
+
+==================================================
+4. 현재 안전 금지선
+==================================================
+
+현재 단계에서 금지:
+- SendOrder 호출
+- QAxWidget SendOrder 연결
+- Kiwoom 실제 주문 코드 매핑
+- ORDER_QUEUED 생성
+- ORDER_SENT 생성
+- order_queue.json status 변경
+- runtime/order_locks.json 생성
+- runtime/order_executions.json 생성
+- runtime/fills.json 생성
+- runtime/positions.json 생성
+- execution_enabled 자동 변경
+- operator_confirmed 자동 변경
+- real_trade_guard 자동 완화
+- rules.json 변경
+- GUI 버튼을 자동 실행 루프에 연결
+- Timer에서 REAL_READY order를 자동 실행하는 흐름
+
+==================================================
+5. 현재 구조적 의미
+==================================================
+
+현재 프로젝트는 REAL_READY order 1건에 대해 SendOrder 직전까지의 실행 준비 상태를 단일 service 호출로 검증할 수 있다.
+
+실제 가능한 흐름:
+
+order_id 입력
+  -> order_queue.json에서 REAL_READY order 읽기
+  -> real_trade_guard.json 읽기 전용 로드
+  -> Execution Preview Pipeline 실행
+  -> Summary 생성
+  -> Reporter text 생성
+  -> GUI 다이얼로그 표시
+
+이 흐름은 실제 주문을 하지 않으며, 운영자가 SendOrder 전 상태를 눈으로 검증하기 위한 Preview 전용 흐름이다.
+
+==================================================
+6. 다음 작업 후보
+==================================================
+
+1. GUI 버튼 연결 회귀 검증 강화
+- offscreen 자동매매설정 창 생성
+- Execution Preview 버튼 존재 확인
+- handler import 오류 없음 확인
+- order_id 빈값 처리 확인
+- guard 파일 없음/JSON 오류 표시 확인
+
+2. Preview 결과 표시 개선
+- text 다이얼로그 내용을 더 명확하게 정리
+- blocked_stage, blocked_reasons, warnings 구분 표시
+- execution_id, request_hash 표시 형식 개선
+
+3. 자동 파이프라인 편입 설계
+- REAL_READY 발생 후 자동으로 Preview만 수행하고 결과를 표시/로그화
+- 이 단계에서도 SendOrder는 금지
+
+4. SendOrder 전 최종 설계 문서화
+- Kiwoom Boundary
+- Order Executor
+- ORDER_QUEUED 생성 주체
+- 실제 Lock 획득
+- Execution Request 저장
+- Chejan/Fill/Position 연결
+
+==================================================
+7. 다음 창 시작 기준
+==================================================
+
+- Execution Preview Phase 1 완료
+- GUI 수동 Execution Preview 버튼 1차 연결 완료
+- 전체 테스트 134개 통과
+- 실주문 미연결
+- Runtime 미변경
+- rules.json 미변경
+- order_queue.json 미변경
+- 다음 작업은 GUI 버튼 회귀 검증 또는 자동 파이프라인 편입 설계 중 선택

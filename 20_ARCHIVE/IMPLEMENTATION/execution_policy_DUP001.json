@@ -1,0 +1,83 @@
+{
+  "version": "1.1",
+  "policy_type": "execution_policy",
+  "description": "루틴별 BUY/SELL/CANCEL 신호를 메인 주문 행동으로 변환하기 위한 공통 실행정책 v3 초안",
+  "order_basis": {
+    "buy_default_basis": "amount",
+    "sell_default_basis": "holding_quantity",
+    "support_quantity_order": true,
+    "support_amount_order": true,
+    "support_holding_quantity_order": true
+  },
+  "order_price_type": {
+    "default_buy_price_type": "current_price",
+    "default_sell_price_type": "current_price",
+    "supported_types": [
+      "market_price",
+      "current_price",
+      "limit_price",
+      "quote_price"
+    ]
+  },
+  "quote_data_usage": {
+    "enabled": true,
+    "source": "kiwoom_server_quote_data",
+    "max_quote_depth": 10,
+    "buy_quote_side": "buy",
+    "sell_quote_side": "sell",
+    "use_quote_quantity_for_reference": true,
+    "quote_quantity_is_reference_only": true
+  },
+  "signal_plan_record": {
+    "enabled": true,
+    "record_main_signal_price": true,
+    "record_main_signal_time": true,
+    "record_main_signal_candle_index": true,
+    "reference_price_is_fixed_during_plan": true
+  },
+  "fill_tracking": {
+    "enabled": true,
+    "track_partial_fill": true,
+    "track_remaining_quantity": true,
+    "track_remaining_budget": true,
+    "partial_fill_is_not_failure": true
+  },
+  "unfilled_handling": {
+    "enabled": true,
+    "delegate_to_cancel_policy": true,
+    "default_wait_seconds": 10,
+    "default_wait_candles": 1,
+    "price_escape_cancel_default": false
+  },
+  "retry": {
+    "enabled": true,
+    "max_retry_count": 3,
+    "retry_interval_seconds": 1,
+    "retry_target_buy": "remaining_budget",
+    "retry_target_sell": "remaining_quantity",
+    "on_retry_exhausted": "review_required"
+  },
+  "average_price_reference": {
+    "primary_source": "kiwoom_server_average_price",
+    "internal_average_price_usage": "validation_only",
+    "mismatch_action": "review_required"
+  },
+  "safety_rules": {
+    "reject_order_when_review_required": true,
+    "reject_buy_when_closing_or_liquidating": true,
+    "reject_new_buy_after_early_close": true,
+    "reject_new_buy_after_auto_close": true,
+    "system_cancel_has_priority_over_routine_cancel": true
+  },
+  "logging": {
+    "enabled": true,
+    "log_order_create": true,
+    "log_fill_update": true,
+    "log_cancel_signal": true,
+    "log_cancel_action": true,
+    "log_retry_order": true,
+    "log_policy_decision": true,
+    "log_multi_point_round": true,
+    "log_multi_quote_order": true
+  }
+}

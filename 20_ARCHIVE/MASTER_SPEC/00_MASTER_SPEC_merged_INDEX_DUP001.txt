@@ -1,0 +1,104 @@
+﻿MASTER_SPEC MERGED INDEX
+Generated: 2026-07-03 15:22:26
+Source zip: C:\Users\JIN KWANG CHUL\Documents\docs\MASTER_SPEC_추가갱신_026-07-03.zip
+Total source TXT documents: 76
+
+==================================================
+Merged outputs
+==================================================
+- 00_Final_Index_Reference_Map: merged_by_index/00_Final_Index_Reference_Map_merged.txt
+  Source documents: 3, unique blocks: 42, duplicates removed: 0
+- 01_Order_Pipeline: merged_by_index/01_Order_Pipeline_merged.txt
+  Source documents: 16, unique blocks: 642, duplicates removed: 6
+- 02_Runtime_Data_Model: merged_by_index/02_Runtime_Data_Model_merged.txt
+  Source documents: 9, unique blocks: 318, duplicates removed: 2
+- 03_Architecture: merged_by_index/03_Architecture_merged.txt
+  Source documents: 7, unique blocks: 251, duplicates removed: 3
+- 04_Implementation_Test_Verification: merged_by_index/04_Implementation_Test_Verification_merged.txt
+  Source documents: 16, unique blocks: 211, duplicates removed: 1
+- 05_Operations_Policy_Governance: merged_by_index/05_Operations_Policy_Governance_merged.txt
+  Source documents: 14, unique blocks: 185, duplicates removed: 1
+- 06_Glossary: merged_by_index/06_Glossary_merged.txt
+  Source documents: 2, unique blocks: 45, duplicates removed: 0
+- 90_Misc: merged_by_index/90_Misc_merged.txt
+  Source documents: 9, unique blocks: 168, duplicates removed: 3
+
+==================================================
+Source assignment
+==================================================
+- [00_Final_Index_Reference_Map] MASTER_SPEC_추가갱신_프로젝트_의사결정기록_ADR_Index_2026-07-03.txt
+- [00_Final_Index_Reference_Map] MASTER_SPEC_추가갱신_프로젝트_참조우선순위_Reference_Priority_Guide_2026-07-03.txt
+- [00_Final_Index_Reference_Map] MASTER_SPEC_추가갱신_프로젝트_통합참조맵_Integrated_Reference_Map_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_갱신자료_2026-07-03_주문파이프라인_Preview.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_ADAPTER_READY_미사용정책_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_Chejan_Fill_Event_Lifecycle_설계_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_Close_Liquidation_Model_청산모델_설계_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_Execution_Request_order_executions_설계_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_Final_Execution_Guard_최종실행게이트_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_Hoga_OrderType_매핑설계_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_Kiwoom_Boundary_API_경계설계_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_order_intent_미확정진단필드_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_Order_Lock_Manager_설계_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_order_provenance_주문생성이력_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_Order_State_Machine_주문상태머신_설계_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_Position_Model_보유상태_설계_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_Request_Hash_중복실행방지_설계_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_Review_Management_주문파이프라인연계_2026-07-03.txt
+- [01_Order_Pipeline] MASTER_SPEC_추가갱신_실주문실행책임_ORDER_QUEUED_주문생명주기_2026-07-03.txt
+- [02_Runtime_Data_Model] MASTER_SPEC_전체_Runtime_파일규격_최종정의_초안_2026-07-03.txt
+- [02_Runtime_Data_Model] MASTER_SPEC_추가갱신_Runtime_Data_Model_Entity_Relationship_2026-07-03.txt
+- [02_Runtime_Data_Model] MASTER_SPEC_추가갱신_프로젝트_Runtime_카탈로그_Runtime_Catalog_2026-07-03.txt
+- [02_Runtime_Data_Model] MASTER_SPEC_추가갱신_프로젝트_구성요소의존성맵_Component_Dependency_Map_2026-07-03.txt
+- [02_Runtime_Data_Model] MASTER_SPEC_추가갱신_프로젝트_데이터계약카탈로그_Data_Contract_Catalog_2026-07-03.txt
+- [02_Runtime_Data_Model] MASTER_SPEC_추가갱신_프로젝트_모듈카탈로그_Module_Catalog_2026-07-03.txt
+- [02_Runtime_Data_Model] MASTER_SPEC_추가갱신_프로젝트_상태전이카탈로그_State_Transition_Catalog_2026-07-03.txt
+- [02_Runtime_Data_Model] MASTER_SPEC_추가갱신_프로젝트_이벤트카탈로그_Event_Catalog_2026-07-03.txt
+- [02_Runtime_Data_Model] MASTER_SPEC_추가갱신_프로젝트_인터페이스카탈로그_Interface_Catalog_2026-07-03.txt
+- [03_Architecture] MASTER_SPEC_추가갱신_Architecture_Dependency_Map_2026-07-03.txt
+- [03_Architecture] MASTER_SPEC_추가갱신_Controller_Layer_호출책임_2026-07-03.txt
+- [03_Architecture] MASTER_SPEC_추가갱신_Recovery_Controller_복구절차_설계_2026-07-03.txt
+- [03_Architecture] MASTER_SPEC_추가갱신_설계검토_체크포인트_Architecture_Review_Checkpoints_2026-07-03.txt
+- [03_Architecture] MASTER_SPEC_추가갱신_설계원칙_Architecture_Principles_2026-07-03.txt
+- [03_Architecture] MASTER_SPEC_추가갱신_프로젝트_문서체계_Document_Architecture_2026-07-03.txt
+- [03_Architecture] MASTER_SPEC_추가갱신_프로젝트_역할책임매트릭스_RACI_Matrix_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_구현체크리스트_Implementation_Checklist_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_코딩규약_Implementation_Standards_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_테스트전략_Test_Strategy_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_검증매트릭스_Verification_Matrix_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_구현금지목록_Implementation_Prohibitions_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_구현기록_템플릿_Implementation_Record_Template_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_구현단계_게이트_Implementation_Gates_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_구현단계_산출물맵_Implementation_Deliverables_Map_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_구현우선순위_Execution_Backlog_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_구현준비도_Readiness_Checklist_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_구현증빙패키지_Evidence_Package_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_구현추적표_Implementation_Trace_Register_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_마일스톤_Milestones_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_운영인증_Production_Readiness_Certification_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_운영준비도_Operational_Readiness_Assessment_2026-07-03.txt
+- [04_Implementation_Test_Verification] MASTER_SPEC_추가갱신_프로젝트_최종통합체크리스트_Final_Integration_Checklist_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_개발운영_라이프사이클_Development_Lifecycle_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_릴리즈정책_Release_Management_Policy_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_백업및복구정책_Backup_Recovery_Policy_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_변경관리정책_Change_Management_Policy_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_성숙도모델_Project_Maturity_Model_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_완성도평가_Completion_Assessment_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_운영인수기준_Operational_Acceptance_Criteria_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_운영정책_Operations_Governance_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_위험관리정책_Risk_Management_Policy_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_유지보수정책_Maintenance_Policy_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_장기로드맵_Product_Roadmap_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_종합평가기준_Project_Governance_Framework_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_최종완료기준_Project_Completion_Criteria_2026-07-03.txt
+- [05_Operations_Policy_Governance] MASTER_SPEC_추가갱신_프로젝트_품질보증정책_Quality_Assurance_Policy_2026-07-03.txt
+- [06_Glossary] MASTER_SPEC_추가갱신_용어사전_Glossary_2026-07-03.txt
+- [06_Glossary] MASTER_SPEC_추가갱신_프로젝트_용어사전_Domain_Glossary_2026-07-03.txt
+- [90_Misc] MASTER_SPEC_갱신자료_2026-07-03.txt
+- [90_Misc] MASTER_SPEC_최종_MASTER_SPEC_반영목록_2026-07-03.txt
+- [90_Misc] MASTER_SPEC_추가갱신_Audit_Log_감사로그_설계_2026-07-03.txt
+- [90_Misc] MASTER_SPEC_추가갱신_구현단계별_완료기준_Definition_of_Done_2026-07-03.txt
+- [90_Misc] MASTER_SPEC_추가갱신_실구현_우선순위_착수계획_2026-07-03.txt
+- [90_Misc] MASTER_SPEC_추가갱신_전체아키텍처_로드맵_2026-07-03.txt
+- [90_Misc] MASTER_SPEC_추가갱신_프로젝트_아키텍처_최종인덱스_2026-07-03.txt
+- [90_Misc] MASTER_SPEC_추가갱신_프로젝트_추적성매트릭스_Traceability_Matrix_2026-07-03.txt
+- [90_Misc] 고정역할정의_ChatGPT_Codex_협업기준_v2026-07-03.txt

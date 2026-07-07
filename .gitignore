@@ -1,0 +1,42 @@
+# OS / editor noise
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.tmp
+*.temp
+*.bak
+*.swp
+~$*
+
+# Python / cache artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# Local Codex / agent workspace metadata
+.agents/
+.codex/
+
+# Temporary docs review area
+90_TEMP/
+90_UNSORTED/
+
+# Legacy intermediate structures kept locally unless explicitly approved
+10_UPDATE_QUEUE/
+20_SOURCE_ARCHIVE/
+30_CODEX_WORK/
+MASTER_SPEC_v2.5_REBUILD_WORKSPACE/
+MASTER_SPEC_v3.0_BASELINE_/
+MASTER_SPEC_v4.0/
+마스터스펙/
+
+# Backup archives and compressed originals
+*.zip
+*.7z
+*.rar
+프로젝트폴더백업/
+

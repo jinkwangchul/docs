@@ -1,0 +1,141 @@
+{
+  "version": "1.2",
+  "policy_type": "sell_policy",
+  "description": "SELL 실행정책 v4: SELL 역시 루틴 제안이며 메인이 최종 승인/집행.",
+  "authority_boundary": {
+    "routine_role": "signal_advisor",
+    "main_role": "final_decision_and_execution",
+    "routine_signal_is_not_order": true,
+    "main_must_approve_before_order": true
+  },
+  "closing_policy_rule": {
+    "sell_signal_during_closing_is_final_sell_candidate": true,
+    "final_sell_order_acceptance_ends_routine_trading_for_day": true,
+    "after_final_sell_order_accepted_buy_and_sell_blocked": true,
+    "description": "조기/자동마감 진입 후 첫 SELL 주문 접수는 그날 마지막 루틴 매매로 간주한다."
+  },
+  "sell_execution_axis": {
+    "price_axis": "single_price",
+    "time_axis": "single_point",
+    "available_price_axis": [
+      "single_price",
+      "multi_quote"
+    ],
+    "available_time_axis": [
+      "single_point",
+      "multi_point"
+    ]
+  },
+  "reference": {
+    "main_signal_price": {
+      "source": "current_price_at_main_sell_signal",
+      "fixed_during_signal_set": true
+    },
+    "average_price": {
+      "source": "kiwoom_server_average_price",
+      "use_internal_average_price_for_validation": true
+    }
+  },
+  "main_gate_required": {
+    "enabled": true,
+    "checks": [
+      "stock_operation_state",
+      "holding_quantity",
+      "review_required",
+      "server_balance",
+      "unfilled_order_status",
+      "closing_policy_phase"
+    ]
+  },
+  "sell_signal_condition": {
+    "oscillator_turn_down": true,
+    "profit_rate_reached": true,
+    "condition_operator": "or",
+    "target_profit_percent": 3.0
+  },
+  "single_price": {
+    "enabled": true,
+    "order_price_type": "current_price",
+    "order_basis": "holding_quantity"
+  },
+  "multi_quote": {
+    "enabled": false,
+    "quote_side": "sell",
+    "quote_levels": [
+      1,
+      3,
+      5
+    ],
+    "quantity_distribution_percent": [
+      40,
+      30,
+      30
+    ],
+    "order_basis": "holding_quantity",
+    "purpose": "가격의 종축 배치. 매도호가 분산으로 체결과 가격 개선 균형 조절."
+  },
+  "single_point": {
+    "enabled": true,
+    "trigger": "main_sell_signal",
+    "sell_quantity_percent": 100
+  },
+  "multi_point": {
+    "enabled": false,
+    "reference_price": "main_signal_price",
+    "mode": "interval_compare",
+    "available_modes": [
+      "fixed_time_split",
+      "interval_compare",
+      "time_window_price_condition"
+    ],
+    "common_limits": {
+      "max_rounds": 3,
+      "total_time_limit_minutes": 15,
+      "round_quantity_distribution_percent": [
+        50,
+        30,
+        20
+      ],
+      "requires_main_approval_each_round": true,
+      "stop_when_position_closed": true,
+      "stop_when_buy_signal_occurs": true
+    },
+    "fixed_time_split": {
+      "enabled": false,
+      "split_count": 3,
+      "total_time_minutes": 10,
+      "interval_minutes": 3,
+      "price_filter": {
+        "enabled": false,
+        "basis": "main_signal_price",
+        "operator": "current_price_gte_reference_percent",
+        "percent": 0.0
+      }
+    },
+    "interval_compare": {
+      "enabled": true,
+      "compare_interval": {
+        "type": "minute",
+        "minutes": 3,
+        "candles": null
+      },
+      "condition": {
+        "basis": "main_signal_price",
+        "operator": "current_price_gte_reference_percent",
+        "percent": 0.0
+      },
+      "max_compare_count": 3
+    },
+    "time_window_price_condition": {
+      "enabled": false,
+      "time_limit_minutes": 15,
+      "condition": {
+        "basis": "main_signal_price",
+        "operator": "current_price_gte_reference_percent",
+        "percent": 2.0
+      },
+      "max_sell_count": 3,
+      "cooldown_between_orders_seconds": 10
+    }
+  }
+}

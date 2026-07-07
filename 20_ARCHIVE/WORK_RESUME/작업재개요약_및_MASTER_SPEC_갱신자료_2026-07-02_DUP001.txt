@@ -1,0 +1,87 @@
+작업재개요약 (UI 상태 저장/로드 1차 완료)
+
+프로젝트 현재 상태
+
+-   지표추종매매 설정 UI 프로토타입 완료
+-   UI 상태 수집(collect), 복원(apply), 저장(save), 로드(load) 완료
+-   UI 상태는 indicator_follow_ui_state에 저장
+-   엔진 Rule과 UI 상태 완전 분리
+-   UI→Engine Rule 변환은 미구현
+
+주요 완료 사항
+
+1.  gui_macd/gui_indicator_follow 구조 전환 완료
+2.  중복 파일, pycache, pyc, bak 정리
+3.  tools 폴더 구성 완료
+4.  숨은 탭 제거, 단일 화면 구조 확정
+5.  Collector 완료
+    -   basic
+    -   buy_ui(signal_filter/base/repeat/price_compare/situation/additional/cycle/exit)
+    -   sell_ui(signal_conditions/selected_sets/setting_a/b/c)
+6.  apply_indicator_follow_ui_state() 구현 완료
+7.  save_indicator_follow_ui_state_to_rules() 구현 완료
+8.  JSON Roundtrip 및 저장/재열기 검증 완료
+
+Rules 저장 정책
+
+신규 namespace
+
+indicator_follow_ui_state - ui_state_version - updated_at - state
+
+기존 buy/sell/indicators/order_policy/cancel_policy/safety는 변경하지
+않음.
+
+현재 완료
+
+-   UI 저장
+-   UI 복원
+-   Preview
+-   Pending Rules Preview
+-   JSON Roundtrip
+-   실제 Save/Load
+
+미완료
+
+-   UI State → Engine Rule 변환
+
+MASTER SPEC 갱신자료
+
+Collector 정책
+
+공식 단일 화면만 수집. 숨은 탭, Legacy, Display 상태 제외.
+
+저장 대상
+
+basic
+
+buy_ui - signal_filter - base - repeat - price_compare - situation -
+additional - cycle - exit
+
+sell_ui - signal_conditions - selected_sets - setting_a - setting_b -
+setting_c
+
+저장 제외
+
+-   buy_ui.close
+-   complete_ui
+-   legacy_summary
+
+Apply 정책
+
+Combo → LineEdit → CheckBox → 상태 Sync
+
+Save 정책
+
+기존 Rules 유지. indicator_follow_ui_state만 갱신.
+
+Load 정책
+
+indicator_follow_ui_state 존재 시 apply. 없으면 기존 populate 유지.
+
+다음 작업
+
+1.  UI State → Engine Rule 매핑 설계
+2.  Rule Mapper 구현
+3.  Preview 검증
+4.  Engine Rule 생성
+5.  Engine 연결

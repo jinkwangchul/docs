@@ -1,0 +1,289 @@
+MACD 사용처 최종 스캔표
+작성일: 2026-07-02
+대상: kiwoom_auto (31)(1).zip 압축 해제본
+범위: .git 및 __pycache__ 제외, py/json/txt/md/cfg 등 텍스트 파일 검색
+
+================================================================================
+1. 전체 요약
+================================================================================
+- MACD/macd 문자열 포함 파일 수: 65개
+- 전체 관련 라인 수: 2446줄
+- reports/PROJECT_CHANGELOG/tools 제외 실질 검토 파일 수: 17개
+- 실질 검토 관련 라인 수: 177줄
+- 파일명에 macd 포함: routines/지표추종매매/routine_macd_engine.py 1개
+
+판정: 현재 공통 UI 파일명은 이미 gui_indicator_follow_* 계열로 정리되어 있으나, 내부 변수/호환 key/rules/test에는 macd 명칭이 남아 있다.
+
+================================================================================
+2. 분류별 파일 목록
+================================================================================
+
+[GUI 기타(문구/주석 보류)]
+- gui_auto_trade_status_ops.py : 관련 라인 1줄 / macd 출현 1회
+- gui_routine_condition_engine.py : 관련 라인 1줄 / macd 출현 1회
+- gui_schedule_window.py : 관련 라인 1줄 / macd 출현 1회
+
+[JSON/rules/runtime(대부분 변경금지)]
+- _등록확인폴더/budget.json : 관련 라인 1줄 / macd 출현 1회
+- _지표추종매매/budget.json : 관련 라인 1줄 / macd 출현 1회
+- routines/지표추종매매/rules.json : 관련 라인 12줄 / macd 출현 13회
+
+[MACD 지표 엔진(변경금지/최후순위)]
+- routines/지표추종매매/routine_macd_engine.py : 관련 라인 25줄 / macd 출현 30회
+
+[Rule Mapper(교체 후보 일부)]
+- routines/지표추종매매/routine_rule_mapper.py : 관련 라인 28줄 / macd 출현 33회
+
+[공통 UI(교체 후보 일부)]
+- gui_indicator_follow_buy_controls.py : 관련 라인 1줄 / macd 출현 1회
+- gui_indicator_follow_data_tabs.py : 관련 라인 7줄 / macd 출현 14회
+- gui_indicator_follow_routine_settings_dialog.py : 관련 라인 11줄 / macd 출현 18회
+- gui_indicator_follow_sell_controls.py : 관련 라인 29줄 / macd 출현 43회
+
+[공통 지표 엔진(지표명 유지)]
+- engines/condition_engine.py : 관련 라인 1줄 / macd 출현 1회
+- engines/indicator_engine.py : 관련 라인 16줄 / macd 출현 21회
+
+[기록/리포트(무시 가능)]
+- PROJECT_CHANGELOG.txt : 관련 라인 1597줄 / macd 출현 2299회
+- reports/blocked_actions/20260603_124134_종목_삭제_처리불가.txt : 관련 라인 18줄 / macd 출현 18회
+- reports/blocked_actions/20260603_124145_루틴_지정_사전검사_처리불가.txt : 관련 라인 12줄 / macd 출현 12회
+- reports/blocked_actions/20260603_124231_루틴_해제_처리불가.txt : 관련 라인 16줄 / macd 출현 16회
+- reports/blocked_actions/20260603_124235_루틴_해제_처리불가.txt : 관련 라인 16줄 / macd 출현 16회
+- reports/blocked_actions/20260603_130119_종목_삭제_처리불가.txt : 관련 라인 12줄 / macd 출현 12회
+- reports/blocked_actions/20260603_130125_종목_삭제_처리불가.txt : 관련 라인 17줄 / macd 출현 17회
+- reports/blocked_actions/20260603_130143_종목_삭제_처리불가.txt : 관련 라인 17줄 / macd 출현 17회
+- reports/blocked_actions/20260603_130205_종목_삭제_처리불가.txt : 관련 라인 25줄 / macd 출현 25회
+- reports/blocked_actions/20260603_130208_종목_삭제_처리불가.txt : 관련 라인 17줄 / macd 출현 17회
+- reports/blocked_actions/20260603_130231_종목_삭제_처리불가.txt : 관련 라인 8줄 / macd 출현 8회
+- reports/blocked_actions/20260603_131926_루틴_지정_사전검사_처리불가.txt : 관련 라인 12줄 / macd 출현 12회
+- reports/blocked_actions/20260603_131928_루틴_지정_사전검사_처리불가.txt : 관련 라인 12줄 / macd 출현 12회
+- reports/blocked_actions/20260603_131932_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260603_131939_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260603_131944_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260603_131946_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260603_131949_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260603_132519_루틴_해제_처리불가.txt : 관련 라인 25줄 / macd 출현 25회
+- reports/blocked_actions/20260603_132521_루틴_해제_처리불가.txt : 관련 라인 25줄 / macd 출현 25회
+- reports/blocked_actions/20260603_141035_루틴_지정_사전검사_처리불가.txt : 관련 라인 6줄 / macd 출현 6회
+- reports/blocked_actions/20260603_141048_루틴_지정_사전검사_처리불가.txt : 관련 라인 6줄 / macd 출현 6회
+- reports/blocked_actions/20260603_141120_루틴_해제_처리불가.txt : 관련 라인 6줄 / macd 출현 6회
+- reports/blocked_actions/20260603_141130_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260603_141143_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260603_141200_종목_삭제_처리불가.txt : 관련 라인 4줄 / macd 출현 4회
+- reports/blocked_actions/20260603_141233_종목_삭제_처리불가.txt : 관련 라인 4줄 / macd 출현 4회
+- reports/blocked_actions/20260603_141240_종목_삭제_처리불가.txt : 관련 라인 8줄 / macd 출현 8회
+- reports/blocked_actions/20260603_141328_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260603_141906_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260603_142959_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260604_063141_종목_삭제_처리불가.txt : 관련 라인 9줄 / macd 출현 9회
+- reports/blocked_actions/20260604_065157_루틴_해제_처리불가.txt : 관련 라인 7줄 / macd 출현 7회
+- reports/blocked_actions/20260604_092913_종목_삭제_처리불가.txt : 관련 라인 1줄 / macd 출현 1회
+- reports/blocked_actions/20260604_092939_종목_삭제_처리불가.txt : 관련 라인 1줄 / macd 출현 1회
+- reports/blocked_actions/20260604_093010_종목_삭제_처리불가.txt : 관련 라인 1줄 / macd 출현 1회
+- reports/blocked_actions/20260604_150535_루틴_해제_처리불가.txt : 관련 라인 4줄 / macd 출현 4회
+- reports/blocked_actions/20260604_150904_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260604_150913_루틴_해제_처리불가.txt : 관련 라인 4줄 / macd 출현 4회
+- reports/blocked_actions/20260604_151403_루틴_해제_처리불가.txt : 관련 라인 4줄 / macd 출현 4회
+- reports/blocked_actions/20260604_153026_루틴_지정_사전검사_처리불가.txt : 관련 라인 3줄 / macd 출현 3회
+- reports/blocked_actions/20260604_처리불가_누적리포트.txt : 관련 라인 54줄 / macd 출현 54회
+- reports/blocked_actions/20260605_처리불가_누적리포트.txt : 관련 라인 114줄 / macd 출현 114회
+- reports/blocked_actions/20260606_처리불가_누적리포트.txt : 관련 라인 20줄 / macd 출현 20회
+- reports/blocked_actions/20260611_처리불가_누적리포트.txt : 관련 라인 52줄 / macd 출현 52회
+- reports/blocked_actions/20260615_처리불가_누적리포트.txt : 관련 라인 94줄 / macd 출현 94회
+
+[기타]
+- routines/지표추종매매/routine_condition_engine.py : 관련 라인 1줄 / macd 출현 1회
+
+[도구/정리스크립트(보류)]
+- tools/cleanup_project_junk_v3.py : 관련 라인 3줄 / macd 출현 3회
+- tools/create_routine_packages_from_legacy.py : 관련 라인 2줄 / macd 출현 2회
+
+[루틴 진입/alias(일부 유지)]
+- routines/지표추종매매/routine.py : 관련 라인 24줄 / macd 출현 24회
+
+[테스트(호환 검증 유지)]
+- tests/test_indicator_follow_rule_mapper_preview.py : 관련 라인 17줄 / macd 출현 18회
+
+================================================================================
+3. 핵심 파일별 세부 스캔
+================================================================================
+
+## gui_indicator_follow_data_tabs.py
+- 관련 라인: 7줄
+- 분류: 공통 UI(교체 후보 일부)
+- 판정: data tab이 기존 sell.signals.macd_sell 상태를 표시/카드화한다. rules 호환 표시라 즉시 변경 금지. 변수명은 장기 교체 후보.
+  주요 라인 예시:
+  - L126:         macd_sell = signals.get("macd_sell", {}) if isinstance(signals.get("macd_sell", {}), dict) else {}
+  - L127:         macd_sell_enabled = bool(macd_sell.get("enabled", True))
+  - L128:         macd_sell_delay = macd_sell.get("delay_bar", sell.get("delay_bar", ""))
+  - L156:         self.macd_sell_enabled_check.setChecked(macd_sell_enabled)
+  - L157:         self.macd_sell_delay_line.setText(str(macd_sell_delay))
+  - L158:         self.macd_sell_status_line.setText("사용" if macd_sell_enabled else "비활성")
+  - L202:                 "macd_sell": self.card_sell["status"].text(),
+
+## gui_indicator_follow_routine_settings_dialog.py
+- 관련 라인: 11줄
+- 분류: 공통 UI(교체 후보 일부)
+- 판정: 설정창 populate/상태표시에서 macd_sell을 읽는다. 기존 rules key 참조라 즉시 변경 금지. UI 변수명은 wrapper/alias 후 장기 교체 후보.
+  주요 라인 예시:
+  - L385:         macd_sell = signals.get("macd_sell", {}) if isinstance(signals.get("macd_sell", {}), dict) else {}
+  - L386:         macd_sell_enabled = bool(macd_sell.get("enabled", True))
+  - L387:         macd_sell_delay = macd_sell.get("delay_bar", sell.get("delay_bar", ""))
+  - L420:         if hasattr(self, "macd_sell_enabled_check"):
+  - L421:             self.macd_sell_enabled_check.setChecked(macd_sell_enabled)
+  - L422:         if hasattr(self, "macd_sell_delay_line"):
+  - L423:             self.macd_sell_delay_line.setText(str(macd_sell_delay))
+  - L424:         if hasattr(self, "macd_sell_status_line"):
+  - L425:             self.macd_sell_status_line.setText("사용" if macd_sell_enabled else "비활성")
+  - L486:                 "macd_sell": self.card_sell["status"].text(),
+
+## gui_indicator_follow_sell_controls.py
+- 관련 라인: 29줄
+- 분류: 공통 UI(교체 후보 일부)
+- 판정: MACD선/시그널선 표시명은 지표명이므로 유지. macd_kind_combo 등 내부 변수명은 저장 key와 분리 확인 후 교체 후보.
+  주요 라인 예시:
+  - L458:         macd_kind_combo = make_combo(["MACD선", "시그널선"], "MACD선", 120)
+  - L459:         macd_sign_combo = make_combo(["-", "+"], "-", 60)
+  - L460:         macd_value_line = make_line("1.0", 60)
+  - L461:         macd_compare_combo = make_combo(["이하", "이상"], "이하", 76)
+  - L463:         def _sync_macd_sign_combo():
+  - L464:             value = macd_value_line.text().strip()
+  - L469:             macd_sign_combo.setEnabled(numeric_value is None or numeric_value != 0.0)
+  - L471:         macd_value_line.textChanged.connect(_sync_macd_sign_combo)
+  - L472:         _sync_macd_sign_combo()
+  - L474:         macd_check = add_filter_row([
+
+## routines/지표추종매매/routine.py
+- 관련 라인: 24줄
+- 분류: 루틴 진입/alias(일부 유지)
+- 판정: indicator_follow 일반명과 MACD alias가 공존한다. alias 유지 필요. 신규 호출은 indicator_follow만 사용해야 함.
+  주요 라인 예시:
+  - L7: - routine_macd_engine.py 사용.
+  - L14: - 없으면 DEFAULT_MACD_ROUTINE_CONFIG를 사용한다.
+  - L25:     from routine_macd_engine import (  # type: ignore
+  - L30:     DEFAULT_MACD_ROUTINE_CONFIG = DEFAULT_INDICATOR_FOLLOW_CONFIG
+  - L31:     evaluate_macd_routine = evaluate_indicator_follow_routine
+  - L32:     _ENGINE_SOURCE = "routine_macd_engine"
+  - L36:         from .routine_macd_engine import (  # type: ignore
+  - L41:         DEFAULT_MACD_ROUTINE_CONFIG = DEFAULT_INDICATOR_FOLLOW_CONFIG
+  - L42:         evaluate_macd_routine = evaluate_indicator_follow_routine
+  - L43:         _ENGINE_SOURCE = "routine_macd_engine"
+
+## routines/지표추종매매/routine_macd_engine.py
+- 관련 라인: 25줄
+- 분류: MACD 지표 엔진(변경금지/최후순위)
+- 판정: 실제 MACD/OSC 엔진. MACD 명칭 유지. 파일명 변경은 최종 migration에서만 검토.
+  주요 라인 예시:
+  - L2: """MACD 전용 신호발생 엔진.
+  - L5: - MACD 오실레이터 기반 BUY / SELL 판단.
+  - L23:     "routine_type": "MACD_OSC",
+  - L26:     "macd": {"fast": 12, "slow": 26, "signal": 9},
+  - L63: DEFAULT_MACD_ROUTINE_CONFIG = DEFAULT_INDICATOR_FOLLOW_CONFIG
+  - L77: def _macd_sell_section(sell_cfg: dict[str, Any]) -> dict[str, Any]:
+  - L78:     """SELL 설정에서 MACD SELL 섹션을 추출한다.
+  - L81:     1. 신규 구조: sell.signals.macd_sell
+  - L86:         macd_sell = signals.get("macd_sell")
+  - L87:         if isinstance(macd_sell, dict):
+
+## routines/지표추종매매/routine_rule_mapper.py
+- 관련 라인: 28줄
+- 분류: Rule Mapper(교체 후보 일부)
+- 판정: Rule Mapper 공통 계층에 macd 후보명이 일부 남아 있다. preview key와 기존 sell.signals.macd_sell 보호 때문에 즉시 전체 치환 금지. 내부 helper부터 단계 교체 가능.
+  주요 라인 예시:
+  - L44:     if path == "sell.signals.ui_preview_condition_c_macd_sell":
+  - L46:     if path == "sell.signals.macd_sell":
+  - L59:         "sell.signals.macd_sell": (
+  - L60:             "UI preview-only sell MACD condition candidate; does not replace existing rules."
+  - L62:         "sell.signals.ui_preview_condition_c_macd_sell": (
+  - L63:             "UI preview-only add signal candidate; existing sell.signals.macd_sell is unchanged."
+  - L154: def _build_sell_macd_condition(condition_c: dict[str, Any], warnings: list[str]) -> dict[str, Any] | None:
+  - L155:     if condition_c.get("macd_check") is False:
+  - L156:         warnings.append("sell condition C MACD row is unchecked")
+  - L160:         "MACD\uc120": "MACD",
+
+## routines/지표추종매매/rules.json
+- 관련 라인: 12줄
+- 분류: JSON/rules/runtime(대부분 변경금지)
+- 판정: 실행 rules 및 UI state 저장 key. 즉시 변경 금지. migration 최후 단계 대상.
+  주요 라인 예시:
+  - L26:     "macd": {
+  - L54:             "description": "MACD 오실레이터 하락 후 상승 전환"
+  - L87:     "note": "MACD SELL과 수익률 SELL은 같은 레벨의 독립 SELL 신호다. 둘 다 활성화된 경우 signal_logic 값으로 AND/OR 결합한다.",
+  - L89:       "macd_sell": {
+  - L96:             "name": "매도조건_MACD_OSC_TURN_DOWN",
+  - L104:                 "description": "MACD 오실레이터 상승 후 하락 전환"
+  - L369:             "macd_check": true,
+  - L370:             "macd_compare_combo": "이하",
+  - L371:             "macd_kind_combo": "MACD선",
+  - L372:             "macd_logic_combo": "AND",
+
+## tests/test_indicator_follow_rule_mapper_preview.py
+- 관련 라인: 17줄
+- 분류: 테스트(호환 검증 유지)
+- 판정: 호환성 검증용 macd key가 포함되어 있다. 당장 유지. indicator_follow 신규 경로 테스트를 추가하는 방향이 안전.
+  주요 라인 예시:
+  - L38:                         "macd_check": True,
+  - L39:                         "macd_compare_combo": "\uc774\ud558",
+  - L40:                         "macd_kind_combo": "MACD\uc120",
+  - L41:                         "macd_sign_combo": "-",
+  - L42:                         "macd_value_line": "1.0",
+  - L81:                     "macd_sell": {
+  - L88:                                 "name": "sell_macd_osc_turn_down",
+  - L107:                 "macd": {"enabled": True},
+  - L134:                 "sell.signals.ui_preview_condition_c_macd_sell",
+  - L187:     def test_sell_add_signal_candidate_does_not_replace_macd_sell(self):
+
+## engines/indicator_engine.py
+- 관련 라인: 16줄
+- 분류: 공통 지표 엔진(지표명 유지)
+- 판정: 공통 지표 계산 엔진. MACD는 실제 지표명이라 유지.
+  주요 라인 예시:
+  - L6: - EMA, 단순이평, RSI, MACD, OSC 계산.
+  - L114: def macd_series(
+  - L123:     macd_line: list[float | None] = []
+  - L126:             macd_line.append(None)
+  - L128:             macd_line.append(fast_value - slow_value)
+  - L130:     signal_line = ema(macd_line, signal_period)
+  - L133:     for macd_value, signal_value in zip(macd_line, signal_line):
+  - L134:         if macd_value is None or signal_value is None:
+  - L137:             osc.append(macd_value - signal_value)
+  - L139:     return macd_line, signal_line, osc
+
+================================================================================
+4. 교체 우선순위
+================================================================================
+
+[P0 변경 금지]
+- routines/지표추종매매/routine_macd_engine.py 전체 MACD/OSC 계산·판정 명칭
+- routines/지표추종매매/rules.json 내부 macd, macd_sell, target: MACD/OSC
+- sell.signals.macd_sell
+- indicator_follow_ui_state 내부 기존 macd_* 저장 key
+- DEFAULT_MACD_ROUTINE_CONFIG / evaluate_macd_routine alias
+- 테스트가 기존 rules key 호환을 확인하는 macd 참조
+
+[P1 즉시 신규 사용 금지]
+- 신규 gui_macd_* 파일명
+- 신규 macd_* 공통 UI 변수/함수
+- 신규 DEFAULT_MACD_* / evaluate_macd_*
+- 신규 Rule Mapper 공통 path에 전략 의미 macd 추가
+
+[P2 안전 교체 후보]
+- gui_indicator_follow_sell_controls.py 내부 변수명: macd_kind_combo, macd_sign_combo, macd_value_line, macd_compare_combo 등
+- gui_indicator_follow_routine_settings_dialog.py 내부 표시 변수: macd_sell_enabled_check 등. 단, rules key와 분리 확인 후
+- routine_rule_mapper.py 내부 helper명: _build_sell_macd_condition 등. 단, preview output key와 테스트 영향 확인 후
+
+[P3 보류/마지막 단계]
+- routine_macd_engine.py 파일명
+- rules.json key migration
+- 테스트 파일명/테스트 데이터 전체 변경
+- alias 제거
+
+================================================================================
+5. 다음 실제 작업 권장
+================================================================================
+1) 코드 수정 전 현재 스캔표를 기준선으로 저장한다.
+2) P1 규칙을 먼저 프로젝트 운영 원칙으로 고정한다.
+3) P2 중에서도 저장 key와 연결되지 않은 UI 내부 변수명부터 소량 변경한다.
+4) 변경마다 py_compile + unittest + rules.json 변경 없음 확인을 수행한다.
+5) Rule Mapper/Preview/Diff가 정상인 상태에서만 다음 교체로 넘어간다.

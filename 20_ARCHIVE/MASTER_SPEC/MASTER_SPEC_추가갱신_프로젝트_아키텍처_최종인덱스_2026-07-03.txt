@@ -1,0 +1,93 @@
+MASTER_SPEC_추가갱신_프로젝트_아키텍처_최종인덱스_2026-07-03
+
+목적
+- 지금까지 작성된 아키텍처/운영/구현 기준 문서를 하나의 인덱스로 통합한다.
+- 각 문서의 역할과 선후 관계를 정의하여 향후 구현 시 참조 순서를 고정한다.
+
+==================================================
+1. 아키텍처 핵심 문서
+==================================================
+01. Order Lifecycle
+02. Order State Machine
+03. Controller Layer
+04. Architecture Dependency Map
+05. Runtime Data Model
+06. Runtime File Specification
+07. Kiwoom Boundary
+
+==================================================
+2. 주문 파이프라인
+==================================================
+08. Order Candidate
+09. Approval
+10. Operation Policy
+11. Real Preflight
+12. Adapter Request Preview
+13. Final Execution Guard
+14. Execution Request
+15. Order Lock
+16. Request Hash
+
+==================================================
+3. 체결 및 보유
+==================================================
+17. Chejan / Fill Lifecycle
+18. Position Model
+19. Close / Liquidation Model
+
+==================================================
+4. 운영 계층
+==================================================
+20. Audit Log
+21. Review Management
+22. Recovery Controller
+
+==================================================
+5. 구현 관리
+==================================================
+23. 전체 아키텍처 로드맵
+24. 구현 우선순위
+25. 구현 체크리스트
+26. Definition of Done
+27. Test Strategy
+28. 작업재개요약서(중간정리)
+
+==================================================
+6. 구현 순서
+==================================================
+1) Runtime 규격 확인
+2) Mapper(hoga/order_type)
+3) ExecutionController
+4) Final Execution Guard
+5) Order Lock
+6) Request Hash
+7) Execution Request
+8) Kiwoom Boundary 연결
+9) Fill
+10) Position
+11) Recovery
+12) Review
+13) Audit
+
+==================================================
+7. 현재 구현 금지
+==================================================
+- SendOrder 연결
+- ORDER_SENT 구현
+- Chejan 자동 연결
+- Position Runtime 구현
+- Runtime 신규 파일 생성
+- execution_enabled 자동 true
+- operator_confirmed 자동 true
+
+==================================================
+8. 프로젝트 현재 위치
+==================================================
+현재 단계는 '실주문 직전 아키텍처 설계 완료' 상태이다.
+
+다음 작업은 새로운 설계 문서를 계속 추가하는 것이 아니라,
+확정된 설계를 기준으로 작은 구현 단위를 순차적으로 적용하는 단계이다.
+
+최종 결론
+이 문서를 프로젝트 아키텍처의 최상위 인덱스로 사용하며,
+모든 구현은 본 인덱스의 참조 순서를 따른다.

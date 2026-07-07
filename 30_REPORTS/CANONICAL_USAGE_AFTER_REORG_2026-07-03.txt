@@ -1,0 +1,23 @@
+﻿CANONICAL_USAGE_AFTER_REORG_2026-07-03
+생성일: 2026-07-03
+
+[앞으로 기준으로 사용할 문서 위치]
+- 00_CANONICAL\CURRENT: 최종 기준본 및 README_CANONICAL_USAGE.txt
+- 00_CANONICAL\TRACE: 추적 부록, 인덱스, 중복 제거 보고서
+- 00_CANONICAL\OPEN_ISSUES: 미해결 쟁점과 충돌 보고서
+- 00_CANONICAL\CHANGELOG: 변경 이력
+
+[앞으로 새 갱신문서를 저장할 위치]
+- 10_UPDATE_QUEUE\UNMERGED: 새 작업재개요약, 마스터스펙 갱신, 작업로그 초안 저장 위치
+- 10_UPDATE_QUEUE\2026-07-03: 2026-07-03 생성된 병합 후보 문서 보관 위치
+
+[이후 병합 작업 절차]
+1. 새 갱신문서는 10_UPDATE_QUEUE\UNMERGED에 저장한다.
+2. Codex 병합 작업 때 00_CANONICAL\CURRENT를 기준으로 삼는다.
+3. 반영 가능한 내용만 Canonical 후보로 병합한다.
+4. 충돌 또는 불확실 항목은 00_CANONICAL\OPEN_ISSUES에 보고한다.
+5. 병합 근거와 변경 내용은 00_CANONICAL\TRACE 및 00_CANONICAL\CHANGELOG에 기록한다.
+
+[주의]
+- 마스터스펙정리\_CANONICAL_OUTPUT 원본 파일은 원본 보존을 위해 이동하지 않고 00_CANONICAL 하위로 복사했다.
+- 기존 파일 삭제와 내용 수정은 수행하지 않았다.

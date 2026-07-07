@@ -1,0 +1,68 @@
+STEP34_MACD설정UI_적용보조스크립트_생성보고_v2026-06-19
+
+작성 목적:
+본 문서는 STEP29~STEP32 파일을 프로젝트 루트에 안전하게 배치하기 위한
+PowerShell 적용 보조 스크립트 생성 결과를 기록한다.
+
+------------------------------------------------------------
+1. 생성 파일
+------------------------------------------------------------
+
+1) apply_STEP29_STEP32_macd_settings_ui.ps1
+- STEP29~STEP32 파일 적용 보조
+- 기존 gui_routine_assign_window.py 백업
+- 기존 gui_macd_routine_settings_dialog.py 백업
+- STEP29 파일을 gui_macd_routine_settings_dialog.py로 복사
+- STEP31 파일을 gui_routine_assign_window.py로 복사
+
+2) rollback_STEP34_macd_settings_ui.ps1
+- 가장 최근 gui_routine_assign_window 백업을 복구
+
+------------------------------------------------------------
+2. 사용 위치
+------------------------------------------------------------
+
+두 ps1 파일과 아래 py 파일들을 모두 프로젝트 루트에 둔다.
+
+프로젝트 루트:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+필요 py 파일:
+- gui_macd_routine_settings_dialog_STEP29.py
+- test_macd_settings_dialog_step30.py
+- gui_routine_assign_window_STEP31_add_macd_settings_button.py
+- test_routine_assign_window_step32.py
+
+------------------------------------------------------------
+3. 실행 명령
+------------------------------------------------------------
+
+PowerShell에서 프로젝트 루트 이동 후:
+
+powershell -ExecutionPolicy Bypass -File .\apply_STEP29_STEP32_macd_settings_ui.ps1
+
+그 다음 검증:
+
+python test_macd_settings_dialog_step30.py
+python test_routine_assign_window_step32.py
+python gui_main.py
+
+------------------------------------------------------------
+4. 복구 명령
+------------------------------------------------------------
+
+문제 발생 시:
+
+powershell -ExecutionPolicy Bypass -File .\rollback_STEP34_macd_settings_ui.ps1
+
+------------------------------------------------------------
+5. 금지 확인
+------------------------------------------------------------
+
+본 STEP34에서 수행하지 않은 것:
+- rules.json 수정 없음
+- HOLD 추가 없음
+- CANCEL 구현 없음
+- BUY 확장 없음
+- 실주문 연결 없음
+- Kiwoom SendOrder 연결 없음

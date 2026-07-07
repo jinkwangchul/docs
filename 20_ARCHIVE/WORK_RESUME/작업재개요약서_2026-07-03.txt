@@ -1,0 +1,29 @@
+작업재개요약서_2026-07-03
+
+완료
+
+-   KiwoomApi Wrapper 구축
+-   로그인 UI/OnEventConnect 연동
+-   opt10080 분봉조회
+-   candles.json 저장
+-   timer→probe→consumer(dry-run) 연결
+-   signal_probe_only 조건부 자동 Consumer
+-   Queue Status(PENDING/BLOCKED/PREVIEWED 등) 확장
+-   실제 Timer Tick에서 SELL 생성→BLOCKED 전이 검증
+-   PENDING 0건 확인
+
+안전성
+
+-   SendOrder 없음
+-   SetRealReg 없음
+-   order_queue.json 생성 없음
+-   orders/rules 변경 없음
+-   테스트 후 state STOPPED 복구
+
+남은 작업
+
+1.  Order Queue 생성
+2.  Approval Engine
+3.  Real Preflight
+4.  SendOrder Adapter
+5.  Executor

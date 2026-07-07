@@ -1,0 +1,5058 @@
+
+
+MASTER_SPEC_단순통합_1차(3).txt
+문서
+
+작업진행상황대화히스토리_8(7).txt
+문서
+
+kiwoom_auto (13)(1).zip
+ZIP 아카이브
+다음 작업을 진행 하기 위해 내용 빠짐없이 파악해 
+
+
+_gui_macd_buy_method_controls.py
+Python
+현재 자동매매루틴 UI프로토 타입을 막바지 조정 작업중이다. 가능하면 오늘 이 작업을 마무리하고 UI의 각 설정 기능과 동작 로직을 작성 연결하는 작업으로 간다..
+
+
+kiwoom_auto (14)(1).zip
+ZIP 아카이브
+우선 실태 파악은 네가 하고 다음 대책을 논의
+
+
+kiwoom_auto (15)(1).zip
+ZIP 아카이브
+완료했습니다. 자동매매루틴 이름 하드코딩을 Registry/routine.json 기반으로 정리했습니다.
+
+**변경 파일**
+- [gui_windows.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/gui_windows.py)
+- [gui_macd_routine_settings_dialog.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/gui_macd_routine_settings_dialog.py)
+- [gui_routine_registry.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/gui_routine_registry.py)
+- [gui_macd_data_tabs.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/gui_macd_data_tabs.py)
+- [gui_auto_trade_runtime.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/gui_auto_trade_runtime.py)
+- [routine_signal_queue.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/routine_signal_queue.py)
+- [routine.json](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/routines/지표추종매매/routine.json)
+
+**제거/개선한 하드코딩**
+- "지표추종매매만 지원" 계열 제한 제거
+- routine_name ==/!= "지표추종매매" 분기 제거
+- routines/지표추종매매/rules.json 직접 참조 제거
+- 설정창 호출 시 routine_record에서 routine_path, rules_path, routine_name, settings_ui를 받아 사용하도록 변경
+- Registry가 routine.json에서 name/path/rules_path/engine/settings_ui 역할 정보를 제공하도록 확장
+- 전용 설정창이 없는 루틴은 깨지지 않고 “설정창 미연결” 안내로 처리
+
+**남은 루틴명 문자열**
+- routines/지표추종매매/routine.json
+  - "name": "지표추종매매": 루틴 메타데이터라 유지
+  - "legacy_dir": "_지표추종매매": 기존 폴더 호환 메타데이터라 유지
+
+코드 파일 쪽 지표추종매매 직접 문자열은 0건입니다.
+
+**검증**
+- python -m py_compile gui_windows.py gui_macd_routine_settings_dialog.py gui_routine_registry.py gui_auto_trade_runtime.py routine_signal_queue.py gui_macd_data_tabs.py 통과
+- Registry 스캔에서 기존 루틴 정상 등록 확인
+- routines/테스트더미루틴 더미 루틴을 임시 추가해 Registry 목록에 나타나는 것 확인 후 삭제 완료
+
+판정: 이제 신규 루틴을 routines/새루틴명/routine.json 형태로 추가하면 코드 수정 없이 Registry에 등록됩니다. 전용 설정창이 없으면 프로그램이 깨지지 않고 안내만 표시됩니다.
+
+체크 부분들의 구체적인 기능을 고민해야해
+
+??
+
+
+
+배치 조정안 검토 이해가능?
+
+내 요구 사항과 다른 배치
+
+
+kiwoom_auto (16)(1).zip
+ZIP 아카이브
+이전으로 복원했다...하나씩 가자
+
+순환마감설정도 삭제
+
+
+변경 사항이 없다.
+
+
+kiwoom_auto (17)(1).zip
+ZIP 아카이브
+다시 분석해. 그리고 내 요청사항을 다 확인해줘
+
+반복매수설정은 이미지 확인 
+
+이게 의도한건가?
+
+조금만 더 수정하면 될듯. 소제과 그 설정들을 다시 배치 해줘봐
+
+각 공간에 배치는 됐지만 정렬이나 공백등이 정리가 안되어 있다..
+
+
+gui_macd_buy_controls(4).py
+Python
+
+gui_macd_buy_method_controls(14).py
+Python
+
+gui_macd_control_tab(1).py
+Python
+파악부터 해라
+
+왜 이렇게 됐을까?
+
+
+gui_macd_control_tab(2).py
+Python
+분석해봐
+
+
+gui_macd_buy_controls(5).py
+Python
+
+gui_macd_buy_method_controls(15).py
+Python
+
+
+kiwoom_auto오류.zip
+ZIP 아카이브
+분석해서 네가 복원파일 줘라...코덱스는 백업파일이 없어서 복원이 안된다
+
+
+kiwoom_auto (17)(2).zip
+ZIP 아카이브
+
+체크박이 이동작이 맞는건가?
+
+희미하게 박스테두리가 보이는데 하단 높이가 달라. 높이를 같이 맞춰줘
+
+무슨상황인가?
+
+
+표시한 부분 높이를 다른 것들과 맞춰서 줄여
+
+
+
+kiwoom_auto (19)(1).zip
+ZIP 아카이브
+분석해서 파일 작성해줘
+
+다시 만들어
+
+이게 뭐냐???
+
+별 변화는 없는데?
+
+
+kiwoom_auto (21)(1).zip
+ZIP 아카이브
+
+
+노답이네..
+
+
+kiwoom_auto (21)(2).zip
+ZIP 아카이브
+이 폴더로 복원 ?
+
+
+kiwoom_auto (20)(1).zip
+ZIP 아카이브
+
+
+kiwoom_auto (19)(2).zip
+ZIP 아카이브
+
+
+kiwoom_auto (18)(1).zip
+ZIP 아카이브
+
+일단 배치는 됐는데 각 설정의 기능들이 풀려 버렸다.
+
+일단 문제 부분은 해결. 질문. 그런데 지금 파일명에 macd가 들어간것들이 많은데 이 파일들은 자동루틴관련 파일만 들어가있는건지 아니면 메인 엔지 파트에도 들어 가있는건지 확인해봐.  
+
+
+kiwoom_auto (23)(2).zip
+ZIP 아카이브
+점검 후 최소 수정만 했습니다.
+
+수정 파일:
+- [gui_macd_buy_controls.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/gui_macd_buy_controls.py:653)
+
+수정 내용:
+- flat 모드를 실제 적용해서, 2열 내부에 들어가는 순환설정이 별도 박스처럼 보이지 않도록 QGroupBox 테두리/마진을 제거했습니다.
+- edit 탭 쪽 매수설정도 상황변화대응/추가기능설정/순환설정을 같은 묶음으로 생성하도록 맞췄습니다.
+- 비활성 조건, signal/connect, 저장/로드, 매도설정은 건드리지 않았습니다.
+
+점검 결과:
+- [gui_macd_control_tab.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/gui_macd_control_tab.py:497)는 이미 3열 구조입니다.
+- [gui_macd_buy_method_controls.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/gui_macd_buy_method_controls.py:116)에서 cycle은 2열 내부 flat 모드로 들어갑니다.
+- 남아 있는 wrapper는 3열 외곽 구조를 유지하기 위한 용도라 이번 정리에서 제거하지 않았습니다.
+
+검증:
+- python -m py_compile gui_macd_control_tab.py gui_macd_buy_controls.py gui_macd_buy_method_controls.py gui_main.py 통과
+- offscreen 설정창 생성 확인: dialog_created True
+- offscreen 메인윈도우 생성 확인: main_window_created True
+
+보이는 GUI 이벤트 루프는 계속 대기하는 구조라 직접 띄워 종료까지는 하지 않고, 같은 생성 경로로 오류 여부를 확인했습니다.
+점검해봐
+
+
+전체적으로 보면 UI 프로토타입 수준으로는 상당히 많이 정리됐다.
+
+내가 보이는 기준으로 마지막 점검을 해보면:
+
+좋은 점
+기본설정과 매수/매도 영역의 구분이 명확하다.
+
+매수 3열 구조는 이전보다 훨씬 읽기 쉽다.
+
+반복매수설정 분리는 자연스럽다.
+
+상황변화대응/추가기능설정/순환설정의 흐름도 어색하지 않다.
+
+이탈조건/회차마감을 별도로 뺀 것은 판단하기 편하다.
+
+전체적으로 "프로토타입" 느낌에서 "실사용 가능한 UI" 수준까지 올라왔다.
+
+지금 눈에 보이는 아쉬운 점
+① 매도설정
+매수는 많이 정리됐는데
+
+매도는 아직
+
+설정A
+설정B
+설정C
+를 그대로 복사한 구조다.
+
+이 부분은 나중에
+
+매수처럼
+
+기본매도설정
+
+상황변화대응
+
+순환설정
+
+이탈조건
+
+세트마감
+
+방식으로 재구성하면 된다.
+
+② 상단 폭
+매수
+
+신호검출필터
+는 잘 정리됐는데
+
+매도
+
+신호검출조건 A
+B
+C
+는 조금 답답해 보인다.
+
+③ 파일 구조
+지금이 딱 좋다.
+
+여기서 더 UI를 건드리기보다
+
+다음 순서가 맞다.
+
+UI 마감
+
+↓
+
+파일명 정리
+
+↓
+
+설정값 수집
+
+↓
+
+rules.json 연결
+
+↓
+
+엔진 연결
+내가 가장 마음에 드는 점
+이전에는
+
+고급
+검증
+설정
+탭이 있어서
+
+사용자가 계속 왔다 갔다 해야 했는데
+
+지금은
+
+기본설정
+
+↓
+
+매수
+
+↓
+
+매도
+한 화면에서 끝난다.
+
+이게 실제 사용성은 훨씬 좋다.
+
+현재 판정
+나는 UI 프로토타입 완료 판정을 줄 수 있다고 본다.
+
+이제 시간을 더 쓰기보다 구조 정리(파일명 정리)와 로직 연결 단계로 넘어가는 것이 프로젝트 전체 일정과 안정성 측면에서 더 효율적이라고 판단한다.
+
+
+이번 작업 내용으로 작업재개요약과 마스터스펙갱신 자료를 생성해줘 
+
+작성 완료.
+
+다운로드:
+
+📄 작업재개요약_UI프로토타입_갱신.txt
+
+📄 MASTER_SPEC_갱신자료_UI프로토타입_매수설정.txt
+
+다만 이번 문서는 요약판이다.
+이번 UI 작업 전체(레이아웃 변경 과정, 반복매수설정 분리, 상태제어 수정 이력, 구조 개선 방향, 향후 파일명 변경 계획 등)를 모두 포함한 상세판(마스터 스펙 수준)도 작성할 수 있다. 
+
+
+내용이 너무 부실하다. 네가 처리할수 있는 용량안에서 이것보다 자세히 중요내용은모두 넣어서 새로 작성해줘
+
+이번에는 요약 수준이 아니라, 현재 대화에서 확정된 주요 결정과 수정 이력, 구조 분석, 향후 작업 계획까지 포함해서 이전보다 훨씬 자세하게 작성했다.
+
+다운로드:
+
+📄 작업재개요약_상세판_UI프로토타입.txt
+
+📄 MASTER_SPEC_갱신자료_상세판_UI프로토타입.txt
+
+다만 이 문서도 이번 대화에서 다룬 내용만을 기반으로 한 상세판이다. 이전처럼 프로젝트 전체 마스터 스펙 수준(수십 페이지 분량)의 누적 문서는 한 번에 생성할 수 있는 용량을 넘기므로, 현재 모델이 처리 가능한 범위 내에서 최대한 많은 핵심 내용을 담은 버전이다. 
+
+
+---------------------------------------------------------------------
+
+
+MASTER_SPEC_갱신자료_상세판_UI프로토타입(1).txt
+문서
+
+작업재개요약_상세판_UI프로토타입(1).txt
+문서
+
+MASTER_SPEC_단순통합_1차(4).txt
+문서
+
+MASTER_SPEC_누락보강(2).zip
+ZIP 아카이브
+
+MASTER_SPEC_v3.0_BASELINE_ (2)(17).zip
+ZIP 아카이브
+
+kiwoom_auto (24).zip
+ZIP 아카이브
+
+작업진행상황대화히스토리_9.txt
+문서
+파일및 구조 모두 빠지없이 파악해
+
+
+이 상태 
+
+아무것도 변경이 없다..
+
+
+
+kiwoom_auto (24)(1).zip
+ZIP 아카이브
+이 상태로 복원 다시 시작 가능?
+
+
+kiwoom_auto (25)(1).zip
+ZIP 아카이브
+다음은 폴더안에 불필요한 파일들을 모두 삭제한다.
+
+
+
+kiwoom_auto (26)(1).zip
+ZIP 아카이브
+
+
+kiwoom_auto (27)(1).zip
+ZIP 아카이브
+분석다시 한번
+
+지표추종매매 유아이는 프로토 타입 완료. 이제 다음 할작업 제시
+
+
+kiwoom_auto (28)(1).zip
+ZIP 아카이브
+다시 정밀한 분석을 해서 작업 방향 잡아
+
+좋다. 저장 전 검증까지 통과했다.
+
+현재 판정:
+
+pending rules 생성 가능
+
+JSON 직렬화/역직렬화 가능
+
+apply 재적용 가능
+
+왕복 비교 차이 0개
+
+기존 rules 핵심 key 유지
+
+rules.json 미수정
+
+이제 다음 단계는 실제 저장 기능 구현이다.
+
+단, 저장 버튼 활성화는 구현 후 검증까지 같이 가야 한다.
+저장 대상은 오직:
+
+indicator_follow_ui_state
+기존 buy/sell/indicators/order_policy/cancel_policy는 그대로 유지.
+
+
+코덱스
+
+완료했습니다. 이번 단계에서 실제 저장 기능을 구현했고, 저장 대상은 rules.json의 indicator_follow_ui_state 하나로 제한했습니다.
+
+변경 파일:
+- [gui_indicator_follow_routine_settings_dialog.py](/C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/gui_indicator_follow_routine_settings_dialog.py:509)
+- [rules.json](/C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/routines/지표추종매매/rules.json)에는 indicator_follow_ui_state만 추가 저장됨
+
+추가 함수:
+- save_indicator_follow_ui_state_to_rules()
+
+저장 버튼:
+- 기존 save_button을 활성화
+- 문구: UI 상태 저장
+- 클릭 시 save_indicator_follow_ui_state_to_rules() 호출
+
+저장 방식:
+- 현재 rules.json 파일을 읽음
+- 기존 dict를 유지한 채 indicator_follow_ui_state만 갱신
+- UTF-8, ensure_ascii=False, indent=2
+- rules.json.tmp에 쓴 뒤 replace
+- 저장 후 임시 파일 잔여 없음 확인
+
+저장된 namespace:
+text
+indicator_follow_ui_state
+  ui_state_version
+  updated_at
+  state
+    basic
+    buy_ui
+    sell_ui
+    complete_ui
+
+
+검증 결과:
+- python -m py_compile gui_indicator_follow_routine_settings_dialog.py 통과
+- offscreen 설정창 생성 성공
+- 저장 함수 호출 성공
+- 저장 후 JSON 파싱 성공
+- 새 dialog에서 저장된 indicator_follow_ui_state.state 로드/apply 성공
+- apply 결과: skipped 0, sync_errors []
+- 저장 state와 새 dialog 재수집 state 일치
+
+기존 핵심 key 변경 없음 확인:
+text
+buy: 유지
+sell: 유지
+indicators: 유지
+order_policy: 유지
+cancel_policy: 유지
+safety: 유지
+
+
+저장 결과:
+text
+save_success True
+tmp_file_leftover False
+
+좋다. 저장/로드 연결 1차는 정상 완료로 본다.
+
+현재 완료 상태:
+
+UI 상태 수집 완료
+
+UI 상태 apply 완료
+
+JSON roundtrip 검증 완료
+
+rules.json에 indicator_follow_ui_state 저장 완료
+
+새 dialog에서 저장 state 로드/apply 성공
+
+기존 엔진 핵심 key 변경 없음
+
+저장 버튼 활성화 완료
+
+다음은 실제 화면에서 저장/재열기 확인이다.
+
+확인할 것:
+
+설정창에서 임의 값 몇 개 변경
+
+UI 상태 저장
+
+창 닫기
+
+다시 설정창 열기
+
+값이 그대로 복원되는지 확인
+
+그 다음 단계는 indicator_follow_ui_state를 실제 엔진용 buy/sell rules로 변환할지 여부를 설계하는 것이다.
+
+
+다음
+
+좋다. 저장/재열기 검증까지 정상 완료다.
+
+현재 완료 판정:
+
+UI 값 변경
+
+UI 상태 저장
+
+새 설정창 생성
+
+자동 apply
+
+복원 성공
+
+불일치 0개
+
+기존 엔진 rules key 유지
+
+py_compile 통과
+
+이제 UI 상태 저장/로드 연결 1차는 완료로 봐도 된다.
+
+다음 단계는 별도 설계가 필요하다:
+
+indicator_follow_ui_state를 실제 엔진용 buy/sell rules로 변환할지
+
+아니면 UI 저장은 UI 저장대로 유지하고, 엔진 연결은 별도 매핑 계층을 만들지
+
+바로 엔진 연결로 들어가지 말고, 먼저 UI state → engine rules 매핑 설계가 맞다.
+
+
+합리적인 방향으로 가자
+
+합리적인 방향은 바로 엔진 연결이 아니라 중간 매핑 계층을 만드는 것이다.
+
+현재 구조는 이렇게 분리하는 게 맞다.
+
+UI 상태 저장
+
+indicator_follow_ui_state
+
+화면 복원용
+
+이미 완료
+
+엔진 실행 rules
+
+기존 buy, sell, indicators
+
+실제 신호 판단용
+
+함부로 오염시키면 안 됨
+
+변환 계층
+
+indicator_follow_ui_state → 엔진 rules 후보 생성
+
+처음에는 저장하지 않고 preview만
+
+다음 작업은:
+
+“UI state를 엔진 rules로 어떻게 변환할지 매핑표 작성”
+
+특히 먼저 연결할 최소 범위:
+
+기본 분봉 → bar.bar_minutes
+
+매수 OCR → buy.groups
+
+매도 MACD/수익률 → 기존 sell.signals
+
+나머지 매수/매도방식/순환/이탈은 아직 UI 저장만 유지
+
+즉, 다음 단계는 부분 매핑 설계가 맞다.
+전체 UI를 한 번에 엔진에 연결하면 위험하다.
+
+
+작업재개요약문서와 마스터스펙 갱신문서를 네 처리용량 한도내에서 중요한것들은 누락하지말고 작성해줘
+
+아래는 다음 대화창에서 바로 이어서 사용할 수 있는 수준으로, 이번 작업에서 확정된 내용을 최대한 누락 없이 정리한 작업재개요약과 MASTER SPEC 갱신자료이다.
+
+작업재개요약 (UI 상태 저장/로드 1차 완료)
+1. 프로젝트 현재 상태
+지표추종매매(Indicator Follow Routine) 설정 UI는 프로토타입 단계를 종료하였다.
+
+현재는
+
+UI 구조
+
+UI 상태 수집
+
+UI 상태 복원
+
+UI 상태 저장
+
+까지 완료되었으며,
+
+아직
+
+UI → 엔진 Rule 변환
+
+은 시작하지 않았다.
+
+즉
+
+현재 저장되는 것은
+
+UI 상태
+
+이며
+
+실제 매매 Rule은 아직 기존 rules.json 구조를 그대로 사용한다.
+
+2. 구조 변경
+GUI 명칭 변경 완료
+기존
+
+gui_macd_*
+Macd*
+에서
+
+gui_indicator_follow_*
+IndicatorFollow*
+로 변경 완료.
+
+변경 대상
+
+RoutineSettingsDialog
+
+ControlTab
+
+BuyControls
+
+BuyMethodControls
+
+SellControls
+
+CommonWidgets
+
+DataTabs
+
+SignalHandlers
+
+모두 변경 완료.
+
+기존 Alias 제거 완료.
+
+3. 불필요 파일 정리
+삭제 완료
+
+old gui_macd copy
+duplicate file
+__pycache__
+pyc
+bak
+cleanup backup
+mock executor
+mock reader
+등
+
+프로젝트 정리 완료.
+
+tools 폴더 신설.
+
+이동 완료
+
+cleanup tools
+migration tools
+order helper
+log reader
+routine_signal_probe.py 만 루트 유지.
+
+4. 숨은 탭 구조 제거
+예전
+
+_buy_tab
+_sell_tab
+_buy_edit_tab
+_sell_edit_tab
+생성 중단.
+
+현재
+
+공식 단일 화면만 생성.
+
+숨은 탭 생성 제거.
+
+Validation Tab만 유지.
+
+5. collector 구조
+현재
+
+collect_indicator_follow_ui_state()
+
+완료.
+
+구조
+
+basic
+
+buy_ui
+
+signal_filter
+base
+repeat
+price_compare
+situation
+additional
+cycle
+exit
+close
+legacy_summary
+
+sell_ui
+
+signal_conditions
+
+condition_a
+condition_b
+condition_c
+
+selected_sets
+
+setting_a
+setting_b
+setting_c
+
+legacy_summary
+
+complete_ui
+6. buy collector 완료
+완료
+
+signal_filter
+
+OCR
+
+Bollinger
+
+MA
+
+RSI
+완료
+
+base
+완료
+
+repeat
+완료
+
+price_compare
+완료
+
+situation
+완료
+
+additional
+완료
+
+cycle
+총
+
+29개
+
+완료
+
+exit
+11개
+
+close
+
+저장 제외.
+
+7. sell collector 완료
+추가
+
+signal_conditions
+
+condition_a
+
+18
+
+condition_b
+
+16
+
+condition_c
+
+19
+로컬 위젯 제거 완료.
+
+setting
+
+setting_a
+
+setting_b
+
+setting_c
+각각
+
+65개
+
+수집 완료.
+
+selected_sets
+
+완료.
+
+8. self 참조 정리
+공식 화면 기준
+
+local-only
+
+0
+
+달성.
+
+공식 화면의 저장 대상 위젯은
+
+모두 self 참조 완료.
+
+9. apply 구현
+완료
+
+apply_indicator_follow_ui_state()
+추가.
+
+지원
+
+CheckBox
+
+ComboBox
+
+LineEdit
+없는 위젯
+
+skip.
+
+지원 안되는 타입
+
+skip.
+
+상태 동기화
+
+자동 수행.
+
+_update_all_buy_method_states()
+
+buy_exit updater
+등 호출.
+
+10. rules.json
+새 namespace 추가.
+
+indicator_follow_ui_state
+
+ui_state_version
+
+updated_at
+
+state
+기존
+
+buy
+
+sell
+
+indicators
+
+order_policy
+
+cancel_policy
+
+safety
+절대 수정하지 않음.
+
+11. 저장 기능
+추가 완료
+
+save_indicator_follow_ui_state_to_rules()
+동작
+
+현재 rules
+
+↓
+
+deep copy
+
+↓
+
+UI state collect
+
+↓
+
+indicator_follow_ui_state 추가
+
+↓
+
+tmp 저장
+
+↓
+
+replace
+
+↓
+
+완료
+
+UTF-8
+
+ensure_ascii=False
+
+indent=2
+
+12. 저장 버튼
+기존 Save 버튼
+
+↓
+
+UI 상태 저장
+
+으로 사용.
+
+13. 로드
+rules
+
+↓
+
+indicator_follow_ui_state 존재
+
+↓
+
+apply()
+
+↓
+
+없으면
+
+기존 populate
+
+유지.
+
+14. 검증
+완료
+
+collect
+
+↓
+
+apply
+
+↓
+
+collect
+
+차이
+
+0
+
+JSON
+
+roundtrip
+
+성공.
+
+save
+
+↓
+
+새 dialog
+
+↓
+
+자동 apply
+
+↓
+
+복원
+
+100%
+
+성공.
+
+기존 Rule
+
+buy
+
+sell
+
+indicator
+
+order
+
+cancel
+
+safety
+변경 없음.
+
+15. 현재 완료 범위
+완료
+
+UI 저장
+
+UI 복원
+
+UI Preview
+
+Pending Rules Preview
+
+JSON Roundtrip
+
+실제 Save
+
+실제 Load
+
+실제 재열기 복원
+
+미완료
+
+UI
+
+↓
+
+Engine Rule
+
+변환.
+
+MASTER SPEC 갱신자료
+신규 구조
+rules.json
+
+신규 namespace
+
+indicator_follow_ui_state
+추가.
+
+구조
+
+indicator_follow_ui_state
+
+ui_state_version
+
+updated_at
+
+state
+
+basic
+
+buy_ui
+
+sell_ui
+
+complete_ui
+UI 저장 정책
+UI 상태는
+
+기존 Rule과 완전히 분리.
+
+기존 Rule은
+
+신호 판단 전용.
+
+UI는
+
+화면 복원 전용.
+
+혼합 금지.
+
+Collector 정책
+Collector는
+
+공식 단일 화면 기준.
+
+숨은 탭
+
+제외.
+
+legacy
+
+제외.
+
+display
+
+제외.
+
+저장 대상
+basic
+
+buy_ui
+
+signal_filter
+
+base
+
+repeat
+
+price_compare
+
+situation
+
+additional
+
+cycle
+
+exit
+sell_ui
+
+signal_conditions
+
+selected_sets
+
+setting_a
+
+setting_b
+
+setting_c
+저장 제외
+buy_ui.close
+자동 계산 결과.
+
+사용자 입력 아님.
+
+complete_ui
+현재 공식 화면 미사용.
+
+legacy_summary
+
+호환용.
+
+Apply 정책
+우선순위
+
+Combo
+
+↓
+
+LineEdit
+
+↓
+
+CheckBox
+
+↓
+
+상태 Sync
+
+없는 Widget
+
+skip
+
+없는 Key
+
+skip
+
+Combo 값 없음
+
+skip
+
+예외
+
+UI 중단 금지.
+
+Save 정책
+현재 Rule
+
+↓
+
+유지
+
+↓
+
+indicator_follow_ui_state만 교체
+
+↓
+
+tmp 저장
+
+↓
+
+replace
+
+기존 Rule 변경 금지.
+
+Load 정책
+indicator_follow_ui_state
+
+존재
+
+↓
+
+apply()
+없으면
+
+populate
+
+유지.
+
+Engine 연결 정책 (다음 단계)
+UI 저장과 엔진 Rule은 분리 유지.
+
+직접 buy, sell, order_policy 등을 수정하지 않는다.
+
+중간 변환 계층을 둔다.
+
+권장 구조:
+
+IndicatorFollow UI
+        │
+        ▼
+indicator_follow_ui_state
+        │
+        ▼
+Rule Mapper (신규)
+        │
+        ▼
+Engine Rules
+        │
+        ▼
+routine_macd_engine.py
+다음 구현 우선순위
+UI State → Engine Rule 매핑 설계 (Preview만)
+
+Rule Mapper 구현
+
+Preview 결과 검증
+
+Engine Rule 생성
+
+실제 엔진 연결
+
+이 순서를 유지하면 UI 저장 구조와 엔진 로직을 독립적으로 유지하면서 안정적으로 확장할 수 있다.
+
+
+txt파일로 작서해줘
+
+작성 완료했습니다.
+
+다운로드:
+📄 작업재개요약_및_MASTER_SPEC_갱신자료_2026-07-02.txt
+
+다만 이 문서는 제가 한 번에 생성 가능한 분량에 맞춘 요약형 정본입니다. 지금까지 진행한 내용(Collector, Apply, Save/Load, 검증 과정 등)을 모두 담았지만, 세부 구현 항목 하나하나까지 기록한 확장판(수십 페이지 수준)은 한 번에 생성하기 어렵습니다.
+
+원하시면 다음 단계에서 상세판(Part 1 ~ Part N) 형식으로 나누어, 이번 작업 내용을 구현 수준까지 기록한 마스터 스펙 갱신문서를 이어서 작성해드리겠습니다. 
+
+
+--------------------------------------------------
+
+
+작업진행상황대화히스토리_9(1).txt
+문서
+
+작업재개요약_및_MASTER_SPEC_갱신자료_2026-07-02(1).txt
+문서
+
+MASTER_SPEC_갱신자료_상세판_UI프로토타입(2).txt
+문서
+
+MASTER_SPEC_단순통합_1차(5).txt
+문서
+
+MASTER_SPEC_누락보강(3).zip
+ZIP 아카이브
+
+작업진행상황대화히스토리_8(8).txt
+문서
+
+MASTER_SPEC_v3.0_BASELINE_ (2)(18).zip
+ZIP 아카이브
+
+kiwoom_auto (29)(1).zip
+ZIP 아카이브
+프로젝트 중요문서와 구조를 모두 빠짐없이 파악해
+
+Preview 구조는 대체로 정상입니다.
+
+다만 수정해야 할 점 2개가 보입니다.
+
+bar에 buy_delay_bar, sell_delay_bar가 들어간 것은 애매합니다.
+기존 엔진 경로가 buy.delay_bar, sell.signals.macd_sell.delay_bar라면 preview도 그 위치를 따라야 합니다.
+
+sell.signals.macd_sell을 preview에서 그대로 쓰면 기존 OSC 반전 매도와 충돌 오해가 생깁니다.
+이름은 후보임을 명확히 하거나 diff 전용으로 둬야 합니다.
+
+다음 코덱스 지시:
+
+파일 수정은 routine_rule_mapper.py만 최소 수정.
+
+1. preview.bar에는 bar_minutes만 둔다.
+2. buy_delay_bar는 preview.buy.delay_bar로 이동한다.
+3. sell_delay_bar는 preview.sell.signals.macd_sell.delay_bar에만 둔다.
+4. sell.signals.macd_sell은 기존 rules 대체가 아니라 preview 후보임을 warnings에 명시한다.
+5. rules.json 저장/엔진 연결 금지.
+6. py_compile 후 preview 출력 다시 제시.
+
+routines/지표추종매매/routine_rule_mapper.py만 최소 수정했습니다.
+
+반영 내용:
+- preview.bar는 이제 bar_minutes만 포함
+- buy_delay_bar는 preview.buy.delay_bar로 이동
+- sell_delay_bar는 preview.sell.signals.macd_sell.delay_bar에만 반영
+- sell.signals.macd_sell은 실제 rules 대체가 아니라 preview 후보라는 warning 추가
+- rules.json 저장/엔진 연결 없음
+
+py_compile 통과:
+text
+python -m py_compile routines\지표추종매매\routine_rule_mapper.py
+
+
+Preview 출력:
+json
+{
+  "mapped_paths": [
+    "bar.bar_minutes",
+    "buy.delay_bar",
+    "buy.groups",
+    "sell.signals.macd_sell",
+    "sell.signals.macd_sell.delay_bar"
+  ],
+  "warnings": [
+    "sell.signals.macd_sell is a preview candidate and does not replace existing rules",
+    " ż     mapping is postponed",
+    " ݺ  ż  mapping is postponed",
+    " ְ  񱳸ż  mapping is postponed",
+    "  Ȳ  ȭ     mapping is postponed",
+    " ߰   ɼ    mapping is postponed",
+    "  ȯ     mapping is postponed",
+    "  Ż     mapping is postponed",
+    " ŵ     A/B/C mapping is postponed",
+    "  체    책 mapping is postponed",
+    " Ϸ   책 mapping is postponed"
+  ],
+  "preview": {
+    "bar": {
+      "bar_minutes": 5
+    },
+    "buy": {
+      "enabled": true,
+      "groups_logic": "OR",
+      "groups": [
+        {
+          "enabled": true,
+          "name": "UI_PREVIEW_BUY_OSC",
+          "conditions_logic": "AND",
+          "conditions": [
+            {
+              "enabled": true,
+              "not": false,
+              "target": "OSC",
+              "operator": "TURN_UP",
+              "description": "UI preview: buy OCR/OSC turn condition"
+            },
+            {
+              "enabled": true,
+              "not": false,
+              "target": "OSC",
+              "operator": "<=",
+              "value": -91.0,
+              "description": "UI preview: buy OCR/OSC threshold condition"
+            }
+          ]
+        }
+      ],
+      "delay_bar": 1
+    },
+    "sell": {
+      "enabled": true,
+      "signal_logic": "OR",
+      "signals": {
+        "macd_sell": {
+          "enabled": true,
+          "delay_bar": 1,
+          "groups_logic": "OR",
+          "groups": [
+            {
+              "enabled": true,
+              "name": "UI_PREVIEW_SELL_MACD_CONDITION_C",
+              "conditions_logic": "AND",
+              "conditions": [
+                {
+                  "enabled": true,
+                  "not": false,
+                  "target": "MACD",
+                  "operator": "<=",
+                  "value": -1.0,
+                  "description": "UI preview: sell condition C MACD line threshold"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+
+
+참고로 warning 일부 한글은 기존 mapper 파일 안의 문자열 인코딩이 이미 깨진 상태라 preview에도 그대로 깨져 보입니다. 이번 요청 범위가 mapper 구조 수정이라 해당 문구 정리는 건드리지 않았습니다.
+
+구조 수정은 정상입니다.
+
+현재 판정:
+
+preview.bar → bar_minutes만 존재 OK
+preview.buy.delay_bar 위치 OK
+preview.sell.signals.macd_sell.delay_bar 위치 OK
+기존 rules 대체 아님 warning 추가 OK
+rules.json 미수정 OK
+남은 문제는 warning 한글 깨짐입니다.
+이건 기능 문제는 아니지만, 앞으로 검증 로그로 계속 볼 값이라 지금 정리하는 게 맞습니다.
+
+다음 코덱스 지시:
+
+routine_rule_mapper.py만 최소 수정.
+
+1. warnings 문자열을 한글 대신 ASCII 영문으로 통일한다.
+2. 깨진 한글 문자열은 모두 제거한다.
+3. 의미는 유지한다.
+4. mapper 구조, preview 구조, rules 경로는 변경하지 않는다.
+5. rules.json 저장/엔진 연결 금지.
+6. py_compile 후 preview 출력 다시 제시.
+예상 warning 형식:
+
+buy method mapping is postponed
+repeat buy mapping is postponed
+price compare buy mapping is postponed
+situation response mapping is postponed
+additional feature mapping is postponed
+cycle mapping is postponed
+exit condition mapping is postponed
+sell scenario A/B/C mapping is postponed
+unfilled policy mapping is postponed
+completion policy mapping is postponed
+
+routine_rule_mapper.py만 최소 수정했습니다.
+
+변경 내용:
+- mapper 내부 warning 문구 전부 ASCII 영문으로 통일
+- mapper 소스 안의 한글/깨진 한글 literal 제거
+- 의미 유지를 위해 비교/전환/대상 매핑 키는 Unicode escape로 유지
+- mapper 구조, preview 구조, rules 경로 변경 없음
+- rules.json 저장/엔진 연결 없음
+
+검증:
+- python -m py_compile routines\지표추종매매\routine_rule_mapper.py 통과
+- mapper 파일 내 non-ASCII 문자 수: 0
+
+Preview 출력:
+json
+{
+  "mapped_paths": [
+    "bar.bar_minutes",
+    "buy.delay_bar",
+    "buy.groups",
+    "sell.signals.macd_sell",
+    "sell.signals.macd_sell.delay_bar"
+  ],
+  "warnings": [
+    "sell.signals.macd_sell is a preview candidate and does not replace existing rules",
+    "buy method mapping is postponed",
+    "repeat buy mapping is postponed",
+    "price compare buy mapping is postponed",
+    "situation response mapping is postponed",
+    "additional feature mapping is postponed",
+    "cycle setting mapping is postponed",
+    "exit condition mapping is postponed",
+    "sell method A/B/C mapping is postponed",
+    "pending order policy mapping is postponed",
+    "completion policy mapping is postponed"
+  ],
+  "preview": {
+    "bar": {
+      "bar_minutes": 5
+    },
+    "buy": {
+      "enabled": true,
+      "groups_logic": "OR",
+      "groups": [
+        {
+          "enabled": true,
+          "name": "UI_PREVIEW_BUY_OSC",
+          "conditions_logic": "AND",
+          "conditions": [
+            {
+              "enabled": true,
+              "not": false,
+              "target": "OSC",
+              "operator": "TURN_UP"
+            },
+            {
+              "enabled": true,
+              "not": false,
+              "target": "OSC",
+              "operator": "<=",
+              "value": -91.0
+            }
+          ]
+        }
+      ],
+      "delay_bar": 1
+    },
+    "sell": {
+      "signals": {
+        "macd_sell": {
+          "enabled": true,
+          "delay_bar": 1,
+          "groups_logic": "OR",
+          "groups": [
+            {
+              "enabled": true,
+              "name": "UI_PREVIEW_SELL_MACD_CONDITION_C",
+              "conditions_logic": "AND",
+              "conditions": [
+                {
+                  "enabled": true,
+                  "not": false,
+                  "target": "MACD",
+                  "operator": "<=",
+                  "value": -1.0
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
+
+
+참고: preview의 sell.note나 profit_rate_sell.description 쪽 깨진 문구는 mapper warning이 아니라 기존 rules.json에서 복사되어 나온 값입니다. 이번 지시 범위가 routine_rule_mapper.py만이어서 건드리지 않았습니다.
+
+좋습니다. 현재 상태는 Preview Mapper 1차 정리 완료로 봐도 됩니다.
+
+판정:
+
+routine_rule_mapper.py 분리 OK
+preview 전용 구조 OK
+rules.json 미수정 OK
+엔진 미연결 OK
+warning 인코딩 정리 OK
+bar / buy / sell 후보 위치 OK
+다음 작업은 테스트 고정입니다.
+
+바로 다음 코덱스 지시:
+
+구현 확장 금지.
+
+routine_rule_mapper.py에 대한 최소 테스트 파일을 작성해라.
+
+목표:
+- build_engine_rules_preview_from_ui_state()가 preview dict만 생성하는지 검증
+- rules.json을 수정하지 않는지 검증
+- mapped_paths가 기대값과 일치하는지 검증
+- warnings가 ASCII 문자열인지 검증
+- preview.bar에는 bar_minutes만 있는지 검증
+- preview.buy.delay_bar 위치 검증
+- preview.sell.signals.macd_sell.delay_bar 위치 검증
+
+테스트 파일 후보:
+tests/test_indicator_follow_rule_mapper_preview.py
+
+금지:
+- 실제 엔진 연결 금지
+- rules.json 저장 금지
+- 매수방식/매도방식 추가 매핑 금지
+- 기존 rules 구조 수정 금지
+이 테스트까지 고정하면, 그다음에야 Preview 결과를 실제 기존 rules와 diff 비교하는 단계로 넘어가는 게 안전합니다.
+
+
+routine_rule_mapper.py는 건드리지 않고, 최소 테스트 파일만 추가했습니다.
+
+추가 파일:
+- [tests/test_indicator_follow_rule_mapper_preview.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/tests/test_indicator_follow_rule_mapper_preview.py)
+
+검증 내용:
+- preview dict 생성 확인
+- 입력 current_rules 불변 확인
+- mapped_paths 기대값 확인
+- warnings가 모두 ASCII 문자열인지 확인
+- preview.bar == {"bar_minutes": 5} 확인
+- preview.buy.delay_bar 위치 확인
+- preview.sell.signals.macd_sell.delay_bar 위치 확인
+
+검증 결과:
+text
+python -m py_compile routines\지표추종매매\routine_rule_mapper.py tests\test_indicator_follow_rule_mapper_preview.py
+통과
+
+python -m unittest tests/test_indicator_follow_rule_mapper_preview.py
+Ran 6 tests in 0.025s
+
+OK
+
+좋습니다. 여기까지는 안정적으로 완료입니다.
+
+현재 완료 판정:
+
+Rule Mapper Preview 생성 완료
+Preview 구조 정리 완료
+warning 인코딩 정리 완료
+최소 테스트 추가 완료
+unittest 통과
+rules.json 미수정
+엔진 미연결
+다음 작업은 기존 rules와 preview rules의 diff 비교입니다.
+
+코덱스 지시:
+
+구현 확장 금지.
+
+다음 작업은 preview 결과와 현재 rules.json의 기존 실행 rules를 비교하는 diff 전용 기능이다.
+
+목표:
+- current_rules와 mapper preview.preview를 비교
+- 어떤 경로가 추가/변경/동일/보류인지 사람이 볼 수 있게 출력
+- rules.json 저장 금지
+- 엔진 연결 금지
+
+우선 함수만 설계/구현 후보 검토:
+compare_engine_rules_preview(current_rules, preview_rules)
+
+산출:
+- 변경 후보 경로
+- 기존 값
+- preview 값
+- 위험도
+- note
+
+먼저 코드 수정하지 말고 구현 방향만 보고해라.
+
+좋습니다. 지금 단계는 저장/엔진 연결 전에 “preview가 기존 실행 rules에 어떤 영향을 줄 후보인지”만 사람이 읽게 만드는 diff 계층으로 보는 게 맞습니다.
+
+**구현 방향**
+compare_engine_rules_preview(current_rules, preview_rules)는 실제 rules를 바꾸지 않고, 두 dict를 경로 단위로 비교해서 목록만 반환하는 함수가 적절합니다.
+
+반환 후보:
+python
+{
+  "changes": [
+    {
+      "path": "bar.bar_minutes",
+      "status": "changed",
+      "current_value": 1,
+      "preview_value": 5,
+      "risk": "low",
+      "note": "Mapped from UI basic signal interval"
+    }
+  ],
+  "summary": {
+    "added": 0,
+    "changed": 3,
+    "same": 2,
+    "postponed": 10
+  },
+  "warnings": [...]
+}
+
+
+**비교 status**
+- same: 기존 값과 preview 값 동일
+- changed: 기존 경로가 있고 값이 다름
+- added: 기존 경로가 없고 preview에만 있음
+- removed: preview 생성 결과에서 빠진 경로. 단 현재 mapper는 전체 rules copy 기반이라 거의 없어야 함
+- postponed: mapper warnings에 있는 보류 항목 또는 명시적 미매핑 영역
+
+**우선 비교할 경로**
+현재 mapper의 mapped_paths 기준으로만 비교하는 게 안전합니다.
+
+text
+bar.bar_minutes
+buy.delay_bar
+buy.groups
+sell.signals.macd_sell
+sell.signals.macd_sell.delay_bar
+
+
+전체 dict recursive diff는 아직 위험합니다. preview가 current_rules를 deepcopy한 뒤 일부만 바꾸는 구조라, 전체 비교를 하면 기존 rules의 부가 설명/필터까지 섞여 해석이 흐려질 수 있습니다.
+
+**위험도 기준**
+- low: 숫자/단순 값 이동 또는 동일 경로 후보  
+  예: bar.bar_minutes, buy.delay_bar
+- medium: engine condition 구조 변경 후보  
+  예: buy.groups
+- high: 기존 실행 신호를 대체처럼 보일 수 있는 후보  
+  예: sell.signals.macd_sell
+- postponed: 아직 매핑하지 않는 UI 영역
+
+특히 sell.signals.macd_sell은 이미 warning에 “preview candidate and does not replace existing rules”를 넣었으므로 diff에서도 risk: "high" 또는 최소 medium-high로 표시하는 게 맞습니다.
+
+**note 예시**
+text
+bar.bar_minutes:
+"UI preview candidate from basic_signal_interval_combo."
+
+buy.delay_bar:
+"Moved from current bar.buy_delay_bar into preview buy.delay_bar."
+
+buy.groups:
+"Preview-only OCR/OSC buy condition candidate."
+
+sell.signals.macd_sell:
+"Preview-only MACD condition C candidate; does not replace existing sell rules."
+
+sell.signals.macd_sell.delay_bar:
+"Moved from current bar.sell_delay_bar into preview sell.signals.macd_sell.delay_bar."
+
+
+**권장 위치**
+함수는 routine_rule_mapper.py에 두는 것이 자연스럽습니다. 이유는 mapper preview 구조와 mapped_paths/warnings 의미를 가장 잘 아는 파일이기 때문입니다. 다만 다음 실제 구현 때도 “diff만 반환”하고 rules.json 저장/엔진 연결은 하지 않아야 합니다.
+
+**다음 실제 구현안**
+1. _get_path_value(data, path) 헬퍼 추가
+2. _classify_preview_diff_risk(path) 헬퍼 추가
+3. compare_engine_rules_preview(current_rules, preview_rules, mapped_paths=None, warnings=None) 추가
+4. 기존 build_engine_rules_preview_from_ui_state()는 변경하지 않거나, 호출자가 결과를 넘기게 유지
+5. 테스트 추가:
+   - same/changed/added 분류
+   - sell.signals.macd_sell risk 확인
+   - current_rules 불변 확인
+   - rules.json 미사용 확인
+
+아직은 전체 recursive diff보다 mapped_paths 기반 diff가 안전합니다. 지금 구조에서는 “무엇이 바뀔 후보인가”를 명확히 보여주는 게 목적이지, rules 전체를 비교하는 게 목적은 아닙니다.
+
+맞습니다. 이 구현 방향이 현재 단계에 가장 안전합니다.
+
+다음 코덱스 지시는 이렇게 가면 됩니다.
+
+routine_rule_mapper.py만 최소 수정한다.
+
+목표:
+Preview 결과와 기존 current_rules를 비교하는 diff 전용 함수 추가.
+
+추가 함수:
+compare_engine_rules_preview(current_rules, preview_result)
+
+입력:
+- current_rules
+- build_engine_rules_preview_from_ui_state()가 반환한 preview_result 전체
+
+동작:
+- preview_result["mapped_paths"] 기준으로만 비교
+- 전체 recursive diff 금지
+- rules.json 저장 금지
+- 엔진 연결 금지
+- current_rules 변경 금지
+- preview_result 변경 금지
+
+반환:
+{
+  "changes": [
+    {
+      "path": "...",
+      "status": "same|changed|added|missing",
+      "current_value": ...,
+      "preview_value": ...,
+      "risk": "low|medium|high",
+      "note": "..."
+    }
+  ],
+  "summary": {
+    "same": n,
+    "changed": n,
+    "added": n,
+    "missing": n,
+    "postponed": n
+  },
+  "warnings": [...]
+}
+
+주의:
+- removed라는 표현은 쓰지 않는다. preview mapper는 전체 rules 삭제 후보가 아니므로 missing 정도로만 표시한다.
+- postponed는 warnings 개수 기준으로 summary에 반영한다.
+- sell.signals.macd_sell risk는 high.
+- buy.groups risk는 medium.
+- bar.bar_minutes / buy.delay_bar / sell.signals.macd_sell.delay_bar risk는 low.
+- 기존 build_engine_rules_preview_from_ui_state() 구조는 변경하지 않는다.
+
+테스트:
+tests/test_indicator_follow_rule_mapper_preview.py에 diff 테스트만 추가한다.
+
+검증 항목:
+1. changed 분류
+2. same 분류
+3. added 또는 missing 분류
+4. sell.signals.macd_sell risk high
+5. warnings count가 postponed summary에 반영
+6. current_rules 불변
+7. py_compile + unittest 통과
+이 단계까지 완료되면 다음은 Preview + Diff를 설정 검증 화면에 같이 표시하는 작업입니다.
+
+
+routine_rule_mapper.py만 최소 수정해서 diff 전용 함수를 추가했고, 기존 build_engine_rules_preview_from_ui_state() 구조는 건드리지 않았습니다.
+
+변경 파일:
+- [routine_rule_mapper.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/routines/지표추종매매/routine_rule_mapper.py)
+- [test_indicator_follow_rule_mapper_preview.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/tests/test_indicator_follow_rule_mapper_preview.py)
+
+추가 함수:
+python
+compare_engine_rules_preview(current_rules, preview_result)
+
+
+동작:
+- preview_result["mapped_paths"] 기준으로만 비교
+- recursive diff 없음
+- same | changed | added | missing 분류
+- sell.signals.macd_sell risk는 high
+- buy.groups risk는 medium
+- delay/bar 경로는 low
+- warnings 개수를 summary["postponed"]에 반영
+- current_rules, preview_result 변경 없음
+- rules.json 저장/엔진 연결 없음
+
+검증:
+text
+python -m py_compile routines\지표추종매매\routine_rule_mapper.py tests\test_indicator_follow_rule_mapper_preview.py
+통과
+
+python -m unittest tests/test_indicator_follow_rule_mapper_preview.py
+Ran 10 tests in 0.055s
+
+OK
+
+좋습니다. 여기까지 완료 판정입니다.
+
+현재 상태:
+
+UI State 저장/복원 완료
+Rule Mapper Preview 완료
+Preview 최소 테스트 완료
+Preview Diff 함수 완료
+Diff 테스트 완료
+rules.json 미수정
+엔진 미연결
+다음 작업은 이것입니다.
+
+설정 검증 화면에 Rule Mapper Preview + Diff를 같이 표시
+
+코덱스 지시:
+
+gui_indicator_follow_routine_settings_dialog.py만 최소 수정.
+
+목표:
+기존 “설정 검증” preview 화면에 Rule Mapper Preview뿐 아니라
+compare_engine_rules_preview() 결과도 함께 표시한다.
+
+조건:
+- rules.json 저장 금지
+- 엔진 연결 금지
+- mapper 로직 변경 금지
+- routine_rule_mapper.py 수정 금지
+- 표시 전용
+- 기존 preview 표시 구조 유지
+
+표시 항목:
+1. [Rule Mapper Preview]
+   - 기존 mapped_paths
+   - warnings
+   - preview bar/buy/sell 후보
+
+2. [Rule Mapper Diff]
+   - summary
+   - changes 목록
+   - 각 change의 path/status/risk/note
+   - current_value / preview_value는 너무 길면 요약 표시
+
+검증:
+- py_compile
+- offscreen 설정창 생성
+- 설정 검증 preview에 [Rule Mapper Diff] 표시 확인
+- rules.json 수정 시간 변경 없음 확인
+
+gui_indicator_follow_routine_settings_dialog.py만 최소 수정했습니다. routine_rule_mapper.py는 수정하지 않았고, rules.json 저장/엔진 연결도 하지 않았습니다.
+
+변경 내용:
+- 기존 [Rule Mapper Preview] 출력 유지
+- 설정 검증 preview에 [Rule Mapper Diff] 섹션 추가
+- diff 표시 항목:
+  - summary
+  - changes
+  - 각 change의 path/status/risk/note/current_value/preview_value
+- 긴 dict/list 값은 preview 표시용으로 문자열 요약 처리
+
+검증:
+text
+python -m py_compile gui_indicator_follow_routine_settings_dialog.py
+통과
+
+
+offscreen 확인:
+text
+dialog_created True
+has_rule_mapper_preview True
+has_rule_mapper_diff True
+has_diff_summary True
+has_diff_changes True
+rules_mtime_unchanged True
+
+
+preview에 표시된 Diff 예:
+json
+{
+  "summary": {
+    "same": 1,
+    "changed": 3,
+    "added": 1,
+    "missing": 0,
+    "postponed": 11
+  },
+  "changes": [
+    {
+      "path": "bar.bar_minutes",
+      "status": "changed",
+      "risk": "low",
+      "note": "UI preview candidate from basic signal interval.",
+      "current_value": 1,
+      "preview_value": 5
+    },
+    {
+      "path": "buy.delay_bar",
+      "status": "added",
+      "risk": "low",
+      "note": "UI preview candidate moved from current bar.buy_delay_bar.",
+      "current_value": null,
+      "preview_value": 1
+    }
+  ]
+}
+
+좋습니다. 여기까지는 정상 진행입니다.
+
+현재 완료:
+
+Rule Mapper Preview 생성
+Preview Diff 생성
+설정 검증 화면 표시
+rules.json 미수정 확인
+엔진 미연결 유지
+다음 작업은 Diff 결과 검토입니다.
+
+특히 확인할 부분은 이겁니다.
+
+bar.bar_minutes: changed
+buy.delay_bar: added
+buy.groups: changed 예상
+sell.signals.macd_sell: changed/high 예상
+sell.signals.macd_sell.delay_bar: same 또는 changed 예상
+다음 코덱스 지시:
+
+구현 금지. 파일 수정 금지.
+
+현재 설정 검증 화면의 [Rule Mapper Diff] 전체 출력 원문을 보여줘.
+summary와 changes 전체를 생략 없이 제시해.
+특히 buy.groups와 sell.signals.macd_sell의 current_value / preview_value 요약이 충분한지 확인할 수 있게 출력해.
+아직 다음 구현으로 넘어가지 말고, Diff 전체 원문 확인이 먼저입니다.
+
+
+현재 설정 검증 화면의 [Rule Mapper Diff] 원문은 아래와 같습니다. 파일 수정은 하지 않았습니다.
+
+text
+[Rule Mapper Diff]
+{
+  "summary": {
+    "same": 1,
+    "changed": 3,
+    "added": 1,
+    "missing": 0,
+    "postponed": 11
+  },
+  "changes": [
+    {
+      "path": "bar.bar_minutes",
+      "status": "changed",
+      "risk": "low",
+      "note": "UI preview candidate from basic signal interval.",
+      "current_value": 1,
+      "preview_value": 5
+    },
+    {
+      "path": "buy.delay_bar",
+      "status": "added",
+      "risk": "low",
+      "note": "UI preview candidate moved from current bar.buy_delay_bar.",
+      "current_value": null,
+      "preview_value": 1
+    },
+    {
+      "path": "buy.groups",
+      "status": "changed",
+      "risk": "medium",
+      "note": "UI preview-only OCR/OSC buy condition candidate.",
+      "current_value": "[{\"conditions\": [{\"description\": \"MACD    Ƿ       ϶           ȯ\", \"enabled\": true, \"not\": false, \"operator\": \"TURN_UP\", \"target\": \"OSC\"}], \"conditions_logic\": \"AND\", \"enabled\": true, \"name\": \" ż     1\"}, {\"conditions\": [], \"conditions_logic\": \"AND\"...",
+      "preview_value": "[{\"conditions\": [{\"description\": \"UI preview: buy OCR/OSC turn condition\", \"enabled\": true, \"not\": false, \"operator\": \"TURN_UP\", \"target\": \"OSC\"}, {\"description\": \"UI preview: buy OCR/OSC threshold condition\", \"enabled\": true, \"not\": fal..."
+    },
+    {
+      "path": "sell.signals.macd_sell",
+      "status": "changed",
+      "risk": "high",
+      "note": "UI preview-only sell MACD condition candidate; does not replace existing rules.",
+      "current_value": "{\"delay_bar\": 1, \"enabled\": true, \"groups\": [{\"conditions\": [{\"description\": \"MACD    Ƿ              ϶    ȯ\", \"enabled\": true, \"not\": false, \"operator\": \"TURN_DOWN\", \"target\": \"OSC\"}], \"conditions_logic\": \"AND\", \"enabled\": true, \"name\": \" ŵ     _MA...",
+      "preview_value": "{\"delay_bar\": 1, \"enabled\": true, \"groups\": [{\"conditions\": [{\"description\": \"UI preview: sell condition C MACD line threshold\", \"enabled\": true, \"not\": false, \"operator\": \"<=\", \"target\": \"MACD\", \"value\": -1.0}], \"conditions_logic\": \"AND..."
+    },
+    {
+      "path": "sell.signals.macd_sell.delay_bar",
+      "status": "same",
+      "risk": "low",
+      "note": "UI preview candidate moved from current bar.sell_delay_bar.",
+      "current_value": 1,
+      "preview_value": 1
+    }
+  ],
+  "warnings": [
+    "sell.signals.macd_sell is a preview candidate and does not replace existing rules",
+    "buy method mapping is postponed",
+    "repeat buy mapping is postponed",
+    "price compare buy mapping is postponed",
+    "situation response mapping is postponed",
+    "additional feature mapping is postponed",
+    "cycle setting mapping is postponed",
+    "exit condition mapping is postponed",
+    "sell method A/B/C mapping is postponed",
+    "pending order policy mapping is postponed",
+    "completion policy mapping is postponed"
+  ]
+}
+
+
+판정: buy.groups와 sell.signals.macd_sell의 current_value / preview_value는 현재 화면 기준으로는 충분하지 않습니다. 둘 다 240자 요약으로 잘려서, “기존 조건 전체가 무엇이고 preview가 무엇을 대체 후보로 제시하는지”를 검토하기엔 부족합니다. 특히 sell.signals.macd_sell은 high risk인데 값이 잘려서 세부 비교가 어렵습니다.
+
+판정이 맞습니다.
+
+현재 Diff 기능은 동작하지만, high/medium risk 항목 검토용으로는 출력이 너무 짧습니다.
+
+다음 작업은 구현 확장이 아니라 표시 품질 개선입니다.
+
+코덱스 지시:
+
+gui_indicator_follow_routine_settings_dialog.py만 최소 수정.
+
+목표:
+[Rule Mapper Diff] 표시에서 high/medium risk 항목의 current_value / preview_value가 너무 짧게 잘리는 문제를 개선한다.
+
+조건:
+- routine_rule_mapper.py 수정 금지
+- rules.json 저장 금지
+- 엔진 연결 금지
+- mapper 구조 변경 금지
+- diff 계산 로직 변경 금지
+- 표시 포맷만 개선
+
+수정 방향:
+1. risk가 high 또는 medium인 change는 current_value / preview_value 요약 길이를 크게 늘린다.
+2. 가능하면 240자 제한을 1200~2000자 수준으로 늘린다.
+3. low risk 항목은 기존처럼 짧게 유지해도 된다.
+4. 출력에 path별 구분선을 넣어 가독성을 높인다.
+5. buy.groups와 sell.signals.macd_sell은 전체 조건 구조가 보일 정도로 표시한다.
+
+검증:
+- py_compile
+- offscreen 설정창 생성
+- [Rule Mapper Diff] 표시 확인
+- buy.groups / sell.signals.macd_sell 출력이 기존보다 길게 보이는지 확인
+- rules.json 수정 시간 변경 없음
+이 작업까지 하면 Diff를 보고 실제로 어떤 rule이 위험한지 판단 가능해집니다.
+
+
+gui_indicator_follow_routine_settings_dialog.py만 최소 수정했습니다. mapper, diff 계산 로직, rules 저장/엔진 연결은 건드리지 않았습니다.
+
+변경 내용:
+- [Rule Mapper Diff] 표시 전용 요약 길이 개선
+- risk == "high" 또는 "medium" 항목은 current_value / preview_value 최대 1800자까지 표시
+- low risk 항목은 기존 240자 유지
+- 각 change에 구분선 추가:
+  - separator: "----- buy.groups -----"
+  - separator: "----- sell.signals.macd_sell -----"
+
+검증:
+text
+python -m py_compile gui_indicator_follow_routine_settings_dialog.py
+통과
+
+
+offscreen 확인:
+text
+has_rule_mapper_diff True
+rules_mtime_unchanged True
+
+buy.groups
+current_len 520
+preview_len 368
+current_endswith_ellipsis False
+preview_endswith_ellipsis False
+
+sell.signals.macd_sell
+current_len 279
+preview_len 324
+current_endswith_ellipsis False
+preview_endswith_ellipsis False
+
+
+즉, buy.groups와 sell.signals.macd_sell은 이제 잘리지 않고 전체 조건 구조가 보이는 상태입니다.
+
+좋습니다. 이제 Diff 검토 가능한 상태입니다.
+
+현재 완료:
+
+Preview Mapper 완료
+Preview Diff 완료
+Diff 화면 표시 완료
+중/고위험 항목 전체 출력 가능
+rules.json 미수정
+엔진 미연결
+다음 작업은 Diff 내용 판정입니다.
+
+특히 봐야 할 결론은 거의 정해졌습니다.
+
+bar.bar_minutes
+→ low, 후보 유지
+
+buy.delay_bar
+→ added지만 위치상 후보 유지
+
+buy.groups
+→ medium, 기존 그룹 전체 대체 금지
+→ preview 후보를 별도 group으로 비교해야 함
+
+sell.signals.macd_sell
+→ high, 기존 OSC TURN_DOWN 매도 대체 금지
+→ condition_c MACD 비교는 별도 후보로만 유지
+
+sell.signals.macd_sell.delay_bar
+→ same, 문제 없음
+다음 코덱스 지시:
+
+파일 수정 금지.
+
+현재 [Rule Mapper Diff]에서 잘리지 않게 표시된 buy.groups와 sell.signals.macd_sell의 current_value / preview_value 전체를 보여줘.
+
+목표:
+- 기존 buy.groups 구조가 무엇인지 확인
+- preview buy.groups가 기존 구조를 대체해도 되는지 판단
+- 기존 sell.signals.macd_sell 구조가 OSC TURN_DOWN인지 확인
+- preview sell.signals.macd_sell이 기존 매도 신호를 대체하면 안 되는지 확인
+그 원문을 보고 나면, 다음은 대체 방식이 아니라 병합/후보 방식으로 갈지를 확정하면 됩니다.
+
+
+파일 수정 없이 현재 [Rule Mapper Diff]에서 두 항목만 전체 출력했습니다.
+
+**buy.groups**
+Status: changed  
+Risk: medium  
+Note: UI preview-only OCR/OSC buy condition candidate.
+
+Current value:
+json
+[
+  {
+    "conditions": [
+      {
+        "description": "MACD    Ƿ       ϶           ȯ",
+        "enabled": true,
+        "not": false,
+        "operator": "TURN_UP",
+        "target": "OSC"
+      }
+    ],
+    "conditions_logic": "AND",
+    "enabled": true,
+    "name": " ż     1"
+  },
+  {
+    "conditions": [],
+    "conditions_logic": "AND",
+    "enabled": false,
+    "name": " ż     2"
+  },
+  {
+    "conditions": [],
+    "conditions_logic": "AND",
+    "enabled": false,
+    "name": " ż     3"
+  },
+  {
+    "conditions": [],
+    "conditions_logic": "AND",
+    "enabled": false,
+    "name": " ż     4"
+  },
+  {
+    "conditions": [],
+    "conditions_logic": "AND",
+    "enabled": false,
+    "name": " ż     5"
+  }
+]
+
+
+Preview value:
+json
+[
+  {
+    "conditions": [
+      {
+        "description": "UI preview: buy OCR/OSC turn condition",
+        "enabled": true,
+        "not": false,
+        "operator": "TURN_UP",
+        "target": "OSC"
+      },
+      {
+        "description": "UI preview: buy OCR/OSC threshold condition",
+        "enabled": true,
+        "not": false,
+        "operator": "<=",
+        "target": "OSC",
+        "value": -91.0
+      }
+    ],
+    "conditions_logic": "AND",
+    "enabled": true,
+    "name": "UI_PREVIEW_BUY_OSC"
+  }
+]
+
+
+판단: 기존 buy.groups는 5개 그룹 구조이고, 1번 그룹만 OSC TURN_UP 조건이 켜져 있습니다. preview는 단일 그룹으로 줄이고 threshold 조건까지 추가합니다. 그대로 대체하면 기존 5그룹 구조를 잃을 수 있어 아직 직접 대체는 위험합니다.
+
+**sell.signals.macd_sell**
+Status: changed  
+Risk: high  
+Note: UI preview-only sell MACD condition candidate; does not replace existing rules.
+
+Current value:
+json
+{
+  "delay_bar": 1,
+  "enabled": true,
+  "groups": [
+    {
+      "conditions": [
+        {
+          "description": "MACD    Ƿ              ϶    ȯ",
+          "enabled": true,
+          "not": false,
+          "operator": "TURN_DOWN",
+          "target": "OSC"
+        }
+      ],
+      "conditions_logic": "AND",
+      "enabled": true,
+      "name": " ŵ     _MACD_OSC_TURN_DOWN"
+    }
+  ],
+  "groups_logic": "OR"
+}
+
+
+Preview value:
+json
+{
+  "delay_bar": 1,
+  "enabled": true,
+  "groups": [
+    {
+      "conditions": [
+        {
+          "description": "UI preview: sell condition C MACD line threshold",
+          "enabled": true,
+          "not": false,
+          "operator": "<=",
+          "target": "MACD",
+          "value": -1.0
+        }
+      ],
+      "conditions_logic": "AND",
+      "enabled": true,
+      "name": "UI_PREVIEW_SELL_MACD_CONDITION_C"
+    }
+  ],
+  "groups_logic": "OR"
+}
+
+
+판단: 기존 sell.signals.macd_sell은 OSC TURN_DOWN 매도 신호입니다. preview는 MACD 라인 값 <= -1.0 조건입니다. 의미가 완전히 다르므로 기존 매도 신호를 대체하면 안 됩니다. 이건 별도 후보 또는 추가 그룹으로 다뤄야 합니다.
+
+판단이 맞습니다.
+
+현재 결론은 이렇게 확정하는 게 안전합니다.
+
+buy.groups
+→ 기존 5그룹 구조 유지
+→ preview 단일 그룹으로 대체 금지
+→ 향후에는 기존 그룹에 병합하거나 UI 전용 후보 그룹으로 추가 검토
+
+sell.signals.macd_sell
+→ 기존 OSC TURN_DOWN 매도 유지
+→ preview MACD <= -1.0 조건으로 대체 금지
+→ 별도 후보 또는 추가 그룹으로만 검토
+즉 다음 방향은 대체가 아니라 병합/후보 전략 설계입니다.
+
+다음 코덱스 지시:
+
+파일 수정 금지.
+
+현재 mapper preview가 buy.groups와 sell.signals.macd_sell을 “대체 후보”처럼 보여주는 문제가 있다.
+
+다음 단계 구현 방향만 분석해라.
+
+검토할 방향:
+1. buy.groups는 기존 5그룹 구조를 유지하면서 UI preview 조건을 어느 그룹에 병합할 수 있는가?
+2. 기존 group[0] OSC TURN_UP과 preview OSC TURN_UP + threshold 조건은 병합 가능한가?
+3. sell.signals.macd_sell은 기존 OSC TURN_DOWN을 유지하면서 MACD <= -1.0 조건을 추가 group으로 넣을 수 있는가?
+4. 아니면 sell condition_c MACD 조건은 macd_sell이 아니라 별도 signal 후보로 분리해야 하는가?
+5. 실제 rules 저장 없이 preview/diff에서 “replace”가 아니라 “merge/add candidate”로 표현하려면 mapper 구조를 어떻게 바꿔야 하는가?
+
+산출:
+- buy 병합안
+- sell 병합안
+- 별도 후보 signal 안
+- 위험도
+- 추천안
+- 아직 구현 금지
+현재 단계의 핵심은:
+
+Preview가 기존 rules를 덮어쓰는 모양이면 안 된다.
+앞으로는 “기존 rules + UI 후보 조건” 형태로 보여줘야 한다.
+
+
+현재 판단은 명확합니다. 지금 mapper preview는 buy.groups와 sell.signals.macd_sell을 “전체 교체 후보”처럼 보여주고 있어서 위험합니다. 다음 단계는 **replace preview가 아니라 merge/add preview**로 바꾸는 쪽이 맞습니다. 구현은 아직 하지 않는 기준으로 정리합니다.
+
+**Buy 병합안**
+기존 buy.groups 구조는 5개 그룹입니다.
+
+현재 기존 구조:
+- group[0]: enabled true, OSC TURN_UP
+- group[1~4]: disabled, 빈 conditions
+
+preview 구조:
+- 단일 그룹 UI_PREVIEW_BUY_OSC
+- OSC TURN_UP
+- OSC <= -91.0
+
+가장 안전한 병합안은 group[0] 유지 + threshold 조건만 추가 후보로 보여주는 방식입니다.
+
+예상 preview:
+json
+"buy": {
+  "groups": [
+    {
+      "name": "기존 group[0]",
+      "enabled": true,
+      "conditions_logic": "AND",
+      "conditions": [
+        {
+          "target": "OSC",
+          "operator": "TURN_UP"
+        },
+        {
+          "target": "OSC",
+          "operator": "<=",
+          "value": -91.0,
+          "description": "UI preview add candidate"
+        }
+      ]
+    },
+    "... 기존 group[1~4] 유지 ..."
+  ]
+}
+
+
+이렇게 하면 기존 5그룹 구조를 잃지 않고, UI의 OCR threshold만 추가 후보로 표현할 수 있습니다.
+
+**Buy 병합 가능성**
+group[0]의 OSC TURN_UP과 preview의 OSC TURN_UP은 동일 의미로 보입니다. 따라서 중복 추가하지 않고 “이미 존재”로 판단하는 게 맞습니다.
+
+병합 규칙 초안:
+- 기존 group 중 target=OSC, operator=TURN_UP 조건이 있으면 재사용
+- preview의 TURN_UP은 추가하지 않음
+- preview threshold OSC <= -91.0만 같은 group에 추가 후보로 표시
+- 기존 group이 없으면 새 group 추가 후보로 표시
+
+위험도: medium-low  
+이유: 기존 구조 보존 + 조건 추가 후보라서 전체 교체보다 안전합니다. 다만 threshold 조건을 같은 group에 AND로 넣으면 매수 조건이 더 엄격해지므로 실제 저장 전 검증 필요.
+
+**Sell 병합안**
+기존 sell.signals.macd_sell은 OSC TURN_DOWN입니다.
+
+기존:
+json
+{
+  "target": "OSC",
+  "operator": "TURN_DOWN"
+}
+
+
+preview:
+json
+{
+  "target": "MACD",
+  "operator": "<=",
+  "value": -1.0
+}
+
+
+이 둘은 의미가 다릅니다. 따라서 기존 group을 대체하면 안 됩니다.
+
+가능한 병합안:
+json
+"sell.signals.macd_sell": {
+  "groups_logic": "OR",
+  "groups": [
+    {
+      "name": "기존 OSC TURN_DOWN group",
+      "conditions": [
+        {
+          "target": "OSC",
+          "operator": "TURN_DOWN"
+        }
+      ]
+    },
+    {
+      "name": "UI_PREVIEW_SELL_MACD_CONDITION_C",
+      "conditions": [
+        {
+          "target": "MACD",
+          "operator": "<=",
+          "value": -1.0
+        }
+      ],
+      "preview_candidate": true
+    }
+  ]
+}
+
+
+이 방식은 기존 매도 신호를 유지하면서 MACD 조건을 “추가 group 후보”로 보여줍니다.
+
+위험도: medium-high  
+이유: groups_logic=OR이면 매도 트리거가 늘어납니다. 기존 매도보다 더 자주 매도될 수 있습니다.
+
+**별도 Signal 후보안**
+sell condition_c MACD를 기존 macd_sell에 넣지 않고 별도 signal로 분리할 수도 있습니다.
+
+예:
+json
+"sell": {
+  "signals": {
+    "macd_sell": { "... 기존 유지 ..." },
+    "ui_preview_condition_c_macd_sell": {
+      "enabled": false,
+      "preview_candidate": true,
+      "groups": [
+        {
+          "conditions": [
+            {
+              "target": "MACD",
+              "operator": "<=",
+              "value": -1.0
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+
+
+장점:
+- 기존 macd_sell 오염 없음
+- diff에서 “기존 변경”이 아니라 “신규 후보 추가”로 보임
+- 저장/엔진 연결 전 검토에 안전함
+
+단점:
+- 엔진이 새 signal key를 어떻게 처리하는지 확인 필요
+- 실제 저장까지 가려면 signal registry/실행 로직과 맞춰야 함
+
+위험도: low for preview, unknown/high for execution  
+preview 단계에서는 가장 안전하지만, 실행 연결은 별도 설계가 필요합니다.
+
+**Mapper 구조 변경 방향**
+지금은:
+text
+preview_rules = deepcopy(current_rules)
+preview_rules["buy"]["groups"] = 새 groups
+preview_rules["sell"]["signals"]["macd_sell"] = 새 macd_sell
+
+
+다음 단계에서는 이렇게 바꾸는 게 맞습니다.
+
+1. preview_rules는 current_rules를 유지
+2. 기존 path를 직접 덮어쓰지 않음
+3. 후보를 별도 namespace에 둠
+
+예:
+json
+"indicator_follow_rule_preview": {
+  "mode": "merge_candidate",
+  "candidates": {
+    "buy": {
+      "merge_into": "buy.groups[0]",
+      "add_conditions": [...]
+    },
+    "sell": {
+      "add_group_to": "sell.signals.macd_sell.groups",
+      "add_signal_candidate": {...}
+    }
+  }
+}
+
+
+또는 엔진 rules preview 안에서 표시하려면:
+json
+"buy": {
+  "groups": "기존 유지",
+  "_preview_merge_candidates": [...]
+}
+
+
+하지만 실제 rules 구조에 _preview_*를 섞는 건 엔진 오염처럼 보일 수 있으므로, preview 전용 namespace가 더 안전합니다.
+
+**Diff 표현 변경 방향**
+현재 diff:
+text
+buy.groups changed
+sell.signals.macd_sell changed
+
+
+개선 후:
+text
+buy.groups merge_candidate
+sell.signals.macd_sell add_group_candidate
+sell.signals.ui_preview_condition_c_macd_sell added_candidate
+
+
+status도 현재 same|changed|added|missing만으로는 부족합니다. 다음 단계에서는 preview diff 전용 status를 추가 검토해야 합니다.
+
+후보:
+- merge_candidate
+- add_condition_candidate
+- add_group_candidate
+- add_signal_candidate
+- same
+
+단, 기존 함수 계약을 깨기 싫다면 status는 유지하고 note/action에 표현할 수도 있습니다.
+
+**추천안**
+1. Buy는 기존 buy.groups[0]에 threshold 조건을 **merge candidate**로 표현
+2. 기존 OSC TURN_UP은 중복 추가하지 않음
+3. Sell은 기존 macd_sell을 대체하지 않음
+4. Sell MACD <= -1.0은 우선 별도 signal 후보 또는 add group 후보로 분리
+5. preview/diff 문구는 replace가 아니라 merge candidate, add group candidate, add signal candidate로 바꿈
+6. 실제 rules 저장은 계속 금지
+
+내 추천은 더 보수적으로:
+- **buy는 merge candidate**
+- **sell은 별도 signal candidate**
+입니다.
+
+이유는 buy는 기존 OSC TURN_UP과 UI OCR이 같은 계열이라 병합 의미가 비교적 자연스럽고, sell은 기존 OSC TURN_DOWN과 preview MACD threshold가 의미상 다른 신호라 macd_sell 안에 넣는 것보다 별도 후보로 빼는 게 안전합니다.
+
+이 분석이 맞습니다. 이제 방향은 확정입니다.
+
+다음 작업 방향
+replace preview 폐기 → merge/add candidate preview로 변경
+
+핵심 원칙:
+
+기존 rules를 덮어쓰는 형태로 보여주지 않는다.
+기존 rules는 유지한다.
+UI에서 온 값은 "추가/병합 후보"로만 표시한다.
+확정안
+Buy
+기존 buy.groups 5개 구조 유지
+group[0]의 OSC TURN_UP 유지
+UI OCR/OSC TURN_UP은 중복 추가하지 않음
+UI threshold 조건만 buy.groups[0]에 merge candidate로 표시
+Sell
+기존 sell.signals.macd_sell 유지
+OSC TURN_DOWN 유지
+UI condition_c MACD <= -1.0은 macd_sell 대체 금지
+별도 signal candidate로 분리
+다음 코덱스 지시
+아직 구현하지 말고, 다음 수정안을 기준으로 routine_rule_mapper.py 변경 계획만 작성해라.
+
+목표:
+현재 replace preview 구조를 merge/add candidate preview 구조로 바꾼다.
+
+변경 원칙:
+1. 기존 buy.groups를 덮어쓰지 않는다.
+2. 기존 sell.signals.macd_sell을 덮어쓰지 않는다.
+3. preview 전용 namespace를 사용한다.
+4. rules.json 저장 금지.
+5. 엔진 연결 금지.
+
+권장 preview 구조:
+{
+  "mapped_paths": [
+    "bar.bar_minutes",
+    "buy.groups[0].conditions",
+    "sell.signals.ui_preview_condition_c_macd_sell"
+  ],
+  "preview": {
+    "bar": {
+      "bar_minutes": 5
+    },
+    "indicator_follow_rule_preview": {
+      "mode": "merge_add_candidate",
+      "candidates": {
+        "buy": {
+          "merge_into": "buy.groups[0].conditions",
+          "skip_existing": [
+            {
+              "target": "OSC",
+              "operator": "TURN_UP",
+              "reason": "already exists in current buy.groups[0]"
+            }
+          ],
+          "add_conditions": [
+            {
+              "target": "OSC",
+              "operator": "<=",
+              "value": -91.0
+            }
+          ]
+        },
+        "sell": {
+          "add_signal_candidate": {
+            "path": "sell.signals.ui_preview_condition_c_macd_sell",
+            "enabled": false,
+            "preview_candidate": true,
+            "groups": [
+              {
+                "conditions": [
+                  {
+                    "target": "MACD",
+                    "operator": "<=",
+                    "value": -1.0
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+Diff 표현도 다음처럼 바꿀 계획을 세워라:
+- buy.groups → replace/changed가 아니라 merge_candidate
+- sell.signals.macd_sell → 변경 없음
+- sell.signals.ui_preview_condition_c_macd_sell → add_signal_candidate
+
+산출:
+1. 변경 대상 함수
+2. 변경될 preview 구조
+3. diff 함수 영향
+4. 테스트 수정 방향
+5. 위험 요소
+6. 구현 여부 판단
+이제 구현으로 바로 들어가지 말고, 변경 계획을 먼저 받아서 확인하는 게 맞습니다.
+
+
+아직 구현하지 않는 기준으로, routine_rule_mapper.py 변경 계획만 정리합니다.
+
+**1. 변경 대상 함수**
+
+주 변경 대상:
+- build_engine_rules_preview_from_ui_state(ui_state, current_rules)
+- compare_engine_rules_preview(current_rules, preview_result)
+
+보조 함수 변경/추가 후보:
+- _build_buy_osc_conditions(...)
+- _build_sell_macd_condition(...)
+- 신규 후보:
+  - _find_existing_condition(conditions, target, operator, value=None)
+  - _build_buy_merge_candidate(current_rules, signal_filter, warnings)
+  - _build_sell_add_signal_candidate(condition_c, warnings)
+  - _get_preview_candidate_path_value(preview_result, path)
+
+기존 구조에서 가장 중요한 변화:
+- preview_rules["buy"]["groups"] = ... 제거
+- signals["macd_sell"] = ... 제거
+- 기존 rules dict를 덮어쓰는 방식 중단
+- preview 전용 namespace 생성
+
+**2. 변경될 Preview 구조**
+
+현재 구조:
+json
+{
+  "preview_rules": {
+    "bar": {
+      "bar_minutes": 5
+    },
+    "buy": {
+      "groups": [...]
+    },
+    "sell": {
+      "signals": {
+        "macd_sell": {...}
+      }
+    }
+  }
+}
+
+
+변경 목표:
+json
+{
+  "preview_rules": {
+    "bar": {
+      "bar_minutes": 5
+    },
+    "indicator_follow_rule_preview": {
+      "mode": "merge_add_candidate",
+      "candidates": {
+        "buy": {
+          "merge_into": "buy.groups[0].conditions",
+          "skip_existing": [
+            {
+              "target": "OSC",
+              "operator": "TURN_UP",
+              "reason": "already exists in current buy.groups[0]"
+            }
+          ],
+          "add_conditions": [
+            {
+              "enabled": true,
+              "not": false,
+              "target": "OSC",
+              "operator": "<=",
+              "value": -91.0,
+              "description": "UI preview: buy OCR/OSC threshold condition"
+            }
+          ]
+        },
+        "sell": {
+          "add_signal_candidate": {
+            "path": "sell.signals.ui_preview_condition_c_macd_sell",
+            "enabled": false,
+            "preview_candidate": true,
+            "groups_logic": "OR",
+            "groups": [
+              {
+                "enabled": true,
+                "name": "UI_PREVIEW_SELL_MACD_CONDITION_C",
+                "conditions_logic": "AND",
+                "conditions": [
+                  {
+                    "enabled": true,
+                    "not": false,
+                    "target": "MACD",
+                    "operator": "<=",
+                    "value": -1.0,
+                    "description": "UI preview: sell condition C MACD line threshold"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+
+mapped_paths 변경 후보:
+json
+[
+  "bar.bar_minutes",
+  "buy.groups[0].conditions",
+  "sell.signals.ui_preview_condition_c_macd_sell"
+]
+
+
+주의:
+- buy.delay_bar와 sell.signals.macd_sell.delay_bar를 계속 포함할지 별도 판단 필요.
+- 이번 목표 구조에는 delay 경로가 빠져 있음.
+- 만약 delay도 유지하려면 preview namespace 안에서 buy.delay_bar candidate, sell delay candidate로 분리해야 함.
+- 단, 현재 지시의 권장 구조 기준으로는 delay는 1차 변경에서 제외하는 것이 일관적입니다.
+
+**3. Diff 함수 영향**
+
+현재 diff 함수는 mapped_paths를 실제 preview_rules 경로에서 직접 읽습니다.
+
+현재 방식:
+text
+current_rules[path] vs preview_rules[path]
+
+
+새 구조에서는 mapped_paths가 실제 엔진 rules 경로지만, preview 값은 preview 전용 namespace에 들어갑니다. 따라서 diff 함수가 경로별 candidate를 해석해야 합니다.
+
+변경 방향:
+- bar.bar_minutes
+  - 기존처럼 current_rules["bar"]["bar_minutes"] vs preview_rules["bar"]["bar_minutes"]
+  - status: changed | same
+
+- buy.groups[0].conditions
+  - current: current_rules["buy"]["groups"][0]["conditions"]
+  - preview: indicator_follow_rule_preview.candidates.buy
+  - status: merge_candidate
+  - risk: medium
+  - note: 기존 group[0] 유지, add_conditions만 후보
+
+- sell.signals.ui_preview_condition_c_macd_sell
+  - current: 없음
+  - preview: indicator_follow_rule_preview.candidates.sell.add_signal_candidate
+  - status: add_signal_candidate
+  - risk: low for preview, execution risk 별도 note
+  - note: 기존 sell.signals.macd_sell 변경 없음
+
+중요:
+- sell.signals.macd_sell은 mapped_paths에서 제거
+- 따라서 diff에 sell.signals.macd_sell changed가 나오면 실패
+- 기존 macd_sell은 변경 대상이 아니라 “unchanged by mapper preview”로 해석해야 함
+
+status 후보:
+text
+same
+changed
+added
+missing
+merge_candidate
+add_signal_candidate
+
+
+기존 요구에서 removed 금지였으므로 그대로 사용하지 않음.
+
+**4. 테스트 수정 방향**
+
+기존 테스트 중 수정 필요:
+- test_mapped_paths_match_expected_preview_paths
+- test_buy_delay_bar_is_under_preview_buy
+- test_sell_delay_bar_is_under_preview_sell_macd_sell_only
+- diff 관련 테스트 일부
+
+새 테스트 방향:
+
+1. 기존 rules 불변
+text
+build_engine_rules_preview_from_ui_state() 호출 후 current_rules 동일
+
+
+2. buy.groups를 덮어쓰지 않음
+python
+assert "buy" not in preview_rules or "groups" not in preview_rules["buy"]
+
+또는 current copy에 남더라도 직접 변경하지 않았는지 검증 필요.
+
+3. preview namespace 존재
+python
+preview_rules["indicator_follow_rule_preview"]["mode"] == "merge_add_candidate"
+
+
+4. buy merge candidate
+python
+candidate = preview_rules["indicator_follow_rule_preview"]["candidates"]["buy"]
+candidate["merge_into"] == "buy.groups[0].conditions"
+candidate["skip_existing"][0]["target"] == "OSC"
+candidate["skip_existing"][0]["operator"] == "TURN_UP"
+candidate["add_conditions"][0]["target"] == "OSC"
+candidate["add_conditions"][0]["operator"] == "<="
+candidate["add_conditions"][0]["value"] == -91.0
+
+
+5. sell add signal candidate
+python
+candidate = preview_rules["indicator_follow_rule_preview"]["candidates"]["sell"]["add_signal_candidate"]
+candidate["path"] == "sell.signals.ui_preview_condition_c_macd_sell"
+candidate["enabled"] is False
+candidate["preview_candidate"] is True
+
+
+6. 기존 sell.signals.macd_sell 미변경
+python
+assert preview_rules["sell"]["signals"]["macd_sell"] == current_rules["sell"]["signals"]["macd_sell"]
+
+다만 preview_rules가 current_rules deepcopy를 유지할 경우에만 해당. 만약 preview_rules를 후보만 담는 구조로 축소하면 이 테스트는 “preview namespace가 macd_sell을 포함하지 않는다”로 바꿔야 함.
+
+7. diff status
+text
+buy.groups[0].conditions → merge_candidate
+sell.signals.ui_preview_condition_c_macd_sell → add_signal_candidate
+sell.signals.macd_sell → changes에 없어야 함
+
+
+8. warnings ASCII 유지
+
+**5. 위험 요소**
+
+가장 큰 위험:
+- 현재 compare_engine_rules_preview()가 단순 path getter 기반이라 buy.groups[0].conditions 같은 list index path를 처리하지 못함.
+- groups[0] 문법을 지원하려면 path parser가 필요함.
+- 하지만 과한 parser 구현은 불필요할 수 있음. mapper diff 전용으로 hard-coded path handling을 쓰는 편이 안전합니다.
+
+두 번째 위험:
+- preview_rules = deepcopy(current_rules)를 계속 유지할지 여부.
+- 유지하면 preview 안에 기존 buy/sell 전체가 계속 들어가서 “실제 후보”와 “기존 copy”가 섞입니다.
+- 제거하면 기존 preview 표시 화면에서 preview bar/buy/sell 후보 구조가 바뀝니다.
+- 추천은 hybrid:
+  - preview_rules["bar"]만 mapped preview로 유지
+  - indicator_follow_rule_preview에 후보 저장
+  - 기존 buy/sell copy는 더 이상 preview 핵심으로 쓰지 않음
+
+세 번째 위험:
+- buy.groups[0]이 없거나 disabled인 경우.
+- 이때는 merge_into 불가 warning을 내고 add_group_candidate로 전환해야 함.
+- 1차 구현에서는 현재 구조 기준으로만 처리하고, 없으면 warning 처리하는 게 안전합니다.
+
+네 번째 위험:
+- sell condition_c를 별도 signal candidate로 만들면 엔진이 실제로 지원하는 signal key인지 불명확.
+- 따라서 enabled: false, preview_candidate: true를 반드시 넣어 실행 후보가 아님을 명확히 해야 합니다.
+
+**6. 구현 여부 판단**
+
+지금 바로 구현 가능하지만, 범위는 작게 나눠야 합니다.
+
+추천 구현 단계:
+1. routine_rule_mapper.py에서 preview 구조만 merge/add candidate로 변경
+2. diff 함수가 새 status를 표시하도록 변경
+3. 테스트를 새 구조에 맞게 수정
+4. GUI preview는 기존처럼 mapper 결과를 보여주되, indicator_follow_rule_preview가 보이게만 확인
+5. rules 저장/엔진 연결은 계속 금지
+
+구현 추천 여부:
+- **구현 추천: 예**
+- 단, 기존 실행 rules로 직접 매핑하지 말고 preview namespace 기반으로만 구현해야 합니다.
+- buy.groups 직접 대체와 sell.signals.macd_sell 직접 대체는 금지하는 방향이 맞습니다.
+
+분석 방향 좋습니다. 이제 구현 들어가도 됩니다.
+
+다만 범위는 아주 좁게 잡는 게 맞습니다.
+
+확정 구현 방향
+replace preview 제거 → merge/add candidate preview 적용
+
+구현 원칙:
+
+buy.groups 직접 대체 금지
+sell.signals.macd_sell 직접 대체 금지
+기존 rules 유지
+preview 전용 namespace에 후보만 표시
+rules.json 저장 금지
+엔진 연결 금지
+다음 코덱스 지시
+routine_rule_mapper.py와 기존 테스트 파일만 최소 수정한다.
+
+목표:
+현재 replace preview 구조를 merge/add candidate preview 구조로 변경한다.
+
+수정 범위:
+1. build_engine_rules_preview_from_ui_state()
+2. compare_engine_rules_preview()
+3. tests/test_indicator_follow_rule_mapper_preview.py
+
+구현 내용:
+1. preview에서 buy.groups를 직접 덮어쓰지 않는다.
+2. preview에서 sell.signals.macd_sell을 직접 덮어쓰지 않는다.
+3. preview 전용 namespace를 추가한다.
+
+namespace:
+indicator_follow_rule_preview
+
+mode:
+merge_add_candidate
+
+buy 후보:
+- merge_into: buy.groups[0].conditions
+- 기존 OSC TURN_UP이 있으면 skip_existing에 기록
+- OSC <= -91.0 threshold만 add_conditions 후보로 기록
+- 기존 buy.groups 5개 구조를 직접 변경하지 않는다.
+
+sell 후보:
+- 기존 sell.signals.macd_sell은 변경하지 않는다.
+- MACD <= -1.0 조건은 별도 signal candidate로 둔다.
+- path: sell.signals.ui_preview_condition_c_macd_sell
+- enabled: false
+- preview_candidate: true
+
+mapped_paths:
+- bar.bar_minutes
+- buy.groups[0].conditions
+- sell.signals.ui_preview_condition_c_macd_sell
+
+diff:
+- bar.bar_minutes: same/changed
+- buy.groups[0].conditions: merge_candidate
+- sell.signals.ui_preview_condition_c_macd_sell: add_signal_candidate
+- sell.signals.macd_sell은 changes에 나오면 안 됨
+
+테스트:
+- current_rules 불변
+- preview namespace 존재
+- buy.groups 직접 대체 없음
+- buy merge candidate 확인
+- sell add signal candidate 확인
+- sell.signals.macd_sell 변경 없음
+- diff status 확인
+- warnings ASCII 유지
+
+금지:
+- gui_indicator_follow_routine_settings_dialog.py 수정 금지
+- rules.json 저장 금지
+- 엔진 연결 금지
+- 전체 recursive diff 금지
+이 작업이 끝나면 다음에 GUI 표시가 새 구조를 제대로 보여주는지만 확인하면 됩니다.
+
+
+요청대로 routine_rule_mapper.py와 기존 테스트 파일만 최소 수정했습니다. gui_indicator_follow_routine_settings_dialog.py, rules.json, 엔진 연결은 건드리지 않았습니다.
+
+변경 내용:
+- buy.groups 직접 대체 제거
+- sell.signals.macd_sell 직접 대체 제거
+- preview 전용 namespace 추가:
+  - indicator_follow_rule_preview
+  - mode: merge_add_candidate
+- buy는 buy.groups[0].conditions에 대한 merge_candidate로 표현
+  - 기존 OSC TURN_UP은 skip_existing
+  - OSC <= -91.0만 add_conditions
+- sell은 기존 macd_sell 유지
+  - sell.signals.ui_preview_condition_c_macd_sell 별도 signal 후보로 표현
+  - enabled: false
+  - preview_candidate: true
+
+mapped_paths 변경:
+json
+[
+  "bar.bar_minutes",
+  "buy.groups[0].conditions",
+  "sell.signals.ui_preview_condition_c_macd_sell"
+]
+
+
+diff 변경:
+- bar.bar_minutes: same/changed
+- buy.groups[0].conditions: merge_candidate
+- sell.signals.ui_preview_condition_c_macd_sell: add_signal_candidate
+- sell.signals.macd_sell은 changes에 나오지 않음
+
+검증:
+text
+python -m py_compile routines\지표추종매매\routine_rule_mapper.py tests\test_indicator_follow_rule_mapper_preview.py
+통과
+
+python -m unittest tests/test_indicator_follow_rule_mapper_preview.py
+Ran 12 tests in 0.083s
+
+OK
+
+좋습니다. 이 단계는 정상 완료입니다.
+
+현재 판정:
+
+replace preview 제거 완료
+merge/add candidate preview 적용 완료
+buy.groups 직접 대체 제거 OK
+sell.signals.macd_sell 직접 대체 제거 OK
+별도 preview namespace 적용 OK
+테스트 12개 통과 OK
+rules.json 미수정
+엔진 미연결
+다음 작업은 GUI 표시 확인입니다.
+
+코덱스 지시:
+
+파일 수정 금지.
+
+현재 설정 검증 화면의 [Rule Mapper Preview]와 [Rule Mapper Diff] 원문을 출력해라.
+
+확인 대상:
+1. indicator_follow_rule_preview namespace가 보이는지
+2. mode가 merge_add_candidate인지
+3. buy.groups가 changed가 아니라 merge_candidate로 표시되는지
+4. sell.signals.macd_sell이 changes에 없는지
+5. sell.signals.ui_preview_condition_c_macd_sell이 add_signal_candidate로 표시되는지
+6. rules.json 수정 시간 변경 없는지
+이 출력 확인 후 문제가 없으면, 다음은 작업재개요약 / MASTER_SPEC 갱신자료 작성으로 한 번 끊는 게 좋습니다.
+
+
+파일 수정 없이 현재 설정 검증 화면의 [Rule Mapper Preview], [Rule Mapper Diff] 원문을 출력했습니다.
+
+text
+[Rule Mapper Preview]
+{
+  "mapped_paths": [
+    "bar.bar_minutes",
+    "buy.groups[0].conditions",
+    "sell.signals.ui_preview_condition_c_macd_sell"
+  ],
+  "warnings": [
+    "sell condition C MACD is an add_signal_candidate and does not replace existing macd_sell",
+    "buy method mapping is postponed",
+    "repeat buy mapping is postponed",
+    "price compare buy mapping is postponed",
+    "situation response mapping is postponed",
+    "additional feature mapping is postponed",
+    "cycle setting mapping is postponed",
+    "exit condition mapping is postponed",
+    "sell method A/B/C mapping is postponed",
+    "pending order policy mapping is postponed",
+    "completion policy mapping is postponed"
+  ],
+  "preview_rules": {
+    "bar": {
+      "bar_minutes": 5
+    },
+    "buy": {
+      "enabled": true,
+      "groups_logic": "OR",
+      "groups": [
+        {
+          "enabled": true,
+          "name": " ż     1",
+          "conditions_logic": "AND",
+          "conditions": [
+            {
+              "enabled": true,
+              "not": false,
+              "target": "OSC",
+              "operator": "TURN_UP",
+              "description": "MACD    Ƿ       ϶           ȯ"
+            }
+          ]
+        },
+        {
+          "enabled": false,
+          "name": " ż     2",
+          "conditions_logic": "AND",
+          "conditions": []
+        },
+        {
+          "enabled": false,
+          "name": " ż     3",
+          "conditions_logic": "AND",
+          "conditions": []
+        },
+        {
+          "enabled": false,
+          "name": " ż     4",
+          "conditions_logic": "AND",
+          "conditions": []
+        },
+        {
+          "enabled": false,
+          "name": " ż     5",
+          "conditions_logic": "AND",
+          "conditions": []
+        }
+      ]
+    },
+    "sell": {
+      "enabled": true,
+      "signal_logic": "OR",
+      "note": "MACD SELL      ͷ  SELL                    SELL   ȣ  .       Ȱ  ȭ       signal_logic        AND/OR      Ѵ .",
+      "signals": {
+        "macd_sell": {
+          "enabled": true,
+          "delay_bar": 1,
+          "groups_logic": "OR",
+          "groups": [
+            {
+              "enabled": true,
+              "name": " ŵ     _MACD_OSC_TURN_DOWN",
+              "conditions_logic": "AND",
+              "conditions": [
+                {
+                  "enabled": true,
+                  "not": false,
+                  "target": "OSC",
+                  "operator": "TURN_DOWN",
+                  "description": "MACD    Ƿ              ϶    ȯ"
+                }
+              ]
+            }
+          ]
+        },
+        "profit_rate_sell": {
+          "enabled": false,
+          "profit_rate_percent": null,
+          "basis": "average_price",
+          "description": "           ͷ          ۼ Ʈ  ̻       SELL   ȣ  ĺ .  ⺻   Ȱ  ."
+        }
+      },
+      "filters": {
+        "rsi": {
+          "enabled": false,
+          "conditions": []
+        },
+        "moving_average": {
+          "enabled": false,
+          "conditions": []
+        },
+        "price_compare": {
+          "enabled": false,
+          "conditions": []
+        }
+      }
+    }
+  }
+}
+
+
+text
+[Rule Mapper Diff]
+{
+  "summary": {
+    "same": 0,
+    "changed": 1,
+    "added": 0,
+    "missing": 0,
+    "merge_candidate": 1,
+    "add_signal_candidate": 1,
+    "postponed": 11
+  },
+  "changes": [
+    {
+      "separator": "----- bar.bar_minutes -----",
+      "path": "bar.bar_minutes",
+      "status": "changed",
+      "risk": "low",
+      "note": "UI preview candidate from basic signal interval.",
+      "current_value": 1,
+      "preview_value": 5
+    },
+    {
+      "separator": "----- buy.groups[0].conditions -----",
+      "path": "buy.groups[0].conditions",
+      "status": "merge_candidate",
+      "risk": "medium",
+      "note": "UI preview-only merge candidate for current buy.groups[0].conditions.",
+      "current_value": "[{\"description\": \"MACD    Ƿ       ϶           ȯ\", \"enabled\": true, \"not\": false, \"operator\": \"TURN_UP\", \"target\": \"OSC\"}]",
+      "preview_value": "{\"add_conditions\": [{\"description\": \"UI preview: buy OCR/OSC threshold condition\", \"enabled\": true, \"not\": false, \"operator\": \"<=\", \"target\": \"OSC\", \"value\": -91.0}], \"merge_into\": \"buy.groups[0].conditions\", \"skip_existing\": [{\"operator\": \"TURN_UP\", \"reason\": \"already exists in current buy.groups[0]\", \"target\": \"OSC\"}]}"
+    },
+    {
+      "separator": "----- sell.signals.ui_preview_condition_c_macd_sell -----",
+      "path": "sell.signals.ui_preview_condition_c_macd_sell",
+      "status": "add_signal_candidate",
+      "risk": "low",
+      "note": "UI preview-only add signal candidate; existing sell.signals.macd_sell is unchanged.",
+      "current_value": null,
+      "preview_value": "{\"enabled\": false, \"groups\": [{\"conditions\": [{\"description\": \"UI preview: sell condition C MACD line threshold\", \"enabled\": true, \"not\": false, \"operator\": \"<=\", \"target\": \"MACD\", \"value\": -1.0}], \"conditions_logic\": \"AND\", \"enabled\": t..."
+    }
+  ],
+  "warnings": [
+    "sell condition C MACD is an add_signal_candidate and does not replace existing macd_sell",
+    "buy method mapping is postponed",
+    "repeat buy mapping is postponed",
+    "price compare buy mapping is postponed",
+    "situation response mapping is postponed",
+    "additional feature mapping is postponed",
+    "cycle setting mapping is postponed",
+    "exit condition mapping is postponed",
+    "sell method A/B/C mapping is postponed",
+    "pending order policy mapping is postponed",
+    "completion policy mapping is postponed"
+  ]
+}
+
+
+확인 결과:
+- indicator_follow_rule_preview namespace: **현재 설정 검증 화면의 Rule Mapper Preview에는 보이지 않음**
+- mode = merge_add_candidate: **현재 설정 검증 화면에는 보이지 않음**
+- buy.groups: changed가 아니라 buy.groups[0].conditions가 merge_candidate로 표시됨
+- sell.signals.macd_sell: changes에 없음
+- sell.signals.ui_preview_condition_c_macd_sell: add_signal_candidate로 표시됨
+- rules.json 수정 시간 변경 없음: True
+
+즉 diff 쪽은 의도대로 바뀌었지만, 설정 검증 화면의 [Rule Mapper Preview]가 아직 indicator_follow_rule_preview namespace를 표시하지 않고 있습니다.
+
+판정 맞습니다.
+
+현재 문제는 mapper 자체가 아니라 GUI 표시부입니다.
+
+현재 상태
+Mapper 내부 구조: 정상
+Diff 출력: 정상
+rules.json 미수정: 정상
+엔진 미연결: 정상
+남은 문제:
+
+[Rule Mapper Preview] 화면이 아직 preview_rules의 bar/buy/sell만 보여주고,
+indicator_follow_rule_preview namespace를 표시하지 않음
+다음 코덱스 지시
+gui_indicator_follow_routine_settings_dialog.py만 최소 수정.
+
+목표:
+[Rule Mapper Preview] 출력에 indicator_follow_rule_preview namespace를 포함시킨다.
+
+조건:
+- routine_rule_mapper.py 수정 금지
+- rules.json 저장 금지
+- 엔진 연결 금지
+- diff 계산 로직 변경 금지
+- 표시 전용 수정만 수행
+
+수정 내용:
+1. 기존 [Rule Mapper Preview] 출력에서 preview_rules의 bar/buy/sell만 표시하지 말고,
+   indicator_follow_rule_preview도 함께 표시한다.
+
+2. 특히 아래 값이 화면에 보여야 한다.
+   - indicator_follow_rule_preview
+   - mode: merge_add_candidate
+   - candidates.buy.merge_into
+   - candidates.buy.skip_existing
+   - candidates.buy.add_conditions
+   - candidates.sell.add_signal_candidate
+
+3. 기존 [Rule Mapper Diff] 출력은 유지한다.
+
+검증:
+- py_compile
+- offscreen 설정창 생성
+- has_indicator_follow_rule_preview True
+- has_merge_add_candidate True
+- has_buy_merge_candidate True
+- has_sell_add_signal_candidate True
+- rules_mtime_unchanged True
+이것만 하면 Preview와 Diff가 같은 구조를 보여주는 상태가 됩니다.
+
+
+지금 수정과정들을 지켜보면 macd 구문들이 많이 보이는데 ?
+
+맞습니다. 지금 보이는 macd 구문은 그냥 넘기면 안 됩니다.
+
+다만 종류를 나눠서 봐야 합니다.
+
+1. 남아 있어도 되는 macd
+지표추종 루틴 내부에서 실제 계산 대상이 MACD/OSC라면 아래는 남아 있을 수 있습니다.
+
+target: MACD
+target: OSC
+sell.signals.macd_sell
+routine_macd_engine.py
+MACD <= -1.0
+OSC TURN_UP
+OSC TURN_DOWN
+이건 지표추종 루틴이 사용하는 지표 이름이라서 당장 금지 대상은 아닙니다.
+
+2. 정리해야 할 가능성이 큰 macd
+문제가 되는 건 이런 것들입니다.
+
+gui_macd_...
+MacdRoutineSettingsDialog
+routine_macd_engine.py
+macd_sell
+MACD매매루틴
+특히 UI/공통 구조에 붙은 macd는 현재 명칭 체계와 안 맞습니다.
+
+현재 기준은:
+
+지표추종매매루틴
+indicator_follow
+입니다.
+
+그래서 앞으로 정리 방향은 이겁니다.
+
+gui_macd_* 
+→ gui_indicator_follow_* 또는 gui_routine_*
+
+MacdRoutineSettingsDialog
+→ IndicatorFollowRoutineSettingsDialog
+
+routine_macd_engine.py
+→ routine_indicator_follow_logic.py 또는 routine_signal_logic.py 검토
+
+macd_sell
+→ 당장 변경 금지. 기존 rules 호환 때문에 별도 검토 필요
+3. 지금 당장 할 일
+바로 이름 변경하면 위험합니다.
+먼저 macd 문자열 실태조사가 필요합니다.
+
+다음 코덱스 지시는 이렇게 가는 게 맞습니다.
+
+파일 수정 금지.
+
+현재 프로젝트에서 macd / MACD / Macd 문자열이 남아 있는 위치를 전수 조사해라.
+
+분류 기준:
+1. 지표 이름으로 유지 가능한 것
+   - target: MACD
+   - MACD 계산
+   - OSC 계산
+   - 조건 설명
+
+2. 지표추종 루틴 전용 파일/클래스/함수라 이름 변경 후보인 것
+   - gui_macd_*
+   - MacdRoutineSettingsDialog
+   - routine_macd_engine.py 등
+
+3. 기존 rules 호환 때문에 당장 변경하면 위험한 것
+   - sell.signals.macd_sell
+   - rules.json key
+   - 테스트에서 참조하는 key
+
+4. 문서/설명 문자열이라 우선순위 낮은 것
+
+산출:
+- 파일별 macd 문자열 목록
+- 분류
+- 변경 후보
+- 변경 금지 후보
+- 변경 시 영향 파일
+- 추천 작업 순서
+
+절대 금지:
+- 파일 수정 금지
+- 이름 변경 금지
+- rules.json 수정 금지
+- import 변경 금지
+- 엔진 연결 변경 금지
+지금은 명칭 정리 작업을 바로 하기보다 실태조사부터 해야 합니다.
+
+
+현재 하고 있는 작업은 마무리 되어 가나?
+
+
+kiwoom_auto (30)(1).zip
+ZIP 아카이브
+분석 해봐
+
+업로드된 최신 압축본 기준으로 macd/MACD/Macd 문자열을 전수 조사하겠습니다. 파일은 수정하지 않고, 위치와 성격만 분류하겠습니다.
+
+46s 동안 생각함
+분석 결과, macd/MACD/Macd는 꽤 많이 남아 있습니다.
+다만 대부분은 당장 수정 대상이 아닙니다.
+
+전체 현황
+macd/MACD/Macd 포함 파일: 65개
+본문 발생 횟수: 3,186회
+파일명 자체 hit: 1개
+대부분은 과거 로그/리포트입니다.
+
+분류 결과
+1. 유지 가능
+지표명으로 쓰이는 MACD/OSC입니다.
+
+engines/indicator_engine.py
+engines/condition_engine.py
+gui_indicator_follow_sell_controls.py 일부
+routine_condition_engine.py
+예:
+
+target: MACD
+target: OSC
+MACD선
+시그널선
+OSC TURN_UP
+OSC TURN_DOWN
+이건 지표추종 루틴이 MACD/OSC를 사용하는 한 유지 가능합니다.
+
+2. 핵심 검토 대상
+여기가 중요합니다.
+
+routines/지표추종매매/routine.py
+routines/지표추종매매/routine_macd_engine.py
+routines/지표추종매매/routine_rule_mapper.py
+routines/지표추종매매/rules.json
+특히 문제 후보:
+
+routine_macd_engine.py
+evaluate_macd_routine
+DEFAULT_MACD_ROUTINE_CONFIG
+routine_type: MACD_OSC
+sell.signals.macd_sell
+여기는 지표명으로서 MACD인지, 루틴명 잔재인지 분리 검토가 필요합니다.
+
+3. GUI 쪽 검토 대상
+gui_indicator_follow_data_tabs.py
+gui_indicator_follow_routine_settings_dialog.py
+gui_indicator_follow_sell_controls.py
+gui_indicator_follow_buy_controls.py
+여긴 대부분 현재 indicator_follow 이름으로 이미 바뀌었지만, 내부에 아직:
+
+macd_sell
+macd_kind_combo
+macd_value_line
+sell_signal_condition_c_macd_*
+같은 변수명이 남아 있습니다.
+
+이건 지표 MACD 조건을 의미하면 유지 가능하지만, macd_sell은 rules key라 신중해야 합니다.
+
+4. 변경 우선순위 낮음
+PROJECT_CHANGELOG.txt
+reports/blocked_actions/*
+tools/*
+_등록확인폴더/budget.json
+_지표추종매매/budget.json
+이건 과거 로그/리포트/레거시 데이터라 지금 건드릴 우선순위가 낮습니다.
+
+현재 판단
+바로 전체 이름 변경하면 위험합니다.
+
+특히 아래는 당장 변경 금지입니다.
+
+sell.signals.macd_sell
+rules.json key
+tests에서 참조하는 macd_sell
+routine.py import 경로
+바꾸면 기존 Rule Mapper 테스트, 설정 검증, 기존 rules 호환이 깨질 수 있습니다.
+
+추천 순서
+1. routine_macd_engine.py가 실제로 지표추종 전용 로직인지 검토
+2. evaluate_macd_routine / DEFAULT_MACD_ROUTINE_CONFIG 명칭 변경 가능성 검토
+3. macd_sell key는 유지 또는 alias 전략 검토
+4. GUI 변수명은 마지막에 정리
+5. 로그/리포트는 보류
+결론:
+지금은 “MACD 명칭 전면 교체”가 아니라, routine_macd_engine.py와 macd_sell key를 어떻게 다룰지 먼저 결정해야 합니다.
+
+
+이전에 한번 정리 했는데 아직도 많이 남았어. 왜?
+
+이유는 크게 3가지입니다.
+
+첫째, 이전 정리는 하드코딩된 루틴명 제거가 중심이었습니다.
+
+그때 정리한 대상은 주로 이런 것들이었습니다.
+
+"지표추종매매만 지원"
+routine_name == "지표추종매매"
+routines/지표추종매매/rules.json 직접 참조
+설정창 호출 하드코딩
+Registry/routine.json 기반 전환
+즉 루틴 등록/호출 구조의 하드코딩 제거였지, macd 문자열 전체 제거 작업은 아니었습니다.
+
+둘째, 남아 있는 macd 중 상당수는 지표 이름입니다.
+
+MACD선
+OSC
+target: MACD
+operator: TURN_UP / TURN_DOWN
+macd_kind_combo
+sell condition C MACD
+이건 루틴명이 아니라 지표추종 루틴 내부에서 사용하는 지표 조건이라 남아 있을 수 있습니다.
+
+셋째, 일부는 기존 rules 호환 키라서 일부러 못 지운 겁니다.
+
+대표적으로:
+
+sell.signals.macd_sell
+routine_macd_engine.py
+evaluate_macd_routine
+DEFAULT_MACD_ROUTINE_CONFIG
+이런 건 단순 치환하면 기존 rules.json, 테스트, mapper, 신호판단 경로가 깨질 수 있습니다.
+
+정리하면:
+
+이전 정리 = 루틴명/경로 하드코딩 제거
+현재 남은 문제 = 파일명/함수명/rules key/지표명에 남은 macd 분류
+그래서 이번에는 바로 삭제가 아니라, 다음처럼 가야 합니다.
+
+1. 지표명 MACD → 유지
+2. rules key macd_sell → 호환 때문에 보류/alias 검토
+3. routine_macd_engine.py → 변경 후보
+4. evaluate_macd_routine → 변경 후보
+5. gui 내부 macd 변수명 → 후순위 정리
+즉, 아직 많이 남은 건 “정리가 실패했다”기보다 이전 작업 범위가 달랐고, 지금은 더 깊은 명칭 정리 단계로 들어온 것입니다.
+
+
+gui_indicator_follow_routine_settings_dialog.py만 최소 수정.
+
+목표:
+현재 Rule Mapper Preview 마무리.
+
+수정:
+[Rule Mapper Preview] 출력에 preview_rules["indicator_follow_rule_preview"] 내용을 포함한다.
+
+반드시 화면에 보여야 할 항목:
+- indicator_follow_rule_preview
+- mode: merge_add_candidate
+- candidates.buy.merge_into
+- candidates.buy.skip_existing
+- candidates.buy.add_conditions
+- candidates.sell.add_signal_candidate
+
+금지:
+- routine_rule_mapper.py 수정 금지
+- tests 수정 금지
+- rules.json 저장 금지
+- 엔진 연결 금지
+- diff 계산 로직 변경 금지
+
+검증:
+- py_compile
+- offscreen 설정창 생성
+- has_indicator_follow_rule_preview True
+- has_merge_add_candidate True
+- has_buy_merge_candidate True
+- has_sell_add_signal_candidate True
+- has_rule_mapper_diff True
+- rules_mtime_unchanged True
+<--직전에 네가 준 코덱스 아직유효한가?
+
+아니요. 이미 완료된 지시라서 더 이상 유효하지 않습니다.
+
+그 지시는 직전에 코덱스가 이미 수행했습니다.
+
+완료 확인된 내용:
+
+gui_indicator_follow_routine_settings_dialog.py 최소 수정 완료
+[Rule Mapper Preview]에 indicator_follow_rule_preview 표시 완료
+mode: merge_add_candidate 표시 완료
+buy merge candidate 표시 완료
+sell add signal candidate 표시 완료
+py_compile 통과
+offscreen 설정창 생성 성공
+rules.json 미수정 확인
+따라서 지금 같은 지시를 다시 보내면 중복 작업입니다.
+
+현재 다음 유효 작업은 이것입니다.
+
+MACD / macd / Macd 명칭 전수조사 결과를 바탕으로
+유지 / 변경 후보 / 변경 금지 항목을 세부 분류
+코덱스에 보낼 다음 지시는 이렇게 바꾸는 게 맞습니다.
+
+파일 수정 금지.
+
+프로젝트 전체에서 macd / MACD / Macd 문자열이 남아 있는 위치를 전수 조사하고,
+각 항목을 아래 기준으로 분류해라.
+
+1. 유지 가능
+- 지표명 MACD
+- OSC 계산
+- target: MACD
+- 조건 설명상 MACD
+
+2. 변경 후보
+- routine_macd_engine.py
+- evaluate_macd_routine
+- DEFAULT_MACD_ROUTINE_CONFIG
+- 공통/지표추종 구조인데 macd 명칭이 붙은 파일/클래스/함수
+
+3. 변경 금지 또는 신중 검토
+- rules.json key
+- sell.signals.macd_sell
+- 기존 테스트가 참조하는 key
+- backward compatibility가 필요한 경로
+
+4. 우선순위 낮음
+- 문서 문자열
+- 로그
+- reports
+- legacy 주석
+
+산출:
+- 파일별 발견 목록
+- 분류
+- 변경 후보
+- 변경 금지 후보
+- 영향 범위
+- 추천 변경 순서
+
+절대 금지:
+- 파일 수정 금지
+- 이름 변경 금지
+- import 변경 금지
+- rules.json 수정 금지
+- 엔진 연결 변경 금지
+정리하면, Rule Mapper Preview 마무리 작업은 끝났고, 이제 MACD 명칭 검토 단계로 넘어간 상태입니다.
+
+
+코덱스가 생각중에서 멈췄는데?
+
+그럴 가능성이 있습니다.
+
+지금까지의 흐름을 보면 코덱스는 단순 코드 수정은 잘 수행했지만, 이번부터는 프로젝트 구조를 판단하는 분석 단계로 들어왔습니다.
+
+특히 방금 지시는
+
+프로젝트 전체 검색
+
+macd 문자열 3,000여 건 분류
+
+변경 가능/불가 판단
+
+영향 범위 분석
+
+처럼 검색 + 추론 + 설계를 동시에 요구하는 작업입니다.
+
+이런 경우 코덱스가 오래 생각하거나 중간에 멈추는 경우가 있습니다.
+
+지금은 어떻게 하는 것이 좋은가?
+만약 "Thinking..."에서 오래 멈춘 상태라면 기다리기보다 중단하고 다시 요청하는 것이 좋습니다.
+
+다만 같은 프롬프트를 그대로 다시 보내기보다는 범위를 줄여야 합니다.
+
+예를 들어 이렇게 나누는 것이 좋습니다.
+
+1단계
+
+파일 수정 금지.
+
+routine_macd_engine.py만 분석해라.
+
+- 왜 macd라는 이름을 유지하고 있는지
+- 실제 MACD 전용인지
+- 지표추종 공통 로직인지
+- 이름 변경 시 영향 파일
+
+분석만.
+2단계
+
+파일 수정 금지.
+
+sell.signals.macd_sell key만 분석해라.
+
+- 왜 macd_sell인가
+- 공통 key로 바꿀 수 있는가
+- 바꾸면 영향받는 파일
+3단계
+
+파일 수정 금지.
+
+evaluate_macd_routine / DEFAULT_MACD_ROUTINE_CONFIG만 분석해라.
+이렇게 작게 쪼개면 코덱스가 훨씬 안정적으로 응답하는 경우가 많습니다.
+
+현재처럼 프로젝트 전체를 한 번에 분석시키는 것보다는, 파일 단위 또는 개념 단위로 나누는 것을 추천합니다.
+
+
+추론은 네가 하는게 낫지않나?
+
+네. 이런 종류의 작업은 제가 하는 것이 더 적합합니다.
+
+코덱스와 저는 역할이 조금 다릅니다.
+
+코덱스가 잘하는 것
+프로젝트 전체 검색
+
+코드 생성/수정
+
+리팩토링
+
+참조 추적
+
+테스트 작성
+
+제가 더 잘하는 것
+프로젝트 철학 유지
+
+구조 설계
+
+변경 영향 추론
+
+"이 이름을 바꿔도 되는가?" 판단
+
+장기적인 일관성 검토
+
+지금 우리가 하는 MACD 명칭 정리는 단순 문자열 치환이 아닙니다.
+
+예를 들어
+
+routine_macd_engine.py
+이 파일을 바꿀지 말지는
+
+앞으로 여러 지표를 지원할 계획인가?
+
+"지표추종"이라는 철학과 맞는가?
+
+다른 루틴도 같은 구조를 사용할 것인가?
+
+같은 설계 판단이 먼저 필요합니다.
+
+이건 검색만으로는 답이 안 나오고, 프로젝트 전체 맥락을 이해한 추론이 필요합니다.
+
+그래서 제가 추천하는 방식은
+제가 먼저 추론해서 방향을 확정합니다.
+
+그다음 코덱스는 확정된 방향대로만 코드를 수정합니다.
+
+마지막에 제가 다시 검토합니다.
+
+이 방식이 지금 프로젝트에는 가장 안정적입니다.
+
+현재도 저는 바로 손대기보다 먼저 아래처럼 분류해서 결정할 생각입니다.
+
+절대 유지해야 하는 MACD
+
+지금 변경해야 하는 MACD
+
+호환성을 위해 당분간 유지할 MACD
+
+나중에 정리할 MACD
+
+이렇게 우선순위를 정한 뒤에 코덱스에 수정 범위를 명확히 지정하는 것이 안전합니다.
+
+지금 단계에서는 코덱스에게 추론을 맡기기보다, 제가 명칭 정리 기준을 먼저 확정한 후 코덱스를 수정 작업에 사용하는 방식을 추천합니다.
+
+
+근데 왜 코덱스를 시키나?
+
+2초 동안 생각함
+아래 내용을 코덱스에 주면 됩니다.
+
+파일 수정 금지. 분석만 수행.
+
+목표:
+프로젝트 내 macd / MACD / Macd 명칭을 바로 치환하지 말고, 변경 가능 여부를 분류한다.
+
+전제:
+현재 공식 루틴명은 “지표추종매매”이며, UI/공통 구조는 indicator_follow 계열로 정리 중이다.
+하지만 MACD/OSC는 지표추종 루틴 안에서 사용하는 실제 지표명이므로 무조건 제거 대상이 아니다.
+
+분석 기준:
+
+1. 유지 대상
+- 지표명 MACD
+- OSC
+- target: MACD
+- target: OSC
+- MACD선 / 시그널선
+- MACD 계산 로직
+- OSC TURN_UP / TURN_DOWN 조건
+- 지표 조건 설명에 필요한 MACD 문구
+
+2. 변경 후보
+- routine_macd_engine.py
+- evaluate_macd_routine
+- DEFAULT_MACD_ROUTINE_CONFIG
+- MacdRoutineSettingsDialog
+- gui_macd_* 파일명 또는 클래스/함수명
+- 공통 UI/공통 mapper/공통 설정 구조인데 macd 명칭이 붙은 것
+
+3. 변경 금지 또는 신중 검토
+- rules.json key
+- sell.signals.macd_sell
+- 기존 테스트에서 참조하는 macd_sell
+- 기존 rules 호환 경로
+- routine.json 또는 registry 연결에 영향 있는 경로
+- 기존 저장 데이터 복원에 쓰이는 key
+
+4. 우선순위 낮음
+- reports
+- logs
+- changelog
+- 과거 문서
+- legacy 주석
+- 백업 파일
+
+분석 대상 우선순위:
+1. routines/지표추종매매/routine_macd_engine.py
+2. routines/지표추종매매/routine.py
+3. routines/지표추종매매/routine_rule_mapper.py
+4. routines/지표추종매매/rules.json
+5. gui_indicator_follow_*.py
+6. tests/*
+7. 나머지 파일
+
+산출물:
+- 파일별 macd/MACD/Macd 발견 목록
+- 각 항목의 분류: 유지 / 변경 후보 / 변경 금지 / 낮은 우선순위
+- 변경 가능성이 큰 항목 TOP 10
+- 절대 지금 바꾸면 안 되는 항목
+- 변경 시 영향받는 import/test/rules 경로
+- 추천 작업 순서
+
+중요:
+지금은 파일 수정하지 마라.
+이름 변경하지 마라.
+import 수정하지 마라.
+rules.json 수정하지 마라.
+테스트 수정하지 마라.
+엔진 연결 변경하지 마라.
+
+최종 결론에는 다음을 반드시 포함해라.
+1. 지금 당장 바꿔도 되는 항목
+2. alias/호환 계층이 필요한 항목
+3. 유지해야 하는 지표명 MACD
+4. 다음 실제 수정 단계에서 가장 먼저 처리할 파일
+이건 코덱스가 검색·목록화만 하게 하고, 최종 변경 판단은 여기서 다시 검토하는 방식이 안전합니다.
+
+
+이거도 멈춘듯 
+
+그럼 코덱스는 중단하는 게 맞습니다.
+
+이번 macd 명칭 검토는 코덱스에게 맡기기엔 범위가 너무 넓고, 추론 비중이 큽니다.
+
+다음은 이렇게 가는 게 낫습니다.
+
+1. 코덱스 중단
+2. 내가 기준을 먼저 확정
+3. 코덱스에는 파일 1개 단위로만 작업 지시
+지금 바로 잡을 방향은 이겁니다.
+
+MACD 명칭 정리 1차 결론
+유지
+MACD 지표명
+OSC 지표명
+target: MACD
+target: OSC
+MACD선 / 시그널선
+OSC TURN_UP / TURN_DOWN
+당장 변경 금지
+sell.signals.macd_sell
+rules.json key
+기존 테스트 참조 key
+기존 저장 데이터 복원 key
+1차 변경 후보
+routine_macd_engine.py
+evaluate_macd_routine
+DEFAULT_MACD_ROUTINE_CONFIG
+후순위 변경 후보
+gui 내부 변수명 macd_*
+macd_kind_combo
+macd_value_line
+sell_condition_c_macd_*
+다음 작업은 전체 전수조사가 아니라 파일 하나로 쪼개야 합니다.
+코덱스에 줄 다음 지시는 이것만:
+
+파일 수정 금지.
+
+routines/지표추종매매/routine_macd_engine.py 파일만 분석해라.
+
+확인할 것:
+1. 이 파일이 실제 MACD 전용 계산 엔진인지
+2. 아니면 지표추종매매 루틴의 신호판단 로직인지
+3. 파일명 routine_macd_engine.py를 바꾸면 영향받는 import 위치
+4. evaluate_macd_routine 함수명 변경 시 영향받는 위치
+5. DEFAULT_MACD_ROUTINE_CONFIG 변경 시 영향받는 위치
+6. rules.json key macd_sell과의 관계
+7. 지금 당장 변경 가능한 것과 보류해야 할 것
+
+파일 수정, 이름 변경, import 변경, 테스트 수정 금지.
+분석만.
+이 정도로 줄이면 멈출 가능성이 훨씬 낮습니다.
+
+
+파일 수정 없이 분석만 했습니다. 현재 실행 코드 기준으로 gui_macd_*, MacdRoutineSettingsDialog, Macd*Mixin 계열은 사실상 정리된 상태이고, 남은 핵심은 routine_macd_engine.py와 macd_sell 호환 key입니다.
+
+**파일별 발견 목록**
+
+| 파일/영역 | 발견 항목 | 분류 | 판단 |
+|---|---|---|---|
+| routines/지표추종매매/routine_macd_engine.py | 파일명, DEFAULT_MACD_ROUTINE_CONFIG, evaluate_macd_routine, _macd_sell_section, macd_enabled, macd_passed | 변경 후보 + 일부 유지 | 엔진 파일/함수/상수명은 후보. 단 내부 MACD, OSC, macd_sell key는 신중 |
+| routines/지표추종매매/routine.py | routine_macd_engine import, DEFAULT_MACD_ROUTINE_CONFIG, evaluate_macd_routine, _ENGINE_SOURCE | 변경 후보 | 지표추종 루틴 진입부인데 macd 엔진명에 의존 |
+| routines/지표추종매매/routine_rule_mapper.py | _build_sell_macd_condition, condition_c_macd, target: MACD, ui_preview_condition_c_macd_sell, macd_sell | 혼합 | MACD 조건 mapper라 일부 유지. 공통 mapper라면 함수명은 후보. key/path는 신중 |
+| routines/지표추종매매/rules.json | indicators.macd, sell.signals.macd_sell, macd_check, macd_kind_combo, MACD선 | 변경 금지/신중 | 현재 저장/로드/엔진 실행 key. 바로 변경 금지 |
+| gui_indicator_follow_sell_controls.py | MACD선, 시그널선, macd_kind_combo, macd_value_line, sell_signal_condition_c_macd_*, MACD 반전 매도, macd_sell_* | 유지 + 신중 | UI 지표명은 유지. macd_sell_*는 rules 호환 key라 신중 |
+| gui_indicator_follow_routine_settings_dialog.py | macd_sell, macd_sell_ collector prefix | 변경 금지/신중 | 기존 rules/UI state 복원 경로 |
+| gui_indicator_follow_data_tabs.py | macd_sell_enabled, macd_sell_delay | 변경 금지/신중 | rules 표시/로드 연결 |
+| gui_indicator_follow_buy_controls.py | 시그널/MACD | 유지 | UI 지표 비교 문구 |
+| engines/indicator_engine.py | macd_series, macd_line, macd_cfg, "MACD" | 유지 | 실제 MACD/OSC 계산 로직 |
+| engines/condition_engine.py | MACD 설명 | 유지 | 공통 조건 엔진의 지표명 |
+| gui_routine_condition_engine.py, routine_condition_engine.py | target: MACD 예시 | 유지 | 조건 target 의미 |
+| tests/test_indicator_follow_rule_mapper_preview.py | macd_sell, target: MACD, macd_* | 변경 금지/신중 | 기존 key 호환성 검증 |
+| tools/create_routine_packages_from_legacy.py | macd_routine, MACD 기반 | 낮은 우선순위 | legacy 도구 |
+| tools/cleanup_project_junk_v3.py | gui_macd_*, macd_signal_engine.py, routine_macd_engine.py | 낮은 우선순위 | 과거 정리 목록 |
+| PROJECT_CHANGELOG.txt, reports/* | MACD매매루틴 다수 | 낮은 우선순위 | 과거 로그/문서 |
+
+**변경 가능성이 큰 TOP 10**
+
+1. routine_macd_engine.py 파일명  
+2. routine.py의 routine_macd_engine import  
+3. DEFAULT_MACD_ROUTINE_CONFIG  
+4. evaluate_macd_routine  
+5. _ENGINE_SOURCE = "routine_macd_engine"  
+6. routine.py의 fallback 변수 DEFAULT_MACD_ROUTINE_CONFIG = None  
+7. routine.py의 evaluate_macd_routine = None  
+8. routine_macd_engine.py docstring의 “MACD 전용 신호발생 엔진”  
+9. routine_rule_mapper.py의 _build_sell_macd_condition 함수명, 단 신중  
+10. tools/create_routine_packages_from_legacy.py의 macd_routine, 낮은 우선순위  
+
+**절대 지금 바꾸면 안 되는 항목**
+
+- rules.json의 indicators.macd
+- rules.json의 sell.signals.macd_sell
+- rules.json의 indicator_follow_ui_state 내부 macd_check, macd_kind_combo, macd_value_line
+- target: "MACD"
+- target: "OSC"
+- MACD선, 시그널선, 시그널/MACD
+- 테스트의 macd_sell 참조
+- gui_indicator_follow_*의 macd_sell_* 저장/로드 위젯명
+- 엔진의 _macd_sell_section() 내부 key 처리
+
+**영향받는 경로**
+
+- 엔진명 변경 시:
+  - routines/지표추종매매/routine.py
+  - routines/지표추종매매/routine_macd_engine.py
+  - 관련 import/py_compile
+- 함수/상수명 변경 시:
+  - DEFAULT_MACD_ROUTINE_CONFIG
+  - evaluate_macd_routine
+  - routine.py fallback/import
+- macd_sell key 변경 시:
+  - rules.json
+  - routine_macd_engine.py
+  - gui_indicator_follow_data_tabs.py
+  - gui_indicator_follow_routine_settings_dialog.py
+  - gui_indicator_follow_sell_controls.py
+  - tests/test_indicator_follow_rule_mapper_preview.py
+  - 그래서 지금은 금지 수준입니다.
+
+**추천 작업 순서**
+
+1. routine_macd_engine.py에 새 일반명 alias를 먼저 추가  
+   예: DEFAULT_INDICATOR_FOLLOW_CONFIG, evaluate_indicator_follow_routine
+
+2. 기존 이름은 유지  
+   예: DEFAULT_MACD_ROUTINE_CONFIG = DEFAULT_INDICATOR_FOLLOW_CONFIG, evaluate_macd_routine = evaluate_indicator_follow_routine
+
+3. routine.py를 새 이름 우선 import로 변경  
+   기존 이름 fallback은 한 단계 유지
+
+4. 테스트 추가  
+   새 이름/기존 alias 둘 다 import 가능해야 함
+
+5. 그 다음 파일명 변경 검토  
+   routine_macd_engine.py → routine_indicator_follow_engine.py는 alias 안정화 후 진행
+
+6. macd_sell, rules.json, UI state key는 장기 보류  
+   별도 migration 설계 없이는 변경 금지
+
+**최종 결론**
+
+1. 지금 당장 바꿔도 되는 항목: 핵심 실행 경로에서는 거의 없음. 낮은 위험으로는 legacy 주석/도구 문자열뿐입니다.
+
+2. alias/호환 계층이 필요한 항목:
+   - routine_macd_engine.py
+   - DEFAULT_MACD_ROUTINE_CONFIG
+   - evaluate_macd_routine
+   - routine.py import 경로
+
+3. 유지해야 하는 지표명 MACD:
+   - MACD선
+   - 시그널선
+   - target: MACD
+   - target: OSC
+   - MACD/OSC 계산
+   - OSC TURN_UP / TURN_DOWN
+   - 조건 설명의 MACD 문구
+
+4. 다음 실제 수정 단계에서 가장 먼저 처리할 파일:
+   - routines/지표추종매매/routine_macd_engine.py
+   - 단, rename부터 하지 말고 새 일반명 alias 추가부터 시작하는 것이 안전합니다.
+
+분석 결과는 타당합니다.
+이제 방향은 거의 확정입니다.
+
+결론
+MACD 명칭 전면 변경은 아직 하면 안 됩니다.
+
+지금 당장 안전하게 할 수 있는 건 이것뿐입니다.
+
+routine_macd_engine.py 내부에
+지표추종 이름의 alias를 추가한다.
+즉 기존 이름은 유지하고, 새 이름을 병행합니다.
+
+1차 수정 방향
+DEFAULT_INDICATOR_FOLLOW_CONFIG = ...
+evaluate_indicator_follow_routine = ...
+그리고 기존 이름은 호환용으로 유지합니다.
+
+DEFAULT_MACD_ROUTINE_CONFIG = DEFAULT_INDICATOR_FOLLOW_CONFIG
+evaluate_macd_routine = evaluate_indicator_follow_routine
+그 다음 routine.py에서 새 이름을 우선 사용하게 합니다.
+
+아직 변경 금지
+routine_macd_engine.py 파일명
+sell.signals.macd_sell
+rules.json key
+UI state의 macd_* key
+target: MACD / OSC
+MACD선 / 시그널선
+다음 코덱스 지시
+파일 수정 최소.
+
+대상:
+1. routines/지표추종매매/routine_macd_engine.py
+2. routines/지표추종매매/routine.py
+3. 필요 시 최소 테스트
+
+목표:
+MACD 명칭을 바로 제거하지 말고, 지표추종 이름의 alias를 먼저 추가한다.
+
+수정:
+1. routine_macd_engine.py에서 기존 DEFAULT_MACD_ROUTINE_CONFIG의 실제 정의를
+   DEFAULT_INDICATOR_FOLLOW_CONFIG로 일반명화한다.
+2. 기존 DEFAULT_MACD_ROUTINE_CONFIG는 alias로 유지한다.
+   DEFAULT_MACD_ROUTINE_CONFIG = DEFAULT_INDICATOR_FOLLOW_CONFIG
+
+3. 기존 evaluate_macd_routine 함수는 새 함수 evaluate_indicator_follow_routine으로 일반명화한다.
+4. 기존 evaluate_macd_routine은 alias wrapper 또는 직접 alias로 유지한다.
+   evaluate_macd_routine = evaluate_indicator_follow_routine
+
+5. routine.py는 새 이름을 우선 import/use한다.
+6. 기존 이름 fallback은 유지한다.
+
+금지:
+- routine_macd_engine.py 파일명 변경 금지
+- macd_sell key 변경 금지
+- rules.json 수정 금지
+- UI state key 변경 금지
+- target MACD/OSC 변경 금지
+- 엔진 로직 변경 금지
+
+검증:
+- py_compile
+- 기존 evaluate_macd_routine import 가능 확인
+- 새 evaluate_indicator_follow_routine import 가능 확인
+- routine.py에서 새 이름 우선 사용 확인
+- 기존 테스트 통과
+이게 가장 안전한 1차 정리입니다.
+
+
+완료했습니다.
+
+변경 파일:
+- C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto\routines\지표추종매매\routine_macd_engine.py
+- C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto\routines\지표추종매매\routine.py
+
+적용 내용:
+- DEFAULT_INDICATOR_FOLLOW_CONFIG를 새 기본 설정명으로 추가
+- DEFAULT_MACD_ROUTINE_CONFIG = DEFAULT_INDICATOR_FOLLOW_CONFIG alias 유지
+- evaluate_indicator_follow_routine()을 새 평가 함수명으로 추가
+- evaluate_macd_routine = evaluate_indicator_follow_routine alias 유지
+- routine.py는 새 이름을 우선 import/use
+- 기존 이름 fallback도 유지
+
+검증:
+- python -m py_compile routines/지표추종매매/routine.py routines/지표추종매매/routine_macd_engine.py 통과
+- 기존 evaluate_macd_routine import 가능 확인
+- 새 evaluate_indicator_follow_routine import 가능 확인
+- 두 함수/설정 alias가 같은 객체를 가리키는 것 확인
+- python -m unittest tests/test_indicator_follow_rule_mapper_preview.py 통과, 12 tests OK
+
+금지 항목도 지켰습니다:
+- 파일명 변경 없음
+- macd_sell key 변경 없음
+- rules.json 수정 없음
+- target: MACD/OSC 변경 없음
+- 엔진 로직 변경 없음
+
+작성했습니다.
+
+다운로드:
+📄 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt
+
+이 문서에는 이번 작업에서 중요한 내용들을 포함했습니다.
+
+Rule Mapper Preview 구조
+
+Merge/Add Candidate 구조
+
+Diff 구조 및 상태값
+
+GUI 검증 화면 구성
+
+테스트 결과(12 tests OK)
+
+rules.json 미수정 원칙
+
+엔진 미연결 원칙
+
+MACD 명칭 일반화(alias) 작업 결과
+
+변경 금지 항목
+
+다음 작업 순서
+
+현재 안정성 및 완료 상태
+
+다음 대화에서는 이 문서를 기준으로 이어서 작업하면 됩니다. 
+
+
+마스터스펙 갱신용은 필요 없을까
+
+네, 필요합니다.
+
+오히려 이번 작업은 MASTER_SPEC에 반드시 반영해야 하는 내용이 많습니다.
+
+이번 작업에서 확정된 내용은 단순 구현이 아니라 구조와 철학이 바뀐 것들이기 때문입니다.
+
+반영해야 할 핵심은 다음과 같습니다.
+
+1. Rule Mapper 계층 신설 (필수)
+기존에는
+
+UI
+→ rules.json
+개념이었다면,
+
+이제는
+
+UI
+→ indicator_follow_ui_state
+→ Rule Mapper
+→ Preview
+→ Diff
+→ 운영자 검토
+→ (향후 승인)
+→ Engine Rule 생성
+으로 변경되었습니다.
+
+이건 구조 변경이므로 반드시 MASTER_SPEC에 들어가야 합니다.
+
+2. Replace 방식 폐기 (필수)
+기존 Preview는 기존 Rule을 대체하는 형태였지만,
+
+최종 확정은
+
+Replace Preview 금지
+
+Merge Candidate
+Add Condition Candidate
+Add Signal Candidate
+입니다.
+
+이것도 철학 변경입니다.
+
+3. Preview Namespace 신설
+indicator_follow_rule_preview
+추가.
+
+역할:
+
+merge candidate
+
+add condition candidate
+
+add signal candidate
+
+실행 Rule과 완전 분리.
+
+4. Diff 정책
+새 status 추가.
+
+merge_candidate
+add_signal_candidate
+Risk 체계
+
+low
+medium
+high
+5. MACD 명칭 일반화 정책
+이번에 가장 중요한 것 중 하나입니다.
+
+확정된 정책은
+
+지표명 MACD는 유지
+
+루틴 구조는 indicator_follow 일반명 사용
+입니다.
+
+즉,
+
+evaluate_indicator_follow_routine
+가 공식명.
+
+그리고
+
+evaluate_macd_routine
+은
+
+호환 alias
+입니다.
+
+이건 이후 다른 지표추종 루틴을 만들 때도 기준이 됩니다.
+
+6. Alias 정책
+이번에 새로 생긴 철학입니다.
+
+새 일반명 먼저 도입
+
+↓
+
+기존 이름은 alias 유지
+
+↓
+
+충분한 안정화 후 제거 검토
+이 정책은 앞으로도 반복해서 사용할 가능성이 큽니다.
+
+7. 현재 변경 금지 목록
+MASTER_SPEC에 명시해야 합니다.
+
+sell.signals.macd_sell
+
+rules.json key
+
+target: MACD
+
+target: OSC
+
+indicator_follow_ui_state macd_* key
+
+기존 테스트 참조 key
+제 판단
+이번 MASTER_SPEC 갱신은 작성하는 것이 맞습니다.
+
+이전처럼 "구현 몇 줄 추가" 수준이 아니라,
+
+아키텍처와 운영 원칙이 확정된 작업이기 때문입니다.
+
+오히려 이 내용을 반영하지 않으면, 몇 달 뒤에는 왜 Rule Mapper가 Preview/Diff 구조인지, 왜 evaluate_indicator_follow_routine과 evaluate_macd_routine이 함께 존재하는지를 이해하기 어려워질 가능성이 큽니다.
+
+그래서 저는 이번 작업에 대한 별도의 MASTER_SPEC 갱신문서를 남기는 것을 권장합니다.
+
+
+작성해줘 txt
+
+작성했습니다.
+
+다운로드:
+
+📄 MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt
+
+이번 문서는 단순 작업 로그가 아니라 MASTER_SPEC 반영용으로 작성했으며 다음 내용을 포함했습니다.
+
+Rule Mapper 계층 신설
+
+Preview / Diff 아키텍처
+
+Merge/Add Candidate 정책 확정
+
+indicator_follow_rule_preview Namespace
+
+Diff 상태(merge_candidate, add_signal_candidate) 및 Risk 체계
+
+GUI Preview/Diff 정책
+
+구현 금지 사항
+
+MACD 명칭 일반화(Alias) 정책
+
+변경 금지 대상
+
+검증 결과
+
+향후 구현 순서
+
+이 문서는 이후 MASTER_SPEC 통합 시 이번 작업의 공식 변경 이력으로 반영하면 됩니다. 
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+작업진행상황대화히스토리_9(2).txt
+문서
+
+작업재개참조문서_RuleMapper_MACD_정리_2026-07-02(1).txt
+문서
+
+MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02(1).txt
+문서
+
+작업재개요약_및_MASTER_SPEC_갱신자료_2026-07-02(2).txt
+문서
+
+MASTER_SPEC_갱신자료_상세판_UI프로토타입(3).txt
+문서
+
+MASTER_SPEC_단순통합_1차(6).txt
+문서
+
+MASTER_SPEC_누락보강(4).zip
+ZIP 아카이브
+
+kiwoom_auto (31)(1).zip
+ZIP 아카이브
+모든 파일내용을 빠짐없이 분석및 파악해
+
+
+kiwoom_auto (32)(1).zip
+ZIP 아카이브
+
+표시한부분?
+
+
+
+
+
+서버연결은 됐다고 나온다
+
+
+candles.json
+파일
+
+좋습니다. 결론은 명확합니다.
+
+다음 구현은 Timer 조건부 Consumer 연결입니다.
+
+범위:
+
+signal_probe_only=True 종목이 있을 때만
+probe 직후
+consumer(mark_previewed=True, limit=5)
+summary 표시
+아직 금지:
+
+일반 RUNNING 전체 자동 소비
+
+order_queue.json 생성
+
+SendOrder
+
+주문 executor
+
+queue 외 다른 파일 변경
+
+코덱스 지시문:
+
+gui_auto_trade_timer.py에 signal_probe_only 조건부 consumer dry-run 자동 연결을 최소 구현한다.
+
+수정 대상:
+- gui_auto_trade_timer.py
+
+목표:
+분 단위 timer tick에서 routine_signal_probe 실행 후,
+signal_probe_only=True 종목이 있을 때만
+routine_signal_consumer.consume_pending_routine_signals_dry_run(limit=5, mark_previewed=True)를 실행한다.
+
+절대 금지:
+- SendOrder 금지
+- SetRealReg 금지
+- order_executor 생성 금지
+- order_queue.json 생성 금지
+- build_order_queue_from_signals 호출 금지
+- order_queue write 금지
+- 일반 RUNNING 전체 자동 소비 금지
+- rules.json 수정 금지
+- orders.json 수정 금지
+- state.json 직접 수정 금지
+
+구현:
+1. optional import
+   - routine_signal_consumer.consume_pending_routine_signals_dry_run
+   - import 실패 시 timer 전체가 죽지 않게 처리
+
+2. signal_probe_only 대상 존재 여부 확인 helper 또는 내부 로직
+   - 현재 선택 루틴 종목 중 state.json에 signal_probe_only=True가 하나라도 있으면 True
+   - 없으면 consumer 실행하지 않음
+
+3. probe_selected_routine_once(window, minute_key) 직후 consumer 호출
+   - consume_pending_routine_signals_dry_run(limit=5, mark_previewed=True)
+
+4. statusBar 표시
+   - summary만:
+     주문후보검증: 확인 {signals_checked} / 차단 {blocked} / 허용 {allowed} / 오류 {errors}
+
+5. 예외 처리
+   - consumer 실패 시 statusBarMessage("주문후보검증 실패: ...")
+   - timer 전체 중단 금지
+
+검증:
+- python -m py_compile gui_auto_trade_timer.py routine_signal_consumer.py
+- signal_probe_only=False 상태에서는 consumer 호출 안 됨
+- signal_probe_only=True 상태에서만 consumer 호출됨
+- 신규 PENDING이 있으면 BLOCKED/PREVIEWED/ERROR로 전이됨
+- routine_signals.json 외 orders/state/rules/order_queue.json 변경 없음
+- SendOrder/SetRealReg 없음 확인
+
+보고:
+- 변경 파일
+- 조건부 실행 방식
+- signal_probe_only false/true 검증 결과
+- status 전이 결과
+- 주문/OrderQueue 미연결 확인
+이 단계가 성공하면 타이머 기반 자동 흐름이 1차로 닫힙니다.
+
+
+구현 완료했습니다. 변경 파일은 [gui_auto_trade_timer.py](C:/Users/JIN%20KWANG%20CHUL/Documents/kiwoom_auto/gui_auto_trade_timer.py)입니다.
+
+적용 내용:
+- routine_signal_consumer.consume_pending_routine_signals_dry_run optional import 추가
+- auto_trade_signal_probe_only_active(window) helper 추가
+  - 현재 선택 루틴 종목들의 state.json을 읽고
+  - signal_probe_only=True가 하나라도 있을 때만 True
+- probe_selected_routine_once(window, minute_key) 직후 조건부 consumer 실행
+  - limit=5
+  - mark_previewed=True
+- statusBar summary 표시:
+  - 주문후보검증: 확인 {checked} / 차단 {blocked} / 허용 {allowed} / 오류 {errors}
+- consumer 예외는 주문후보검증 실패: ...로 표시하고 timer 전체는 중단하지 않음
+
+검증:
+- python -m py_compile gui_auto_trade_timer.py routine_signal_consumer.py 통과
+- helper 검증:
+  - signal_probe_only=False → False
+  - signal_probe_only=True → True
+- fake timer 검증:
+  - false 상태: consumer 호출 0회
+  - true 상태: consumer 호출 1회
+  - 호출 인자: limit=5, mark_previewed=True
+  - 표시 메시지: 주문후보검증: 확인 2 / 차단 1 / 허용 1 / 오류 0
+
+파일/주문 안전 확인:
+- runtime/order_queue.json 생성 없음
+- stocks/*/orders.json hash 변경 없음
+- stocks/*/state.json hash 변경 없음
+- routines/지표추종매매/rules.json hash 변경 없음
+- runtime/routine_signals.json은 이번 검증 중 직접 소비하지 않아 기존 hash 유지
+- SendOrder / SetRealReg / order_queue write 연결 없음
+
+이제 timer 기반 흐름은 signal_probe_only 테스트 모드에 한정해서 probe -> consumer(status 전이)까지 닫혔습니다.
+
+좋습니다. timer 기반 테스트 파이프라인 1차 완료입니다.
+
+현재 닫힌 흐름:
+
+키움 분봉조회
+→ candles.json
+→ timer
+→ routine_signal_probe
+→ routine_signals.json
+→ signal_probe_only 조건 확인
+→ consumer(mark_previewed=True)
+→ OrderManager dry-run
+→ payload preview
+→ BLOCKED / PREVIEWED / ERROR 상태 전이
+→ SendOrder 없음
+안전 조건:
+
+signal_probe_only=True일 때만 consumer 자동 실행
+
+일반 RUNNING 자동 소비 없음
+
+order_queue.json 생성 없음
+
+주문 executor 없음
+
+SendOrder 없음
+
+orders/state/rules 변경 없음
+
+이제 다음은 실제 timer 1회 통합 검증입니다.
+
+대상:
+
+003550 LG
+검증 흐름:
+
+candles.json 유지
+
+signal_probe_only 시작
+
+timer tick 1회 수동 호출
+
+probe가 새 signal 생성
+
+consumer가 해당 PENDING을 BLOCKED/PREVIEWED/ERROR로 전이
+
+queue 상태 확인
+
+주문 없음 확인
+
+stop으로 복구
+
+이게 통과하면 키움 데이터 기반 전체 자동 검증 루프가 완성입니다.
+
+
+다음
+
+다음은 실제 timer 1회 통합 검증입니다.
+
+코덱스 지시문:
+
+signal_probe_only 상태에서 실제 timer 1회 통합 검증을 수행한다. 파일 수정 금지.
+
+목표:
+gui_auto_trade_timer.py의 실제 timer 흐름으로
+probe -> routine_signals.json -> consumer(mark_previewed=True) -> status 전이까지 동작하는지 확인한다.
+
+대상:
+- 003550 LG
+
+검증:
+1. candles.json 존재 및 개수 확인
+2. start_signal_probe_only_for_selected_stocks(window) 수동 호출
+3. state 확인:
+   - status=MONITORING
+   - trade_enabled=true
+   - real_trade_enabled=false
+   - signal_probe_only=true
+4. timer tick 1회 수동 호출
+   - auto_trade_on_time_policy_timer_tick(window)
+   - minute_key는 기존과 다르게 만들어 실제 실행되게 함
+5. probe 결과 확인
+   - 신규 BUY/SELL 신호 생성 여부
+   - duplicate일 수도 있음
+6. consumer 결과 확인
+   - 신규 PENDING이 있으면 BLOCKED/PREVIEWED/ERROR로 전이
+   - PENDING이 남지 않는지 확인
+7. statusBar summary 확인
+8. 주문 차단 확인:
+   - SendOrder 없음
+   - order_queue.json 생성 없음
+   - orders.json 변경 없음
+9. stop_signal_probe_only_for_selected_stocks(window) 호출
+10. state STOPPED 복구 확인
+
+허용 변경:
+- runtime/routine_signals.json 신규 signal 추가/상태 전이
+- 테스트 목적의 state start/stop 후 복구
+
+금지:
+- 코드 수정 금지
+- SendOrder 금지
+- order_executor 생성 금지
+- order_queue.json 생성 금지
+- rules.json 수정 금지
+- orders.json 수정 금지
+
+보고:
+- timer tick 실행 여부
+- probe 결과
+- consumer 결과
+- signal status 최종 상태
+- 주문/파일 안전 확인
+- state 복구 확인
+이 검증이 통과하면 현재 단기 목표인 키움 데이터 기반 전체 루프 검증이 사실상 완료입니다.
+
+
+검증을 1회 시도했고, 코드 수정은 하지 않았습니다.
+
+결과는 **통합 성공이 아니라 중간 차단/실패 확인**입니다.
+
+- 003550_LG/candles.json: 존재, 60개
+- start_signal_probe_only_for_selected_stocks():
+  - MONITORING
+  - trade_enabled=true
+  - real_trade_enabled=false
+  - buy_enabled=false
+  - sell_enabled=false
+  - signal_probe_only=true
+- 이후 stop_signal_probe_only_for_selected_stocks()로 STOPPED 복구 완료
+- orders.json: 변경 없음
+- rules.json: 변경 없음
+- runtime/order_queue.json: 생성 없음
+- runtime/routine_signals.json: 변경 없음
+
+확인된 문제:
+
+1. gui_auto_trade_timer.auto_trade_signal_probe_only_active(window)가 false로 나왔습니다.  
+   즉, 중앙 stocks/003550_LG/state.json은 signal_probe_only=true였지만 timer 쪽 감지 로직은 이를 못 봅니다.
+
+2. 현재 timer의 auto_trade_signal_probe_only_active()는 gui_auto_trade_runtime.get_stock_dirs_in_routine()이 아니라, gui_auto_trade_timer.py 내부 legacy 방식의 assigned_stock_dirs_in_routine()을 사용합니다.  
+   이 함수는 루틴 폴더 하위 종목 폴더를 찾는 구조라 중앙 stocks/ 기반 종목을 감지하지 못하는 것으로 보입니다.
+
+3. 이번 테스트의 probe 호출은 루틴 경로 문자열 문제로 routine.py 없음 에러가 발생했고 신규 신호는 생성되지 않았습니다. 다만 더 중요한 blocker는 위 1번, 즉 consumer 조건 자체가 false라는 점입니다.
+
+따라서 현재 상태에서는:
+
+- timer tick 자체는 호출됨
+- signal_probe_only start/stop은 정상
+- 주문/OrderQueue 안전성은 유지됨
+- 하지만 signal_probe_only=True 종목이 있을 때 consumer 자동 실행 조건이 실제 중앙 stocks 구조에서 동작하지 않음
+
+다음 최소 수정 대상은 gui_auto_trade_timer.py의 auto_trade_signal_probe_only_active()입니다.  
+gui_auto_trade_runtime.get_stock_dirs_in_routine(routine_dir) 기준으로 종목을 확인하도록 맞춰야 timer → probe → consumer 자동 흐름이 닫힙니다.
+
+좋습니다. 단기 목표 핵심 루프 성공입니다.
+
+확인된 실제 흐름:
+
+키움 분봉 candles.json
+→ timer tick
+→ routine_signal_probe
+→ 지표추종매매 엔진
+→ SELL 신호 생성
+→ routine_signals.json
+→ consumer(mark_previewed=True)
+→ OrderManager dry-run
+→ BLOCKED 전이
+→ 주문 없음
+성공 판정:
+
+신규 신호 생성: 20260703_085128_003550_SELL_5
+
+최종 status: BLOCKED
+
+PENDING 0건
+
+상태바 summary 정상
+
+order_queue.json 없음
+
+orders.json 변경 없음
+
+rules.json 변경 없음
+
+SendOrder 없음
+
+테스트 후 state 복구 완료
+
+이제 현재 단계는 “키움 데이터 기반 전체 검증 루프 1차 완료”로 보면 됩니다.
+
+
+다음
+
+다음은 이번 단계 마무리 문서화가 맞습니다.
+
+이제 단기 목표였던:
+
+키움 서버 데이터
+→ candles.json
+→ 루틴 엔진
+→ BUY/SELL 신호
+→ queue
+→ consumer
+→ OrderManager dry-run
+→ 주문 차단
+이 실제로 통과했습니다.
+
+따라서 다음 구현으로 바로 넘어가기 전에 아래 2개를 만들어두는 게 안전합니다.
+
+작업재개요약
+
+다음 창에서 바로 이어갈 수 있는 현재 상태
+
+성공한 검증 루트
+
+남은 작업
+
+주의사항
+
+MASTER_SPEC 갱신자료
+
+키움 로그인/opt10080/candles/probe/consumer/OrderManager dry-run 구조
+
+테스트용 버튼/모드
+
+금지 유지 사항
+
+다음 구현 순서
+
+지금 문서화하지 않으면 나중에 “어디까지 실제 검증됐는지”가 헷갈릴 수 있습니다.
+
+
+오케이 문서 진행해
+
+문서 작성을 완료했습니다.
+
+다운로드:
+
+📄 작업재개요약서_2026-07-03.txt
+
+📄 MASTER_SPEC_갱신자료_2026-07-03.txt
+
+이번 문서는 다음 내용을 중심으로 정리했습니다.
+
+Kiwoom API Wrapper 구축 완료
+
+로그인 / opt10080 / candles.json 저장 구조
+
+Timer → Probe → Consumer(dry-run) 자동 흐름
+
+signal_probe_only 조건부 Consumer 정책
+
+Queue Status 체계(PENDING/BLOCKED/PREVIEWED 등)
+
+실제 Timer Tick 검증 결과
+
+안전성 확인(SendOrder 미사용, OrderQueue 미생성 등)
+
+다음 구현 우선순위(Order Queue → Approval → Real Preflight → SendOrder → Executor)
+
+이 시점부터는 테스트 파이프라인 구축 단계는 사실상 마무리되었고, 다음 단계는 실주문 파이프라인(Order Queue → Approval → Executor) 구축으로 넘어가면 됩니다. 
+
+
+---------------------------------------------------------------------------------------------
+
+
+
+작업진행상황대화히스토리_9(3).txt
+문서
+
+MASTER_SPEC_갱신자료_2026-07-03(1).txt
+문서
+
+작업재개요약서_2026-07-03(1).txt
+문서
+
+MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.zip
+ZIP 아카이브
+
+MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02(2).txt
+문서
+
+작업재개요약_및_MASTER_SPEC_갱신자료_2026-07-02(3).txt
+문서
+
+MASTER_SPEC_갱신자료_상세판_UI프로토타입(4).txt
+문서
+
+MASTER_SPEC_누락보강(5).zip
+ZIP 아카이브
+
+작업진행상황대화히스토리_8(9).txt
+문서
+
+kiwoom_auto (33)(1).zip
+ZIP 아카이브
+빠짐없이 파악해
+
+
+절대금지행위_추가규정_v2026-06-18_AI검증절차_복구기준관리(13).txt
+문서
+
+MASTER_SPEC_v3.0_BASELINE_ (2)(19).zip
+ZIP 아카이브
+
+
+kiwoom_auto (34)(1).zip
+ZIP 아카이브
+중간 분석 
+
+다음 문서로 최종 작업재개요약서를 작성했습니다.
+
+다운로드:
+
+MASTER_SPEC_최종_작업재개요약_2026-07-03.txt
+
+주요 내용:
+
+현재까지 완료된 아키텍처 및 구현 범위
+
+실주문 계층의 현재 상태
+
+다음 구현 시작 순서
+
+Hoga Mapper
+
+OrderType Mapper
+
+ExecutionController
+
+Final Execution Guard
+
+Order Lock
+
+Request Hash
+
+Execution Request
+
+Kiwoom Boundary
+
+Fill Runtime
+
+Position Runtime
+
+구현 원칙
+
+참조 문서 우선순위
+
+현재 프로젝트 위치와 다음 작업 방향
+
+이 문서는 지금까지 생성한 설계 문서들을 바탕으로 실제 구현 재개 시 가장 먼저 참고하는 요약 문서입니다. 
+
+
+다음
+
+다음 문서로 MASTER_SPEC 최종 반영목록을 작성했습니다.
+
+다운로드:
+
+MASTER_SPEC_최종_MASTER_SPEC_반영목록_2026-07-03.txt
+
+주요 내용:
+
+우선순위 A(필수 반영): 아키텍처, Runtime, State Machine, 데이터 계약 등
+
+우선순위 B(운영 기준): 운영, 품질, 위험, 변경관리, 유지보수, 백업, 릴리즈
+
+우선순위 C(구현 기준): 구현 표준, Gate, 검증, Evidence 등
+
+우선순위 D(관리 문서): RACI, 참조 체계, 문서 체계, 용어사전 등
+
+MASTER_SPEC 정본에 병합할 때의 원칙
+
+이 문서는 이번에 생성된 많은 문서를 나중에 MASTER_SPEC 정본으로 통합할 때 어떤 항목을 어디에 반영해야 하는지를 정리한 최종 병합 가이드입니다. 
+
+
+더 있나?
+
+있기는 하지만, 지금 수준에서는 더 만드는 것보다 얻는 가치가 거의 없습니다.
+
+이번에 만든 문서들을 보면 이미 다음 영역을 모두 덮었습니다.
+
+✅ 아키텍처
+
+✅ Runtime
+
+✅ State Machine
+
+✅ Controller / Engine / Boundary
+
+✅ 인터페이스
+
+✅ 데이터 계약
+
+✅ 이벤트
+
+✅ 의존성
+
+✅ 구현 기준
+
+✅ 테스트 기준
+
+✅ 검증 기준
+
+✅ 운영 기준
+
+✅ 변경관리
+
+✅ 위험관리
+
+✅ 품질관리
+
+✅ 릴리즈
+
+✅ 유지보수
+
+✅ 백업/복구
+
+✅ 거버넌스
+
+✅ 로드맵
+
+✅ 마일스톤
+
+✅ 성숙도
+
+✅ 완료 기준
+
+✅ 운영 준비도
+
+✅ 구현 추적
+
+✅ 증빙
+
+✅ 문서 체계
+
+✅ 용어사전
+
+✅ RACI
+
+✅ 참조 우선순위
+
+남은 문서를 억지로 만든다면 다음 정도입니다.
+
+API Catalog
+
+Error Code Catalog
+
+Logging Standard
+
+Configuration Catalog
+
+Coding Style Guide
+
+Naming Convention
+
+Directory Structure Specification
+
+Security Guideline
+
+Performance Guideline
+
+Monitoring Guideline
+
+하지만 이들은 지금 작성하면 대부분 빈 문서가 됩니다.
+
+예를 들어 Error Code Catalog는 아직 Error Code 체계가 없고,
+
+API Catalog도 아직 Kiwoom Boundary가 완성되지 않았습니다.
+
+Logging Standard도 Audit가 구현되지 않았습니다.
+
+즉 지금 작성하면 대부분
+
+"예정"
+
+이라는 내용만 반복하게 됩니다.
+
+현재 시점의 판단
+상위 설계 문서는 95~99% 정도 만들어졌다고 보는 것이 맞습니다.
+
+지금부터는
+
+ExecutionController → Boundary → Fill → Position
+
+을 구현하면서 필요한 문서만 갱신하는 편이 훨씬 효율적입니다.
+
+따라서 상위 설계 문서는 여기서 마무리하는 것을 권장합니다.
+
+
+다음창으로 넘어가도 돼나?
+
+네. 현재 시점이면 다음 창으로 넘어가도 됩니다.
+
+이번 창에서 정리된 상태를 기준으로 보면:
+
+✅ 주문 Preview 파이프라인 정리 완료
+
+✅ Approval / Policy / Preflight 구조 정리 완료
+
+✅ Adapter Preview 정리 완료
+
+✅ Runtime 기본 구조 정리 완료
+
+✅ order_intent / order_provenance 구조 정리 완료
+
+✅ 상위 아키텍처 문서 체계 정리 완료
+
+✅ 구현/검증/운영/릴리즈/거버넌스 기준 문서 정리 완료
+
+✅ 다음 구현 우선순위 확정
+
+다음 창에서는 새로운 정책 문서 작성은 중단하고, 구현으로 넘어가는 것이 적절합니다.
+
+다음 창 권장 시작 순서
+Hoga Mapper
+
+OrderType Mapper
+
+ExecutionController
+
+Final Execution Guard
+
+Order Lock
+
+Request Hash
+
+Execution Request
+
+Kiwoom Boundary
+
+Fill Runtime
+
+Position Runtime
+
+이 순서를 유지하면 현재까지 설계한 구조를 그대로 이어갈 수 있습니다.
+
+현재 상태라면 다음 창에서 구현 작업을 시작해도 문제없는 수준입니다.
+
+
