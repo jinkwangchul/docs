@@ -48,6 +48,29 @@ MASTER_SPEC는 `00_CANONICAL/CURRENT`의 최신 `MASTER_SPEC_CANONICAL_*.txt`를
 - 실제 구현된 내용만 Canonical에 반영한다.
 - CHANGELOG를 통해 변경 이력을 남긴다.
 
+## AI Reference Edition
+
+최신 MASTER_SPEC Canonical은 크기가 커서 GitHub Web과 일부 AI Connector에서 전체 내용을 한 번에 읽기 어렵다. 이를 위해 `00_CANONICAL/REFERENCE`에 AI 참조용 분할본을 둔다.
+
+Reference Edition 원칙:
+
+- 공식 원본은 `00_CANONICAL/CURRENT`의 최신 Canonical이다.
+- Reference Edition은 AI 참조 편의를 위한 분할본이다.
+- Reference Edition은 원문을 요약하거나 생략하지 않는다.
+- Reference Edition은 원본 순서를 유지한다.
+
+새 AI 세션에서는 다음 순서로 참조한다.
+
+```text
+README
+↓
+00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
+↓
+필요한 PART
+↓
+00_CANONICAL/CURRENT 최신 Canonical
+```
+
 ## CURRENT 사용법
 
 `00_CANONICAL/CURRENT`는 현재 프로젝트를 바로 재개하는 데 필요한 최신 기준 문서만 두는 영역이다.
