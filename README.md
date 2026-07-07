@@ -56,6 +56,8 @@ Reference Edition 원칙:
 
 - 공식 원본은 `00_CANONICAL/CURRENT`의 최신 Canonical이다.
 - Reference Edition은 AI 참조 편의를 위한 분할본이다.
+- SUBPART는 AI가 우선 참조하는 작은 단위 분할본이다.
+- 기존 PART01~PART05는 Legacy large part / Full part로 유지한다.
 - Reference Edition은 원문을 요약하거나 생략하지 않는다.
 - Reference Edition은 원본 순서를 유지한다.
 
@@ -66,9 +68,11 @@ README
 ↓
 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
 ↓
-필요한 PART
+필요한 SUBPART
 ↓
-00_CANONICAL/CURRENT 최신 Canonical
+필요한 경우 기존 PART
+↓
+필요한 경우 00_CANONICAL/CURRENT 최신 Canonical
 ```
 
 ## CURRENT 사용법
