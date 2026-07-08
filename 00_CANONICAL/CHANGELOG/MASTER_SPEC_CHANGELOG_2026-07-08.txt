@@ -1,78 +1,61 @@
-MASTER_SPEC_CHANGELOG_2026-07-08
+MASTER_SPEC CHANGELOG
+작성일: 2026-07-08
 
-문서 목적
-- 2026-07-08 MASTER_SPEC Canonical 갱신 내용을 CHANGELOG로 기록한다.
-- 본 CHANGELOG는 Canonical 본문을 추가 수정하지 않고, 이미 생성된 신규 Canonical과 병합 완료 UPDATE 문서를 기준으로 작성한다.
+1. 기준 Canonical
+- 병합 기준 Canonical 파일명: (기존 Canonical 세트 — 직접 수정 없음)
+- 신규 Canonical 파일명: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_LIFECYCLE_COMMIT_WRITER_SERVICE.txt
 
-기준 문서
-- CHANGELOG 작성 기준 Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt`
-- 병합 전 기준 Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt`
-- 신규 Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt`
-- 병합된 UPDATE 문서: `10_UPDATE/MERGED/UPDATE_20260707_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt`
-- UPDATE 이동 상태: `10_UPDATE/INBOX` -> `10_UPDATE/MERGED`
+2. 병합된 UPDATE
+- 파일명: UPDATE_20260708_LIFECYCLE_COMMIT_WRITER_SERVICE.txt
+- 경로 이동: 10_UPDATE/INBOX → 10_UPDATE/MERGED/UPDATE_20260708_LIFECYCLE_COMMIT_WRITER_SERVICE.txt
 
-추가 섹션
-- 신규 섹션 `29.8 Execution SendOrder Chejan Lifecycle Pipeline` 전체를 기록했다.
-- `29.8.1 Execution Queue Commit Pipeline`
-- `29.8.2 Canonical SendOrder Path`
-- `29.8.3 Canonical SendOrder Pipeline`
-- `29.8.4 SendOrder Recorder`
-- `29.8.5 Chejan Entry Pipeline`
-- `29.8.6 Chejan Event Pipeline`
-- `29.8.7 Lifecycle Transition Preview`
-- `29.8.8 AI Development Tools / Local Analyzer 운영 도구`
-- `29.8.9 Test Coverage / Verification Status`
-- `29.8.10 Maintained Safety Boundaries`
+3. 추가된 MASTER_SPEC 내용
+- Lifecycle Commit Writer
+- Lifecycle Commit Service
+- SQLite Lifecycle Store
+- transitions / journal / metadata
+- prepare_commit
+- finalize_commit
+- prepared / committed / aborted 상태
+- evidence_id 중복 방지
+- order_id + event 중복 방지
+- read_store_snapshot
+- transaction rollback
+- audit journal
+- commit_lifecycle 오케스트레이션
+- executor 성공 처리
+- executor 실패 처리
+- recovery / audit 가능 상태
 
-주요 기록 내용
-- Execution Queue Commit Pipeline은 Execution Preview 이후 Queue Commit 가능 여부를 판단하고, Approval Gate, Readiness Validator, Contract Preview, Dry-run, Executor, Result Review를 분리하는 계층으로 기록했다.
-- Canonical SendOrder Path는 Queue Commit 이후 Canonical SendOrder, SendOrder Recorder, Chejan Entry, Chejan Event, Lifecycle Preview까지 이어지는 명시적 후보 흐름으로 기록했다.
-- Canonical SendOrder Pipeline은 Dispatch Builder, Safety Gate, Call Preview, Executor, Result Review를 분리하는 SendOrder 전후 경계로 기록했다.
-- SendOrder Recorder는 SendOrder 결과를 lifecycle 전환으로 직접 넘기지 않고 Recorder Contract, Recorder Review, Chejan Entry Adapter로 분리하는 계층으로 기록했다.
-- Chejan Entry Pipeline은 SendOrder Recorder Review 이후 Open Policy와 Raw Event Contract를 통해 Chejan event 처리 진입 기준을 검증하는 계층으로 기록했다.
-- Chejan Event Pipeline은 Classification Preview, Evidence Builder, Evidence Review로 분리되는 event 처리 후보 계층으로 기록했다.
-- Lifecycle Transition Preview는 Chejan Review 이후 lifecycle 전환을 자동 commit하지 않고 Preview, Approval, Contract Preview, Dry-run으로 나누는 계층으로 기록했다.
-- AI Development Tools / Local Analyzer 운영 도구는 실행 pipeline 자체가 아니라 분석, 구현 요청, 영향 분석, 호출 흐름 분석을 보조하는 read-only 성격의 운영 도구 후보로 기록했다.
+4. 테스트 결과
+- py_compile: OK
+- Writer/Service 관련 단위 테스트: 12 tests OK
+- Lifecycle 관련 테스트: 69 tests OK
+- 전체 unittest discovery: 2534 tests OK
 
-테스트 결과
-- UPDATE 기준으로 Execution Queue Commit Pipeline 관련 테스트 추가를 기록했다.
-- UPDATE 기준으로 Canonical SendOrder Pipeline 관련 테스트 추가를 기록했다.
-- UPDATE 기준으로 SendOrder Recorder Pipeline 관련 테스트 추가를 기록했다.
-- UPDATE 기준으로 Chejan Entry/Event Pipeline 관련 테스트 추가를 기록했다.
-- UPDATE 기준으로 Lifecycle Preview Pipeline 관련 테스트 추가를 기록했다.
-- 이번 CHANGELOG 작성 작업에서는 `kiwoom_auto` 로컬 프로젝트를 열지 않았고 Python 테스트를 실행하지 않았다.
-- 전체 unittest 통과 개수는 이번 CHANGELOG에서 새로 확정하지 않는다.
-- GitHub 기준 최신 코드의 전체 unittest discovery 결과는 별도 검토 필요로 기록한다.
+5. 유지된 금지선
+- runtime(파이썬) 변경 없음
+- rules.json 변경 없음
+- GUI 연결 없음
+- SendOrder live 연결 없음
+- Chejan live 연결 없음
 
-유지된 금지선
-- Preview 단계에서 runtime write 금지.
-- Preview 단계에서 queue write 금지.
-- Queue Commit은 명시 계층에서만 수행.
-- SendOrder 직접 호출 금지.
-- Kiwoom 직접 호출 금지.
-- Chejan 자동 연결 금지.
-- Lifecycle 자동 commit 금지.
-- GUI 자동 연결 금지.
-- rules.json 임의 수정 금지.
-- runtime 파일 임의 수정 금지.
-- MASTER_SPEC 직접 덮어쓰기 금지.
-- 기존 Canonical 수정 금지.
+6. 다음 구현 후보
+- finalize idempotency 강화
+- TTL / Reaper
+- Backup / Recovery
+- Monitoring
 
-검토 필요로 남긴 항목
-- 실제 구현 파일의 세부 계약은 GitHub 최신 코드 기준으로 별도 재검토가 필요하다.
-- 기존 Canonical의 "SendOrder는 KiwoomOrderExecutor만 호출 가능" 정책과 `kiwoom_send_order_executor.py` 계층의 명칭/책임 관계는 별도 확인이 필요하다.
-- SendOrder Recorder Review와 Chejan Entry Adapter 간 데이터 계약은 실제 코드 기준으로 재검토가 필요하다.
-- Chejan Evidence Review 이후 Lifecycle Transition Preview 진입 조건은 실제 코드 기준으로 재검토가 필요하다.
-- AI Development Tools / Local Analyzer의 read-only 보장 여부는 실제 도구 동작 기준으로 확인이 필요하다.
+금지:
+- Canonical 수정 금지
+- UPDATE 수정 금지
+- REFERENCE 수정 금지
+- Python 수정 금지
+- Git commit/push 금지
 
-보호 기록
-- Canonical 본문을 추가 수정하지 않았다.
-- Reference를 수정하지 않았다.
-- `kiwoom_auto`를 수정하지 않았다.
-- Python, runtime, rules.json을 수정하지 않았다.
-- Git commit을 수행하지 않았다.
-- Git push를 수행하지 않았다.
-
-생성 파일
-- `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-08.txt`
-- `00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-08.txt`
+보고:
+- 생성 파일명:
+  - 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-08.txt
+  - 00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-08.txt
+- 주요 기록 내용: Lifecycle Commit Writer Service 관련 MASTER_SPEC 규격화 문서 추가 및 UPDATE 병합
+- docs git status: (아래 git status --porcelain 실행 결과를 참조)

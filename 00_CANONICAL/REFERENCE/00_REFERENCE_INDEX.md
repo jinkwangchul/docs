@@ -32,6 +32,7 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_
 | PART05_RULE_APPROVAL.md | Legacy large part / Full part: Sequential original body before 29.6 | 1027123 bytes |
 | PART06_EXECUTION_PREVIEW.md | 29.6 Execution Preview Pipeline Complete | 13405 bytes |
 | PART07_EXECUTION_CONTROLLER.md | 29.7 Rule Apply Preview Execution Preview Controller; 2249 tests OK | 13495 bytes |
+| | PART07_01_LIFECYCLE_COMMIT_WRITER.md | Lifecycle Commit Writer / Service candidate | 7556 bytes |
 | PART08_OPERATION_POLICY.md | 29.8 Execution SendOrder Chejan Lifecycle Pipeline | 18145 bytes |
 | PART09_APPENDIX.md | Reserved; no original body assigned | 649 bytes |
 

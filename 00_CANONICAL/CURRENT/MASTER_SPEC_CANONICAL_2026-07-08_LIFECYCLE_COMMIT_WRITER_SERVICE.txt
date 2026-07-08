@@ -1,0 +1,131 @@
+MASTER_SPEC CANONICAL — Lifecycle Commit Writer Service
+작성일: 2026-07-08
+원본 UPDATE: 10_UPDATE/INBOX/UPDATE_20260708_LIFECYCLE_COMMIT_WRITER_SERVICE.txt
+기준 프로젝트: kiwoom_auto
+기준 커밋: cdd74a2 (Add lifecycle commit writer service)
+
+요약
+본 문서는 kiwoom_auto 프로젝트에 새로 도입된 'Lifecycle Commit Writer' 계층과 이를 오케스트레이션하는 'Lifecycle Commit Service'의 구현 내용을 MASTER_SPEC Canonical 규격으로 정리한 문서입니다. 본 문서는 다음 항목을 규격화하고 Canonical 문서 세트에 추가하기 위한 후보 문서로 작성되었습니다.
+
+1) 구현 개요
+- 목적: 라이프사이클 단위의 변경을 원자적으로 기록하고, prepare/finalize 패턴을 통해 외부 실행(executor)과의 동기화를 보장하며, 감사(journal) 및 장애 복구(recovery)를 지원한다.
+- 구성: Writer 계층(데이터 영속화, 중복 방지, 트랜잭션 관리)과 Service 계층(prepare→executor→finalize 오케스트레이션)으로 분리.
+
+2) GitHub 참조 정보
+- Repository: https://github.com/jinkwangchul/kiwoom_auto
+- Branch: main (확인 필요)
+- Commit Hash: cdd74a2
+- Commit Message: Add lifecycle commit writer service
+
+3) 적용/관련 파일
+- lifecycle_commit_writer.py
+  - SQLite 기반 저장소 스키마 정의, prepare_commit / finalize_commit 구현, 중복 방지(UNIQUE 제약), journal 기록, 트랜잭션 경계 보장 등.
+- lifecycle_commit_service.py
+  - commit_lifecycle API(prepare→executor→finalize 흐름), executor 실패 처리 및 aborted 기록 등.
+- tests/test_lifecycle_commit_writer_service.py
+  - Writer/Service 주요 시나리오(정상/중복/실패 등) 단위 테스트.
+
+4) SQLite Lifecycle Commit Store (스키마)
+- transitions 테이블(소스 오브 트루스)
+  - id INTEGER PRIMARY KEY AUTOINCREMENT
+  - evidence_id TEXT UNIQUE NOT NULL
+  - order_id TEXT
+  - event TEXT
+  - payload TEXT / BLOB
+  - state TEXT CHECK(state IN ('prepared','committed','aborted'))
+  - created_at TIMESTAMP
+  - finalized_at TIMESTAMP NULL
+  - UNIQUE(order_id, event)
+- journal 테이블(감사용)
+  - id INTEGER PRIMARY KEY AUTOINCREMENT
+  - transition_id INTEGER REFERENCES transitions(id)
+  - action TEXT CHECK(action IN ('prepare','finalize','abort'))
+  - detail TEXT
+  - ts TIMESTAMP
+- metadata 테이블
+  - key TEXT PRIMARY KEY
+  - value TEXT
+
+5) transitions / journal / metadata 동작
+- transitions가 라이프사이클 상태의 단일 소스이며, prepare 시 prepared 상태로 삽입되고 finalize 시 committed 또는 aborted로 전이된다.
+- journal은 prepare/finalize/abort 등 각 단계의 상세 근거(예: executor 결과, 예외 스택)를 기록해 감사와 복구 시 사용된다.
+- metadata는 스키마 버전, 마지막 처리 위치 등 운영 정보를 보관한다.
+
+6) prepare_commit
+- 입력: evidence_id, order_id, event, payload
+- 동작: DB 트랜잭션 내에서 transitions에 prepared 레코드를 삽입하고 journal에 prepare 이벤트를 기록.
+- 중복 처리: evidence_id 또는 (order_id,event) 복합 제약에 의한 삽입 실패(IntegrityError) 발생 시 기존 레코드를 조회해 중복에 따른 no-op 또는 에러 반환 정책을 적용.
+- 반환: prepared 레코드 식별자 및 메타 정보.
+
+7) finalize_commit
+- 동작: 준비된 레코드의 상태를 committed 또는 aborted로 전환. committed인 경우 finalized_at 타임스탬프 기록.
+- idempotency: 이미 committed이면 no-op으로 처리하여 중복 호출에 안전하도록 설계. finalize idempotency 강화는 향후 과제.
+- 실패 처리: finalize 과정에서 예외 발생 시 트랜잭션을 롤백하고 journal에 실패 정보를 남김. Service 계층에서 executor 실패에 따른 abort 결정 및 후속 조치를 수행.
+
+8) 상태 모델 (prepared / committed / aborted)
+- prepared: 외부 executor가 실행할 수 있는 준비된 상태. 장애 시에도 남아 복구/재시도 가능.
+- committed: executor 성공 후 영구 적용된 최종 상태.
+- aborted: executor 실패 또는 수동 취소로 인해 작업이 취소된 상태.
+
+9) 중복 방지 전략
+- evidence_id 중복 방지: evidence_id에 UNIQUE 제약을 두고 DB 수준에서 중복을 방지. 동시성 충돌 시 IntegrityError를 잡아 기존 레코드 기반 판단을 수행.
+- order_id + event 중복 방지: (order_id,event) 복합 UNIQUE 인덱스로 동일 주문에 같은 이벤트가 중복 적용되는 것을 방지.
+
+10) read_store_snapshot
+- Writer는 prepare 전 또는 executor 실행 전 필요 시 읽기 전용 스냅샷을 조회해 현재 상태를 검증. SQLite의 일관된 읽기를 활용.
+
+11) 트랜잭션과 롤백
+- prepare, finalize, journal 기록 등 모든 DB 변경은 명확한 트랜잭션 경계 내에서 실행되며, 예외 발생 시 롤백하여 불완전한 레코드가 남지 않도록 설계.
+
+12) 감사(Journal)와 복구
+- journal에 prepare/finalize/abort 관련 상세 정보를 보존해 감사 및 장애 복구 시 근거로 사용.
+- Prepared 레코드는 장애 복구 시점에 finalize를 재시도하거나 수동 개입으로 정리할 수 있도록 설계.
+
+13) Lifecycle Commit Service (오케스트레이션)
+- commit_lifecycle API: Writer.prepare_commit 호출 → executor 실행 → Writer.finalize_commit 호출의 흐름을 관리.
+- 흐름 요약:
+  1) prepare_commit(evidence_id, order_id, event, payload) -> prepared 획득
+  2) executor 실행(비즈니스 작업, 외부 의존 호출)
+  3) executor 성공 -> finalize_commit(prepared_id, committed)
+  4) executor 실패 -> finalize_commit(prepared_id, aborted) 및 journal에 실패 정보 기록
+- aborted 처리: aborted는 명시적 기록으로 남아 재시도/수동 복구 포인트로 활용.
+
+14) Executor 실패/성공 처리
+- 성공: committed로 전환하고 감사 기록을 남김.
+- 실패: aborted로 전환하고 실패 원인(예외 메시지, 스택 등)을 journal에 저장. 자동 재시도는 현재 미구현이며 차후 과제로 분류.
+
+15) 복구 및 감사 가능 상태
+- 시스템 장애 후에도 prepared 레코드와 journal을 통해 복구(재시도/수동정리)가 가능하도록 설계.
+
+16) 테스트 결과(요약)
+- py_compile: OK
+- Writer/Service 단위 테스트: 12 tests OK
+- Lifecycle 관련 테스트: 69 tests OK
+- 전체 unittest: 2534 tests OK
+
+17) 유지된 금지선
+- Python 런타임 또는 의존성 변경 없음
+- rules.json 변경 없음
+- GUI/Live SendOrder/Chejan 연결 없음
+- retry 미구현
+- TTL/Reaper 미구현
+- MASTER_SPEC 직접 수정 금지(본 문서는 반영 후보)
+
+18) MASTER_SPEC 반영 후보 항목
+- Lifecycle Commit Writer 규격
+- Lifecycle Commit Service 규격
+- Lifecycle Commit Storage 스키마( transitions / journal / metadata )
+- prepare_commit / finalize_commit 동작 규격
+- 상태 기계 정의( prepared / committed / aborted )
+- 중복 방지 규약( evidence_id, order_id+event )
+- executor 실패 처리 및 감사 포맷
+
+19) 다음 구현/규격화 후보
+- TTL / Reaper 정책 및 구현
+- finalize의 idempotency 강화
+- Backup/Recovery 절차 및 Runbook
+- 모니터링 및 경보 체계
+
+참고: 이 파일은 기존 Canonical을 수정하지 않고 새 Canonical 파일로 추가되었습니다. 실제 MASTER_SPEC에 반영하려면 별도의 검토/PR 프로세스를 거치기 바랍니다.
+
+끝.
