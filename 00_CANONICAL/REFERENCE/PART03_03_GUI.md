@@ -1,16 +1,554 @@
-# PART03_03 GUI
+# PART03 03 GUI
 
 Reference Edition Subpart
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
 Source Full Part: PART03_GUI.md
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 하위 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 Original Body Marker: START
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+기존 구조에서 가장 중요한 변화:
+- preview_rules["buy"]["groups"] = ... 제거
+- signals["macd_sell"] = ... 제거
+- 기존 rules dict를 덮어쓰는 방식 중단
+- preview 전용 namespace 생성
+**2. 변경될 Preview 구조**
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+현재 구조:
+json
+{
+ "preview_rules": {
+ "bar": {
+ "bar_minutes": 5
+ },
+ "buy": {
+ "groups": [...]
+ },
+ "sell": {
+ "signals": {
+ "macd_sell": {...}
+ }
+ }
+ }
+}
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+mapped_paths 변경 후보:
+json
+[
+ "bar.bar_minutes",
+ "buy.groups[0].conditions",
+ "sell.signals.ui_preview_condition_c_macd_sell"
+]
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+- sell.signals.ui_preview_condition_c_macd_sell
+ - current: 없음
+ - preview: indicator_follow_rule_preview.candidates.sell.add_signal_candidate
+ - status: add_signal_candidate
+ - risk: low for preview, execution risk 별도 note
+ - note: 기존 sell.signals.macd_sell 변경 없음
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+중요:
+- sell.signals.macd_sell은 mapped_paths에서 제거
+- 따라서 diff에 sell.signals.macd_sell changed가 나오면 실패
+- 기존 macd_sell은 변경 대상이 아니라 “unchanged by mapper preview”로 해석해야 함
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+기존 테스트 중 수정 필요:
+- test_mapped_paths_match_expected_preview_paths
+- test_buy_delay_bar_is_under_preview_buy
+- test_sell_delay_bar_is_under_preview_sell_macd_sell_only
+- diff 관련 테스트 일부
+새 테스트 방향:
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+5. sell add signal candidate
+python
+candidate = preview_rules["indicator_follow_rule_preview"]["candidates"]["sell"]["add_signal_candidate"]
+candidate["path"] == "sell.signals.ui_preview_condition_c_macd_sell"
+candidate["enabled"] is False
+candidate["preview_candidate"] is True
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+6. 기존 sell.signals.macd_sell 미변경
+python
+assert preview_rules["sell"]["signals"]["macd_sell"] == current_rules["sell"]["signals"]["macd_sell"]
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+다만 preview_rules가 current_rules deepcopy를 유지할 경우에만 해당. 만약 preview_rules를 후보만 담는 구조로 축소하면 이 테스트는 “preview namespace가 macd_sell을 포함하지 않는다”로 바꿔야 함.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+7. diff status
+text
+buy.groups[0].conditions → merge_candidate
+sell.signals.ui_preview_condition_c_macd_sell → add_signal_candidate
+sell.signals.macd_sell → changes에 없어야 함
+8. warnings ASCII 유지
+**5. 위험 요소**
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+구현 추천 여부:
+- **구현 추천: 예**
+- 단, 기존 실행 rules로 직접 매핑하지 말고 preview namespace 기반으로만 구현해야 합니다.
+- buy.groups 직접 대체와 sell.signals.macd_sell 직접 대체는 금지하는 방향이 맞습니다.
+분석 방향 좋습니다. 이제 구현 들어가도 됩니다.
+다만 범위는 아주 좁게 잡는 게 맞습니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+수정 범위:
+1. build_engine_rules_preview_from_ui_state()
+2. compare_engine_rules_preview()
+3. tests/test_indicator_follow_rule_mapper_preview.py
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+구현 내용:
+1. preview에서 buy.groups를 직접 덮어쓰지 않는다.
+2. preview에서 sell.signals.macd_sell을 직접 덮어쓰지 않는다.
+3. preview 전용 namespace를 추가한다.
+namespace:
+indicator_follow_rule_preview
+mode:
+merge_add_candidate
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+sell 후보:
+- 기존 sell.signals.macd_sell은 변경하지 않는다.
+- MACD <= -1.0 조건은 별도 signal candidate로 둔다.
+- path: sell.signals.ui_preview_condition_c_macd_sell
+- enabled: false
+- preview_candidate: true
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+mapped_paths:
+- bar.bar_minutes
+- buy.groups[0].conditions
+- sell.signals.ui_preview_condition_c_macd_sell
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+diff:
+- bar.bar_minutes: same/changed
+- buy.groups[0].conditions: merge_candidate
+- sell.signals.ui_preview_condition_c_macd_sell: add_signal_candidate
+- sell.signals.macd_sell은 changes에 나오면 안 됨
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+테스트:
+- current_rules 불변
+- preview namespace 존재
+- buy.groups 직접 대체 없음
+- buy merge candidate 확인
+- sell add signal candidate 확인
+- sell.signals.macd_sell 변경 없음
+- diff status 확인
+- warnings ASCII 유지
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+변경 내용:
+- buy.groups 직접 대체 제거
+- sell.signals.macd_sell 직접 대체 제거
+- preview 전용 namespace 추가:
+ - indicator_follow_rule_preview
+ - mode: merge_add_candidate
+- buy는 buy.groups[0].conditions에 대한 merge_candidate로 표현
+ - 기존 OSC TURN_UP은 skip_existing
+ - OSC <= -91.0만 add_conditions
+- sell은 기존 macd_sell 유지
+ - sell.signals.ui_preview_condition_c_macd_sell 별도 signal 후보로 표현
+ - enabled: false
+ - preview_candidate: true
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+mapped_paths 변경:
+json
+[
+ "bar.bar_minutes",
+ "buy.groups[0].conditions",
+ "sell.signals.ui_preview_condition_c_macd_sell"
+]
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+diff 변경:
+- bar.bar_minutes: same/changed
+- buy.groups[0].conditions: merge_candidate
+- sell.signals.ui_preview_condition_c_macd_sell: add_signal_candidate
+- sell.signals.macd_sell은 changes에 나오지 않음
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+replace preview 제거 완료
+merge/add candidate preview 적용 완료
+buy.groups 직접 대체 제거 OK
+sell.signals.macd_sell 직접 대체 제거 OK
+별도 preview namespace 적용 OK
+테스트 12개 통과 OK
+rules.json 미수정
+엔진 미연결
+다음 작업은 GUI 표시 확인입니다.
+코덱스 지시:
+파일 수정 금지.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+확인 대상:
+1. indicator_follow_rule_preview namespace가 보이는지
+2. mode가 merge_add_candidate인지
+3. buy.groups가 changed가 아니라 merge_candidate로 표시되는지
+4. sell.signals.macd_sell이 changes에 없는지
+5. sell.signals.ui_preview_condition_c_macd_sell이 add_signal_candidate로 표시되는지
+6. rules.json 수정 시간 변경 없는지
+이 출력 확인 후 문제가 없으면, 다음은 작업재개요약 / MASTER_SPEC 갱신자료 작성으로 한 번 끊는 게 좋습니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+text
+[Rule Mapper Preview]
+{
+ "mapped_paths": [
+ "bar.bar_minutes",
+ "buy.groups[0].conditions",
+ "sell.signals.ui_preview_condition_c_macd_sell"
+ ],
+ "warnings": [
+ "sell condition C MACD is an add_signal_candidate and does not replace existing macd_sell",
+ "buy method mapping is postponed",
+ "repeat buy mapping is postponed",
+ "price compare buy mapping is postponed",
+ "situation response mapping is postponed",
+ "additional feature mapping is postponed",
+ "cycle setting mapping is postponed",
+ "exit condition mapping is postponed",
+ "sell method A/B/C mapping is postponed",
+ "pending order policy mapping is postponed",
+ "completion policy mapping is postponed"
+ ],
+ "preview_rules": {
+ "bar": {
+ "bar_minutes": 5
+ },
+ "buy": {
+ "enabled": true,
+ "groups_logic": "OR",
+ "groups": [
+ {
+ "enabled": true,
+ "name": " ż 1",
+ "conditions_logic": "AND",
+ "conditions": [
+ {
+ "enabled": true,
+ "not": false,
+ "target": "OSC",
+ "operator": "TURN_UP",
+ "description": "MACD Ƿ ϶ ȯ"
+ }
+ ]
+ },
+ {
+ "enabled": false,
+ "name": " ż 2",
+ "conditions_logic": "AND",
+ "conditions": []
+ },
+ {
+ "enabled": false,
+ "name": " ż 3",
+ "conditions_logic": "AND",
+ "conditions": []
+ },
+ {
+ "enabled": false,
+ "name": " ż 4",
+ "conditions_logic": "AND",
+ "conditions": []
+ },
+ {
+ "enabled": false,
+ "name": " ż 5",
+ "conditions_logic": "AND",
+ "conditions": []
+ }
+ ]
+ },
+ "sell": {
+ "enabled": true,
+ "signal_logic": "OR",
+ "note": "MACD SELL ͷ SELL SELL ȣ . Ȱ ȭ signal_logic AND/OR Ѵ .",
+ "signals": {
+ "macd_sell": {
+ "enabled": true,
+ "delay_bar": 1,
+ "groups_logic": "OR",
+ "groups": [
+ {
+ "enabled": true,
+ "name": " ŵ _MACD_OSC_TURN_DOWN",
+ "conditions_logic": "AND",
+ "conditions": [
+ {
+ "enabled": true,
+ "not": false,
+ "target": "OSC",
+ "operator": "TURN_DOWN",
+ "description": "MACD Ƿ ϶ ȯ"
+ }
+ ]
+ }
+ ]
+ },
+ "profit_rate_sell": {
+ "enabled": false,
+ "profit_rate_percent": null,
+ "basis": "average_price",
+ "description": " ͷ ۼ Ʈ ̻ SELL ȣ ĺ . ⺻ Ȱ ."
+ }
+ },
+ "filters": {
+ "rsi": {
+ "enabled": false,
+ "conditions": []
+ },
+ "moving_average": {
+ "enabled": false,
+ "conditions": []
+ },
+ "price_compare": {
+ "enabled": false,
+ "conditions": []
+ }
+ }
+ }
+ }
+}
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+확인 결과:
+- indicator_follow_rule_preview namespace: **현재 설정 검증 화면의 Rule Mapper Preview에는 보이지 않음**
+- mode = merge_add_candidate: **현재 설정 검증 화면에는 보이지 않음**
+- buy.groups: changed가 아니라 buy.groups[0].conditions가 merge_candidate로 표시됨
+- sell.signals.macd_sell: changes에 없음
+- sell.signals.ui_preview_condition_c_macd_sell: add_signal_candidate로 표시됨
+- rules.json 수정 시간 변경 없음: True
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+즉 diff 쪽은 의도대로 바뀌었지만, 설정 검증 화면의 [Rule Mapper Preview]가 아직 indicator_follow_rule_preview namespace를 표시하지 않고 있습니다.
+판정 맞습니다.
+현재 문제는 mapper 자체가 아니라 GUI 표시부입니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+검증:
+- py_compile
+- offscreen 설정창 생성
+- has_indicator_follow_rule_preview True
+- has_merge_add_candidate True
+- has_buy_merge_candidate True
+- has_sell_add_signal_candidate True
+- rules_mtime_unchanged True
+이것만 하면 Preview와 Diff가 같은 구조를 보여주는 상태가 됩니다.
+지금 수정과정들을 지켜보면 macd 구문들이 많이 보이는데 ?
+맞습니다. 지금 보이는 macd 구문은 그냥 넘기면 안 됩니다.
+다만 종류를 나눠서 봐야 합니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+1. 남아 있어도 되는 macd
+지표추종 루틴 내부에서 실제 계산 대상이 MACD/OSC라면 아래는 남아 있을 수 있습니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+target: MACD
+target: OSC
+sell.signals.macd_sell
+routine_macd_engine.py
+MACD <= -1.0
+OSC TURN_UP
+OSC TURN_DOWN
+이건 지표추종 루틴이 사용하는 지표 이름이라서 당장 금지 대상은 아닙니다.
+2. 정리해야 할 가능성이 큰 macd
+문제가 되는 건 이런 것들입니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+gui_macd_...
+MacdRoutineSettingsDialog
+routine_macd_engine.py
+macd_sell
+MACD매매루틴
+특히 UI/공통 구조에 붙은 macd는 현재 명칭 체계와 안 맞습니다.
+현재 기준은:
+지표추종매매루틴
+indicator_follow
+입니다.
+그래서 앞으로 정리 방향은 이겁니다.
+gui_macd_* 
+→ gui_indicator_follow_* 또는 gui_routine_*
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+MacdRoutineSettingsDialog
+→ IndicatorFollowRoutineSettingsDialog
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+routine_macd_engine.py
+→ routine_indicator_follow_logic.py 또는 routine_signal_logic.py 검토
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+macd_sell
+→ 당장 변경 금지. 기존 rules 호환 때문에 별도 검토 필요
+3. 지금 당장 할 일
+바로 이름 변경하면 위험합니다.
+먼저 macd 문자열 실태조사가 필요합니다.
+다음 코덱스 지시는 이렇게 가는 게 맞습니다.
+파일 수정 금지.
+현재 프로젝트에서 macd / MACD / Macd 문자열이 남아 있는 위치를 전수 조사해라.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+분류 기준:
+1. 지표 이름으로 유지 가능한 것
+ - target: MACD
+ - MACD 계산
+ - OSC 계산
+ - 조건 설명
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+2. 지표추종 루틴 전용 파일/클래스/함수라 이름 변경 후보인 것
+ - gui_macd_*
+ - MacdRoutineSettingsDialog
+ - routine_macd_engine.py 등
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+산출:
+- 파일별 macd 문자열 목록
+- 분류
+- 변경 후보
+- 변경 금지 후보
+- 변경 시 영향 파일
+- 추천 작업 순서
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+업로드된 최신 압축본 기준으로 macd/MACD/Macd 문자열을 전수 조사하겠습니다. 파일은 수정하지 않고, 위치와 성격만 분류하겠습니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+46s 동안 생각함
+분석 결과, macd/MACD/Macd는 꽤 많이 남아 있습니다.
+다만 대부분은 당장 수정 대상이 아닙니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+전체 현황
+macd/MACD/Macd 포함 파일: 65개
+본문 발생 횟수: 3,186회
+파일명 자체 hit: 1개
+대부분은 과거 로그/리포트입니다.
+분류 결과
+1. 유지 가능
+지표명으로 쓰이는 MACD/OSC입니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+target: MACD
+target: OSC
+MACD선
+시그널선
+OSC TURN_UP
+OSC TURN_DOWN
+이건 지표추종 루틴이 MACD/OSC를 사용하는 한 유지 가능합니다.
+2. 핵심 검토 대상
+여기가 중요합니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+routines/지표추종매매/routine.py
+routines/지표추종매매/routine_macd_engine.py
+routines/지표추종매매/routine_rule_mapper.py
+routines/지표추종매매/rules.json
+특히 문제 후보:
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+routine_macd_engine.py
+evaluate_macd_routine
+DEFAULT_MACD_ROUTINE_CONFIG
+routine_type: MACD_OSC
+sell.signals.macd_sell
+여기는 지표명으로서 MACD인지, 루틴명 잔재인지 분리 검토가 필요합니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+macd_sell
+macd_kind_combo
+macd_value_line
+sell_signal_condition_c_macd_*
+같은 변수명이 남아 있습니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+이건 지표 MACD 조건을 의미하면 유지 가능하지만, macd_sell은 rules key라 신중해야 합니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+추천 순서
+1. routine_macd_engine.py가 실제로 지표추종 전용 로직인지 검토
+2. evaluate_macd_routine / DEFAULT_MACD_ROUTINE_CONFIG 명칭 변경 가능성 검토
+3. macd_sell key는 유지 또는 alias 전략 검토
+4. GUI 변수명은 마지막에 정리
+5. 로그/리포트는 보류
+결론:
+지금은 “MACD 명칭 전면 교체”가 아니라, routine_macd_engine.py와 macd_sell key를 어떻게 다룰지 먼저 결정해야 합니다.
+이전에 한번 정리 했는데 아직도 많이 남았어. 왜?
+이유는 크게 3가지입니다.
+첫째, 이전 정리는 하드코딩된 루틴명 제거가 중심이었습니다.
+그때 정리한 대상은 주로 이런 것들이었습니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+"지표추종매매만 지원"
+routine_name == "지표추종매매"
+routines/지표추종매매/rules.json 직접 참조
+설정창 호출 하드코딩
+Registry/routine.json 기반 전환
+즉 루틴 등록/호출 구조의 하드코딩 제거였지, macd 문자열 전체 제거 작업은 아니었습니다.
+둘째, 남아 있는 macd 중 상당수는 지표 이름입니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+MACD선
+OSC
+target: MACD
+operator: TURN_UP / TURN_DOWN
+macd_kind_combo
+sell condition C MACD
+이건 루틴명이 아니라 지표추종 루틴 내부에서 사용하는 지표 조건이라 남아 있을 수 있습니다.
+셋째, 일부는 기존 rules 호환 키라서 일부러 못 지운 겁니다.
+대표적으로:
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+sell.signals.macd_sell
+routine_macd_engine.py
+evaluate_macd_routine
+DEFAULT_MACD_ROUTINE_CONFIG
+이런 건 단순 치환하면 기존 rules.json, 테스트, mapper, 신호판단 경로가 깨질 수 있습니다.
+정리하면:
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+이전 정리 = 루틴명/경로 하드코딩 제거
+현재 남은 문제 = 파일명/함수명/rules key/지표명에 남은 macd 분류
+그래서 이번에는 바로 삭제가 아니라, 다음처럼 가야 합니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+1. 지표명 MACD → 유지
+2. rules key macd_sell → 호환 때문에 보류/alias 검토
+3. routine_macd_engine.py → 변경 후보
+4. evaluate_macd_routine → 변경 후보
+5. gui 내부 macd 변수명 → 후순위 정리
+즉, 아직 많이 남은 건 “정리가 실패했다”기보다 이전 작업 범위가 달랐고, 지금은 더 깊은 명칭 정리 단계로 들어온 것입니다.
+gui_indicator_follow_routine_settings_dialog.py만 최소 수정.
+목표:
+현재 Rule Mapper Preview 마무리.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+수정:
+[Rule Mapper Preview] 출력에 preview_rules["indicator_follow_rule_preview"] 내용을 포함한다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+MACD / macd / Macd 명칭 전수조사 결과를 바탕으로
+유지 / 변경 후보 / 변경 금지 항목을 세부 분류
+코덱스에 보낼 다음 지시는 이렇게 바꾸는 게 맞습니다.
+파일 수정 금지.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+프로젝트 전체에서 macd / MACD / Macd 문자열이 남아 있는 위치를 전수 조사하고,
 각 항목을 아래 기준으로 분류해라.
 1. 유지 가능
 - 지표명 MACD
@@ -2700,1330 +3238,6 @@ MACD 명칭 일반화 파일별 대상 목록
 [출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
 ================================================================================
 0. 결론 요약
-================================================================================
-현재 파일명 기준으로 macd가 남은 실제 소스 파일은 다음 1개뿐이다.
-- routines/지표추종매매/routine_macd_engine.py
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-따라서 과거 gui_macd_* 계열 파일명은 현재 압축본 기준으로 대부분 gui_indicator_follow_* 계열로 전환된 상태로 판단된다.
-다만 코드 내부에는 macd_sell, macd_check, MACD선, MACD target, macd config 등이 남아 있다.
-이 중 일부는 실제 지표/호환 key이므로 유지해야 하고, 일부는 앞으로 신규 확산을 막기 위해 일반명으로 교체해야 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-현재 전략:
-- 파일명 전체 변경은 즉시 진행하지 않는다.
-- 신규 코드에서는 macd 명칭을 금지한다.
-- 기존 rules.json key와 테스트 호환 key는 유지한다.
-- UI/Mapper 내부 변수명은 단계적으로 일반화한다.
-- MACD 계산/OSC 계산/target: MACD는 유지한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-================================================================================
-1. 분류 기준
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-[유지]
-실제 지표명, 기존 rules 호환 key, 기존 테스트 기준, 엔진 고유 로직이다.
-지금 변경하면 신호 판정, rules 호환성, 테스트 안정성이 깨질 수 있다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-[교체 후보]
-실제 지표 의미가 아니라 UI 위젯명, 함수명, preview 후보명, 내부 변수명에 MACD가 들어간 경우다.
-향후 확장 시 지표추종 루틴 전체를 MACD 루틴처럼 보이게 만들 수 있으므로 단계적으로 교체한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-[무시]
-과거 로그, changelog, blocked_actions 리포트, cleanup 도구의 기록성 문자열이다.
-실행 구조에 직접 영향을 주지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-================================================================================
-2. 파일명 조사 결과
-================================================================================
-실제 파일명에 macd가 포함된 항목:
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-1) routines/지표추종매매/routine_macd_engine.py
-- 분류: 보류/유지
-- 이유: 현재 MACD/OSC 전용 계산 및 신호 평가 엔진이다.
-- 즉시 변경 금지.
-- 장기적으로 alias 안정화, 테스트 통과, rules migration 설계 이후에만 파일명 변경 검토.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-2) routines/지표추종매매/__pycache__/routine_macd_engine.cpython-311.pyc
-- 분류: 삭제 가능 캐시
-- 이유: 실행 소스가 아니라 캐시 파일이다.
-- 배포/정리 시 삭제 대상.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-현재 압축본 기준 gui_macd_* 파일명은 실제 소스 파일명으로 남아 있지 않다.
-이는 과거 작업에서 gui_indicator_follow_* 계열로 전환된 결과로 판단된다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-================================================================================
-3. 파일별 상세 분류
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-1. engines/condition_engine.py
---------------------------------------------------------------------------------
-사용처:
-- 주석/설명: RSI / 이평선 / MACD / OSC / 가격 / 거래량 등 공통 조건 평가
-분류:
-- 유지
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- 실제 지표 목록 설명이므로 변경 대상이 아니다.
-- MACD를 지표명으로 언급하는 것은 허용한다.
-조치:
-- 수정 불필요.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-2. engines/indicator_engine.py
---------------------------------------------------------------------------------
-사용처:
-- docstring: EMA, 단순이평, RSI, MACD, OSC 계산
-- def macd_series(...)
-- macd_line 변수
-- macd_cfg = cfg.get("macd", {})
-- result map의 "MACD": macd_line
-분류:
-- 유지
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- 이 파일은 공통 지표 계산 엔진이며, MACD는 실제 지표명이다.
-- macd_series, macd_line, cfg["macd"], "MACD" key는 계산 의미가 명확하다.
-- 여기서 MACD 명칭을 일반명으로 바꾸면 오히려 의미가 흐려진다.
-조치:
-- 수정 금지.
-- 단, 신규 지표 추가 시에는 실제 지표명 기준으로 별도 함수/키를 추가한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-3. gui_indicator_follow_buy_controls.py
---------------------------------------------------------------------------------
-사용처:
-- 표시 문자열: "시그널/MACD"
-분류:
-- 검토 후 유지 가능
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- UI 표시 문자열이 실제 지표 비교를 의미한다면 유지 가능하다.
-- 단, "시그널/MACD"가 일반 지표추종 UI의 기본 문구로 고정되어 있다면 향후 다중지표 확장 시 어색해질 수 있다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-조치:
-- 지금 즉시 변경하지 않는다.
-- 향후 UI 문구 체계 정리 시 다음 후보 검토:
- - "시그널/MACD" 유지: MACD 전용 필터일 때
- - "지표선/기준선" 변경: 공통 지표 비교 UI로 확장할 때
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-4. gui_indicator_follow_data_tabs.py
---------------------------------------------------------------------------------
-사용처:
-- macd_sell = signals.get("macd_sell", {})
-- macd_sell_enabled
-- macd_sell_delay
-- self.macd_sell_enabled_check
-- self.macd_sell_delay_line
-- self.macd_sell_status_line
-- 카드 출력 key "macd_sell"
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-분류:
-- 혼합
- - "macd_sell" rules key 접근: 유지
- - 위젯/변수명 macd_sell_*: 교체 후보
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- sell.signals.macd_sell은 기존 rules.json key이므로 유지해야 한다.
-- 하지만 UI 위젯명까지 macd_sell_*로 계속 두면 지표추종 UI 내부가 MACD 전용처럼 굳어진다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-권장 조치:
-- 1차: rules key 접근은 그대로 둔다.
-- 2차: 내부 변수/위젯명만 일반명으로 교체한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-교체 후보:
-- macd_sell_enabled_check -> primary_sell_signal_enabled_check 또는 sell_reversal_enabled_check
-- macd_sell_delay_line -> primary_sell_signal_delay_line 또는 sell_reversal_delay_line
-- macd_sell_status_line -> primary_sell_signal_status_line 또는 sell_reversal_status_line
-- macd_sell_enabled -> primary_sell_signal_enabled
-- macd_sell_delay -> primary_sell_signal_delay
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-주의:
-- 저장 key "macd_sell"은 변경 금지.
-- 화면 표시 문자열이 "MACD 반전 매도"라면 실제 UI 정책 확정 후 별도 변경한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-5. gui_indicator_follow_routine_settings_dialog.py
---------------------------------------------------------------------------------
-사용처:
-- macd_sell = signals.get("macd_sell", {})
-- macd_sell_enabled
-- macd_sell_delay
-- hasattr(self, "macd_sell_enabled_check")
-- hasattr(self, "macd_sell_delay_line")
-- hasattr(self, "macd_sell_status_line")
-- 카드 출력 key "macd_sell"
-- 상태 수집 prefix "macd_sell_"
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-분류:
-- 혼합
- - rules key "macd_sell": 유지
- - 내부 위젯/변수/prefix: 교체 후보
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- 이 파일은 설정창 중심 파일이므로 신규 코드 확산 가능성이 높다.
-- 여기서 macd_sell_* 명칭을 계속 복제하면 향후 sell signal 일반화가 어려워진다.
-권장 조치:
-- 즉시 대규모 수정은 하지 않는다.
-- 먼저 호환 wrapper 방식으로 정리한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-예상 교체 방향:
-- macd_sell 변수 -> existing_sell_signal_rule 또는 legacy_macd_sell_rule
-- macd_sell_enabled -> primary_sell_signal_enabled
-- macd_sell_delay -> primary_sell_signal_delay
-- self.macd_sell_enabled_check -> self.primary_sell_signal_enabled_check
-- self.macd_sell_delay_line -> self.primary_sell_signal_delay_line
-- self.macd_sell_status_line -> self.primary_sell_signal_status_line
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-호환 처리:
-- 기존 self.macd_sell_* 속성을 참조하는 다른 파일이 있으면 alias로 일정 기간 유지 가능.
-- 내부 수집 prefix "macd_sell_"는 indicator_follow_ui_state 구조와 연결되어 있으므로 즉시 변경하지 않는다.
-- UI state key migration 설계 후 변경한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-6. gui_indicator_follow_sell_controls.py
---------------------------------------------------------------------------------
-사용처:
-- macd_kind_combo = make_combo(["MACD선", "시그널선"], ...)
-- macd_sign_combo
-- macd_value_line
-- macd_compare_combo
-- _sync_macd_sign_combo()
-- sell_signal_condition_c_macd_check
-- sell_signal_condition_c_macd_kind_combo
-- sell_signal_condition_c_macd_sign_combo
-- sell_signal_condition_c_macd_value_line
-- sell_signal_condition_c_macd_compare_combo
-- sell_signal_condition_c_macd_logic_combo
-- QGroupBox("MACD 반전 매도")
-- self.macd_sell_enabled_check
-- self.macd_sell_delay_line
-- self.macd_sell_status_line
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-분류:
-- 혼합
- - 표시 문자열 "MACD선", "시그널선", "MACD 반전 매도": 유지/검토
- - UI 내부 변수명 macd_*: 교체 후보
- - condition C macd key: 보류
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- Condition C가 실제 MACD선/시그널선 필터라면 표시 문자열은 유지 가능하다.
-- 그러나 변수명과 위젯 속성명이 macd_*로 굳어져 있어 신규 확장 시 위험하다.
-- 이 파일이 가장 먼저 일반화 후보가 될 가능성이 높다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-권장 조치:
-- 조건 C 내부 위젯명은 다음처럼 일반화한다.
- - macd_kind_combo -> indicator_line_kind_combo
- - macd_sign_combo -> indicator_line_sign_combo
- - macd_value_line -> indicator_line_value_line
- - macd_compare_combo -> indicator_line_compare_combo
- - _sync_macd_sign_combo -> _sync_indicator_line_sign_combo
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-- 상태 위젯명은 다음처럼 일반화한다.
- - macd_sell_enabled_check -> primary_sell_signal_enabled_check
- - macd_sell_delay_line -> primary_sell_signal_delay_line
- - macd_sell_status_line -> primary_sell_signal_status_line
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-보류:
-- sell_signal_condition_c_macd_*는 indicator_follow_ui_state의 현재 저장 key와 연결되어 있으면 즉시 변경하지 않는다.
-- UI state key migration 설계 후 변경한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-7. routines/지표추종매매/routine.py
---------------------------------------------------------------------------------
-사용처:
-- routine_macd_engine import
-- DEFAULT_MACD_ROUTINE_CONFIG alias
-- evaluate_macd_routine alias
-- _ENGINE_SOURCE = "routine_macd_engine"
-분류:
-- 보류/호환 유지
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- 현재 이미 DEFAULT_INDICATOR_FOLLOW_CONFIG와 evaluate_indicator_follow_routine를 우선 사용하고, 기존 MACD 명칭은 alias로 유지하는 구조다.
-- 이것은 현재 단계에서 가장 안전한 방식이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-조치:
-- 즉시 변경하지 않는다.
-- 신규 코드는 반드시 evaluate_indicator_follow_routine, DEFAULT_INDICATOR_FOLLOW_CONFIG만 사용한다.
-- evaluate_macd_routine, DEFAULT_MACD_ROUTINE_CONFIG는 legacy compatibility alias로만 문서화한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-장기 조치:
-- routine_macd_engine.py 파일명 변경이 확정된 이후 import 경로를 변경한다.
-- 그 전까지는 이 파일의 MACD import 경로를 건드리지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-8. routines/지표추종매매/routine_macd_engine.py
---------------------------------------------------------------------------------
-사용처:
-- 파일명 자체 routine_macd_engine.py
-- docstring: MACD 전용 신호발생 엔진
-- routine_type: MACD_OSC
-- indicators.macd config
-- DEFAULT_MACD_ROUTINE_CONFIG alias
-- _macd_sell_section()
-- sell.signals.macd_sell
-- macd_enabled, macd_passed
-- active_sell_names.append("macd_sell")
-- signal_pass_map = {"macd_sell": ...}
-- evaluate_macd_routine alias
-분류:
-- 대부분 유지/보류
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- 이 파일은 실제 MACD/OSC 신호 판정 엔진이므로 현재 MACD 명칭 유지가 타당하다.
-- 다만 루틴명이 지표추종매매로 확장된 상황에서는 장기적으로 파일명/함수명 일반화 검토가 필요하다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-즉시 유지:
-- MACD/OSC 계산 관련 설명
-- cfg["indicators"]["macd"]
-- target "MACD"
-- sell.signals.macd_sell rules key
-- evaluate_macd_routine alias
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-교체 후보:
-- _macd_sell_section -> _primary_sell_signal_section 또는 _legacy_macd_sell_section
-- macd_enabled -> primary_sell_signal_enabled 또는 macd_signal_enabled
-- macd_passed -> primary_sell_signal_passed 또는 macd_signal_passed
-권장:
-- 지금은 변경하지 않는다.
-- Rule Mapper 승인/저장/엔진 연결 이후에만 정리한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-9. routines/지표추종매매/routine_rule_mapper.py
---------------------------------------------------------------------------------
-사용처:
-- sell.signals.macd_sell
-- sell.signals.ui_preview_condition_c_macd_sell
-- _build_sell_macd_condition()
-- condition_c.get("macd_check") 등 UI state macd_* key
-- "MACD선" -> "MACD"
-- warning 문구: sell condition C MACD ...
-- description: UI preview: sell condition C MACD line threshold
-- UI_PREVIEW_SELL_MACD_CONDITION_C
-분류:
-- 핵심 교체 후보
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- 이 파일은 앞으로 UI state를 engine rules로 연결하는 중간 계층이다.
-- 여기에 MACD 전용 후보명이 계속 남으면, 향후 RSI/볼린저/이평 등 지표 확장 시 mapper가 MACD 중심으로 굳어진다.
-- 단, 기존 rules key sell.signals.macd_sell은 변경하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-즉시 유지:
-- existing path: sell.signals.macd_sell
-- target "MACD"
-- UI state의 기존 macd_* key 접근
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-교체 후보:
-- _build_sell_macd_condition -> _build_sell_indicator_line_condition
-- sell_macd_condition -> sell_indicator_line_condition
-- UI_PREVIEW_SELL_MACD_CONDITION_C -> UI_PREVIEW_SELL_INDICATOR_LINE_CONDITION_C
-- ui_preview_condition_c_macd_sell -> ui_preview_condition_c_indicator_line_sell 또는 ui_preview_condition_c_sell_indicator_line
-- warning 문구의 "MACD"는 실제 target이 MACD일 때만 사용하고, 함수/후보명에서는 제거
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-중요:
-- preview candidate path를 변경하면 테스트와 GUI 표시가 함께 바뀐다.
-- 따라서 변경 전 테스트 갱신 계획이 필요하다.
-- 지금 바로 코드 수정하지 말고, 먼저 preview path 명명 규칙을 확정해야 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-10. routines/지표추종매매/rules.json
---------------------------------------------------------------------------------
-사용처:
-- indicators.macd
-- description: MACD 오실레이터...
-- sell.note: MACD SELL과 수익률 SELL...
-- sell.signals.macd_sell
-- name: 매도조건_MACD_OSC_TURN_DOWN
-- indicator_follow_ui_state 내부 condition C macd_* keys
-분류:
-- 변경 금지
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-장기 절차:
-1. 새 key 병행 저장
-2. 기존 key fallback 유지
-3. migration 테스트
-4. 실제 변환
-5. legacy key 제거 여부 검토
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-11. tests/test_indicator_follow_rule_mapper_preview.py
---------------------------------------------------------------------------------
-사용처:
-- UI state macd_* key
-- current_rules sell.signals.macd_sell
-- indicators.macd
-- test name: test_sell_add_signal_candidate_does_not_replace_macd_sell
-- expected path: sell.signals.ui_preview_condition_c_macd_sell
-- expected target: MACD
-분류:
-- 보류/추후 갱신
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- 현재 테스트는 기존 Rule Mapper Preview/Diff의 호환성 검증 역할을 한다.
-- macd_sell을 교체하지 않는다는 테스트는 현재 구조에서 중요하다.
-- 따라서 지금 변경하면 안 된다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-조치:
-- Rule Mapper path 명명 규칙을 바꿀 때 테스트도 함께 갱신한다.
-- target "MACD" 검증은 유지한다.
-- 기존 macd_sell을 replace하지 않는 검증은 계속 유지한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-12. gui_routine_condition_engine.py
---------------------------------------------------------------------------------
-사용처:
-- 예시/설명: {"target":"MACD", "operator":"CROSS_UP", "compare_target":"SIGNAL"}
-분류:
-- 유지
-판정:
-- 조건 엔진 예시에서 MACD는 실제 지표 target이다.
-- 변경 대상이 아니다.
-조치:
-- 수정 불필요.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-13. routines/지표추종매매/routine_condition_engine.py
---------------------------------------------------------------------------------
-사용처:
-- 예시/설명: {"target":"MACD", "operator":"CROSS_UP", "compare_target":"SIGNAL"}
-분류:
-- 유지
-판정:
-- 실제 지표 target 예시다.
-- 변경 대상이 아니다.
-조치:
-- 수정 불필요.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-14. tools/cleanup_project_junk_v3.py
---------------------------------------------------------------------------------
-사용처:
-- 제거/정리 대상 문자열: gui_macd_routine_settings_dialog.py, macd_signal_engine.py, routine_macd_engine.py
-분류:
-- 무시/보류
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- cleanup 도구 내부의 과거 파일명 문자열이다.
-- 실제 실행 흐름의 신규 MACD 확산과 직접 관련 없다.
-- 다만 정리 도구가 현재 구조와 맞지 않을 수 있으므로 나중에 tools 정리 때 재검토한다.
-조치:
-- 지금 수정하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-15. tools/create_routine_packages_from_legacy.py
---------------------------------------------------------------------------------
-사용처:
-- module_name: macd_routine
-- description: MACD 기반 자동매매 루틴 패키지...
-분류:
-- 보류/레거시 도구
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- legacy package 생성 도구 성격이다.
-- 현재 자동인식 루틴 패키지 방향과 다를 수 있으므로 즉시 사용 여부부터 확인해야 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-조치:
-- 실행 중인 핵심 흐름이 아니면 당장 수정하지 않는다.
-- tools 정리 단계에서 폐기/보존/갱신 판단.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3-16. reports/blocked_actions/*, PROJECT_CHANGELOG.txt
---------------------------------------------------------------------------------
-사용처:
-- 다수의 MACD 기록 문자열
-분류:
-- 무시
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-판정:
-- 과거 작업 기록, blocked action report, changelog 성격이다.
-- 실행 코드 일반화 대상이 아니다.
-- 문서 이력에서 MACD가 많이 나오는 것은 문제가 아니다.
-조치:
-- 수정 금지.
-- 검색 결과를 볼 때 이 파일들은 제외하고 판단한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-================================================================================
-4. 우선순위별 작업 후보
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-[우선순위 1: 신규 확산 차단]
-- 신규 파일명에 macd 사용 금지.
-- 신규 함수명에 macd 사용 금지.
-- 신규 변수명에 macd 사용 금지.
-- 단, 실제 지표명/target/key는 예외.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-[우선순위 2: Rule Mapper 명칭 정리 설계]
-대상:
-- routines/지표추종매매/routine_rule_mapper.py
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-변경 후보:
-- _build_sell_macd_condition -> _build_sell_indicator_line_condition
-- sell.signals.ui_preview_condition_c_macd_sell -> sell.signals.ui_preview_condition_c_indicator_line_sell
-- UI_PREVIEW_SELL_MACD_CONDITION_C -> UI_PREVIEW_SELL_INDICATOR_LINE_CONDITION_C
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-[우선순위 3: UI 내부 위젯명 일반화]
-대상:
-- gui_indicator_follow_sell_controls.py
-- gui_indicator_follow_data_tabs.py
-- gui_indicator_follow_routine_settings_dialog.py
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-변경 후보:
-- macd_sell_enabled_check -> primary_sell_signal_enabled_check
-- macd_sell_delay_line -> primary_sell_signal_delay_line
-- macd_sell_status_line -> primary_sell_signal_status_line
-- macd_kind_combo -> indicator_line_kind_combo
-- macd_sign_combo -> indicator_line_sign_combo
-- macd_value_line -> indicator_line_value_line
-- macd_compare_combo -> indicator_line_compare_combo
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-주의:
-- self 속성명 변경은 다른 파일 참조와 연결되므로 grep 후 단계적으로 변경한다.
-- 기존 속성 alias를 잠시 유지하는 방식도 가능하다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-[우선순위 4: routine.py alias 정책 문서화]
-대상:
-- routines/지표추종매매/routine.py
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-조치:
-- DEFAULT_INDICATOR_FOLLOW_CONFIG / evaluate_indicator_follow_routine 우선.
-- DEFAULT_MACD_ROUTINE_CONFIG / evaluate_macd_routine는 legacy alias로만 유지.
-- 신규 import에서 MACD alias 사용 금지.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-[우선순위 5: 엔진 파일명 변경 검토]
-대상:
-- routines/지표추종매매/routine_macd_engine.py
-조치:
-- 가장 마지막에 검토.
-- 엔진 연결 안정화 전 변경 금지.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-================================================================================
-5. 절대 변경 금지 목록
-================================================================================
-다음은 현재 단계에서 변경 금지다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-- rules.json의 indicators.macd
-- rules.json의 sell.signals.macd_sell
-- rules.json의 indicator_follow_ui_state 내부 macd_* key
-- target: MACD
-- target: OSC
-- MACD선 / 시그널선 UI 표시 문자열 중 실제 지표명인 부분
-- engines/indicator_engine.py의 macd_series
-- routine_macd_engine.py의 MACD/OSC 계산 및 판정 설명
-- 기존 테스트가 검증하는 macd_sell 미대체 정책
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-================================================================================
-6. 다음 실제 작업 제안
-================================================================================
-가장 안전한 다음 실제 작업은 코드 수정이 아니라 아래 설계 확정이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-1. Rule Mapper preview candidate path 명칭 확정
- - 현재: sell.signals.ui_preview_condition_c_macd_sell
- - 후보: sell.signals.ui_preview_condition_c_indicator_line_sell
- - 또는: sell.signals.ui_preview_condition_c_sell_indicator_line
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-2. Rule Mapper 내부 함수명 확정
- - 현재: _build_sell_macd_condition
- - 후보: _build_sell_indicator_line_condition
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-3. UI 내부 위젯명 일반화 범위 확정
- - macd_sell_* 위젯명 교체 여부
- - condition_c_macd_* 저장 key 유지 여부
-4. 테스트 갱신 범위 확정
- - path 기대값 변경 여부
- - macd_sell 미대체 테스트는 유지
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-================================================================================
-7. 현재 최종 판정
-================================================================================
-현재 MACD 명칭 문제는 "위험하지만 통제 가능한 상태"다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-위험한 이유:
-- Rule Mapper와 UI 내부 변수명에 MACD가 남아 있어 신규 확장 시 계속 복제될 가능성이 있다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-통제 가능한 이유:
-- 실제 파일명 macd 잔존은 routine_macd_engine.py 1개뿐이다.
-- GUI 파일명은 이미 indicator_follow 계열로 정리되어 있다.
-- 호출 구조는 일반명 우선 + MACD alias 유지 방식으로 정리되어 있다.
-- rules.json과 엔진 key는 변경 금지 대상으로 분리 가능하다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
-따라서 다음 단계는 "전체 치환"이 아니라 "Rule Mapper와 UI 내부 명칭의 제한적 일반화"가 맞다.
-[문서 끝]
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-MACD 명칭 사용처 전수조사 및 일반화 기준
-작성일: 2026-07-02
-대상: 키움 자동매매 프로젝트 / 지표추종매매 루틴
-목적: 향후 프로젝트 확장 시 MACD 명칭이 불필요하게 확산되는 것을 방지하고, 변경 금지 대상과 일반화 대상을 명확히 구분한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-================================================================================
-1. 현재 판정
-================================================================================
-현재 MACD 용어 문제는 완전 해결 상태가 아니다.
-다만 1차 일반화는 완료된 상태다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-완료된 부분:
-- DEFAULT_INDICATOR_FOLLOW_CONFIG 추가
-- evaluate_indicator_follow_routine() 추가
-- routine.py에서 일반명 우선 사용
-- DEFAULT_MACD_ROUTINE_CONFIG는 호환 alias로 유지
-- evaluate_macd_routine()은 호환 alias로 유지
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-미완료/잔존 부분:
-- routine_macd_engine.py 파일명 유지
-- sell.signals.macd_sell 유지
-- rules.json 내부 macd 관련 key 유지
-- indicator_follow_ui_state 내부 일부 macd_* key 유지
-- UI/Mapper 내부 변수명·후보명 일부 macd 명칭 유지
-- 테스트 코드 일부 macd 명칭 유지
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-현재 결론:
-- 기존 호환성 때문에 MACD 명칭을 즉시 전부 제거하면 위험하다.
-- 하지만 신규 코드에서 MACD 명칭을 계속 사용하면 나중에 일반화 범위가 폭증한다.
-- 따라서 즉시 전체 치환이 아니라, 신규 확산 차단 + 점진적 일반화가 공식 방향이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-================================================================================
-2. MACD 명칭 사용처 분류
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-2.1 유지 대상: 실제 지표/엔진 의미가 있는 MACD
---------------------------------------------------------------------------------
-아래 항목은 MACD 지표 자체를 의미하므로 변경하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-유지 대상:
-- MACD선
-- 시그널선
-- OSC
-- target: MACD
-- target: OSC
-- indicators.macd
-- macd_series()
-- MACD/OSC 계산 로직
-- MACD/OSC 신호 판정 로직
-- routine_macd_engine.py 내부 실제 MACD 계산부
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-유지 사유:
-- MACD는 루틴 일반명이 아니라 기술적 지표명이다.
-- 지표명까지 일반화하면 오히려 의미가 불명확해진다.
-- OSC 역시 MACD 기반 오실레이터 개념으로 현재 루틴 로직 핵심이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-금지 사항:
-- MACD선/시그널선/OSC 표시명을 임의로 indicator 등으로 바꾸지 않는다.
-- rules.json 내부 target 값의 MACD/OSC를 검증 없이 변경하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-호환 유지 대상:
-- DEFAULT_MACD_ROUTINE_CONFIG
-- evaluate_macd_routine()
-- sell.signals.macd_sell
-- rules.json의 macd 관련 key
-- indicator_follow_ui_state 내부 기존 macd_* key
-- 기존 테스트가 참조하는 macd_* key
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-운영 원칙:
-- 기존 동작 보존을 위해 alias는 유지한다.
-- 새 코드에서는 DEFAULT_INDICATOR_FOLLOW_CONFIG를 사용한다.
-- 새 코드에서는 evaluate_indicator_follow_routine()을 사용한다.
-- sell.signals.macd_sell은 기존 실행 Rule 보호를 위해 변경하지 않는다.
-- rules.json key migration은 장기 과제로 미룬다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-2.3 교체 후보: 일반화가 필요한 MACD 명칭
---------------------------------------------------------------------------------
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-아래 항목들은 실제 지표명이라기보다 UI/Mapper/후보명/변수명에 MACD가 남아 있는 경우다.
-향후 확장 전 점진적으로 일반명으로 교체해야 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-교체 후보 예시:
-- macd_sell_enabled_check
-- macd_sell_delay_line
-- macd_kind_combo
-- sell_signal_condition_c_macd_*
-- _build_sell_macd_condition
-- UI_PREVIEW_SELL_MACD_CONDITION_C
-- ui_preview_condition_c_macd_sell
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-교체 방향 예시:
-- macd_sell_enabled_check
- → indicator_sell_enabled_check 또는 condition_c_sell_enabled_check
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-- macd_sell_delay_line
- → sell_delay_line 또는 condition_c_sell_delay_line
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-- macd_kind_combo
- → indicator_kind_combo 또는 signal_indicator_kind_combo
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-- sell_signal_condition_c_macd_*
- → sell_signal_condition_c_indicator_* 또는 sell_signal_condition_c_osc_*
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-- _build_sell_macd_condition
- → _build_sell_indicator_condition 또는 _build_sell_condition_c_candidate
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-- UI_PREVIEW_SELL_MACD_CONDITION_C
- → UI_PREVIEW_SELL_CONDITION_C
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-- ui_preview_condition_c_macd_sell
- → ui_preview_condition_c_sell
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-2.4 무시 가능 대상: 기록/로그/문서성 잔존
---------------------------------------------------------------------------------
-아래 항목은 실행 구조가 아니라 기록이므로 당장 변경 대상이 아니다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-무시 가능:
-- PROJECT_CHANGELOG.txt
-- reports/blocked_actions/*
-- 과거 작업 리포트
-- 과거 오류 로그
-- cleanup tool 내부 문자열
-- 백업/이전 단계 문서
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-원칙:
-- 기록 문서는 당시 상황 보존이 우선이다.
-- 과거 문서의 MACD 명칭까지 정리하려 하면 작업 범위가 불필요하게 커진다.
-- 단, 최신 MASTER_SPEC 갱신자료에는 일반화 기준을 반영한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-================================================================================
-3. 신규 개발 명명 규칙
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3.1 신규 코드에서 금지할 명칭
---------------------------------------------------------------------------------
-앞으로 새로 작성하는 코드에서는 아래 명칭을 사용하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-금지:
-- 새로운 gui_macd_*.py
-- 새로운 routine_macd_*.py
-- 새로운 test_macd_*.py
-- 새로운 macd_* 함수명
-- 새로운 macd_* 변수명
-- 새로운 DEFAULT_MACD_* 상수
-- 새로운 evaluate_macd_* 함수
-- 새로운 *_macd_sell 후보명
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3.2 신규 코드에서 사용할 일반명
---------------------------------------------------------------------------------
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-신규 코드 기본 명칭:
-- indicator_follow
-- indicator_signal
-- signal_condition
-- condition_c
-- osc
-- rule_mapper
-- preview_candidate
-- engine_rules_preview
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-사용 권장:
-- DEFAULT_INDICATOR_FOLLOW_CONFIG
-- evaluate_indicator_follow_routine()
-- indicator_follow_ui_state
-- indicator_follow_rule_preview
-- routine_rule_mapper.py
-- build_engine_rules_preview_from_ui_state()
-- compare_engine_rules_preview()
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-3.3 파일명 기준
---------------------------------------------------------------------------------
-현재 유지:
-- routines/지표추종매매/routine_macd_engine.py
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-유지 사유:
-- 실제 MACD/OSC 계산 엔진이다.
-- 파일명 변경 시 import, 테스트, 문서, rules 연계가 동시에 흔들릴 수 있다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-향후 방향:
-- 엔진 연결 안정화 후 파일명 변경 검토
-- 변경 후보:
- - routine_macd_engine.py → routine_indicator_engine.py
- - 단, MACD 전용 계산 파일로 남길 경우 유지 가능
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-신규 파일명 원칙:
-- gui_indicator_follow_*.py 사용
-- routine_indicator_follow_*.py 사용
-- test_indicator_follow_*.py 사용
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-4.2 Rule Mapper 현재 정책
---------------------------------------------------------------------------------
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-현재 구조:
-UI → indicator_follow_ui_state → Rule Mapper Preview → Rule Mapper Diff → 운영자 검토 → 향후 승인 저장
-현재 구현 범위:
-- Preview 생성
-- Diff 생성
-- Merge/Add Candidate 생성
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-Sell Preview:
-- 기존 sell.signals.macd_sell 유지
-- 별도 후보 생성
-- 후보는 enabled=false, preview_candidate=true
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-4.3 Rule Mapper 명칭 교체 우선순위
---------------------------------------------------------------------------------
-1순위:
-- Python 내부 함수명/상수명에서 불필요한 macd 제거
-2순위:
-- Preview candidate 이름에서 macd 제거
-3순위:
-- GUI 내부 변수명에서 macd 제거
-4순위:
-- 테스트 명칭 일반화
-마지막:
-- rules.json key migration
-- sell.signals.macd_sell 변경
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-================================================================================
-5. 작업 순서 제안
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-5.1 즉시 작업
---------------------------------------------------------------------------------
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-1. MACD 명칭 유지/교체/금지 기준 문서화
-2. 신규 코드 작성 시 indicator_follow 명칭만 사용
-3. Rule Mapper 내부 후보명부터 일반화
-4. UI 내부 변수명 중 실제 지표명이 아닌 macd_*만 점진 교체
-5. 중복 정의된 build_engine_rules_preview_from_current_ui_state() 정리
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-5.2 단기 작업
---------------------------------------------------------------------------------
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-5.3 중기 작업
---------------------------------------------------------------------------------
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-1. Engine Rule 생성 함수 구현
-2. 운영자 승인 후에만 rules.json 갱신
-3. 매수 OCR threshold merge 적용
-4. SELL 후보는 기존 macd_sell과 분리 유지
-5. 테스트 확장
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
---------------------------------------------------------------------------------
-5.4 장기 작업
---------------------------------------------------------------------------------
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-================================================================================
-7. 결론
-================================================================================
-현재 MACD 명칭 문제는 다음과 같이 관리한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-A안: 코드 수정 없이 Preview/Diff 화면 검증
-B안: 동작 변경 없이 UI/Mapper 내부 macd 명칭 일부 일반화
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
-권장 순서:
-1. 중복 함수 정리
-2. Rule Mapper 내부 후보명 일반화
-3. Preview/Diff 재검증
-4. 승인 절차 설계
-5. Engine Rule 생성 설계
-[문서 끝]
-
-[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
-변경 후 UI -> indicator_follow_ui_state -> Rule Mapper Preview -> Rule
-Mapper Diff -> 운영자 검토 -> (향후) 실제 Rule 생성
-현재는 Preview/Diff까지만 구현되었으며 실제 저장 및 엔진 연결은 수행하지
-않는다.
-2. 완료 항목
-
-[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
-Buy - merge_into = buy.groups[0].conditions - skip_existing - OSC
-TURN_UP - add_conditions - OSC <= UI OCR 값
-
-[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
-Sell - 기존 sell.signals.macd_sell 유지 -
-ui_preview_condition_c_macd_sell 별도 후보 - enabled = false -
-preview_candidate = true
-4. Diff 구조
-
-[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
-status - changed - same - added - missing - merge_candidate -
-add_signal_candidate
-risk - low - medium - high
-
-[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
-현재 확인 - bar.bar_minutes -> changed(low) - buy.groups[0].conditions
--> merge_candidate - sell.signals.ui_preview_condition_c_macd_sell ->
-add_signal_candidate - sell.signals.macd_sell 변경 없음
-5. 구현 원칙
-
-[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
-Rule Mapper Preview - mapped_paths - warnings - preview_rules -
-indicator_follow_rule_preview - merge_add_candidate 표시
-Rule Mapper Diff - summary - changes - warnings - 위험도 표시
-7. MACD 명칭 정리 결과
-
-[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
-완료 - DEFAULT_INDICATOR_FOLLOW_CONFIG 추가 -
-evaluate_indicator_follow_routine 추가 - 기존
-DEFAULT_MACD_ROUTINE_CONFIG는 alias - 기존 evaluate_macd_routine는
-alias - routine.py는 새 일반명 우선 사용
-
-[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
-호환 유지 - routine_macd_engine.py 파일명 -
-DEFAULT_MACD_ROUTINE_CONFIG - evaluate_macd_routine
-8. 변경 금지
-
-[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
-- rules.json의 macd 관련 key
-- sell.signals.macd_sell
-- indicator_follow_ui_state의 macd_* key
-- target: MACD
-- target: OSC
-- MACD선/시그널선
-- MACD/OSC 계산
-- 기존 테스트 참조 key
-9. 향후 작업
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
-UI → indicator_follow_ui_state → Rule Mapper → Rule Preview → Rule Diff
-→ 운영자 검토 → (향후 승인) → Engine Rule 생성
-현재 구현 범위는 Preview/Diff까지이며 실제 Rule 저장 및 엔진 연결은
-구현하지 않는다.
-3. Rule Mapper
-신규 구성요소
-routine_rule_mapper.py
-주요 함수
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
-- build_engine_rules_preview_from_ui_state()
-- compare_engine_rules_preview()
-역할
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
-- UI State를 Preview 후보로 변환
-- 기존 Rule과 Preview 차이 비교
-- 저장하지 않음
-- 실행하지 않음
-4. Preview 정책
-Replace Preview 폐기.
-공식 정책
-Merge/Add Candidate
-신규 Namespace
-indicator_follow_rule_preview
-mode
-merge_add_candidate
-Buy
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
-- same
-- changed
-- added
-- missing
-- merge_candidate
-- add_signal_candidate
-위험도
-- low
-- medium
-- high
-현재 기준
-bar.bar_minutes → changed
-buy.groups[0].conditions → merge_candidate
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
-sell.signals.ui_preview_condition_c_macd_sell → add_signal_candidate
-sell.signals.macd_sell → 변경 대상 아님
-6. GUI 정책
-설정 검증 화면은 다음 정보를 표시한다.
-Rule Mapper Preview
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
-- mapped_paths
-- warnings
-- preview_rules
-- indicator_follow_rule_preview
-- merge_add_candidate
-Rule Mapper Diff
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
-- summary
-- changes
-- warnings
-- risk
-- current_value
-- preview_value
-7. 구현 금지
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
-- DEFAULT_INDICATOR_FOLLOW_CONFIG
-- evaluate_indicator_follow_routine()
-호환 Alias 유지
-- DEFAULT_MACD_ROUTINE_CONFIG
-- evaluate_macd_routine()
-routine.py는 일반명을 우선 사용한다.
-9. 변경 금지
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
-- routine_macd_engine.py 파일명
-- rules.json macd 관련 key
-- sell.signals.macd_sell
-- indicator_follow_ui_state macd_* key
-- target: MACD
-- target: OSC
-- MACD선/시그널선
-- 기존 테스트 참조 key
-10. 검증 결과
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
-1. Preview 기반 실제 Rule 생성 설계
-2. 승인 절차 설계
-3. Engine 연결
-4. Alias 안정화
-5. routine_macd_engine.py 파일명 변경 검토
-6. rules key migration 장기 검토
-
-[출처: 작업재개요약_및_MASTER_SPEC_갱신자료_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 13:57:47 | 분류: 작업재개요약]
-- 지표추종매매 설정 UI 프로토타입 완료
-- UI 상태 수집(collect), 복원(apply), 저장(save), 로드(load) 완료
-- UI 상태는 indicator_follow_ui_state에 저장
-- 엔진 Rule과 UI 상태 완전 분리
-- UI→Engine Rule 변환은 미구현
-주요 완료 사항
-
-[출처: 작업재개요약_및_MASTER_SPEC_갱신자료_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 13:57:47 | 분류: 작업재개요약]
-1. gui_macd/gui_indicator_follow 구조 전환 완료
-2. 중복 파일, pycache, pyc, bak 정리
-3. tools 폴더 구성 완료
-4. 숨은 탭 제거, 단일 화면 구조 확정
-5. Collector 완료
- - basic
- - buy_ui(signal_filter/base/repeat/price_compare/situation/additional/cycle/exit)
- - sell_ui(signal_conditions/selected_sets/setting_a/b/c)
-6. apply_indicator_follow_ui_state() 구현 완료
-7. save_indicator_follow_ui_state_to_rules() 구현 완료
-8. JSON Roundtrip 및 저장/재열기 검증 완료
-Rules 저장 정책
-신규 namespace
-
-[출처: 작업재개요약_및_MASTER_SPEC_갱신자료_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 13:57:47 | 분류: 작업재개요약]
-indicator_follow_ui_state - ui_state_version - updated_at - state
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_상세판_UI프로토타입.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 06:40:32 | 분류: 갱신문서]
-- gui_macd_control_tab.py : 3열 외곽 배치 담당.
-- gui_macd_buy_method_controls.py :
- 기본매수/반복매수/상황변화/추가기능 UI 생성 담당.
-- gui_macd_buy_controls.py : 순환설정, 이탈조건, 회차마감 생성 및
- 상태제어 담당.
-보류 항목
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_상세판_UI프로토타입.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 06:40:32 | 분류: 갱신문서]
-- _make_buy_avg_overview_controls() 생성 흐름 분리.
-- gui_macd_* 파일명 공통 루틴 명칭으로 변경.
-- 숨겨진 cycle 위젯 생성 구조 개선.
-- wrapper 및 레이아웃 정크 코드 최종 정리.
-설계 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_상세판_UI프로토타입.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 06:40:32 | 분류: 갱신문서]
-- 루틴 UI와 엔진은 분리 유지.
-- UI는 공통 루틴 기반으로 일반화 예정.
-- 실제 MACD 고유 로직은 엔진과 루틴 모듈에만 존재하도록 정리 예정.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_┤⌐╢⌠║╕░¡86╚≈╜║┼Σ╕«▒Γ╣▌PLAN╝│░Φ║»░µ░ⁿ╕«╛╞┼░┼╪├│└»┴÷┐°─ó.txt
-================================================================================
-MASTER_SPEC 누락보강 86 주제 : 히스토리 기반 PLAN 설계 변경 관리 및
-아키텍처 유지 원칙
-출처 : 작업진행상황대화히스토리_3~8 비교 반영
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-5. 변경 절차 ① 변경 요구 확인 ② 기존 구조 영향 분석 ③ 공통 구조 유지
- 여부 검토 ④ 구현 ⑤ 상태·로그 검증 ⑥ MASTER_SPEC 갱신
-6. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 기존 루틴과의 호환성을 유지한다.
-- 공통 엔진 수정은 최소화한다.
-- 변경 사유와 영향 범위를 기록한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-7. 검증 항목 □ 기존 기능 영향 없음 □ PLAN 구조 유지 □ 상태 일관성 □
- 로그 일관성 □ 복구 일관성
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_┼δ╟╒░╗╜┼└┌╖ß_2026-06-30.txt
-================================================================================
-MASTER SPEC 통합 갱신자료 (원본 병합본)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-주의: - 본 문서는 업로드된 TXT 문서들을 순서대로 병합한 통합본이다. -
-내용을 임의 요약하거나 삭제하지 않았다. - 중복 내용은 그대로 유지하였다.
-원본: MASTER_SPEC_갱신메모_UI프로토타입단계(1).txt
-MASTER SPEC 갱신 메모
-현재 판정
-UI는 최종판이 아닌 프로토타입.
-원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-□ 가격비교매수 - 평단 >= 현재가 - 호가설정 - 다중지점 - 회차기준 -
-예산기준 - 능동매수 - 평단 < 현재가 - 호가설정 - 다중지점 - 회차기준 -
-예산기준 - 능동매수
-설계 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-[제목 규칙] - 기본설정 / 매수설정 / 매도설정은 버튼형 박스 사용. - 검정
-테두리. - 배경색 없음. - 제목 색상만 사용. - ’|’는 박스 밖, 검정색 유지.
-[강조 규칙] - 글자 크기 확대 금지. - 박스 높이, 테두리, 패딩으로 강조.
-[복원 기준] - 실험했던 디자인은 폐기. - 복원본을 기준으로 후속 작업
-진행.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-[상단] - 신호검출조건 = A OR B OR C 기본. - 매도방식지정 추가. - 설정 A
-기본 선택. - 최소 1개 선택. - OR만 사용.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-[설정 공통] 1. 주신호대응 매도설정 2. 매도중상황변화대응 3.
-후속매도반복설정 4. 반복이탈조건 5. 매도완료정책
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-[UI 정책] - 소제목 트리형. - 들여쓰기 통일. - 신호검출조건 입력컨트롤과
-동일 스타일. - 상단 헤더 구성 확정. - 설정 A/B/C 동일 구조 유지.
-원본: MASTER_SPEC_갱신자료_v2026-06-25_MACD매도설정_UI_미체결정책(6).txt
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================ 1.
-매도 실행 구조 갱신
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-2. 매도방식 UI 갱신
-================================================================================
-2.1 매도방식 기본 구조 매도방식은 다음 항목으로 구성한다. - 단일호가 -
-다중호가 - 다중지점
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-단일호가와 다중호가는 상호배타로 동작한다. 다중지점 내부의 시간 기준과
-가격/평단 기준도 상호배타로 동작한다.
-2.2 다중호가 표시 형식: - 상향 [4] 호가 / 기준 1호가 / 하향 [2] 호가 |
-합계 [7]호가
-합계 계산: - 상향 수 + 기준 1호가 + 하향 수 - 예: 4 + 1 + 2 = 7호가
-2.3 다중지점 시간 기준 표시 형식: - 시간 [30][분/초/봉][이내/간격][3]회
-[주문가/현재가]
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-2.4 다중지점 가격 기준 표시 형식: - [주문가/현재가/평단가] 대비
-[주문가/현재가/평단가] [상향/하향/상하] [0.15]% [이상/이하/이내/이탈] /
-[3]회
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-중요 변경: - 기존 “에” 표현은 “대비”로 변경한다. - 예: “주문가에 평단가”
-→ “주문가 대비 평단가” - 방향에 따라 비교 콤보 표시 옵션을 제한한다.
-상향/하향: 이상/이하 상하: 이내/이탈
-2.5 마지막회 주문 타입 기존: - 마지막회 시장가 매도
-변경: - 마지막회 [시장가/현재가]
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-의미: - 다중지점 설정의 하위 항목이다. - 다중지점 시간/가격 조건 중
-하나가 활성화되어야 선택 가능하다. - 마지막회 주문을 시장가로 할지
-현재가로 할지 선택한다. - 이 설정은 최초 매도방식과 완료정책에서
-독립적으로 가져갈 수 있어야 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-기본값: - 현재 UI에서는 20초를 기준으로 쓰는 화면이 많았다. - 단, 콤보
-아이템 순서는 분/초/봉으로 유지한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-SELL: - [주문가/현재가/평단가] 대비 [주문가/현재가/평단가]
-[상향/하향/상하] [0.15]% [이상/이하/이내/이탈] 매도주문취소
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-BUY: - [주문가/현재가/평단가] 대비 [주문가/현재가/평단가]
-[상향/하향/상하] [0.15]% [이상/이하/이내/이탈] 매수주문취소
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-기본 체크: - 기본값은 꺼짐(False)이 적절하다. - 기존 시간 기준 취소는
-켜짐(True) 유지 가능.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-3.5 가격조건 비교 콤보 숨김 규칙 반드시 적용: - 방향이 상향이면 비교
-콤보는 이상/이하만 표시. - 방향이 하향이면 비교 콤보는 이상/이하만
-표시. - 방향이 상하이면 비교 콤보는 이내/이탈만 표시. - 숨김 처리는
-QComboBox view row hidden 방식으로 기존 공통폼과 동일하게 한다. - 방향
-변경 시 현재 선택값이 보이는 옵션에 없으면 자동으로 적절한 기본값으로
-바꾼다. 상하: 이내 상향/하향: 이하
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-4. 완료정책 UI 갱신
-================================================================================
-4.1 완료정책 첫 줄 삭제 삭제 대상: - 마지막 주문 취소 이후 [3][분] 동안
-수행
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-삭제 이유: - 현재 완료정책 구조에서 이 항목의 의미가 불명확하다. -
-완료정책이 재매도 전략으로 재정의되는 상황에서 상단 실행시간 행은 혼란을
-만든다. - 사용자는 해당 행 삭제를 요청했다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-4.2 삭제 시 구현 주의사항 단순히 UI 행만 제거하면 안 된다. 해당
-체크박스를 참조하는 내부 로직도 함께 정리해야 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-점검 대상 메서드: - sync_detail_row_enabled - sync_fill_ratio_enabled -
-sync_complete_mode - sync_after_cancel_by_multi_point - toggled.connect
-관련 구문
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-발생했던 오류: - AttributeError: ‘MacdRoutineSettingsDialog’ object has
-no attribute ‘complete_after_cancel_check’ - 원인은 삭제된 체크박스를
-참조하는 로직이 남아 있었기 때문이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-4.3 완료정책 남길 항목 완료정책에는 다음 항목을 남긴다. - 단일호가 -
-다중호가 - 다중지점 - 마지막회차 시장가 또는 향후 마지막회
-[시장가/현재가] 구조
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-추후 완료정책도 매도방식과 같은 공통 SellExecutionPolicy UI를 재사용할
-수 있다. 단, 현재 단계에서는 대규모 리팩토링 금지.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-5. 신호검출조건 UI 갱신
-================================================================================
-5.1 조건 B 볼린저밴드 추가 매도 신호검출조건 B에 볼린저밴드를 가격박스와
-같은 형태로 추가한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
 
 Original Body Marker: END
 
@@ -4035,4 +3249,4 @@ Reference Navigation
 - Next: PART03_04_GUI.md
 - Full PART: PART03_GUI.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt

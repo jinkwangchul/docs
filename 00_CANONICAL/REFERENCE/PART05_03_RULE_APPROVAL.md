@@ -1,47 +1,16 @@
-# PART05_03 RULE_APPROVAL
+# PART05 03 RULE APPROVAL
 
 Reference Edition Subpart
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
 Source Full Part: PART05_RULE_APPROVAL.md
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 하위 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 Original Body Marker: START
-- 변경 이력 기록
-
-[출처: 마스터스펙\MASTER_SPEC_누락보강\MASTER_SPEC_누락보강_138_파일시스템_Storage관리체계_신규.txt | 기준일: 2026-06-30 | 수정시각: 2026-06-30 20:52:34 | 분류: MASTER_SPEC]
-5. 저장 정책
-- 중요 데이터 즉시 저장
-- Runtime 주기 저장
-- 로그 Append 방식
-- 백업 세대 관리
-6. 무결성
-- 파일 존재 확인
-- 손상 검사
-- 참조 관계 확인
-- 버전 호환성 확인
-- 백업 검증
-7. 장애 대응
-- 손상 파일 격리
-- 자동 백업 복원
-- 복구 실패 기록
-- 검토관리 연계
-8. 향후 확장
-- 압축 백업
-- 암호화 저장
-- 클라우드 Storage
-- 증분 백업
-
-[출처: 마스터스펙\MASTER_SPEC_누락보강\MASTER_SPEC_누락보강_137_JSONSchema_데이터규격표준_신규.txt | 기준일: 2026-06-30 | 수정시각: 2026-06-30 20:52:18 | 분류: MASTER_SPEC]
-MASTER_SPEC 누락보강 137
-주제 : JSON Schema 및 데이터 규격 표준 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_누락보강\MASTER_SPEC_누락보강_137_JSONSchema_데이터규격표준_신규.txt | 기준일: 2026-06-30 | 수정시각: 2026-06-30 20:52:18 | 분류: MASTER_SPEC]
-1. 목적
 모든 JSON 데이터의 구조를 일관되게 정의하여 호환성, 유지보수성 및
 데이터 무결성을 확보한다.
 
@@ -5158,40 +5127,6 @@ GUI → OpenAPI 직접 호출
 ==================================================
 현재 단계에서 금지:
 
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-금지:
-- PENDING/APPROVED/EXECUTABLE에서 생성 금지
-- Adapter Preview만으로 생성 금지
-- Timer 자동 생성 금지
-- GUI 직접 생성 금지, Controller 경유 필요
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-12. 구현 금지사항
-==================================================
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-정책:
-- GUI가 최종 실행 버튼을 제공하더라도 GUI는 ExecutionController를 호출해야 한다.
-- Timer는 Final Execution Guard를 자동 호출하면 안 된다.
-- signal_probe_only 흐름에서는 Final Execution Guard 호출 금지.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-금지:
-- Preflight에서 true 전환.
-- Adapter Preview에서 true 전환.
-- Timer에서 true 전환.
-- Approval/Policy에서 true 전환.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-16. 금지사항
-==================================================
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-작성 목적
-- 본 문서는 주문 후보 생성 단계에서 추가된 order_intent 필드의 의미, 현재 범위, 금지사항, 향후 확장 방향을 MASTER_SPEC에 반영하기 위한 추가 갱신자료이다.
-- order_intent는 현재 주문방식 확정값이 아니라, 주문방식이 아직 확정되지 않았음을 명시하는 진단 필드이다.
 
 Original Body Marker: END
 
@@ -5203,4 +5138,4 @@ Reference Navigation
 - Next: PART05_04_RULE_APPROVAL.md
 - Full PART: PART05_RULE_APPROVAL.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt

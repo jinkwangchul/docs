@@ -1,0 +1,533 @@
+# UPDATE_20260707_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE
+
+문서 목적:
+
+이 문서는 GitHub `jinkwangchul/kiwoom_auto` 저장소의 최신 commit
+`197e4deba9f7dce4903064ecedf13ec89a83503a`까지 반영된 6개 commit을 기준으로,
+Execution Queue Commit, Canonical SendOrder, SendOrder Recorder, Chejan, Lifecycle Preview,
+AI Development Tools 구현 내용을 MASTER_SPEC Canonical 병합 후보로 정리한다.
+
+작성 기준:
+
+- 자료 출처: GitHub `jinkwangchul/kiwoom_auto`
+- 기준 최신 commit: `197e4deba9f7dce4903064ecedf13ec89a83503a`
+- 기준 commit 범위: 최신 commit부터 부모 방향 6개 commit
+- 문서 성격: MASTER_SPEC 반영 후보 UPDATE
+- 작성 위치: `docs/10_UPDATE/INBOX`
+
+주의:
+
+- 이 문서는 Canonical이 아니다.
+- 이 문서는 CHANGELOG가 아니다.
+- 이 문서는 Reference Edition이 아니다.
+- 이 문서는 구현 코드가 아니다.
+- MASTER_SPEC 병합 전 검토 후보로만 사용한다.
+
+## 1. 이번 구현 개요
+
+이번 구현 범위는 Execution Preview 이후 실제 실행 계층으로 넘어가기 전후의 보호 계층을 넓힌 것이다.
+
+반영된 큰 축은 다음과 같다.
+
+1. Execution Queue Commit Pipeline
+2. Canonical SendOrder Pipeline
+3. SendOrder Recorder Pipeline
+4. Chejan Entry Pipeline
+5. Chejan Event Pipeline
+6. Lifecycle Preview Pipeline
+7. AI Development Tools
+
+구현 방향은 기존 프로젝트의 Preview First, Approval First, Policy First, Commit Isolation, Review Separation 원칙을 유지하면서,
+Queue Commit, SendOrder, Chejan, Lifecycle 전환을 각각 분리된 계층으로 다룬다.
+
+이번 UPDATE에서 기록하는 구조는 실제 GitHub commit에 추가된 파일 기준이다.
+
+## 2. GitHub 반영 Commit 목록
+
+최신 commit 기준 6개 commit 목록은 다음과 같다.
+
+1. `197e4de` / 2026-07-08T04:50:34Z / Add AI development tools
+2. `01c93fc` / 2026-07-08T04:46:48Z / Add lifecycle preview pipeline and architecture audit
+3. `af75168` / 2026-07-08T04:36:03Z / Add chejan event pipeline
+4. `0abde3a` / 2026-07-08T04:27:54Z / Add send order recorder and chejan entry bridge
+5. `1ec3388` / 2026-07-08T04:21:22Z / Add canonical send order pipeline
+6. `ec0dc74` / 2026-07-08T04:04:15Z / Add execution queue commit pipeline
+
+## 3. Execution Queue Commit Pipeline
+
+기준 commit:
+
+- `ec0dc74` Add execution queue commit pipeline
+
+추가된 주요 파일:
+
+- `execution_approval_gate.py`
+- `execution_queue_commit_contract_preview.py`
+- `execution_queue_commit_dry_run.py`
+- `execution_queue_commit_executor.py`
+- `execution_queue_commit_result_review.py`
+- `execution_readiness_validator.py`
+- `rule_apply_preview_execution_order_adapter.py`
+- `rule_apply_preview_execution_preview_controller.py`
+
+추가된 테스트:
+
+- `tests/test_execution_approval_gate.py`
+- `tests/test_execution_pipeline_preview_only_e2e_contract.py`
+- `tests/test_execution_queue_commit_contract_preview.py`
+- `tests/test_execution_queue_commit_dry_run.py`
+- `tests/test_execution_queue_commit_executor.py`
+- `tests/test_execution_queue_commit_result_review.py`
+- `tests/test_execution_readiness_validator.py`
+- `tests/test_rule_apply_preview_execution_order_adapter.py`
+- `tests/test_rule_apply_preview_execution_order_adapter_e2e_contract.py`
+- `tests/test_rule_apply_preview_execution_preview_bridge_contract.py`
+- `tests/test_rule_apply_preview_execution_preview_controller.py`
+
+MASTER_SPEC 반영 후보:
+
+- Preview Controller Result 이후 Queue Commit 가능 여부를 판단하는 readiness 검증 계층이 추가되었다.
+- Queue Commit은 Preview, Approval, Readiness, Dry-run, Executor, Result Review로 분리된다.
+- `execution_readiness_validator.py`는 Queue Commit 진입 전 READY/BLOCKED/INVALID 판정 계층으로 기록할 후보이다.
+- Queue Commit 실제 수행은 별도 executor 계층으로 분리되며, Preview-only E2E Contract가 유지된다.
+
+정책 후보:
+
+- Queue Commit은 Preview 결과만으로 바로 수행하지 않는다.
+- Approval Gate와 Readiness Validator를 통과해야 한다.
+- Dry-run은 실제 queue write 이전의 검토 계층이다.
+- Result Review는 Commit 이후 검토 계층이다.
+
+## 4. Canonical SendOrder Pipeline
+
+기준 commit:
+
+- `1ec3388` Add canonical send order pipeline
+
+추가된 주요 파일:
+
+- `broker_dispatch_preview.py`
+- `execution_order_dispatch_builder.py`
+- `kiwoom_send_order_adapter_contract.py`
+- `kiwoom_send_order_call_preview.py`
+- `kiwoom_send_order_executor.py`
+- `kiwoom_send_order_executor_result_review.py`
+- `kiwoom_send_order_safety_gate.py`
+
+추가된 테스트:
+
+- `tests/test_broker_dispatch_preview.py`
+- `tests/test_canonical_sendorder_path_e2e_contract.py`
+- `tests/test_execution_order_dispatch_builder.py`
+- `tests/test_execution_pipeline_e2e_contract_audit.py`
+- `tests/test_kiwoom_send_order_adapter_contract.py`
+- `tests/test_kiwoom_send_order_call_preview.py`
+- `tests/test_kiwoom_send_order_executor.py`
+- `tests/test_kiwoom_send_order_executor_result_review.py`
+- `tests/test_kiwoom_send_order_safety_gate.py`
+
+MASTER_SPEC 반영 후보:
+
+- Canonical SendOrder Path는 Queue Commit 이후 SendOrder 호출을 직접 연결하지 않고 별도 계층으로 분리한다.
+- Dispatch Builder, Safety Gate, Call Preview, Executor, Result Review가 분리된다.
+- Broker Dispatch Preview는 실제 broker/Kiwoom 호출 전 preview 계층으로 기록할 후보이다.
+- SendOrder 호출 계약은 `kiwoom_send_order_adapter_contract.py`를 기준으로 별도 검증 대상이 된다.
+
+정책 후보:
+
+- SendOrder 호출 전 Safety Gate를 통과해야 한다.
+- Call Preview는 실제 SendOrder 호출이 아니다.
+- Executor는 Canonical SendOrder Path의 명시 계층으로만 취급한다.
+- Result Review는 SendOrder 결과 처리와 분리된다.
+
+## 5. SendOrder Recorder Pipeline
+
+기준 commit:
+
+- `0abde3a` Add send order recorder and chejan entry bridge
+
+추가된 주요 파일:
+
+- `send_order_record_review_to_chejan_entry_adapter.py`
+- `send_order_result_recorder_contract.py`
+- `send_order_result_recorder_review.py`
+- `send_order_result_recorder_v1.py`
+
+추가된 테스트:
+
+- `tests/test_send_order_record_review_to_chejan_entry_adapter.py`
+- `tests/test_send_order_result_recorder_contract.py`
+- `tests/test_send_order_result_recorder_review.py`
+- `tests/test_send_order_result_recorder_v1.py`
+
+MASTER_SPEC 반영 후보:
+
+- SendOrder 결과는 recorder 계층을 통해 계약 기반으로 기록 후보가 된다.
+- Recorder 본체, Recorder Contract, Recorder Review가 분리된다.
+- SendOrder 기록 검토 결과는 Chejan Entry로 넘기기 전에 adapter를 통해 변환된다.
+
+정책 후보:
+
+- SendOrder 결과 기록은 직접 lifecycle 전환으로 이어지지 않는다.
+- 기록 결과는 Review를 거친 뒤 Chejan Entry Bridge로 전달한다.
+- Chejan Entry로 넘기는 데이터는 adapter를 통해 명시 변환한다.
+
+## 6. Chejan Entry Pipeline
+
+기준 commit:
+
+- `0abde3a` Add send order recorder and chejan entry bridge
+- `af75168` Add chejan event pipeline
+
+추가된 주요 파일:
+
+- `send_order_record_review_to_chejan_entry_adapter.py`
+- `chejan_entry_open_policy.py`
+- `chejan_raw_event_contract.py`
+
+추가된 테스트:
+
+- `tests/test_send_order_record_review_to_chejan_entry_adapter.py`
+- `tests/test_chejan_entry_open_policy.py`
+- `tests/test_chejan_raw_event_contract.py`
+
+MASTER_SPEC 반영 후보:
+
+- SendOrder Recorder Review에서 Chejan Entry로 넘어가는 bridge가 추가되었다.
+- Chejan Entry는 open policy를 통해 진입 가능 여부를 판정한다.
+- Chejan raw event는 contract로 정의되어 후속 event pipeline의 입력 기준이 된다.
+
+정책 후보:
+
+- Chejan Entry는 SendOrder 결과에서 자동 연결되는 숨은 호출이 아니다.
+- Chejan Entry 진입은 Open Policy와 Contract를 기준으로 한다.
+- Raw Event는 분류/증거/리뷰 계층으로 넘기기 전 계약 검증 대상이다.
+
+## 7. Chejan Event Pipeline
+
+기준 commit:
+
+- `af75168` Add chejan event pipeline
+
+추가된 주요 파일:
+
+- `chejan_event_classification_preview.py`
+- `chejan_event_evidence_builder.py`
+- `chejan_event_evidence_review.py`
+- `chejan_raw_event_contract.py`
+- `chejan_entry_open_policy.py`
+
+추가된 테스트:
+
+- `tests/test_chejan_event_classification_preview.py`
+- `tests/test_chejan_event_evidence_builder.py`
+- `tests/test_chejan_event_evidence_review.py`
+- `tests/test_chejan_raw_event_contract.py`
+- `tests/test_chejan_entry_open_policy.py`
+
+MASTER_SPEC 반영 후보:
+
+- Chejan event는 raw event contract 이후 classification preview, evidence builder, evidence review로 분리된다.
+- Classification Preview는 이벤트 의미를 분류하지만 실제 runtime 반영을 수행하지 않는 후보 계층이다.
+- Evidence Builder는 event 처리 근거를 구성한다.
+- Evidence Review는 event evidence의 적합성을 검토한다.
+
+정책 후보:
+
+- Chejan event는 자동 runtime write로 이어지지 않는다.
+- Chejan classification은 preview 성격으로 분리한다.
+- Evidence Review를 통과한 결과만 후속 lifecycle 후보가 된다.
+
+## 8. Lifecycle Preview Pipeline
+
+기준 commit:
+
+- `01c93fc` Add lifecycle preview pipeline and architecture audit
+
+추가된 주요 파일:
+
+- `chejan_to_lifecycle_transition_preview.py`
+- `lifecycle_commit_contract_preview.py`
+- `lifecycle_commit_dry_run.py`
+- `lifecycle_transition_approval_gate.py`
+
+추가된 감사/검토 문서:
+
+- `CANONICAL_SENDORDER_PATH_2026-07-07.txt`
+- `EXECUTION_PIPELINE_CONCEPT_AUDIT_2026-07-07.txt`
+- `EXECUTION_QUEUE_COMMIT_SAFETY_BOUNDARY_REVIEW_2026-07-07.txt`
+- `EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_STRUCTURAL_AUDIT_2026-07-07.txt`
+- `POST_SEND_ORDER_BOUNDARY_AUDIT_2026-07-07.txt`
+- `SEND_ORDER_EXECUTOR_SAFETY_BOUNDARY_REVIEW_2026-07-07.txt`
+
+추가된 테스트:
+
+- `tests/test_chejan_to_lifecycle_transition_preview.py`
+- `tests/test_lifecycle_commit_contract_preview.py`
+- `tests/test_lifecycle_commit_dry_run.py`
+- `tests/test_lifecycle_transition_approval_gate.py`
+
+MASTER_SPEC 반영 후보:
+
+- Chejan Review 이후 lifecycle 전환은 preview, approval, contract preview, dry-run으로 분리된다.
+- Lifecycle Commit은 Chejan event 처리 직후 자동 수행되지 않는다.
+- 구조 감사 문서가 함께 추가되어 Execution, SendOrder, Chejan, Lifecycle 경계 검토 근거가 생겼다.
+
+정책 후보:
+
+- Lifecycle 전환은 Chejan evidence만으로 자동 commit되지 않는다.
+- Approval Gate와 Contract Preview를 통과해야 한다.
+- Dry-run은 lifecycle commit 이전 검토 계층이다.
+
+## 9. AI Development Tools
+
+기준 commit:
+
+- `197e4de` Add AI development tools
+
+추가된 주요 파일:
+
+- `.ai/ANALYST.md`
+- `.ai/IMPLEMENTER.md`
+- `.ai/MASTER_SPEC_RULE.md`
+- `.ai/NON_NEGOTIABLE_RULES.md`
+- `.ai/PROJECT_STRUCTURE.md`
+- `.ai/REVIEWER.md`
+- `.ai/SYSTEM.md`
+- `.ai/PROMPTS/bug_analysis.md`
+- `.ai/PROMPTS/call_flow.md`
+- `.ai/PROMPTS/dependency.md`
+- `.ai/PROMPTS/impact_analysis.md`
+- `.ai/PROMPTS/implementation_request.md`
+- `AI_ANALYZE.bat`
+- `tools/ai_analyzer/README.md`
+- `tools/ai_analyzer/ai_analyze.py`
+- `tools/ai_analyzer/prompts/call_flow.md`
+- `tools/ai_analyzer/prompts/dependency.md`
+- `tools/ai_analyzer/prompts/impact_analysis.md`
+- `tools/ai_analyzer/prompts/system_readonly.md`
+
+MASTER_SPEC 반영 후보:
+
+- AI 협업용 구조 분석, 호출 흐름 분석, 영향 분석, 구현 요청 프롬프트가 프로젝트 내부 도구로 추가되었다.
+- `.ai` 디렉터리는 역할별 AI 운영 지침을 담는 구조로 보인다.
+- `tools/ai_analyzer`는 read-only 분석 보조 도구 성격으로 기록할 후보이다.
+
+주의:
+
+- AI Development Tools는 구현 pipeline 자체가 아니라 개발/분석 보조 도구이다.
+- MASTER_SPEC 반영 시 기능 구현 계층과 운영/도구 계층을 분리해서 기록해야 한다.
+
+## 10. Canonical SendOrder Path
+
+Canonical SendOrder Path는 이번 6개 commit에서 Queue Commit 이후 SendOrder, Recorder, Chejan, Lifecycle까지 이어지는 전체 흐름 후보로 정리된다.
+
+후보 흐름:
+
+```text
+Execution Queue Commit Pipeline
+↓
+Canonical SendOrder Pipeline
+↓
+SendOrder Recorder Pipeline
+↓
+Chejan Entry Pipeline
+↓
+Chejan Event Pipeline
+↓
+Lifecycle Preview Pipeline
+```
+
+세부 후보 흐름:
+
+```text
+Readiness Validator
+↓
+Approval Gate
+↓
+Queue Commit Contract Preview
+↓
+Queue Commit Dry-run
+↓
+Queue Commit Executor
+↓
+Queue Commit Result Review
+↓
+Execution Order Dispatch Builder
+↓
+Kiwoom SendOrder Safety Gate
+↓
+Kiwoom SendOrder Call Preview
+↓
+Kiwoom SendOrder Executor
+↓
+Kiwoom SendOrder Executor Result Review
+↓
+SendOrder Result Recorder
+↓
+SendOrder Result Recorder Review
+↓
+Chejan Entry Adapter
+↓
+Chejan Entry Open Policy
+↓
+Chejan Raw Event Contract
+↓
+Chejan Event Classification Preview
+↓
+Chejan Event Evidence Builder
+↓
+Chejan Event Evidence Review
+↓
+Chejan to Lifecycle Transition Preview
+↓
+Lifecycle Transition Approval Gate
+↓
+Lifecycle Commit Contract Preview
+↓
+Lifecycle Commit Dry-run
+```
+
+MASTER_SPEC 병합 시 주의:
+
+- 이 흐름은 GitHub commit 파일명과 commit message 기준의 병합 후보이다.
+- 실제 구현 세부 계약은 각 파일 내용을 재검토한 뒤 Canonical에 반영해야 한다.
+- Preview, Approval, Contract, Dry-run, Executor, Review의 경계를 유지해야 한다.
+
+## 11. 전체 테스트 결과
+
+GitHub commit 기준으로 확인된 테스트 추가 현황:
+
+- Execution Queue Commit Pipeline 관련 테스트 추가
+- Canonical SendOrder Pipeline 관련 테스트 추가
+- SendOrder Recorder Pipeline 관련 테스트 추가
+- Chejan Entry/Event Pipeline 관련 테스트 추가
+- Lifecycle Preview Pipeline 관련 테스트 추가
+
+이번 docs UPDATE 작성 작업에서는 `kiwoom_auto` 로컬 프로젝트를 열지 않았고, Python 테스트를 실행하지 않았다.
+
+따라서 전체 unittest 통과 개수는 이 UPDATE 문서에서 새로 확정하지 않는다.
+
+MASTER_SPEC 병합 전 확인 필요:
+
+- GitHub 기준 최신 코드의 전체 unittest discovery 결과
+- Queue Commit 관련 테스트 결과
+- Canonical SendOrder 관련 테스트 결과
+- SendOrder Recorder 관련 테스트 결과
+- Chejan 관련 테스트 결과
+- Lifecycle Preview 관련 테스트 결과
+
+## 12. 보호 파일 검증
+
+이번 docs UPDATE 작성 작업에서 확인한 보호 원칙:
+
+- `docs` 프로젝트에서만 문서 생성
+- `kiwoom_auto` 로컬 프로젝트 미오픈
+- Python 코드 미수정
+- runtime 미수정
+- rules.json 미수정
+- order_queue 미수정
+- MASTER_SPEC 미수정
+- Reference 미수정
+- Canonical 미수정
+- CHANGELOG 미생성
+- Git commit 미수행
+- Git push 미수행
+
+GitHub commit 기준으로 별도 확인이 필요한 보호 파일:
+
+- `runtime/`
+- `rules.json`
+- order queue runtime 파일
+- real Kiwoom/SendOrder 연결부
+
+## 13. 유지된 금지선
+
+이번 UPDATE에서 유지해야 하는 금지선:
+
+- Preview 단계에서 runtime write 금지
+- Preview 단계에서 queue write 금지
+- Queue Commit은 명시 계층에서만 수행
+- SendOrder 직접 호출 금지
+- Kiwoom 직접 호출 금지
+- Chejan 자동 연결 금지
+- Lifecycle 자동 commit 금지
+- GUI 자동 연결 금지
+- rules.json 임의 수정 금지
+- runtime 파일 임의 수정 금지
+- MASTER_SPEC 직접 덮어쓰기 금지
+- 기존 Canonical 수정 금지
+
+## 14. MASTER_SPEC 반영 후보
+
+MASTER_SPEC에 반영할 후보 섹션:
+
+1. Execution Queue Commit Pipeline
+2. Execution Readiness Validator
+3. Execution Approval Gate
+4. Queue Commit Contract Preview
+5. Queue Commit Dry-run
+6. Queue Commit Executor
+7. Queue Commit Result Review
+8. Canonical SendOrder Pipeline
+9. Execution Order Dispatch Builder
+10. Kiwoom SendOrder Safety Gate
+11. Kiwoom SendOrder Call Preview
+12. Kiwoom SendOrder Executor
+13. Kiwoom SendOrder Executor Result Review
+14. Broker Dispatch Preview
+15. Kiwoom SendOrder Adapter Contract
+16. SendOrder Result Recorder
+17. SendOrder Result Recorder Contract
+18. SendOrder Result Recorder Review
+19. SendOrder Record Review to Chejan Entry Adapter
+20. Chejan Entry Open Policy
+21. Chejan Raw Event Contract
+22. Chejan Event Classification Preview
+23. Chejan Event Evidence Builder
+24. Chejan Event Evidence Review
+25. Chejan to Lifecycle Transition Preview
+26. Lifecycle Transition Approval Gate
+27. Lifecycle Commit Contract Preview
+28. Lifecycle Commit Dry-run
+29. Execution/SendOrder/Chejan/Lifecycle Structural Audit
+30. AI Development Tools
+
+MASTER_SPEC 병합 시 반영 원칙:
+
+- 기존 Canonical을 직접 수정하지 않는다.
+- 새 Canonical 후보 또는 병합본을 생성한다.
+- GitHub 최신 코드 기준으로 실제 파일 내용을 재검토한다.
+- commit message만으로 구현 세부 정책을 확정하지 않는다.
+- 구현된 내용과 감사 문서를 분리해 기록한다.
+- 테스트 결과는 실제 실행 결과 또는 GitHub에 남은 명시 결과를 기준으로 기록한다.
+
+## 15. 다음 구현 후보
+
+다음 구현 후보:
+
+1. Execution Readiness Validator와 Queue Commit Executor 사이의 계약 재검토
+2. Queue Commit Result Review 이후 SendOrder Dispatch 진입 조건 검토
+3. Kiwoom SendOrder Executor의 real 호출 보호선 검토
+4. SendOrder Recorder Review와 Chejan Entry Adapter 간 데이터 계약 검토
+5. Chejan Raw Event Contract와 Classification Preview의 입력 검증 강화 여부 검토
+6. Chejan Evidence Review 이후 Lifecycle Transition Preview 진입 조건 검토
+7. Lifecycle Commit Dry-run 이후 실제 commit 계층 필요 여부 검토
+8. AI Development Tools의 read-only 보장 여부 검토
+9. 전체 unittest discovery 결과 확보
+10. MASTER_SPEC Canonical 병합 및 CHANGELOG 작성 필요 여부 판단
+
+다음 문서 작업 후보:
+
+- MASTER_SPEC Canonical 병합 후보 작성
+- CHANGELOG 후보 작성
+- Execution/SendOrder/Chejan/Lifecycle Reference Edition 반영 여부 검토
+
+## 작성 작업 기록
+
+- 작성일: 2026-07-08
+- 작성 프로젝트: docs
+- 작성 위치: `10_UPDATE/INBOX`
+- 생성 파일: `UPDATE_20260707_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt`
+- GitHub 기준 최신 commit: `197e4deba9f7dce4903064ecedf13ec89a83503a`
+- 로컬 `kiwoom_auto` 프로젝트 작업 여부: 수행하지 않음

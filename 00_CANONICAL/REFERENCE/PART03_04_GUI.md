@@ -1,16 +1,1340 @@
-# PART03_04 GUI
+# PART03 04 GUI
 
 Reference Edition Subpart
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
 Source Full Part: PART03_GUI.md
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 하위 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 Original Body Marker: START
+================================================================================
+현재 파일명 기준으로 macd가 남은 실제 소스 파일은 다음 1개뿐이다.
+- routines/지표추종매매/routine_macd_engine.py
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+따라서 과거 gui_macd_* 계열 파일명은 현재 압축본 기준으로 대부분 gui_indicator_follow_* 계열로 전환된 상태로 판단된다.
+다만 코드 내부에는 macd_sell, macd_check, MACD선, MACD target, macd config 등이 남아 있다.
+이 중 일부는 실제 지표/호환 key이므로 유지해야 하고, 일부는 앞으로 신규 확산을 막기 위해 일반명으로 교체해야 한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+현재 전략:
+- 파일명 전체 변경은 즉시 진행하지 않는다.
+- 신규 코드에서는 macd 명칭을 금지한다.
+- 기존 rules.json key와 테스트 호환 key는 유지한다.
+- UI/Mapper 내부 변수명은 단계적으로 일반화한다.
+- MACD 계산/OSC 계산/target: MACD는 유지한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+================================================================================
+1. 분류 기준
+================================================================================
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+[유지]
+실제 지표명, 기존 rules 호환 key, 기존 테스트 기준, 엔진 고유 로직이다.
+지금 변경하면 신호 판정, rules 호환성, 테스트 안정성이 깨질 수 있다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+[교체 후보]
+실제 지표 의미가 아니라 UI 위젯명, 함수명, preview 후보명, 내부 변수명에 MACD가 들어간 경우다.
+향후 확장 시 지표추종 루틴 전체를 MACD 루틴처럼 보이게 만들 수 있으므로 단계적으로 교체한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+[무시]
+과거 로그, changelog, blocked_actions 리포트, cleanup 도구의 기록성 문자열이다.
+실행 구조에 직접 영향을 주지 않는다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+================================================================================
+2. 파일명 조사 결과
+================================================================================
+실제 파일명에 macd가 포함된 항목:
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+1) routines/지표추종매매/routine_macd_engine.py
+- 분류: 보류/유지
+- 이유: 현재 MACD/OSC 전용 계산 및 신호 평가 엔진이다.
+- 즉시 변경 금지.
+- 장기적으로 alias 안정화, 테스트 통과, rules migration 설계 이후에만 파일명 변경 검토.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+2) routines/지표추종매매/__pycache__/routine_macd_engine.cpython-311.pyc
+- 분류: 삭제 가능 캐시
+- 이유: 실행 소스가 아니라 캐시 파일이다.
+- 배포/정리 시 삭제 대상.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+현재 압축본 기준 gui_macd_* 파일명은 실제 소스 파일명으로 남아 있지 않다.
+이는 과거 작업에서 gui_indicator_follow_* 계열로 전환된 결과로 판단된다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+================================================================================
+3. 파일별 상세 분류
+================================================================================
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-1. engines/condition_engine.py
+--------------------------------------------------------------------------------
+사용처:
+- 주석/설명: RSI / 이평선 / MACD / OSC / 가격 / 거래량 등 공통 조건 평가
+분류:
+- 유지
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- 실제 지표 목록 설명이므로 변경 대상이 아니다.
+- MACD를 지표명으로 언급하는 것은 허용한다.
+조치:
+- 수정 불필요.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-2. engines/indicator_engine.py
+--------------------------------------------------------------------------------
+사용처:
+- docstring: EMA, 단순이평, RSI, MACD, OSC 계산
+- def macd_series(...)
+- macd_line 변수
+- macd_cfg = cfg.get("macd", {})
+- result map의 "MACD": macd_line
+분류:
+- 유지
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- 이 파일은 공통 지표 계산 엔진이며, MACD는 실제 지표명이다.
+- macd_series, macd_line, cfg["macd"], "MACD" key는 계산 의미가 명확하다.
+- 여기서 MACD 명칭을 일반명으로 바꾸면 오히려 의미가 흐려진다.
+조치:
+- 수정 금지.
+- 단, 신규 지표 추가 시에는 실제 지표명 기준으로 별도 함수/키를 추가한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-3. gui_indicator_follow_buy_controls.py
+--------------------------------------------------------------------------------
+사용처:
+- 표시 문자열: "시그널/MACD"
+분류:
+- 검토 후 유지 가능
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- UI 표시 문자열이 실제 지표 비교를 의미한다면 유지 가능하다.
+- 단, "시그널/MACD"가 일반 지표추종 UI의 기본 문구로 고정되어 있다면 향후 다중지표 확장 시 어색해질 수 있다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+조치:
+- 지금 즉시 변경하지 않는다.
+- 향후 UI 문구 체계 정리 시 다음 후보 검토:
+ - "시그널/MACD" 유지: MACD 전용 필터일 때
+ - "지표선/기준선" 변경: 공통 지표 비교 UI로 확장할 때
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-4. gui_indicator_follow_data_tabs.py
+--------------------------------------------------------------------------------
+사용처:
+- macd_sell = signals.get("macd_sell", {})
+- macd_sell_enabled
+- macd_sell_delay
+- self.macd_sell_enabled_check
+- self.macd_sell_delay_line
+- self.macd_sell_status_line
+- 카드 출력 key "macd_sell"
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+분류:
+- 혼합
+ - "macd_sell" rules key 접근: 유지
+ - 위젯/변수명 macd_sell_*: 교체 후보
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- sell.signals.macd_sell은 기존 rules.json key이므로 유지해야 한다.
+- 하지만 UI 위젯명까지 macd_sell_*로 계속 두면 지표추종 UI 내부가 MACD 전용처럼 굳어진다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+권장 조치:
+- 1차: rules key 접근은 그대로 둔다.
+- 2차: 내부 변수/위젯명만 일반명으로 교체한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+교체 후보:
+- macd_sell_enabled_check -> primary_sell_signal_enabled_check 또는 sell_reversal_enabled_check
+- macd_sell_delay_line -> primary_sell_signal_delay_line 또는 sell_reversal_delay_line
+- macd_sell_status_line -> primary_sell_signal_status_line 또는 sell_reversal_status_line
+- macd_sell_enabled -> primary_sell_signal_enabled
+- macd_sell_delay -> primary_sell_signal_delay
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+주의:
+- 저장 key "macd_sell"은 변경 금지.
+- 화면 표시 문자열이 "MACD 반전 매도"라면 실제 UI 정책 확정 후 별도 변경한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-5. gui_indicator_follow_routine_settings_dialog.py
+--------------------------------------------------------------------------------
+사용처:
+- macd_sell = signals.get("macd_sell", {})
+- macd_sell_enabled
+- macd_sell_delay
+- hasattr(self, "macd_sell_enabled_check")
+- hasattr(self, "macd_sell_delay_line")
+- hasattr(self, "macd_sell_status_line")
+- 카드 출력 key "macd_sell"
+- 상태 수집 prefix "macd_sell_"
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+분류:
+- 혼합
+ - rules key "macd_sell": 유지
+ - 내부 위젯/변수/prefix: 교체 후보
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- 이 파일은 설정창 중심 파일이므로 신규 코드 확산 가능성이 높다.
+- 여기서 macd_sell_* 명칭을 계속 복제하면 향후 sell signal 일반화가 어려워진다.
+권장 조치:
+- 즉시 대규모 수정은 하지 않는다.
+- 먼저 호환 wrapper 방식으로 정리한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+예상 교체 방향:
+- macd_sell 변수 -> existing_sell_signal_rule 또는 legacy_macd_sell_rule
+- macd_sell_enabled -> primary_sell_signal_enabled
+- macd_sell_delay -> primary_sell_signal_delay
+- self.macd_sell_enabled_check -> self.primary_sell_signal_enabled_check
+- self.macd_sell_delay_line -> self.primary_sell_signal_delay_line
+- self.macd_sell_status_line -> self.primary_sell_signal_status_line
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+호환 처리:
+- 기존 self.macd_sell_* 속성을 참조하는 다른 파일이 있으면 alias로 일정 기간 유지 가능.
+- 내부 수집 prefix "macd_sell_"는 indicator_follow_ui_state 구조와 연결되어 있으므로 즉시 변경하지 않는다.
+- UI state key migration 설계 후 변경한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-6. gui_indicator_follow_sell_controls.py
+--------------------------------------------------------------------------------
+사용처:
+- macd_kind_combo = make_combo(["MACD선", "시그널선"], ...)
+- macd_sign_combo
+- macd_value_line
+- macd_compare_combo
+- _sync_macd_sign_combo()
+- sell_signal_condition_c_macd_check
+- sell_signal_condition_c_macd_kind_combo
+- sell_signal_condition_c_macd_sign_combo
+- sell_signal_condition_c_macd_value_line
+- sell_signal_condition_c_macd_compare_combo
+- sell_signal_condition_c_macd_logic_combo
+- QGroupBox("MACD 반전 매도")
+- self.macd_sell_enabled_check
+- self.macd_sell_delay_line
+- self.macd_sell_status_line
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+분류:
+- 혼합
+ - 표시 문자열 "MACD선", "시그널선", "MACD 반전 매도": 유지/검토
+ - UI 내부 변수명 macd_*: 교체 후보
+ - condition C macd key: 보류
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- Condition C가 실제 MACD선/시그널선 필터라면 표시 문자열은 유지 가능하다.
+- 그러나 변수명과 위젯 속성명이 macd_*로 굳어져 있어 신규 확장 시 위험하다.
+- 이 파일이 가장 먼저 일반화 후보가 될 가능성이 높다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+권장 조치:
+- 조건 C 내부 위젯명은 다음처럼 일반화한다.
+ - macd_kind_combo -> indicator_line_kind_combo
+ - macd_sign_combo -> indicator_line_sign_combo
+ - macd_value_line -> indicator_line_value_line
+ - macd_compare_combo -> indicator_line_compare_combo
+ - _sync_macd_sign_combo -> _sync_indicator_line_sign_combo
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+- 상태 위젯명은 다음처럼 일반화한다.
+ - macd_sell_enabled_check -> primary_sell_signal_enabled_check
+ - macd_sell_delay_line -> primary_sell_signal_delay_line
+ - macd_sell_status_line -> primary_sell_signal_status_line
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+보류:
+- sell_signal_condition_c_macd_*는 indicator_follow_ui_state의 현재 저장 key와 연결되어 있으면 즉시 변경하지 않는다.
+- UI state key migration 설계 후 변경한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-7. routines/지표추종매매/routine.py
+--------------------------------------------------------------------------------
+사용처:
+- routine_macd_engine import
+- DEFAULT_MACD_ROUTINE_CONFIG alias
+- evaluate_macd_routine alias
+- _ENGINE_SOURCE = "routine_macd_engine"
+분류:
+- 보류/호환 유지
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- 현재 이미 DEFAULT_INDICATOR_FOLLOW_CONFIG와 evaluate_indicator_follow_routine를 우선 사용하고, 기존 MACD 명칭은 alias로 유지하는 구조다.
+- 이것은 현재 단계에서 가장 안전한 방식이다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+조치:
+- 즉시 변경하지 않는다.
+- 신규 코드는 반드시 evaluate_indicator_follow_routine, DEFAULT_INDICATOR_FOLLOW_CONFIG만 사용한다.
+- evaluate_macd_routine, DEFAULT_MACD_ROUTINE_CONFIG는 legacy compatibility alias로만 문서화한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+장기 조치:
+- routine_macd_engine.py 파일명 변경이 확정된 이후 import 경로를 변경한다.
+- 그 전까지는 이 파일의 MACD import 경로를 건드리지 않는다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-8. routines/지표추종매매/routine_macd_engine.py
+--------------------------------------------------------------------------------
+사용처:
+- 파일명 자체 routine_macd_engine.py
+- docstring: MACD 전용 신호발생 엔진
+- routine_type: MACD_OSC
+- indicators.macd config
+- DEFAULT_MACD_ROUTINE_CONFIG alias
+- _macd_sell_section()
+- sell.signals.macd_sell
+- macd_enabled, macd_passed
+- active_sell_names.append("macd_sell")
+- signal_pass_map = {"macd_sell": ...}
+- evaluate_macd_routine alias
+분류:
+- 대부분 유지/보류
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- 이 파일은 실제 MACD/OSC 신호 판정 엔진이므로 현재 MACD 명칭 유지가 타당하다.
+- 다만 루틴명이 지표추종매매로 확장된 상황에서는 장기적으로 파일명/함수명 일반화 검토가 필요하다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+즉시 유지:
+- MACD/OSC 계산 관련 설명
+- cfg["indicators"]["macd"]
+- target "MACD"
+- sell.signals.macd_sell rules key
+- evaluate_macd_routine alias
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+교체 후보:
+- _macd_sell_section -> _primary_sell_signal_section 또는 _legacy_macd_sell_section
+- macd_enabled -> primary_sell_signal_enabled 또는 macd_signal_enabled
+- macd_passed -> primary_sell_signal_passed 또는 macd_signal_passed
+권장:
+- 지금은 변경하지 않는다.
+- Rule Mapper 승인/저장/엔진 연결 이후에만 정리한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-9. routines/지표추종매매/routine_rule_mapper.py
+--------------------------------------------------------------------------------
+사용처:
+- sell.signals.macd_sell
+- sell.signals.ui_preview_condition_c_macd_sell
+- _build_sell_macd_condition()
+- condition_c.get("macd_check") 등 UI state macd_* key
+- "MACD선" -> "MACD"
+- warning 문구: sell condition C MACD ...
+- description: UI preview: sell condition C MACD line threshold
+- UI_PREVIEW_SELL_MACD_CONDITION_C
+분류:
+- 핵심 교체 후보
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- 이 파일은 앞으로 UI state를 engine rules로 연결하는 중간 계층이다.
+- 여기에 MACD 전용 후보명이 계속 남으면, 향후 RSI/볼린저/이평 등 지표 확장 시 mapper가 MACD 중심으로 굳어진다.
+- 단, 기존 rules key sell.signals.macd_sell은 변경하지 않는다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+즉시 유지:
+- existing path: sell.signals.macd_sell
+- target "MACD"
+- UI state의 기존 macd_* key 접근
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+교체 후보:
+- _build_sell_macd_condition -> _build_sell_indicator_line_condition
+- sell_macd_condition -> sell_indicator_line_condition
+- UI_PREVIEW_SELL_MACD_CONDITION_C -> UI_PREVIEW_SELL_INDICATOR_LINE_CONDITION_C
+- ui_preview_condition_c_macd_sell -> ui_preview_condition_c_indicator_line_sell 또는 ui_preview_condition_c_sell_indicator_line
+- warning 문구의 "MACD"는 실제 target이 MACD일 때만 사용하고, 함수/후보명에서는 제거
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+중요:
+- preview candidate path를 변경하면 테스트와 GUI 표시가 함께 바뀐다.
+- 따라서 변경 전 테스트 갱신 계획이 필요하다.
+- 지금 바로 코드 수정하지 말고, 먼저 preview path 명명 규칙을 확정해야 한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-10. routines/지표추종매매/rules.json
+--------------------------------------------------------------------------------
+사용처:
+- indicators.macd
+- description: MACD 오실레이터...
+- sell.note: MACD SELL과 수익률 SELL...
+- sell.signals.macd_sell
+- name: 매도조건_MACD_OSC_TURN_DOWN
+- indicator_follow_ui_state 내부 condition C macd_* keys
+분류:
+- 변경 금지
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+장기 절차:
+1. 새 key 병행 저장
+2. 기존 key fallback 유지
+3. migration 테스트
+4. 실제 변환
+5. legacy key 제거 여부 검토
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-11. tests/test_indicator_follow_rule_mapper_preview.py
+--------------------------------------------------------------------------------
+사용처:
+- UI state macd_* key
+- current_rules sell.signals.macd_sell
+- indicators.macd
+- test name: test_sell_add_signal_candidate_does_not_replace_macd_sell
+- expected path: sell.signals.ui_preview_condition_c_macd_sell
+- expected target: MACD
+분류:
+- 보류/추후 갱신
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- 현재 테스트는 기존 Rule Mapper Preview/Diff의 호환성 검증 역할을 한다.
+- macd_sell을 교체하지 않는다는 테스트는 현재 구조에서 중요하다.
+- 따라서 지금 변경하면 안 된다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+조치:
+- Rule Mapper path 명명 규칙을 바꿀 때 테스트도 함께 갱신한다.
+- target "MACD" 검증은 유지한다.
+- 기존 macd_sell을 replace하지 않는 검증은 계속 유지한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-12. gui_routine_condition_engine.py
+--------------------------------------------------------------------------------
+사용처:
+- 예시/설명: {"target":"MACD", "operator":"CROSS_UP", "compare_target":"SIGNAL"}
+분류:
+- 유지
+판정:
+- 조건 엔진 예시에서 MACD는 실제 지표 target이다.
+- 변경 대상이 아니다.
+조치:
+- 수정 불필요.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-13. routines/지표추종매매/routine_condition_engine.py
+--------------------------------------------------------------------------------
+사용처:
+- 예시/설명: {"target":"MACD", "operator":"CROSS_UP", "compare_target":"SIGNAL"}
+분류:
+- 유지
+판정:
+- 실제 지표 target 예시다.
+- 변경 대상이 아니다.
+조치:
+- 수정 불필요.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-14. tools/cleanup_project_junk_v3.py
+--------------------------------------------------------------------------------
+사용처:
+- 제거/정리 대상 문자열: gui_macd_routine_settings_dialog.py, macd_signal_engine.py, routine_macd_engine.py
+분류:
+- 무시/보류
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- cleanup 도구 내부의 과거 파일명 문자열이다.
+- 실제 실행 흐름의 신규 MACD 확산과 직접 관련 없다.
+- 다만 정리 도구가 현재 구조와 맞지 않을 수 있으므로 나중에 tools 정리 때 재검토한다.
+조치:
+- 지금 수정하지 않는다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-15. tools/create_routine_packages_from_legacy.py
+--------------------------------------------------------------------------------
+사용처:
+- module_name: macd_routine
+- description: MACD 기반 자동매매 루틴 패키지...
+분류:
+- 보류/레거시 도구
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- legacy package 생성 도구 성격이다.
+- 현재 자동인식 루틴 패키지 방향과 다를 수 있으므로 즉시 사용 여부부터 확인해야 한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+조치:
+- 실행 중인 핵심 흐름이 아니면 당장 수정하지 않는다.
+- tools 정리 단계에서 폐기/보존/갱신 판단.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3-16. reports/blocked_actions/*, PROJECT_CHANGELOG.txt
+--------------------------------------------------------------------------------
+사용처:
+- 다수의 MACD 기록 문자열
+분류:
+- 무시
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+판정:
+- 과거 작업 기록, blocked action report, changelog 성격이다.
+- 실행 코드 일반화 대상이 아니다.
+- 문서 이력에서 MACD가 많이 나오는 것은 문제가 아니다.
+조치:
+- 수정 금지.
+- 검색 결과를 볼 때 이 파일들은 제외하고 판단한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+================================================================================
+4. 우선순위별 작업 후보
+================================================================================
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+[우선순위 1: 신규 확산 차단]
+- 신규 파일명에 macd 사용 금지.
+- 신규 함수명에 macd 사용 금지.
+- 신규 변수명에 macd 사용 금지.
+- 단, 실제 지표명/target/key는 예외.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+[우선순위 2: Rule Mapper 명칭 정리 설계]
+대상:
+- routines/지표추종매매/routine_rule_mapper.py
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+변경 후보:
+- _build_sell_macd_condition -> _build_sell_indicator_line_condition
+- sell.signals.ui_preview_condition_c_macd_sell -> sell.signals.ui_preview_condition_c_indicator_line_sell
+- UI_PREVIEW_SELL_MACD_CONDITION_C -> UI_PREVIEW_SELL_INDICATOR_LINE_CONDITION_C
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+[우선순위 3: UI 내부 위젯명 일반화]
+대상:
+- gui_indicator_follow_sell_controls.py
+- gui_indicator_follow_data_tabs.py
+- gui_indicator_follow_routine_settings_dialog.py
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+변경 후보:
+- macd_sell_enabled_check -> primary_sell_signal_enabled_check
+- macd_sell_delay_line -> primary_sell_signal_delay_line
+- macd_sell_status_line -> primary_sell_signal_status_line
+- macd_kind_combo -> indicator_line_kind_combo
+- macd_sign_combo -> indicator_line_sign_combo
+- macd_value_line -> indicator_line_value_line
+- macd_compare_combo -> indicator_line_compare_combo
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+주의:
+- self 속성명 변경은 다른 파일 참조와 연결되므로 grep 후 단계적으로 변경한다.
+- 기존 속성 alias를 잠시 유지하는 방식도 가능하다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+[우선순위 4: routine.py alias 정책 문서화]
+대상:
+- routines/지표추종매매/routine.py
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+조치:
+- DEFAULT_INDICATOR_FOLLOW_CONFIG / evaluate_indicator_follow_routine 우선.
+- DEFAULT_MACD_ROUTINE_CONFIG / evaluate_macd_routine는 legacy alias로만 유지.
+- 신규 import에서 MACD alias 사용 금지.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+[우선순위 5: 엔진 파일명 변경 검토]
+대상:
+- routines/지표추종매매/routine_macd_engine.py
+조치:
+- 가장 마지막에 검토.
+- 엔진 연결 안정화 전 변경 금지.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+================================================================================
+5. 절대 변경 금지 목록
+================================================================================
+다음은 현재 단계에서 변경 금지다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+- rules.json의 indicators.macd
+- rules.json의 sell.signals.macd_sell
+- rules.json의 indicator_follow_ui_state 내부 macd_* key
+- target: MACD
+- target: OSC
+- MACD선 / 시그널선 UI 표시 문자열 중 실제 지표명인 부분
+- engines/indicator_engine.py의 macd_series
+- routine_macd_engine.py의 MACD/OSC 계산 및 판정 설명
+- 기존 테스트가 검증하는 macd_sell 미대체 정책
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+================================================================================
+6. 다음 실제 작업 제안
+================================================================================
+가장 안전한 다음 실제 작업은 코드 수정이 아니라 아래 설계 확정이다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+1. Rule Mapper preview candidate path 명칭 확정
+ - 현재: sell.signals.ui_preview_condition_c_macd_sell
+ - 후보: sell.signals.ui_preview_condition_c_indicator_line_sell
+ - 또는: sell.signals.ui_preview_condition_c_sell_indicator_line
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+2. Rule Mapper 내부 함수명 확정
+ - 현재: _build_sell_macd_condition
+ - 후보: _build_sell_indicator_line_condition
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+3. UI 내부 위젯명 일반화 범위 확정
+ - macd_sell_* 위젯명 교체 여부
+ - condition_c_macd_* 저장 key 유지 여부
+4. 테스트 갱신 범위 확정
+ - path 기대값 변경 여부
+ - macd_sell 미대체 테스트는 유지
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+================================================================================
+7. 현재 최종 판정
+================================================================================
+현재 MACD 명칭 문제는 "위험하지만 통제 가능한 상태"다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+위험한 이유:
+- Rule Mapper와 UI 내부 변수명에 MACD가 남아 있어 신규 확장 시 계속 복제될 가능성이 있다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+통제 가능한 이유:
+- 실제 파일명 macd 잔존은 routine_macd_engine.py 1개뿐이다.
+- GUI 파일명은 이미 indicator_follow 계열로 정리되어 있다.
+- 호출 구조는 일반명 우선 + MACD alias 유지 방식으로 정리되어 있다.
+- rules.json과 엔진 key는 변경 금지 대상으로 분리 가능하다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_일반화_파일별_대상목록_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:26:50 | 분류: MASTER_SPEC]
+따라서 다음 단계는 "전체 치환"이 아니라 "Rule Mapper와 UI 내부 명칭의 제한적 일반화"가 맞다.
+[문서 끝]
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+MACD 명칭 사용처 전수조사 및 일반화 기준
+작성일: 2026-07-02
+대상: 키움 자동매매 프로젝트 / 지표추종매매 루틴
+목적: 향후 프로젝트 확장 시 MACD 명칭이 불필요하게 확산되는 것을 방지하고, 변경 금지 대상과 일반화 대상을 명확히 구분한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+================================================================================
+1. 현재 판정
+================================================================================
+현재 MACD 용어 문제는 완전 해결 상태가 아니다.
+다만 1차 일반화는 완료된 상태다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+완료된 부분:
+- DEFAULT_INDICATOR_FOLLOW_CONFIG 추가
+- evaluate_indicator_follow_routine() 추가
+- routine.py에서 일반명 우선 사용
+- DEFAULT_MACD_ROUTINE_CONFIG는 호환 alias로 유지
+- evaluate_macd_routine()은 호환 alias로 유지
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+미완료/잔존 부분:
+- routine_macd_engine.py 파일명 유지
+- sell.signals.macd_sell 유지
+- rules.json 내부 macd 관련 key 유지
+- indicator_follow_ui_state 내부 일부 macd_* key 유지
+- UI/Mapper 내부 변수명·후보명 일부 macd 명칭 유지
+- 테스트 코드 일부 macd 명칭 유지
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+현재 결론:
+- 기존 호환성 때문에 MACD 명칭을 즉시 전부 제거하면 위험하다.
+- 하지만 신규 코드에서 MACD 명칭을 계속 사용하면 나중에 일반화 범위가 폭증한다.
+- 따라서 즉시 전체 치환이 아니라, 신규 확산 차단 + 점진적 일반화가 공식 방향이다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+================================================================================
+2. MACD 명칭 사용처 분류
+================================================================================
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+2.1 유지 대상: 실제 지표/엔진 의미가 있는 MACD
+--------------------------------------------------------------------------------
+아래 항목은 MACD 지표 자체를 의미하므로 변경하지 않는다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+유지 대상:
+- MACD선
+- 시그널선
+- OSC
+- target: MACD
+- target: OSC
+- indicators.macd
+- macd_series()
+- MACD/OSC 계산 로직
+- MACD/OSC 신호 판정 로직
+- routine_macd_engine.py 내부 실제 MACD 계산부
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+유지 사유:
+- MACD는 루틴 일반명이 아니라 기술적 지표명이다.
+- 지표명까지 일반화하면 오히려 의미가 불명확해진다.
+- OSC 역시 MACD 기반 오실레이터 개념으로 현재 루틴 로직 핵심이다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+금지 사항:
+- MACD선/시그널선/OSC 표시명을 임의로 indicator 등으로 바꾸지 않는다.
+- rules.json 내부 target 값의 MACD/OSC를 검증 없이 변경하지 않는다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+호환 유지 대상:
+- DEFAULT_MACD_ROUTINE_CONFIG
+- evaluate_macd_routine()
+- sell.signals.macd_sell
+- rules.json의 macd 관련 key
+- indicator_follow_ui_state 내부 기존 macd_* key
+- 기존 테스트가 참조하는 macd_* key
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+운영 원칙:
+- 기존 동작 보존을 위해 alias는 유지한다.
+- 새 코드에서는 DEFAULT_INDICATOR_FOLLOW_CONFIG를 사용한다.
+- 새 코드에서는 evaluate_indicator_follow_routine()을 사용한다.
+- sell.signals.macd_sell은 기존 실행 Rule 보호를 위해 변경하지 않는다.
+- rules.json key migration은 장기 과제로 미룬다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+2.3 교체 후보: 일반화가 필요한 MACD 명칭
+--------------------------------------------------------------------------------
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+아래 항목들은 실제 지표명이라기보다 UI/Mapper/후보명/변수명에 MACD가 남아 있는 경우다.
+향후 확장 전 점진적으로 일반명으로 교체해야 한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+교체 후보 예시:
+- macd_sell_enabled_check
+- macd_sell_delay_line
+- macd_kind_combo
+- sell_signal_condition_c_macd_*
+- _build_sell_macd_condition
+- UI_PREVIEW_SELL_MACD_CONDITION_C
+- ui_preview_condition_c_macd_sell
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+교체 방향 예시:
+- macd_sell_enabled_check
+ → indicator_sell_enabled_check 또는 condition_c_sell_enabled_check
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+- macd_sell_delay_line
+ → sell_delay_line 또는 condition_c_sell_delay_line
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+- macd_kind_combo
+ → indicator_kind_combo 또는 signal_indicator_kind_combo
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+- sell_signal_condition_c_macd_*
+ → sell_signal_condition_c_indicator_* 또는 sell_signal_condition_c_osc_*
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+- _build_sell_macd_condition
+ → _build_sell_indicator_condition 또는 _build_sell_condition_c_candidate
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+- UI_PREVIEW_SELL_MACD_CONDITION_C
+ → UI_PREVIEW_SELL_CONDITION_C
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+- ui_preview_condition_c_macd_sell
+ → ui_preview_condition_c_sell
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+2.4 무시 가능 대상: 기록/로그/문서성 잔존
+--------------------------------------------------------------------------------
+아래 항목은 실행 구조가 아니라 기록이므로 당장 변경 대상이 아니다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+무시 가능:
+- PROJECT_CHANGELOG.txt
+- reports/blocked_actions/*
+- 과거 작업 리포트
+- 과거 오류 로그
+- cleanup tool 내부 문자열
+- 백업/이전 단계 문서
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+원칙:
+- 기록 문서는 당시 상황 보존이 우선이다.
+- 과거 문서의 MACD 명칭까지 정리하려 하면 작업 범위가 불필요하게 커진다.
+- 단, 최신 MASTER_SPEC 갱신자료에는 일반화 기준을 반영한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+================================================================================
+3. 신규 개발 명명 규칙
+================================================================================
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3.1 신규 코드에서 금지할 명칭
+--------------------------------------------------------------------------------
+앞으로 새로 작성하는 코드에서는 아래 명칭을 사용하지 않는다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+금지:
+- 새로운 gui_macd_*.py
+- 새로운 routine_macd_*.py
+- 새로운 test_macd_*.py
+- 새로운 macd_* 함수명
+- 새로운 macd_* 변수명
+- 새로운 DEFAULT_MACD_* 상수
+- 새로운 evaluate_macd_* 함수
+- 새로운 *_macd_sell 후보명
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3.2 신규 코드에서 사용할 일반명
+--------------------------------------------------------------------------------
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+신규 코드 기본 명칭:
+- indicator_follow
+- indicator_signal
+- signal_condition
+- condition_c
+- osc
+- rule_mapper
+- preview_candidate
+- engine_rules_preview
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+사용 권장:
+- DEFAULT_INDICATOR_FOLLOW_CONFIG
+- evaluate_indicator_follow_routine()
+- indicator_follow_ui_state
+- indicator_follow_rule_preview
+- routine_rule_mapper.py
+- build_engine_rules_preview_from_ui_state()
+- compare_engine_rules_preview()
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+3.3 파일명 기준
+--------------------------------------------------------------------------------
+현재 유지:
+- routines/지표추종매매/routine_macd_engine.py
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+유지 사유:
+- 실제 MACD/OSC 계산 엔진이다.
+- 파일명 변경 시 import, 테스트, 문서, rules 연계가 동시에 흔들릴 수 있다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+향후 방향:
+- 엔진 연결 안정화 후 파일명 변경 검토
+- 변경 후보:
+ - routine_macd_engine.py → routine_indicator_engine.py
+ - 단, MACD 전용 계산 파일로 남길 경우 유지 가능
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+신규 파일명 원칙:
+- gui_indicator_follow_*.py 사용
+- routine_indicator_follow_*.py 사용
+- test_indicator_follow_*.py 사용
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+4.2 Rule Mapper 현재 정책
+--------------------------------------------------------------------------------
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+현재 구조:
+UI → indicator_follow_ui_state → Rule Mapper Preview → Rule Mapper Diff → 운영자 검토 → 향후 승인 저장
+현재 구현 범위:
+- Preview 생성
+- Diff 생성
+- Merge/Add Candidate 생성
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+Sell Preview:
+- 기존 sell.signals.macd_sell 유지
+- 별도 후보 생성
+- 후보는 enabled=false, preview_candidate=true
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+4.3 Rule Mapper 명칭 교체 우선순위
+--------------------------------------------------------------------------------
+1순위:
+- Python 내부 함수명/상수명에서 불필요한 macd 제거
+2순위:
+- Preview candidate 이름에서 macd 제거
+3순위:
+- GUI 내부 변수명에서 macd 제거
+4순위:
+- 테스트 명칭 일반화
+마지막:
+- rules.json key migration
+- sell.signals.macd_sell 변경
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+================================================================================
+5. 작업 순서 제안
+================================================================================
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+5.1 즉시 작업
+--------------------------------------------------------------------------------
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+1. MACD 명칭 유지/교체/금지 기준 문서화
+2. 신규 코드 작성 시 indicator_follow 명칭만 사용
+3. Rule Mapper 내부 후보명부터 일반화
+4. UI 내부 변수명 중 실제 지표명이 아닌 macd_*만 점진 교체
+5. 중복 정의된 build_engine_rules_preview_from_current_ui_state() 정리
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+5.2 단기 작업
+--------------------------------------------------------------------------------
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+5.3 중기 작업
+--------------------------------------------------------------------------------
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+1. Engine Rule 생성 함수 구현
+2. 운영자 승인 후에만 rules.json 갱신
+3. 매수 OCR threshold merge 적용
+4. SELL 후보는 기존 macd_sell과 분리 유지
+5. 테스트 확장
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+--------------------------------------------------------------------------------
+5.4 장기 작업
+--------------------------------------------------------------------------------
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+================================================================================
+7. 결론
+================================================================================
+현재 MACD 명칭 문제는 다음과 같이 관리한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+A안: 코드 수정 없이 Preview/Diff 화면 검증
+B안: 동작 변경 없이 UI/Mapper 내부 macd 명칭 일부 일반화
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:22:12 | 분류: MASTER_SPEC]
+권장 순서:
+1. 중복 함수 정리
+2. Rule Mapper 내부 후보명 일반화
+3. Preview/Diff 재검증
+4. 승인 절차 설계
+5. Engine Rule 생성 설계
+[문서 끝]
+
+[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
+변경 후 UI -> indicator_follow_ui_state -> Rule Mapper Preview -> Rule
+Mapper Diff -> 운영자 검토 -> (향후) 실제 Rule 생성
+현재는 Preview/Diff까지만 구현되었으며 실제 저장 및 엔진 연결은 수행하지
+않는다.
+2. 완료 항목
+
+[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
+Buy - merge_into = buy.groups[0].conditions - skip_existing - OSC
+TURN_UP - add_conditions - OSC <= UI OCR 값
+
+[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
+Sell - 기존 sell.signals.macd_sell 유지 -
+ui_preview_condition_c_macd_sell 별도 후보 - enabled = false -
+preview_candidate = true
+4. Diff 구조
+
+[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
+status - changed - same - added - missing - merge_candidate -
+add_signal_candidate
+risk - low - medium - high
+
+[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
+현재 확인 - bar.bar_minutes -> changed(low) - buy.groups[0].conditions
+-> merge_candidate - sell.signals.ui_preview_condition_c_macd_sell ->
+add_signal_candidate - sell.signals.macd_sell 변경 없음
+5. 구현 원칙
+
+[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
+Rule Mapper Preview - mapped_paths - warnings - preview_rules -
+indicator_follow_rule_preview - merge_add_candidate 표시
+Rule Mapper Diff - summary - changes - warnings - 위험도 표시
+7. MACD 명칭 정리 결과
+
+[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
+완료 - DEFAULT_INDICATOR_FOLLOW_CONFIG 추가 -
+evaluate_indicator_follow_routine 추가 - 기존
+DEFAULT_MACD_ROUTINE_CONFIG는 alias - 기존 evaluate_macd_routine는
+alias - routine.py는 새 일반명 우선 사용
+
+[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
+호환 유지 - routine_macd_engine.py 파일명 -
+DEFAULT_MACD_ROUTINE_CONFIG - evaluate_macd_routine
+8. 변경 금지
+
+[출처: 작업재개참조문서_RuleMapper_MACD_정리_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:08:06 | 분류: 작업재개요약]
+- rules.json의 macd 관련 key
+- sell.signals.macd_sell
+- indicator_follow_ui_state의 macd_* key
+- target: MACD
+- target: OSC
+- MACD선/시그널선
+- MACD/OSC 계산
+- 기존 테스트 참조 key
+9. 향후 작업
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
+UI → indicator_follow_ui_state → Rule Mapper → Rule Preview → Rule Diff
+→ 운영자 검토 → (향후 승인) → Engine Rule 생성
+현재 구현 범위는 Preview/Diff까지이며 실제 Rule 저장 및 엔진 연결은
+구현하지 않는다.
+3. Rule Mapper
+신규 구성요소
+routine_rule_mapper.py
+주요 함수
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
+- build_engine_rules_preview_from_ui_state()
+- compare_engine_rules_preview()
+역할
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
+- UI State를 Preview 후보로 변환
+- 기존 Rule과 Preview 차이 비교
+- 저장하지 않음
+- 실행하지 않음
+4. Preview 정책
+Replace Preview 폐기.
+공식 정책
+Merge/Add Candidate
+신규 Namespace
+indicator_follow_rule_preview
+mode
+merge_add_candidate
+Buy
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
+- same
+- changed
+- added
+- missing
+- merge_candidate
+- add_signal_candidate
+위험도
+- low
+- medium
+- high
+현재 기준
+bar.bar_minutes → changed
+buy.groups[0].conditions → merge_candidate
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
+sell.signals.ui_preview_condition_c_macd_sell → add_signal_candidate
+sell.signals.macd_sell → 변경 대상 아님
+6. GUI 정책
+설정 검증 화면은 다음 정보를 표시한다.
+Rule Mapper Preview
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
+- mapped_paths
+- warnings
+- preview_rules
+- indicator_follow_rule_preview
+- merge_add_candidate
+Rule Mapper Diff
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
+- summary
+- changes
+- warnings
+- risk
+- current_value
+- preview_value
+7. 구현 금지
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
+- DEFAULT_INDICATOR_FOLLOW_CONFIG
+- evaluate_indicator_follow_routine()
+호환 Alias 유지
+- DEFAULT_MACD_ROUTINE_CONFIG
+- evaluate_macd_routine()
+routine.py는 일반명을 우선 사용한다.
+9. 변경 금지
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
+- routine_macd_engine.py 파일명
+- rules.json macd 관련 key
+- sell.signals.macd_sell
+- indicator_follow_ui_state macd_* key
+- target: MACD
+- target: OSC
+- MACD선/시그널선
+- 기존 테스트 참조 key
+10. 검증 결과
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_RuleMapper_MergeCandidate_MACD_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 16:07:50 | 분류: 갱신문서]
+1. Preview 기반 실제 Rule 생성 설계
+2. 승인 절차 설계
+3. Engine 연결
+4. Alias 안정화
+5. routine_macd_engine.py 파일명 변경 검토
+6. rules key migration 장기 검토
+
+[출처: 작업재개요약_및_MASTER_SPEC_갱신자료_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 13:57:47 | 분류: 작업재개요약]
+- 지표추종매매 설정 UI 프로토타입 완료
+- UI 상태 수집(collect), 복원(apply), 저장(save), 로드(load) 완료
+- UI 상태는 indicator_follow_ui_state에 저장
+- 엔진 Rule과 UI 상태 완전 분리
+- UI→Engine Rule 변환은 미구현
+주요 완료 사항
+
+[출처: 작업재개요약_및_MASTER_SPEC_갱신자료_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 13:57:47 | 분류: 작업재개요약]
+1. gui_macd/gui_indicator_follow 구조 전환 완료
+2. 중복 파일, pycache, pyc, bak 정리
+3. tools 폴더 구성 완료
+4. 숨은 탭 제거, 단일 화면 구조 확정
+5. Collector 완료
+ - basic
+ - buy_ui(signal_filter/base/repeat/price_compare/situation/additional/cycle/exit)
+ - sell_ui(signal_conditions/selected_sets/setting_a/b/c)
+6. apply_indicator_follow_ui_state() 구현 완료
+7. save_indicator_follow_ui_state_to_rules() 구현 완료
+8. JSON Roundtrip 및 저장/재열기 검증 완료
+Rules 저장 정책
+신규 namespace
+
+[출처: 작업재개요약_및_MASTER_SPEC_갱신자료_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 13:57:47 | 분류: 작업재개요약]
+indicator_follow_ui_state - ui_state_version - updated_at - state
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_상세판_UI프로토타입.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 06:40:32 | 분류: 갱신문서]
+- gui_macd_control_tab.py : 3열 외곽 배치 담당.
+- gui_macd_buy_method_controls.py :
+ 기본매수/반복매수/상황변화/추가기능 UI 생성 담당.
+- gui_macd_buy_controls.py : 순환설정, 이탈조건, 회차마감 생성 및
+ 상태제어 담당.
+보류 항목
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_상세판_UI프로토타입.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 06:40:32 | 분류: 갱신문서]
+- _make_buy_avg_overview_controls() 생성 흐름 분리.
+- gui_macd_* 파일명 공통 루틴 명칭으로 변경.
+- 숨겨진 cycle 위젯 생성 구조 개선.
+- wrapper 및 레이아웃 정크 코드 최종 정리.
+설계 원칙
+
+[출처: 마스터스펙\MASTER_SPEC_갱신자료_2026-07-02\MASTER_SPEC_갱신자료_상세판_UI프로토타입.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 06:40:32 | 분류: 갱신문서]
+- 루틴 UI와 엔진은 분리 유지.
+- UI는 공통 루틴 기반으로 일반화 예정.
+- 실제 MACD 고유 로직은 엔진과 루틴 모듈에만 존재하도록 정리 예정.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+================================================================================
+파일:
+MASTER_SPEC_┤⌐╢⌠║╕░¡86╚≈╜║┼Σ╕«▒Γ╣▌PLAN╝│░Φ║»░µ░ⁿ╕«╛╞┼░┼╪├│└»┴÷┐°─ó.txt
+================================================================================
+MASTER_SPEC 누락보강 86 주제 : 히스토리 기반 PLAN 설계 변경 관리 및
+아키텍처 유지 원칙
+출처 : 작업진행상황대화히스토리_3~8 비교 반영
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+5. 변경 절차 ① 변경 요구 확인 ② 기존 구조 영향 분석 ③ 공통 구조 유지
+ 여부 검토 ④ 구현 ⑤ 상태·로그 검증 ⑥ MASTER_SPEC 갱신
+6. 구현 원칙
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+- 기존 루틴과의 호환성을 유지한다.
+- 공통 엔진 수정은 최소화한다.
+- 변경 사유와 영향 범위를 기록한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+7. 검증 항목 □ 기존 기능 영향 없음 □ PLAN 구조 유지 □ 상태 일관성 □
+ 로그 일관성 □ 복구 일관성
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+================================================================================
+파일: MASTER_SPEC_┼δ╟╒░╗╜┼└┌╖ß_2026-06-30.txt
+================================================================================
+MASTER SPEC 통합 갱신자료 (원본 병합본)
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+주의: - 본 문서는 업로드된 TXT 문서들을 순서대로 병합한 통합본이다. -
+내용을 임의 요약하거나 삭제하지 않았다. - 중복 내용은 그대로 유지하였다.
+원본: MASTER_SPEC_갱신메모_UI프로토타입단계(1).txt
+MASTER SPEC 갱신 메모
+현재 판정
+UI는 최종판이 아닌 프로토타입.
+원칙
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+□ 가격비교매수 - 평단 >= 현재가 - 호가설정 - 다중지점 - 회차기준 -
+예산기준 - 능동매수 - 평단 < 현재가 - 호가설정 - 다중지점 - 회차기준 -
+예산기준 - 능동매수
+설계 원칙
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+[제목 규칙] - 기본설정 / 매수설정 / 매도설정은 버튼형 박스 사용. - 검정
+테두리. - 배경색 없음. - 제목 색상만 사용. - ’|’는 박스 밖, 검정색 유지.
+[강조 규칙] - 글자 크기 확대 금지. - 박스 높이, 테두리, 패딩으로 강조.
+[복원 기준] - 실험했던 디자인은 폐기. - 복원본을 기준으로 후속 작업
+진행.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+[상단] - 신호검출조건 = A OR B OR C 기본. - 매도방식지정 추가. - 설정 A
+기본 선택. - 최소 1개 선택. - OR만 사용.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+[설정 공통] 1. 주신호대응 매도설정 2. 매도중상황변화대응 3.
+후속매도반복설정 4. 반복이탈조건 5. 매도완료정책
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+[UI 정책] - 소제목 트리형. - 들여쓰기 통일. - 신호검출조건 입력컨트롤과
+동일 스타일. - 상단 헤더 구성 확정. - 설정 A/B/C 동일 구조 유지.
+원본: MASTER_SPEC_갱신자료_v2026-06-25_MACD매도설정_UI_미체결정책(6).txt
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+================================================================================ 1.
+매도 실행 구조 갱신
+================================================================================
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+================================================================================
+2. 매도방식 UI 갱신
+================================================================================
+2.1 매도방식 기본 구조 매도방식은 다음 항목으로 구성한다. - 단일호가 -
+다중호가 - 다중지점
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+단일호가와 다중호가는 상호배타로 동작한다. 다중지점 내부의 시간 기준과
+가격/평단 기준도 상호배타로 동작한다.
+2.2 다중호가 표시 형식: - 상향 [4] 호가 / 기준 1호가 / 하향 [2] 호가 |
+합계 [7]호가
+합계 계산: - 상향 수 + 기준 1호가 + 하향 수 - 예: 4 + 1 + 2 = 7호가
+2.3 다중지점 시간 기준 표시 형식: - 시간 [30][분/초/봉][이내/간격][3]회
+[주문가/현재가]
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+2.4 다중지점 가격 기준 표시 형식: - [주문가/현재가/평단가] 대비
+[주문가/현재가/평단가] [상향/하향/상하] [0.15]% [이상/이하/이내/이탈] /
+[3]회
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+중요 변경: - 기존 “에” 표현은 “대비”로 변경한다. - 예: “주문가에 평단가”
+→ “주문가 대비 평단가” - 방향에 따라 비교 콤보 표시 옵션을 제한한다.
+상향/하향: 이상/이하 상하: 이내/이탈
+2.5 마지막회 주문 타입 기존: - 마지막회 시장가 매도
+변경: - 마지막회 [시장가/현재가]
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+의미: - 다중지점 설정의 하위 항목이다. - 다중지점 시간/가격 조건 중
+하나가 활성화되어야 선택 가능하다. - 마지막회 주문을 시장가로 할지
+현재가로 할지 선택한다. - 이 설정은 최초 매도방식과 완료정책에서
+독립적으로 가져갈 수 있어야 한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+기본값: - 현재 UI에서는 20초를 기준으로 쓰는 화면이 많았다. - 단, 콤보
+아이템 순서는 분/초/봉으로 유지한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+SELL: - [주문가/현재가/평단가] 대비 [주문가/현재가/평단가]
+[상향/하향/상하] [0.15]% [이상/이하/이내/이탈] 매도주문취소
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+BUY: - [주문가/현재가/평단가] 대비 [주문가/현재가/평단가]
+[상향/하향/상하] [0.15]% [이상/이하/이내/이탈] 매수주문취소
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+기본 체크: - 기본값은 꺼짐(False)이 적절하다. - 기존 시간 기준 취소는
+켜짐(True) 유지 가능.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+3.5 가격조건 비교 콤보 숨김 규칙 반드시 적용: - 방향이 상향이면 비교
+콤보는 이상/이하만 표시. - 방향이 하향이면 비교 콤보는 이상/이하만
+표시. - 방향이 상하이면 비교 콤보는 이내/이탈만 표시. - 숨김 처리는
+QComboBox view row hidden 방식으로 기존 공통폼과 동일하게 한다. - 방향
+변경 시 현재 선택값이 보이는 옵션에 없으면 자동으로 적절한 기본값으로
+바꾼다. 상하: 이내 상향/하향: 이하
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+================================================================================
+4. 완료정책 UI 갱신
+================================================================================
+4.1 완료정책 첫 줄 삭제 삭제 대상: - 마지막 주문 취소 이후 [3][분] 동안
+수행
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+삭제 이유: - 현재 완료정책 구조에서 이 항목의 의미가 불명확하다. -
+완료정책이 재매도 전략으로 재정의되는 상황에서 상단 실행시간 행은 혼란을
+만든다. - 사용자는 해당 행 삭제를 요청했다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+4.2 삭제 시 구현 주의사항 단순히 UI 행만 제거하면 안 된다. 해당
+체크박스를 참조하는 내부 로직도 함께 정리해야 한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+점검 대상 메서드: - sync_detail_row_enabled - sync_fill_ratio_enabled -
+sync_complete_mode - sync_after_cancel_by_multi_point - toggled.connect
+관련 구문
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+발생했던 오류: - AttributeError: ‘MacdRoutineSettingsDialog’ object has
+no attribute ‘complete_after_cancel_check’ - 원인은 삭제된 체크박스를
+참조하는 로직이 남아 있었기 때문이다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+4.3 완료정책 남길 항목 완료정책에는 다음 항목을 남긴다. - 단일호가 -
+다중호가 - 다중지점 - 마지막회차 시장가 또는 향후 마지막회
+[시장가/현재가] 구조
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+추후 완료정책도 매도방식과 같은 공통 SellExecutionPolicy UI를 재사용할
+수 있다. 단, 현재 단계에서는 대규모 리팩토링 금지.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
+================================================================================
+5. 신호검출조건 UI 갱신
+================================================================================
+5.1 조건 B 볼린저밴드 추가 매도 신호검출조건 B에 볼린저밴드를 가격박스와
+같은 형태로 추가한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
 예: - 가격박스 [하향] [0.1]% [이상] - 볼린저밴드 [하향] [0.1]% [이상] -
 [주문가/현재가/평단가] 대비 [주문가/현재가/평단가] …
 5.2 조건 C 가격필터 추가 매도 신호검출조건 C 상단에 가격필터를 추가한다.
@@ -1649,2345 +2973,6 @@ MASTER_SPEC 누락보강 117 주제 : 다중 루틴 스케줄링 및 실행 우�
 - 루틴 우선순위
 - 종목 상태
 - PLAN 진행 상태
-- 예산 가용성
-- 위험도
-5. 실행 큐
-- FIFO 기본
-- 우선순위 재정렬 허용
-- 중복 실행 방지
-- 실행 중 락(Lock) 적용
-6. 충돌 방지
-- 동일 종목 중복 실행 금지
-- 동일 PLAN 중복 실행 금지
-- 예산 충돌 방지
-- 주문 충돌 방지
-7. 부하 관리
-- 실행량 제한
-- 큐 길이 감시
-- 지연 실행 허용
-- 비정상 루틴 자동 격리
-8. 장애 대응
-- 실행 실패 재시도
-- 반복 실패 격리
-- 로그 기록
-- 검토관리 연계
-9. 향후 확장
-- 다중 계좌 스케줄링
-- 분산 실행
-- 멀티 프로세스
-- 멀티 서버 지원
-10. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 스케줄러는 전략을 변경하지 않는다.
-- 루틴은 실행 순서를 직접 제어하지 않는다.
-- 실행 엔진은 스케줄러의 결과만 수행한다.
-반영 원칙 본 문서는 다중 루틴 스케줄링과 실행 우선순위 엔진을 신규
-정의한 설계 문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_118_로그저장소_분석아키텍처_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 118 주제 : 로그 저장소 및 분석 아키텍처 (신규)
-※ 본 문서는 기존 01~117과 중복되지 않는 로그 저장·분석 체계를 신규
-정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 프로젝트 전반에서 발생하는 모든 이벤트를 일관된 형식으로
- 기록하고, 장애 분석과 운영 개선에 활용할 수 있는 로그 아키텍처를
- 정의한다.
-2. 로그 계층 ① 이벤트 발생 ② 로그 수집 ③ 로그 분류 ④ 저장 ⑤ 조회 ⑥ 분석
- ⑦ 보관/정리
-3. 로그 분류
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 시스템 로그
-- 운영 로그
-- 루틴 로그
-- PLAN 로그
-- 주문 로그
-- 체결 로그
-- OpenAPI 로그
-- 오류 로그
-- 복구 로그
-4. 로그 구조
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 발생시각
-- 모듈
-- 종목
-- 루틴
-- PLAN ID
-- 이벤트 종류
-- 상세 내용
-- 결과
-- 추적 ID
-5. 저장 정책
-- 날짜별 저장
-- 로그 레벨 구분
-- 검색 가능 구조
-- 압축/보관 정책
-- 장기 보존 정책
-6. 분석 기능
-- 오류 빈도
-- 주문 성공률
-- 체결 지연
-- 루틴별 성능
-- 예산 사용
-- 장애 이력
-- 운영 통계
-7. 장애 대응
-- 중요 오류 즉시 기록
-- 동일 오류 그룹화
-- 반복 오류 감지
-- 검토관리 연계
-- 운영 알림 생성
-8. 향후 확장
-- 시각화 대시보드
-- 원격 로그 서버
-- AI 기반 이상 탐지
-- 로그 리플레이
-9. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_119_Profile관리_운영환경전환시스템_신규.txt
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-MASTER_SPEC 누락보강 119 주제 : 설정(Profile) 관리 및 운영 환경 전환
-시스템 (신규)
-※ 본 문서는 기존 01~118과 중복되지 않는 설정(Profile) 관리 체계를 신규
-정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Profile은 운영 상태와 분리하여 관리한다.
-- 적용 실패 시 기존 Profile로 즉시 복원한다.
-- 모든 변경은 추적 가능해야 한다.
-반영 원칙 본 문서는 설정(Profile) 관리 및 운영 환경 전환 시스템을 신규
-정의한 설계 문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_11_매수미완성_매수실패판정철학.txt
-================================================================================
-MASTER_SPEC 누락보강 11 주제 : 매수 미완성 및 매수 실패 판정 철학
-1. 목적 매수 미완성과 매수 실패를 명확히 구분하여 잘못된 후속 처리를
- 방지한다.
-2. 기본 개념
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_120_플러그인루틴SDK_개발자확장규격_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 120 주제 : 플러그인(루틴) SDK 및 개발자 확장 규격
-(신규)
-※ 본 문서는 기존 01~119와 중복되지 않는 루틴 개발자용 SDK 및 확장 규격을
-신규 정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 외부 또는 신규 개발자가 동일한 규격으로 루틴을 개발하고 배포할
- 수 있도록 표준 SDK 구조와 인터페이스를 정의한다.
-2. SDK 구성
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 루틴 기본 클래스
-- 공통 인터페이스
-- 이벤트 API
-- PLAN 연동 API
-- 설정 API
-- 로그 API
-- 테스트 API
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-3. 루틴 개발 절차 ① 프로젝트 생성 ② 메타데이터 작성 ③ 신호 로직 구현 ④
- 설정 정의 ⑤ 테스트 ⑥ 패키징 ⑦ 배포
-4. 필수 인터페이스
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- initialize()
-- validate()
-- on_market_data()
-- evaluate_signal()
-- build_plan()
-- shutdown()
-5. 패키지 규격
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- SDK는 엔진 내부 구현에 의존하지 않는다.
-- 루틴은 공개 API만 사용한다.
-- SDK 변경 시 하위 호환성을 우선 고려한다.
-반영 원칙 본 문서는 플러그인(루틴) SDK 및 개발자 확장 규격을 신규 정의한
-설계 문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_누락보강_121_초기운영정책_ATS_검토관리확정이력_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 121 주제 : 초기 운영정책·ATS·검토관리 확정 이력
-통합본 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~120과 중복되지 않으며 프로젝트 초기 운영정책이 현재
-구조로 확정되기까지의 핵심 결정 사항을 설계 관점에서 정리한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 초기 운영정책의 변경 이유와 최종 확정 기준을 기록하여 향후
- 동일한 논의를 반복하지 않도록 한다.
-2. 운영 정책 발전 과정
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 정규장
-- 장전 추가시간
-- 장후 추가시간
-- 시간 변경 시 상태를 즉시 재판정한다.
-- 전역 설정과 개별 설정은 명확히 구분한다.
-5. 검토관리 정책 다음 상황은 검토관리 대상이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 데이터 불일치
-- 복구 실패
-- 재시작 후 상태 불일치
-- 주문/체결 정보 불일치
-- 운영자가 확인해야 하는 예외
-6. 프로그램 재시작 ① 상태 복원 ② 무결성 검사 ③ 데이터 비교 ④ 검토관리
- 대상 분리 ⑤ 운영 재개
-7. 데이터 무결성
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 내부 상태와 OpenAPI 정보를 비교한다.
-- 불일치가 해소되지 않으면 자동 운영을 중단한다.
-- 검토 완료 후에만 복귀를 허용한다.
-8. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~121과 중복되지 않으며, 실제 프로젝트에서 검증한 운영
-시나리오를 기준으로 상태 전이와 운영 판정 기준을 정리한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 이벤트를 통해서만 상태가 변경된다.
-- 동일 조건에서는 항상 동일한 결과를 보장한다.
-- 상태 전이는 로그에 기록한다.
-5. 검토관리 진입 기준
-- 복구 실패
-- 데이터 불일치
-- 반복 오류
-- 운영 정책 위반
-- 수동 확인 필요
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_누락보강_123_프로젝트운영시뮬레이션_통합테스트표준_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 123 주제 : 프로젝트 운영 시뮬레이션 및 통합 테스트
-표준 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 루틴 신호
-- PLAN 생성
-- 주문 생성
-- 체결 처리
-- 예산 변동
-- 시간 정책
-- 검토관리
-- 장애 복구
-4. 운영 시나리오
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-7. 운영 승인 조건 □ 핵심 기능 정상 □ 정책 일치 □ 데이터 무결성 확보 □
- 복구 검증 완료 □ 로그 검증 완료 □ 운영자 승인
-8. 향후 확장
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 자동 회귀 테스트
-- 장기간 시뮬레이션
-- 성능 부하 테스트
-- 다중 계좌 테스트
-- 다중 루틴 동시 테스트
-9. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_누락보강_124_프로젝트성능_안정성_모니터링아키텍처_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 124 주제 : 프로젝트 성능·안정성·모니터링 아키텍처
-(신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~123과 중복되지 않으며 프로젝트의 장기 운영을 위한
-성능 관리, 안정성 확보 및 모니터링 체계를 정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 장시간 자동매매 운영에서도 안정적인 성능을 유지하고 이상 상황을
- 조기에 탐지할 수 있는 통합 모니터링 구조를 구축한다.
-2. 모니터링 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- CPU 사용률
-- 메모리 사용량
-- OpenAPI 연결 상태
-- 실시간 데이터 수신률
-- 이벤트 큐 길이
-- 주문 처리량
-- 체결 처리량
-- 로그 발생량
-3. 성능 관리
-- 불필요한 연산 최소화
-- 이벤트 기반 처리
-- 캐시 활용
-- UI 갱신 최소화
-- 병목 구간 분석
-4. 안정성 관리
-- 주기적 무결성 검사
-- 데이터 일관성 확인
-- 예외 발생 감시
-- 장시간 실행 검증
-- 자동 복구 연계
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-5. 경고 단계 1단계 : 정보(Info) 2단계 : 주의(Warning) 3단계 :
- 위험(Critical) 4단계 : 운영 중단(Emergency)
-6. 운영 알림
-- 연결 끊김
-- 데이터 지연
-- 주문 실패 증가
-- 체결 지연
-- 메모리 이상
-- 반복 오류
-7. 통계 수집
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 평균 처리 시간
-- 최대 처리 시간
-- 이벤트 처리량
-- 주문 성공률
-- 장애 발생 빈도
-- 복구 성공률
-8. 향후 확장
-- 웹 대시보드
-- 원격 모니터링
-- AI 이상 탐지
-- 성능 예측
-- 자동 리포트 생성
-9. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_125_보안_권한관리_Audit아키텍처_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 125 주제 : 보안·권한관리·감사(Audit) 아키텍처
-(신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~124와 중복되지 않으며 프로젝트의 보안, 권한관리,
-감사(Audit) 체계를 정의한다.
-1. 목적 운영 환경의 안전성을 확보하고 모든 중요 작업을 추적 가능한
- 형태로 관리한다.
-2. 보호 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 계좌 정보
-- API 연결 정보
-- 운영 설정
-- 루틴 설정
-- 종목 설정
-- 예산 정보
-- 로그 데이터
-3. 권한 계층 ① 시스템 관리자 ② 운영 관리자 ③ 개발자 ④ 읽기 전용 사용자
-4. 권한 정책
-- 최소 권한 원칙
-- 기능별 접근 제어
-- 중요 설정 변경 제한
-- 운영 중 위험 기능 확인 절차
-5. 감사(Audit) 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 로그인/로그아웃
-- 설정 변경
-- 루틴 등록 및 삭제
-- 종목 등록 및 삭제
-- 예산 변경
-- 운영 시작/중지
-- 긴급정지
-- 검토관리 복귀
-6. 감사 기록
-- 수행 시각
-- 수행 주체
-- 대상 기능
-- 변경 전 상태
-- 변경 후 상태
-- 결과
-- 사유
-7. 이상 행위 감지
-- 반복 실패
-- 비정상 설정 변경
-- 권한 없는 접근
-- 동일 작업 반복
-- 예상치 못한 운영 중단
-8. 복구 지원
-- 설정 변경 이력 복원
-- Audit 기반 원인 분석
-- 변경 시점 비교
-- 운영 이력 추적
-9. 향후 확장
-- 전자서명
-- 다중 승인
-- 원격 감사
-- 변경 비교 리포트
-- 보안 정책 자동 점검
-10. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_126_버전관리_릴리스_배포운영체계_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 126 주제 : 버전관리·릴리스·배포 운영 체계 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~125와 중복되지 않으며 프로젝트의 버전관리, 릴리스
-절차 및 배포 운영 기준을 정의한다.
-1. 목적 프로젝트의 모든 변경 사항을 추적 가능하게 관리하고 안정적인
- 배포 체계를 구축한다.
-2. 버전 정책
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Major : 구조 변경
-- Minor : 기능 추가
-- Patch : 버그 수정
-- Hotfix : 긴급 수정
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_누락보강_127_프로젝트구성요소_Lifecycle관리체계_신규.txt
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-MASTER_SPEC 누락보강 127 주제 : 프로젝트 구성요소 생명주기(Lifecycle)
-관리 체계 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 상태는 이벤트로만 변경한다.
-- 이전 상태를 추적 가능해야 한다.
-- 종료 객체는 임의로 재활성화하지 않는다.
-5. 객체 간 관계
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-8. 생명주기 검증 □ 생성 정상 □ 상태 전이 정상 □ 종료 정상 □ 삭제 정상 □
- 복원 정상 □ 로그 기록
-9. 향후 확장
-- 객체 버전 관리
-- Snapshot 기반 복원
-- 자동 정리 정책
-- 장기 보관 정책
-10. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_누락보강_128_Runtime데이터저장소_Persistence아키텍처_신규.txt
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-MASTER_SPEC 누락보강 128 주제 : Runtime 데이터 저장소 및
-지속성(Persistence) 아키텍처 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 프로젝트 실행 중 생성되는 모든 Runtime 데이터를 안정적으로
- 저장하고, 프로그램 재시작 및 장애 복구 시 동일한 상태를 재현할 수
- 있도록 한다.
-2. Runtime 데이터 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 종목 상태(State)
-- PLAN 정보
-- 주문 정보
-- 체결 정보
-- 예산 상태
-- 운영 상태
-- 검토관리 정보
-- 임시 캐시
-3. 저장 계층 ① 메모리(Runtime) ② Runtime 파일 ③ 로그 저장소 ④ 백업
- 저장소
-4. 저장 정책
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 이벤트 발생 시 즉시 저장
-- 중요 상태 변경 시 강제 저장
-- 주기적 자동 저장
-- 종료 시 최종 저장
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-반영 원칙 본 문서는 Runtime 데이터 저장소 및 Persistence 아키텍처를 신규
-정의한 설계 문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_129_EventBus_메시지전달아키텍처_신규.txt
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-MASTER_SPEC 누락보강 129 주제 : 이벤트 버스(Event Bus) 및 메시지 전달
-아키텍처 (신규)
-※ 본 문서는 기존 01~128과 중복되지 않으며 프로젝트 내부 이벤트 전달
-체계를 정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 모든 모듈 간 통신을 이벤트 기반으로 표준화하여 결합도를 낮추고
- 확장성과 유지보수성을 향상시킨다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-2. 이벤트 흐름 ① 이벤트 생성 ② Event Bus 등록 ③ 구독자 탐색 ④ 이벤트
- 전달 ⑤ 처리 결과 기록 ⑥ 후속 이벤트 생성
-3. 이벤트 분류
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 시스템 이벤트
-- 운영 이벤트
-- 루틴 이벤트
-- PLAN 이벤트
-- 주문 이벤트
-- 체결 이벤트
-- UI 이벤트
-- 복구 이벤트
-4. 이벤트 구성
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Event ID
-- Event Type
-- Timestamp
-- Source
-- Target
-- Payload
-- Priority
-5. 전달 정책
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 발행(Publish) / 구독(Subscribe)
-- 비동기 처리 지원
-- 우선순위 기반 전달
-- 중복 이벤트 제거
-6. 장애 대응
-- 이벤트 처리 실패 기록
-- 재시도 정책
-- Dead Event Queue
-- 장애 분석 로그
-7. 모니터링
-- 이벤트 처리량
-- 대기 큐 길이
-- 평균 처리 시간
-- 실패율
-8. 향후 확장
-- 분산 Event Bus
-- 원격 이벤트
-- 멀티 프로세스 이벤트
-- 이벤트 리플레이
-9. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_12_능동매수정책_발전방향.txt
-================================================================================
-MASTER_SPEC 누락보강 12 주제 : 능동매수 정책 및 발전 방향
-1. 목적 능동매수의 역할을 일반 추매와 구분하고 프로젝트 전체 구조에서의
- 위치를 정의한다.
-2. 기본 철학
-- 능동매수는 단순 추가매수가 아니다.
-- 현재 포지션을 루틴 의도에 맞게 보정하기 위한 정책이다.
-3. 일반 추매와의 차이 고정 추매
-- 사전에 정의된 회차와 조건으로 수행
-- 계획된 매수 진행
-능동매수 - 현재 상태를 판단하여 수행 - 후속 대응 성격
-4. 적용 시점
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 능동매수는 기본 매수정책을 대체하지 않는다.
-- 고정 추매를 우선 적용한다.
-- 필요 시 후속 정책으로 진입한다.
-7. 프로젝트 방향
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 추매 기술을 프로젝트 핵심 경쟁력으로 발전시킨다.
-- 평균단가 관리와 연계한다.
-- 불필요한 실패 판정을 줄인다.
-8. 구현 시 주의사항
-- 루틴이 허용한 경우에만 수행한다.
-- 메인은 주문만 담당한다.
-- 판단 로직은 루틴에서 관리한다.
-9. 향후 연구 과제
-- 능동매수 알고리즘
-- 포지션 완성도
-- 현재 포지션 평가
-- 자동 보정 전략
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-10. 결론 능동매수는 독립 기능이 아니라 매수 미완성 이후의 전략 보정
- 수단으로 발전시키는 방향을 기본으로 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_130_작업스케줄러_비동기실행아키텍처_신규.txt
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-MASTER_SPEC 누락보강 130 주제 : 작업 스케줄러(Job Scheduler) 및 비동기
-실행 아키텍처 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~129와 중복되지 않으며 프로젝트 내부의 작업(Job)
-실행, 예약 및 비동기 처리 체계를 정의한다.
-1. 목적 동시에 발생하는 다양한 작업을 안정적으로 관리하고 실행 순서를
- 표준화한다.
-2. Job 종류
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 루틴 평가
-- PLAN 생성
-- 주문 요청
-- 체결 반영
-- Runtime 저장
-- 로그 저장
-- UI 갱신
-- 무결성 검사
-- 백업
-3. Job 생명주기 ① 생성 ② 대기 ③ 실행 ④ 완료 ⑤ 실패 ⑥ 재시도 ⑦ 종료
-4. 스케줄링 정책
-- 우선순위 기반 실행
-- 동일 Job 중복 방지
-- 실행 시간 기록
-- 취소 가능 Job 관리
-5. Queue 구조
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- High Priority Queue
-- Normal Queue
-- Low Priority Queue
-- Retry Queue
-- Deferred Queue
-6. 비동기 실행
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 독립 작업 분리
-- UI 블로킹 방지
-- 순차 실행이 필요한 작업은 직렬 처리
-- 장시간 작업은 백그라운드 처리
-7. 실패 처리
-- 재시도 횟수 제한
-- 실패 원인 기록
-- Dead Job Queue 이동
-- 운영자 알림 연계
-8. 성능 관리
-- Queue 길이 감시
-- 평균 실행 시간
-- 최대 대기 시간
-- 처리량 통계
-9. 향후 확장
-- 멀티 스레드 Job
-- 멀티 프로세스 Job
-- 분산 Scheduler
-- 우선순위 자동 조정
-10. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 모든 비동기 작업은 Scheduler를 통해 실행한다.
-- Job 상태는 항상 추적 가능해야 한다.
-- Scheduler는 업무 로직이 아닌 실행만 담당한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-반영 원칙 본 문서는 작업 스케줄러(Job Scheduler) 및 비동기 실행 체계를
-신규 정의한 설계 문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_누락보강_131_Configuration관리_시스템초기화아키텍처_신규.txt
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-MASTER_SPEC 누락보강 131 주제 : 구성(Configuration) 관리 및 시스템
-초기화 아키텍처 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~130과 중복되지 않으며 프로젝트의 설정(Configuration)
-관리와 초기화 절차를 표준화하기 위한 설계 문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 프로그램 시작부터 종료까지 모든 구성 정보를 일관성 있게
- 관리하고, 환경 변화에도 안정적으로 초기화할 수 있는 구조를 정의한다.
-2. 관리 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 프로그램 전역 설정
-- 운영환경 설정
-- 루틴 설정
-- 종목 설정
-- UI 설정
-- 로그 설정
-- Runtime 설정
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-3. 초기화 단계 ① 환경 확인 ② 설정 로드 ③ 버전 확인 ④ 무결성 검사 ⑤
- 기본값 보완 ⑥ 모듈 초기화 ⑦ 운영 준비 완료
-4. Configuration 계층
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- System Config
-- Runtime Config
-- Routine Config
-- Stock Config
-- User Profile Config
-5. 검증 정책
-- 필수 항목 존재 여부
-- 데이터 형식 검증
-- 버전 호환성
-- 중복 설정 검사
-- 손상 파일 감지
-6. 변경 정책
-- 변경 이력 기록
-- 즉시 반영 가능 항목과 재시작 필요 항목 구분
-- 실패 시 이전 설정 복원
-7. 장애 대응
-- 기본 설정 자동 생성
-- 손상 설정 격리
-- 백업 설정 복원
-- 초기화 실패 로그 기록
-8. 향후 확장
-- 환경별 설정 템플릿
-- 원격 설정 동기화
-- 설정 비교 기능
-- 자동 마이그레이션
-9. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 설정은 단일 Configuration Manager를 통해 관리한다.
-- 초기화 순서는 항상 동일하게 유지한다.
-- 설정 변경은 추적 가능해야 한다.
-반영 원칙 본 문서는 Configuration 관리 및 시스템 초기화 구조를 신규
-정의한 설계 문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_132_Thread관리_동시성아키텍처_신규.txt
-================================================================================
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-MASTER_SPEC 누락보강 132 주제 : Thread 관리 및 동시성(Concurrency)
-아키텍처 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~131과 중복되지 않으며 프로젝트의 Thread 운용 및
-동시성 제어 기준을 정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 여러 작업이 동시에 수행되는 환경에서 데이터 무결성과 운영
- 안정성을 유지하기 위한 Thread 관리 체계를 정의한다.
-2. Thread 구성
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Main(UI) Thread
-- OpenAPI Event Thread
-- Scheduler Thread
-- Runtime 저장 Thread
-- 로그 처리 Thread
-- 백업 Thread
-3. 역할 분리
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- UI는 화면 처리만 담당한다.
-- 주문/체결 처리는 UI Thread에서 수행하지 않는다.
-- 장시간 작업은 Worker Thread로 분리한다.
-4. 동기화 대상
-- Runtime 상태
-- PLAN 상태
-- 주문 정보
-- 체결 정보
-- 예산 정보
-- 검토관리 정보
-5. 동시성 제어
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 공유 데이터 접근 최소화
-- Lock은 필요한 범위에서만 사용
-- 읽기/쓰기 충돌 방지
-- 동일 객체의 중복 갱신 방지
-6. Thread 통신
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Event Bus 기반 전달
-- Queue 기반 작업 요청
-- 직접 호출 최소화
-- 처리 완료 이벤트 반환
-7. 장애 대응
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- UI Thread는 항상 응답성을 유지한다.
-- 공유 데이터는 일관된 동기화 정책을 따른다.
-- 동시성 제어는 성능보다 데이터 무결성을 우선한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-반영 원칙 본 문서는 Thread 관리 및 동시성(Concurrency) 아키텍처를 신규
-정의한 설계 문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_133_메모리관리_객체캐시전략_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 133 주제 : 메모리 관리 및 객체 캐시 전략 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~132와 중복되지 않으며 프로젝트의 메모리 사용과 객체
-캐시(Cache) 운용 기준을 정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 장시간 자동매매 운영에서도 안정적인 메모리 사용과 빠른 데이터
- 접근을 보장하기 위한 표준 전략을 정의한다.
-2. 관리 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 종목 객체
-- PLAN 객체
-- 주문 객체
-- 체결 객체
-- Runtime 상태
-- UI 표시 데이터
-- 설정 정보
-3. 메모리 계층 ① 영구 저장소 ② Runtime 객체 ③ Cache 객체 ④ UI 표시 객체
-4. 캐시 정책
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 자주 조회되는 데이터 우선 캐싱
-- 동일 데이터 중복 생성 금지
-- 변경 시 캐시 동기화
-- 필요 시 즉시 무효화(Invalidate)
-5. 객체 수명
-- 생성
-- 참조
-- 갱신
-- 캐시 유지
-- 해제
-- 정리
-6. 메모리 최적화
-- 불필요한 객체 제거
-- 대용량 데이터 지연 로딩
-- 순환 참조 방지
-- 장시간 미사용 객체 정리
-7. 무결성
-- 캐시와 Runtime 상태 일치
-- 참조 무결성 유지
-- 객체 중복 생성 방지
-8. 모니터링
-- 메모리 사용량
-- 캐시 적중률
-- 객체 생성/해제 횟수
-- 누수 의심 객체 추적
-9. 향후 확장
-- LRU 캐시
-- 객체 풀(Object Pool)
-- 공유 메모리
-- 메모리 Snapshot
-10. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Runtime을 기준으로 캐시를 유지한다.
-- 캐시는 영구 저장소가 아니다.
-- 메모리 최적화보다 데이터 정확성을 우선한다.
-반영 원칙 본 문서는 메모리 관리 및 객체 캐시 전략을 신규 정의한 설계
-문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_134_RuntimeQueue_Buffer관리체계_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 134 주제 : Runtime Queue 및 Buffer 관리 체계 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~133과 중복되지 않으며 Runtime 환경에서 사용되는
-Queue와 Buffer의 관리 원칙을 정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 이벤트와 작업이 집중되는 상황에서도 데이터 유실 없이 안정적으로
- 처리하기 위한 Queue 및 Buffer 관리 체계를 정의한다.
-2. 관리 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Event Queue
-- Job Queue
-- Order Queue
-- Execution Queue
-- Retry Queue
-- Log Queue
-- UI Update Queue
-3. Queue 생명주기 ① 생성 ② 등록 ③ 대기 ④ 처리 ⑤ 완료 ⑥ 제거
-4. Buffer 정책
-- 일시적인 데이터 저장
-- 처리 완료 후 즉시 해제
-- 장기 보관 금지
-- Runtime 상태와 동기화
-5. 우선순위
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 긴급(Event)
-- 주문(Order)
-- 체결(Execution)
-- Runtime 저장
-- 로그 저장
-- UI 갱신
-6. Overflow 대응
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Queue 길이 감시
-- 임계치 초과 경고
-- 우선순위 기반 처리
-- Drop 정책 금지
-- 처리 지연 기록
-7. 장애 대응
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Queue 손상 검사
-- 재처리 가능 여부 판정
-- Retry Queue 이동
-- Dead Queue 기록
-8. 모니터링
-- Queue 길이
-- 평균 대기 시간
-- 최대 처리 시간
-- 처리 성공률
-- Retry 비율
-9. 향후 확장
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Lock-Free Queue
-- Ring Buffer
-- Priority Queue 개선
-- 분산 Queue 지원
-10. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Queue는 단일 책임을 가진다.
-- Buffer는 영구 저장소가 아니다.
-- Queue 처리 순서는 추적 가능해야 한다.
-반영 원칙 본 문서는 Runtime Queue 및 Buffer 관리 체계를 신규 정의한 설계
-문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_135_오류코드_예외처리표준_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 135 주제 : 오류(Error) 코드 및 예외 처리 표준
-(신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~134와 중복되지 않으며 프로젝트 전반의 오류 코드,
-예외 처리 및 장애 대응 표준을 정의한다.
-1. 목적 오류를 일관된 방식으로 식별·기록·복구하여 운영 안정성과 디버깅
- 효율을 높인다.
-2. 오류 분류
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- System Error
-- Configuration Error
-- Runtime Error
-- OpenAPI Error
-- Network Error
-- Order Error
-- Execution Error
-- Validation Error
-- Unknown Error
-3. 오류 코드 체계
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- SYS-xxxx
-- CFG-xxxx
-- RUN-xxxx
-- API-xxxx
-- ORD-xxxx
-- EXE-xxxx
-- VAL-xxxx
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-4. 예외 처리 절차 ① 오류 감지 ② 오류 코드 생성 ③ 로그 기록 ④ 영향 범위
- 분석 ⑤ 자동 복구 시도 ⑥ 운영 지속 여부 판정 ⑦ 검토관리 또는 운영
- 재개
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-5. 심각도 Level 1 : Info Level 2 : Warning Level 3 : Error Level 4 :
- Critical Level 5 : Fatal
-6. 자동 복구 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 일시적 네트워크 오류
-- OpenAPI 재연결
-- Runtime 파일 재로드
-- Queue 재처리
-- 설정 재검증
-7. 복구 불가 대상
-- 데이터 무결성 손상
-- 반복 치명 오류
-- 설정 호환성 실패
-- 참조 구조 손상
-8. 기록 항목
-- 발생 시각
-- 오류 코드
-- 심각도
-- 발생 위치
-- 예외 메시지
-- 복구 결과
-- 관련 이벤트 ID
-9. 향후 확장
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 오류 사전(Error Catalog)
-- 자동 원인 분석
-- 오류 통계 대시보드
-- AI 기반 장애 예측
-10. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 모든 예외는 공통 예외 처리기를 통해 처리한다.
-- 사용자 표시와 내부 오류 코드를 분리한다.
-- 치명적 오류는 데이터 무결성을 우선 보호한다.
-반영 원칙 본 문서는 오류 코드 및 예외 처리 표준을 신규 정의한 설계
-문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_136_데이터검증_Validation프레임워크_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 136 주제 : 데이터 검증(Validation) 프레임워크
-(신규)
-※ 본 문서는 기존 01~135와 중복되지 않으며 프로젝트 전반의 데이터 검증
-체계를 정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 모든 입력과 내부 데이터의 신뢰성을 확보하고 잘못된 데이터가
- 운영 로직으로 전파되는 것을 방지한다.
-2. 검증 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 설정 데이터
-- Runtime 데이터
-- OpenAPI 수신 데이터
-- 주문 데이터
-- 체결 데이터
-- JSON 파일
-- Profile 정보
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-3. 검증 단계 ① 입력 검증 ② 형식 검증 ③ 범위 검증 ④ 참조 검증 ⑤ 정책
- 검증 ⑥ 운영 가능 여부 판정
-4. 검증 유형
-- Null 검사
-- 자료형 검사
-- 범위 검사
-- 중복 검사
-- 참조 무결성 검사
-- 버전 호환성 검사
-5. 실패 처리
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 오류 코드 생성
-- Validation 로그 기록
-- 운영 영향도 평가
-- 자동 보정 가능 여부 판단
-- 검토관리 연계
-6. 자동 보정
-- 기본값 적용
-- 누락 항목 보완
-- 구버전 데이터 변환
-- 안전 범위 내 값 보정
-7. 검증 결과
-- PASS
-- WARNING
-- FAIL
-- CRITICAL
-8. 모니터링
-- Validation 실패율
-- 자동 보정 횟수
-- 반복 오류 유형
-- 데이터 품질 통계
-9. 향후 확장
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- JSON Schema 자동 검증
-- Rule 기반 Validation
-- 사용자 정의 Validation
-- AI 기반 데이터 이상 탐지
-10. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_137_JSONSchema_데이터규격표준_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 137 주제 : JSON Schema 및 데이터 규격 표준 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~136과 중복되지 않으며 프로젝트에서 사용하는 JSON
-기반 데이터의 구조와 규격을 표준화하기 위한 설계 문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- schema_version
-- created_at
-- updated_at
-- object_type
-- data
-- metadata
-4. Schema 관리
-- 버전 명시
-- 필수 필드 정의
-- 선택 필드 정의
-- Deprecated 필드 관리
-- 호환성 규칙
-5. 데이터 규격
-- 자료형 통일
-- 날짜/시간 형식 통일
-- 코드 체계 통일
-- Enum 정의
-- 기본값 규칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Schema 불일치
-- 필수 필드 누락
-- 잘못된 자료형
-- 지원하지 않는 버전
-- Validation 실패
-9. 향후 확장
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- JSON Schema 자동 생성
-- 시각적 Schema 편집기
-- 자동 문서 생성
-- API Schema 공유
-10. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_138_파일시스템_Storage관리체계_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 138 주제 : 파일 시스템(Storage) 관리 체계 (신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 설정 파일
-- Runtime 파일
-- 로그 파일
-- 루틴 패키지
-- 종목 데이터
-- 백업 파일
-- 테스트 데이터
-- 문서
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Storage 계층은 업무 로직과 분리한다.
-- 동일 데이터는 단일 저장 위치를 원칙으로 한다.
-- 저장 경로는 Configuration을 통해 관리한다.
-반영 원칙 본 문서는 파일 시스템(Storage) 관리 체계를 신규 정의한 설계
-문서이다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_139_프로젝트공통API_인터페이스규격_신규.txt
-================================================================================
-MASTER_SPEC 누락보강 139 주제 : 프로젝트 공통 API 및 인터페이스 규격
-(신규)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-※ 본 문서는 기존 01~138과 중복되지 않으며 프로젝트 내부 모듈 간 공통
-API와 인터페이스 규격을 정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 모듈 간 결합도를 낮추고 확장성과 유지보수성을 확보하기 위해
- 공통 인터페이스 규칙을 표준화한다.
-2. 적용 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- Routine API
-- PLAN API
-- Runtime API
-- Order API
-- Execution API
-- UI API
-- Storage API
-- Logging API
-3. 인터페이스 원칙
-- 단일 책임
-- 명확한 입·출력
-- 구현과 인터페이스 분리
-- 하위 호환성 유지
-4. 공통 규약
-- 메서드 명명 규칙
-- 반환값 표준
-- 오류 반환 규칙
-- Event ID 연계
-- Version 명시
-5. 데이터 전달
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 외부 API Adapter
-- REST/WebSocket Gateway
-- SDK 자동 생성
-- API 문서 자동화
-9. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_13_시나리오UI설계이력_발전과정.txt
-================================================================================
-MASTER_SPEC 누락보강 13 주제 : 시나리오 UI 설계 이력 및 발전 과정
-1. 목적 시나리오 기반 UI가 현재 구조로 확정되기까지의 설계 변화와 핵심
- 의사결정을 기록한다.
-2. 초기 구조
-- 설정 항목을 단순 나열하는 방식.
-- 설정 간 관계를 한눈에 파악하기 어려웠다.
-3. 검토한 구조
-- 카드형 UI
-- 설정 중심 UI
-- 시나리오 중심 UI
-4. 카드형 UI 평가 장점
-- 독립적인 영역 구분
-- 시각적 집중
-단점 - 공간 낭비 - 시선 흐름 단절 - 설정 요약 영역 부족
-결론 - 채택하지 않음.
-5. 시나리오 중심 UI 채택
-- 실행 순서를 그대로 표현.
-- 수행 단계를 위에서 아래로 구성.
-- 사용자가 처리 흐름을 쉽게 이해.
-6. 수행 단계 발전 초기 : 매도방식/미체결/완료조건 개선 : 수행1~수행5
- 단계 구조
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 소제목 좌측 정렬
-- 설정 반칸 들여쓰기
-- 줄간격 확대
-- 콤보 잘림 해결
-- 입력창 크기 통일
-- 흰색 배경 제거
-9. 현재 단계
-- 프로토타입 UI 확정.
-- 로직 연결 전 구조 검증 단계.
-10. 향후 과제
-- UI와 엔진 매핑
-- 시나리오 저장 구조
-- 시나리오 복제 기능
-- 최종 디자인 보완
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_14_비교조건통일정책_공통규칙.txt
-================================================================================
-MASTER_SPEC 누락보강 14 주제 : 비교조건 통일 정책 및 공통 규칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 사용하지 않는 항목은 숨김 처리한다.
-- 의미 없는 선택지는 노출하지 않는다.
-- 모든 비교 UI는 동일한 동작을 수행한다.
-6. 구현 원칙
-- 공통 비교 콤보 생성 함수 사용
-- 공통 방향 변경 함수 사용
-- 개별 화면에서 별도 구현 금지
-7. UI 원칙
-- 동일한 순서 유지
-- 동일한 폭 유지
-- 동일한 정렬 유지
-- 동일한 높이 유지
-8. 검증 항목
-- 방향 변경
-- 표시 전환
-- 저장값 확인
-- 로드 확인
-- UI 상태 확인
-9. 향후 확장
-- 신규 비교조건 추가 시 본 정책을 우선 적용한다.
-- 모든 루틴에서 동일한 비교 규칙을 사용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_15_UI레이아웃표준_배치규칙.txt
-================================================================================
-MASTER_SPEC 누락보강 15 주제 : UI 레이아웃 표준 및 배치 규칙
-1. 목적 루틴 설정창 전체의 화면 배치 기준을 통일하여 일관성과 가독성을
- 확보한다.
-2. 배치 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 사용자는 위에서 아래, 좌에서 우 순서로 자연스럽게 읽을 수 있어야
- 한다.
-- 설정 순서와 실제 실행 순서를 최대한 동일하게 유지한다.
-3. 제목 배치
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 대제목은 좌측 기준 정렬.
-- 소제목 역시 좌측 기준으로 최대한 붙여 배치한다.
-- 제목은 설정 영역과 명확히 구분한다.
-4. 설정 항목 배치
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 제목 아래 설정은 반칸 들여쓰기 적용.
-- 동일 계층은 동일 들여쓰기 유지.
-- 하위 설정은 부모 항목과 시각적으로 구분한다.
-5. 입력 컨트롤 배치
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 콤보박스, 입력칸, 체크박스는 기준선에 맞춰 정렬한다.
-- 입력 컨트롤 높이는 공통 규격을 사용한다.
-- 숫자 입력은 우측 정렬을 기본으로 한다.
-6. 간격 규칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 행 간격은 전체 화면에서 동일하게 유지한다.
-- 그룹 간 간격은 행 간격보다 크게 둔다.
-- 설정이 많은 영역은 줄간격을 희생하지 않는다.
-7. 폭 규칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 콤보박스의 텍스트가 잘리지 않도록 충분한 폭을 확보한다.
-- 입력칸은 의미 단위별로 폭을 통일한다.
-- 화면 확장보다 배치 최적화를 우선 검토한다.
-8. 시각적 표현
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 불필요한 흰색 배경 사용 금지.
-- 그림자 효과 사용 금지.
-- 강조는 간격, 정렬, 제목으로 표현한다.
-- 카드형 UI는 공식 구조에서 제외한다.
-9. 공통 레이아웃 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 동일 의미의 항목은 동일 위치.
-- 동일 의미의 위젯은 동일 크기.
-- 동일 기능은 동일 배치 규칙을 따른다.
-10. 향후 관리
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 새로운 설정이 추가되어도 본 레이아웃 규칙을 우선 적용한다.
-- 예외 배치는 최소화하며, 필요한 경우 MASTER_SPEC에 사유를 기록한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_16_매도설정_수행1-5_상세정책_연계규칙.txt
-================================================================================
-MASTER_SPEC 누락보강 16 주제 : 매도설정 수행 1~5 상세 정책 및 연계 규칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 매도설정의 수행 1~5를 독립 기능이 아닌 하나의 연속 실행
- 흐름으로 정의하고, 각 수행 단계의 역할과 상호 연계 규칙을 명확히
- 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_17_프로토타입운영원칙_UI확정절차.txt
-================================================================================
-MASTER_SPEC 누락보강 17 주제 : 프로토타입 운영 원칙 및 UI 확정 절차
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-3. 구현 우선순위 ① 구조 설계 ② UI 배치 ③ 입력 컨트롤 ④ 상태제어 ⑤ 저장
- 구조 ⑥ 엔진 연결 ⑦ 실주문 연계
-상위 단계가 확정되기 전 하위 단계 구현을 진행하지 않는다.
-4. 변경 관리 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 구조 변경은 허용
-- 기능 변경은 최소화
-- 로직 연결은 보류
-- 확정 사항만 MASTER_SPEC 반영
-5. UI 검토 절차
-- 화면 배치 검토
-- 시나리오 흐름 검토
-- 컨트롤 정렬 검토
-- 입력 방식 검토
-- 상태제어 검토
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-6. 보류 항목 관리 보류된 기능은 삭제하지 않는다. MASTER_SPEC에 다음
- 상태 중 하나로 기록한다.
-- 확정
-- 보류
-- 폐기
-- 재검토 예정
-7. 문서 반영 원칙
-- 변경 이유 기록
-- 변경 전 구조 기록
-- 변경 후 구조 기록
-- 향후 영향 범위 기록
-8. 구현 금지
-- 프로토타입 단계에서 최적화
-- 임시 코드 누적
-- UI와 엔진 직접 연결
-- 테스트용 코드 영구 반영
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-9. 완료 기준 프로토타입 완료는 ’로직이 구현되었는가’가 아니라 ’구조
- 변경 가능성이 거의 없는가’를 기준으로 판단한다.
-10. 향후 절차
-- UI 구조 확정
-- 저장 구조 확정
-- 엔진 매핑
-- 테스트
-- 최종 디자인 보완
-- 운영 단계 전환
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_18_MASTER_SPEC반영기준_변경이력관리규칙.txt
-================================================================================
-MASTER_SPEC 누락보강 18 주제 : MASTER_SPEC 반영 기준 및 변경 이력 관리
-규칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 MASTER_SPEC를 프로젝트의 단일 기준 문서로 유지하기 위해 반영
- 대상과 변경 이력 관리 기준을 정의한다.
-2. 반영 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 기존 내용을 임의 삭제하지 않는다.
-- 새로운 정책은 해당 항목에 편입한다.
-- 중복은 통합하고 의미는 유지한다.
-7. 번호 관리
-- 누락 보강은 연속 번호로 관리한다.
-- 번호는 재사용하지 않는다.
-- 폐기 문서도 번호는 유지한다.
-8. 검증 절차 ① 구현 ② UI 확인 ③ 기능 검증 ④ 문서 반영 ⑤ MASTER_SPEC
- 갱신
-9. 장기 운영 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 설정창은 실행 흐름을 그대로 표현한다.
-- 사용자는 화면만 보고도 루틴의 동작 순서를 이해할 수 있어야 한다.
-- 기능보다 정책 구조의 표현을 우선한다.
-3. 화면 구성 원칙 상단
-- 루틴 기본정보
-- 신호검출조건
-- 공통 설정
-중앙 - 매수 정책 - 매도 정책 - 평단관리
-하단 - 후속 정책 - 상태 표시 - 향후 확장 영역
-4. 구성 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 하나의 정책은 하나의 영역만 가진다.
-- 동일 정책을 여러 위치에 중복 배치하지 않는다.
-- 설정 간 책임을 명확히 분리한다.
-5. 확장성
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 새로운 루틴이 추가되어도 동일한 프레임을 사용한다.
-- 새로운 정책은 기존 계층에 자연스럽게 편입한다.
-- 기존 UI를 크게 변경하지 않고 확장 가능해야 한다.
-6. 공통 컴포넌트
-- 체크박스
-- 콤보박스
-- 입력칸
-- 상태 표시
-- 그룹 박스
-공통 생성 로직을 사용한다.
-7. 정책 계층 ① 신호 ② 필터 ③ 실행 정책 ④ 후속 정책 ⑤ 종료 정책
-모든 루틴은 이 계층을 따른다.
-8. 설계 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_20_엔진연결준비사항_구현체크리스트.txt
-================================================================================
-MASTER_SPEC 누락보강 20 주제 : 엔진 연결 준비사항 및 구현 체크리스트
-1. 목적 UI 구조 확정 이후 엔진 연결 시 필요한 준비사항과 검증 절차를
- 표준화한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-9. 완료 기준 엔진 연결 완료는 기능 구현이 아니라
- 입력→저장→로드→엔진→결과가 모두 일관되게 동작하는 상태를 의미한다.
-10. 장기 운영 모든 신규 루틴과 기능은 본 체크리스트를 통과한 뒤
- 프로젝트에 반영한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_21_루틴설정창_용어체계_명명규칙.txt
-================================================================================
-MASTER_SPEC 누락보강 21 주제 : 루틴 설정창 용어 체계 및 명명 규칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-10. 결론 용어의 일관성은 구조 안정성의 일부이며, 모든 변경은 MASTER_SPEC
- 기준으로 관리한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_22_UI변경의사결정_설계검토원칙.txt
-================================================================================
-MASTER_SPEC 누락보강 22 주제 : UI 변경 의사결정 및 설계 검토 원칙
-1. 목적 UI 변경 과정에서 반복된 시행착오를 줄이고, 변경 여부를 판단하는
- 공통 기준을 정의한다.
-2. 변경 판단 기준
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 보기 좋은가 보다 사용 흐름이 자연스러운가를 우선한다.
-- 구조가 복잡해지면 채택하지 않는다.
-- 기능 추가보다 기존 구조 활용을 우선한다.
-3. 채택 기준
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 실행 순서가 명확하게 보일 것
-- 설정 간 관계를 쉽게 이해할 것
-- 동일 패턴을 다른 화면에도 적용 가능할 것
-4. 보류 기준
-- 장점과 단점이 모두 큰 구조
-- 실제 엔진 연결 전 판단이 어려운 구조
-- 사용성 검증이 필요한 구조
-5. 폐기 기준
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 시선 흐름을 방해하는 구조
-- 공간 활용이 비효율적인 구조
-- 동일 정보를 중복 표현하는 구조
-- 유지보수가 어려운 구조
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-6. 변경 절차 ① 시안 작성 ② 화면 확인 ③ 장단점 기록 ④ 채택/보류/폐기
- 결정 ⑤ MASTER_SPEC 반영
-7. 기록 원칙
-- 왜 변경했는지 기록
-- 왜 기존안을 버렸는지 기록
-- 향후 재검토 가능 여부 기록
-8. 프로토타입 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 화면을 실제로 확인한 뒤 결정한다.
-- 추측만으로 구조를 확정하지 않는다.
-- 필요 시 여러 시안을 비교한다.
-9. 장기 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- UI는 점진적으로 개선한다.
-- 큰 구조는 쉽게 바꾸지 않는다.
-- 확정된 설계 철학은 일관되게 유지한다.
-10. 결론 모든 UI 변경은 ’구조의 일관성’과 ’실행 흐름의 가독성’을 최우선
- 기준으로 판단한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_23_UI시행착오_반복개선원칙.txt
-================================================================================
-MASTER_SPEC 누락보강 23 주제 : UI 시행착오 및 반복 개선 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 프로토타입 단계에서 반복적으로 발생한 UI 수정 과정을 기록하고,
- 동일한 시행착오의 재발을 방지한다.
-2. 기본 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 화면을 실제 확인한 후 수정 여부를 결정한다.
-- 추론만으로 UI를 확정하지 않는다.
-- 작은 수정 후 즉시 검증한다.
-3. 반복 개선 방식 ① 시안 적용 ② 화면 확인 ③ 문제점 기록 ④ 최소 수정 ⑤
- 재검증
-4. 대표 개선 항목
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 콤보박스 글자 잘림
-- 입력칸 폭 조정
-- 줄간격 조정
-- 제목 정렬
-- 반칸 들여쓰기
-- 체크박스 위치
-- 입력 컨트롤 높이 통일
-5. 금지 사항
-- 여러 영역을 한 번에 수정
-- 확인 없이 대규모 레이아웃 변경
-- 검증되지 않은 디자인 적용
-6. 변경 기준
-- 가독성 향상
-- 실행 흐름 유지
-- 공통 규칙 유지
-- 구조 단순화
-7. 기록 원칙
-- 수정 이유
-- 수정 결과
-- 남은 문제
-- 보류 여부
-8. 완료 기준
-- 기능보다 구조가 안정된 상태
-- 동일 문제가 반복되지 않는 상태
-9. 향후 적용
-- 신규 UI도 동일 절차 적용
-- 모든 변경은 단계적으로 진행
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-10. 결론 UI는 반복 검증을 통해 완성하며, 한 번의 대규모 수정보다 작은
- 개선을 지속적으로 누적하는 방식을 기본 원칙으로 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_24_매도설정UI변경이력_최종확정과정.txt
-================================================================================
-MASTER_SPEC 누락보강 24 주제 : 매도설정 UI 변경 이력 및 최종 확정 과정
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 매도설정 UI가 최종 프로토타입 구조에 도달하기까지의 변경 이력과
- 채택·보류·폐기 과정을 기록한다.
-2. 초기 구조
-- 기능 중심의 단순 설정 나열 방식.
-- 항목 간 실행 관계를 파악하기 어려웠다.
-3. 검토된 구조
-- 기존 박스형
-- 카드형
-- 시나리오 중심
-- 수행 단계 중심
-4. 폐기된 구조 ① 카드형 UI
-- 공간 활용 저하
-- 설정 요약 영역 부족
-- 시선 분산
-② 설정 나열형 - 실행 순서 표현 부족 - 확장성 저하
-5. 최종 채택 구조 상단
-- 신호검출조건
-- 매도방식지정(A/B/C)
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 소제목 좌측 정렬
-- 설정은 반칸 들여쓰기
-- 입력 컨트롤 높이 통일
-- 콤보박스 폭 확대
-- 줄간격 통일
-- 흰색 배경 제거
-- 그림자 효과 제거
-7. 연계 규칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 수행2 시간 반복 사용 시 수행4 제한시간 비활성
-- 수행4 사용 여부에 따라 수행5 표시 자동 변경
-- 공통 상태제어 함수 사용
-8. 공통 설계 철학
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_25_매수설정UI변경이력_최종확정과정.txt
-================================================================================
-MASTER_SPEC 누락보강 25 주제 : 매수설정 UI 변경 이력 및 최종 확정 과정
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 매수설정 UI가 현재 프로토타입 구조로 정리되기까지의 변경 과정과
- 최종 확정된 설계 원칙을 기록한다.
-2. 초기 구조
-- 설정 항목 중심의 나열 방식
-- 중복 설정이 많고 실행 흐름이 직관적이지 않았음
-3. 주요 변경 과정
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_26_평단관리정책_확정이력_설계철학.txt
-================================================================================
-MASTER_SPEC 누락보강 26 주제 : 평단관리 정책 확정 이력 및 설계 철학
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 평단관리 기능의 역할과 설계 철학을 정의하고,
- 회차기준·예산기준·능동매수의 책임을 명확히 구분한다.
-2. 핵심 철학
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 직전 예산 또는 기준 예산을 기반으로 다음 회차 예산을 결정한다.
-- 예산 정책과 회차 정책을 혼합하지 않는다.
-6. 능동매수
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 기본 추매 정책을 대체하지 않는다.
-- 현재 포지션을 보정하기 위한 보조 정책이다.
-- 루틴이 허용한 경우에만 수행한다.
-7. 조건별동작
-- 특정 조건 만족 시 평단관리 동작을 변경한다.
-- 회차·예산·능동매수와 중복 역할을 수행하지 않는다.
-8. 설계 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_28_완료정책_후속정책_설계원칙.txt
-================================================================================
-MASTER_SPEC 누락보강 28 주제 : 완료정책 및 후속 정책 설계 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 완료정책은 주문 종료 여부만 판단하는 기능이 아니라, 매수·매도
- 계획 종료 이후의 처리 흐름을 정의한다.
-2. 기본 철학
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-4. 후속 정책 ① 다음 신호 대기 ② 보유잔량 시장가 처리 ③ 검토관리 전환 ④
- 루틴 종료 ⑤ 후속 루틴 연계(향후)
-5. 연계 규칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-10. 결론 완료정책은 실행 종료가 아니라 다음 단계로 연결하기 위한
- 정책이며, 프로젝트 전체의 후속 흐름을 일관되게 관리하는 기준이 된다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 루틴의 각 상태가 어떤 순서로 전이되는지 정의하여 UI, 저장구조,
- 루틴 엔진, 메인 엔진이 동일한 흐름을 따르도록 한다.
-2. 기본 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 상태는 항상 순차적으로 전이한다.
-- 이전 상태를 건너뛰는 직접 전이는 예외 상황에서만 허용한다.
-- 상태 전이는 데이터 기반으로 관리한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 프로젝트를 UI, 데이터, 루틴, 메인 엔진으로 명확히 분리하여
- 확장성과 유지보수성을 확보한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- UI는 엔진을 직접 제어하지 않는다.
-- 엔진은 UI 위젯을 참조하지 않는다.
-- 데이터 구조를 통해서만 계층을 연결한다.
-9. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 루틴 추가 시 UI 변경 최소화
-- 엔진 교체 시 UI 영향 최소화
-- 정책 확장 시 저장 구조 유지
-- 전체 프로젝트를 모듈 단위로 독립 운영 가능하도록 설계한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_31_루틴등록_복제_삭제정책.txt
-================================================================================
-MASTER_SPEC 누락보강 31 주제 : 루틴 등록 · 복제 · 삭제 정책
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 루틴의 생성부터 등록, 복제, 삭제까지의 전 과정을 표준화하여
- 운영 중 구조가 흔들리지 않도록 한다.
-2. 기본 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 루틴은 하나의 독립 패키지로 관리한다.
-- 등록은 파일 배치만으로 가능해야 한다.
-- 별도의 설치 절차를 요구하지 않는다.
-3. 루틴 등록
-- 루틴 폴더 자동 인식
-- 메타데이터 검증
-- 중복 여부 확인
-- 등록 가능 여부 판정
-4. 루틴 복제
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 원본 정책을 그대로 유지한다.
-- 새 이름과 식별자만 변경한다.
-- 복제 후 독립적으로 수정 가능해야 한다.
-5. 루틴 삭제
-- 등록 목록에서 제거
-- 실행 중인 루틴은 즉시 삭제하지 않는다.
-- 삭제 전 참조 여부를 확인한다.
-6. 루틴 지정
-- 종목별 독립 지정
-- 지정 해제 가능
-- 변경 즉시 내부 상태 동기화
-7. 데이터 원칙
-- 루틴 자체와 사용자 설정을 분리 관리한다.
-- 원본 루틴을 직접 수정하지 않는다.
-8. 검증 항목 □ 중복 등록 □ 복제 무결성 □ 삭제 후 참조 오류 □ 지정/해제
- 동기화
-9. 장기 원칙
-- 신규 루틴도 동일 등록 절차 사용
-- 공통 등록 구조 유지
-10. 향후 보강
-- 루틴 버전 정책
-- 호환성 검사
-- 자동 마이그레이션 기준
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- UI 위젯 자체는 저장하지 않는다.
-- 설정값만 데이터 형태로 저장한다.
-- 저장 구조와 화면 구조를 분리한다.
-3. 저장 대상
-- 루틴별 설정
-- 공통 설정
-- 사용자 선택값
-- 활성/비활성 상태
-- 버전 정보(필요 시)
-4. 저장 제외 대상
-- 런타임 객체
-- QWidget/QObject 참조
-- 임시 계산값
-- 테스트용 데이터
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 누락 항목은 기본값으로 보완한다.
-- 알 수 없는 항목은 무시하지 말고 기록한다.
-- 버전 차이는 호환 정책에 따라 처리한다.
-7. 변경 관리
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 키 이름은 신중히 변경한다.
-- 변경 시 변환 규칙을 함께 정의한다.
-- 사용자 데이터 손실을 최소화한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 저장 계층은 UI와 독립적으로 관리한다.
-- 저장 형식은 엔진에서도 사용할 수 있어야 한다.
-- 동일 데이터는 한 곳에서만 관리한다.
-10. 향후 보강
-- 설정 백업 정책
-- 버전 업그레이드 절차
-- 자동 마이그레이션
-- 설정 무결성 검사
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_33_rulesjson_설계원칙_데이터구조.txt
-================================================================================
-MASTER_SPEC 누락보강 33 주제 : JSON(rules.json) 설계 원칙 및 데이터 구조
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_34_공통위젯생성규칙_재사용정책.txt
-================================================================================
-MASTER_SPEC 누락보강 34 주제 : 공통 위젯 생성 규칙 및 재사용 정책
-1. 목적 루틴 설정창에서 반복적으로 사용되는 UI 컴포넌트를 공통화하여
- 일관성과 유지보수성을 확보한다.
-2. 기본 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 동일한 기능은 동일한 생성 함수를 사용한다.
-- 화면마다 별도의 위젯을 새로 구현하지 않는다.
-- 공통 위젯 수정 시 전체 화면에 동일하게 반영되도록 설계한다.
-3. 공통 대상
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- QCheckBox
-- QComboBox
-- QLineEdit
-- QLabel
-- GroupBox
-- 행(Row) 생성 레이아웃
-4. 생성 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 동일 행 구성은 재사용 가능한 Row Builder 사용
-- 입력 순서와 정렬 규칙을 통일한다.
-- 좌우 여백과 간격은 공통 기준을 따른다.
-7. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 위젯명은 의미 기반으로 작성한다.
-- 동일 기능에 다른 이름을 사용하지 않는다.
-- 생성 함수는 한 가지 책임만 가진다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-8. 검증 항목 □ 공통 생성 함수 사용 여부 □ 스타일 일관성 □ 상태 제어
- 일관성 □ 레이아웃 정렬 □ 중복 코드 발생 여부
-9. 향후 보강
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 공통 Widget Factory
-- Row Builder 표준화
-- 공통 Style Manager
-- UI Component Library 구축
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_35_상태동기화_이벤트처리정책.txt
-================================================================================
-MASTER_SPEC 누락보강 35 주제 : 상태 동기화 및 이벤트 처리 정책
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 UI, 저장 데이터, 루틴 엔진, 메인 엔진의 상태를 항상 동일하게
- 유지하기 위한 상태 동기화 및 이벤트 처리 기준을 정의한다.
-2. 기본 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-4. 이벤트 흐름 ① 사용자 입력 ② UI 이벤트 발생 ③ 상태 검증 ④ 데이터 갱신
- ⑤ 화면 갱신 ⑥ 엔진 전달(필요 시)
-5. 처리 원칙
-- 동일 이벤트는 동일 처리 함수 사용
-- 중복 이벤트 처리 금지
-- 상태 변경 없이 화면만 변경 금지
-6. 예외 처리
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 데이터 불일치 감지
-- 이벤트 중복 발생
-- 잘못된 상태 전이
-- 런타임 오류 발생 시 이전 정상 상태 유지
-7. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 상태 변경은 공통 관리 계층에서 수행
-- UI는 상태 표시 역할에 집중
-- 엔진은 상태 변경 요청만 수행
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-8. 검증 항목 □ UI 표시와 내부 상태 일치 □ 저장 데이터 일치 □ 이벤트
- 중복 여부 □ 상태 전이 정상 여부 □ 복구 동작 확인
-9. 향후 보강
-- 이벤트 큐 관리
-- 상태 변경 로그
-- 상태 변경 이력 추적
-- 이벤트 디버깅 도구
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_36_UI_데이터_엔진매핑상세규칙.txt
-================================================================================
-MASTER_SPEC 누락보강 36 주제 : UI ↔ 데이터 ↔ 엔진 매핑 상세 규칙
-1. 목적 UI, 설정 데이터, JSON, 루틴 엔진, 메인 엔진 간 데이터 전달
- 구조를 표준화한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- UI는 JSON을 직접 수정하지 않는다.
-- JSON은 UI 위젯을 알지 않는다.
-- 엔진은 UI 객체를 참조하지 않는다.
-- 모든 변환은 공통 매핑 계층에서 처리한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_38_예외처리_복구정책.txt
-================================================================================
-MASTER_SPEC 누락보강 38 주제 : 예외 처리 및 복구 정책
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 예외 상황에서는 기능 수행보다 데이터 무결성을 우선한다.
-- 자동 복구가 불가능하면 안전한 상태로 전환한다.
-- 모든 예외는 기록 가능해야 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-4. 복구 절차 ① 예외 감지 ② 영향 범위 확인 ③ 정상 상태 보존 ④ 복구 가능
- 여부 판단 ⑤ 자동 복구 또는 안전 정지 ⑥ 로그 기록 ⑦ 운영자 확인(필요
- 시)
-5. 프로그램 재시작
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 신규 주문 즉시 차단
-- 진행 중인 상태 유지
-- 복구 절차 완료 후 운영 재개
-- 복구 전 자동 재시작 금지
-7. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 예외 처리는 공통 계층에서 수행한다.
-- UI는 예외를 표시만 한다.
-- 루틴은 복구 정책을 직접 수행하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-8. 검증 항목 □ 예외 감지 □ 복구 성공 □ 상태 동기화 □ 로그 생성 □ 데이터
- 무결성 □ 정상 운영 복귀
-9. 향후 보강
-- 복구 시나리오
-- 자동 복구 정책
-- 장애 등급 분류
-- 복구 이력 관리
-10. 결론 모든 예외는 동일한 복구 원칙을 따르며, 데이터의 일관성과
- 안전성을 최우선으로 유지한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_39_루틴버전관리_호환성정책.txt
-================================================================================
-MASTER_SPEC 누락보강 39 주제 : 루틴 버전 관리 및 호환성 정책
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 신규 필드 추가는 기존 버전과 호환되도록 한다.
-- 기존 필드 삭제는 가능한 한 지양한다.
-- 변경이 불가피할 경우 변환 규칙을 함께 정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 공식 지원 대상 여부를 명시한다.
-- 지원하지 않는 경우 사용자에게 알린다.
-- 데이터 손실 가능성을 기록한다.
-7. 검증 항목 □ 버전 인식 □ 호환성 검사 □ 자동 변환 □ 기본값 보완 □ 엔진
- 정상 동작
-8. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 버전 비교는 공통 계층에서 수행한다.
-- UI는 버전 정보를 표시만 한다.
-- 엔진은 변환 완료된 데이터만 사용한다.
-9. 향후 보강
-- 자동 마이그레이션
-- 버전 변경 로그
-- 호환성 테스트
-- 변환 규칙 관리
-10. 결론 버전 관리는 장기 유지보수의 핵심 요소이며, 모든 구조 변경은
- 버전 정책과 함께 관리한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_40_OpenAPI연계절차_운영전환정책.txt
-================================================================================
-MASTER_SPEC 누락보강 40 주제 : OpenAPI 연계 절차 및 운영 전환 정책
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 신규 기능은 테스트 후 운영 반영
-- 운영 중 구조 변경 최소화
-- 장애 발생 시 안전 정지 우선
-- 데이터 무결성 유지
-7. 장애 대응
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- OpenAPI 연결 실패
-- 주문 오류
-- 체결 불일치
-- 서버 상태 이상
-- 재시작 복구 모든 상황은 공통 복구 정책을 따른다.
-8. 문서 관리
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 운영 단계 변경 시 MASTER_SPEC 갱신
-- 변경 이력 기록
-- 운영 정책과 구현 정책을 분리 관리
-9. 향후 보강
-- 실시간 이벤트 처리
-- 운영 로그 분석
-- 자동 장애 감지
-- 운영 체크리스트 고도화
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_41_히스토리기반_용어변경_UI표준화.txt
-================================================================================
-MASTER_SPEC 누락보강 41 주제 : 히스토리 기반 용어 변경 및 UI 표준화
-결정사항
-출처 : 작업진행상황대화히스토리_8 비교 반영
-1. 목적 프로토타입 단계에서 확정된 용어 변경과 UI 표준화 사항을
- MASTER_SPEC에 반영한다.
-2. 용어 변경
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-5. 반영 원칙 위 항목은 매도설정 UI의 실제 검토 과정에서 확정된
- 내용으로, 향후 동일 기능 구현 시 우선 기준으로 사용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_42_히스토리기반_UI수정원칙_점진조정기준.txt
-================================================================================
-MASTER_SPEC 누락보강 42 주제 : 히스토리 기반 UI 수정 원칙 및 점진적 조정
-기준
-출처 : 작업진행상황대화히스토리_6 비교 반영
-1. 목적 UI 수정 과정에서 반복적으로 확정된 운영 원칙을 MASTER_SPEC에
- 반영한다.
-2. 점진적 UI 조정 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- UI 폭은 한 번에 크게 변경하지 않는다.
-- 소폭 조정 후 화면 확인을 수행한다.
-- 확인 결과에 따라 추가 조정을 진행한다.
-3. 임의 변경 금지 사용자 승인 없이 다음 사항을 변경하지 않는다.
-- 문구 변경
-- 컨트롤 삭제
-- 체크박스 제거
-- 대규모 폭 변경
-4. 비교조건 표시 규칙 방향이 ’상향’인 경우
-- 이상 / 이하 활성
-방향이 ’하향’인 경우 - 이상 / 이하 활성
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-방향이 ’상하’인 경우 - 비교 항목을 비활성화하는 정책을 적용하며, 해당
-UI는 방향 선택에 맞춰 자동 상태를 변경한다.
-5. UI 검증 절차 ① 소폭 수정 ② 실제 화면 확인 ③ 정렬 및 잘림 확인 ④ 추가
- 수정 여부 결정
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-6. 반영 원칙 위 규칙은 반복적인 UI 수정 과정에서 확정된 운영 기준으로,
- 향후 모든 설정창 수정 작업에 동일하게 적용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_누락보강_43_히스토리기반_NOT연산규칙_입력기해석기준.txt
-================================================================================
-MASTER_SPEC 누락보강 43 주제 : 히스토리 기반 NOT 연산 규칙 및 입력기
-해석 기준
-출처 : 작업진행상황대화히스토리_7 비교 반영
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-7. 반영 원칙 본 규칙은 히스토리 검토 과정에서 확정된 입력기 해석
- 기준이며, 향후 조건식 파서와 UI의 공식 기준으로 사용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 신호 종류를 임의로 추가하지 않는다.
-- 신호 의미를 화면마다 다르게 해석하지 않는다.
-- 모든 루틴은 동일한 신호 체계를 따른다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-8. 반영 원칙 본 정책은 히스토리 검토 및 복구 과정에서 확정된 공식 신호
- 체계이며, 향후 MASTER_SPEC와 모든 구현의 기준으로 사용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_45_히스토리기반_AI오판복구_절대금지규칙.txt
-================================================================================
-MASTER_SPEC 누락보강 45 주제 : 히스토리 기반 AI 오판 복구 및 절대금지
-규칙
-출처 : 프로젝트 복구 이력 및 히스토리 비교 반영
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 공식 용어 임의 변경
-- 존재하지 않는 상태(State) 추가
-- 존재하지 않는 신호(Signal) 추가
-- 구현되지 않은 기능을 완료로 기록
-- 확인되지 않은 정책을 MASTER_SPEC에 반영
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-4. 검증 절차 ① 기존 MASTER_SPEC 확인 ② 작업 히스토리 확인 ③ 구현 내용
- 확인 ④ 세 자료가 일치할 때만 문서 반영
-5. 복구 원칙
-- 오염된 개념은 즉시 폐기한다.
-- 기존 확정 개념으로 되돌린다.
-- 복구 이유와 영향을 기록한다.
-6. 문서 반영 기준
-- 히스토리에서 실제 확정된 내용만 반영한다.
-- 추론으로 생성한 일반 원칙은 확정 정책과 구분한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-7. 향후 운영 새로운 정책은 구현·검증·문서 반영의 순서를 반드시 지키며,
- AI의 제안은 사용자 확인 전까지 공식 정책으로 간주하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-8. 결론 프로젝트의 기준은 MASTER_SPEC와 검증된 히스토리이며, AI의
- 추론은 이를 대체하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_누락보강_46_히스토리기반_프로젝트복구기준_기준문서우선순위.txt
-================================================================================
-MASTER_SPEC 누락보강 46 주제 : 히스토리 기반 프로젝트 복구 기준 및 기준
-문서 우선순위
-출처 : 프로젝트 복구 이력 및 작업 히스토리 비교 반영
-1. 목적 프로젝트 복구 및 재개 시 어떤 자료를 기준으로 판단할 것인지
- 공식 우선순위를 정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 가장 최근 구현 상태를 먼저 확인한다.
-- 코드와 문서가 다르면 원인을 분석한다.
-- 문서가 오래된 경우 최신 구현에 맞게 갱신한다.
-- 추정으로 복구하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-4. 변경 검증 절차 ① 현재 코드 확인 ② 히스토리 확인 ③ MASTER_SPEC 확인 ④
- 차이점 정리 ⑤ 수정 여부 결정 ⑥ 문서 갱신
-5. 작업 재개 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 최신 정상 파일을 기준으로 시작한다.
-- 중간 결과물이 아닌 확정본을 우선 사용한다.
-- 폐기된 구조를 다시 적용하지 않는다.
-6. 충돌 처리
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 코드와 문서가 다르면 이유를 기록한다.
-- 히스토리와 문서가 다르면 실제 결정 과정을 확인한다.
-- 사용자 최종 결정이 항상 우선한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-7. 검증 항목 □ 최신 구현 확인 □ 문서 일치 여부 □ 정책 일치 여부 □ 복구
- 완료 확인 □ 재발 방지 기록
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-8. 결론 프로젝트 복구는 하나의 자료만으로 판단하지 않으며,
- 코드·MASTER_SPEC·히스토리를 함께 검증한 후 진행한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_47_히스토리기반_시나리오중심_UI설계원칙.txt
-================================================================================
-MASTER_SPEC 누락보강 47 주제 : 히스토리 기반 시나리오 중심 UI 설계 원칙
-출처 : 작업진행상황대화히스토리_8 비교 반영
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 매도설정 UI를 ‘설정 항목 나열’ 방식이 아니라 ‘시나리오 흐름’
- 중심으로 구성하기 위해 확정된 설계 원칙을 기록한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 시나리오 번호를 유지한다.
-- 각 수행은 독립 블록으로 구성한다.
-- 설정은 제목 아래 반칸 들여쓰기 형태로 배치한다.
-- 흐름을 우선하고 설정은 보조 정보로 배치한다.
-5. 구현 기준
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 새 기능이 추가되어도 수행 번호 체계를 유지한다.
-- 시나리오 순서를 임의로 변경하지 않는다.
-- 동일한 레이아웃 규칙을 모든 수행 블록에 적용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-6. 반영 원칙 본 내용은 실제 UI 시제품 검토 과정에서 확정된 설계
- 방향이며, 향후 매도설정 UI의 기준 구조로 사용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_48_히스토리기반_카드형UI검토_폐기사유.txt
-================================================================================
-MASTER_SPEC 누락보강 48 주제 : 히스토리 기반 카드형 UI 검토 및 폐기 사유
-출처 : 작업진행상황대화히스토리_8 비교 반영
-1. 목적 매도설정 UI 개선 과정에서 검토한 카드형 배치의 장단점과 최종
- 판단 근거를 기록한다.
-2. 검토 배경 시나리오별 설정을 명확하게 구분하기 위해 카드형 UI를 시범
- 적용하였다.
-3. 장점
-- 시나리오 단위 구분이 명확함
-- 각 블록의 독립성이 높음
-- 확장 시 카드 추가가 용이함
-4. 확인된 문제점
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 카드 경계가 많아 화면이 산만해짐
-- 설정 영역이 좁아 주요 문구가 잘림
-- 시선이 카드 테두리에 분산됨
-- 설정 흐름보다 박스가 먼저 보임
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-5. 검토 결과 카드형은 완전 폐기 대상은 아니었으나, 현재 프로젝트의 긴
- 설정 문장과는 적합성이 낮다고 판단하였다.
-6. 최종 결정
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 카드형 배치는 사용하지 않는다.
-- 기존 그룹박스 기반 구조를 유지한다.
-- 각 그룹 내부를 시나리오(수행) 중심으로 재구성한다.
-7. 후속 적용
-- 흰색 카드 배경 제거
-- 그룹 내부만 단계별 구성
-- 제목과 설정 입력을 분리
-- 반칸 들여쓰기 적용
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-8. 반영 원칙 본 결정은 실제 UI 시제품 검토 결과에 따른 것이며, 향후
- 동일한 화면 구성 시 기준으로 사용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일: MASTER_SPEC_누락보강_49_히스토리기반_수행1_5구조확정과정.txt
-================================================================================
-MASTER_SPEC 누락보강 49 주제 : 히스토리 기반 수행 1~5 구조 확정 과정
-출처 : 작업진행상황대화히스토리_8 비교 반영
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 매도설정 화면을 단계별 시나리오 구조로 재편하는 과정에서 수행
- 1~5 구성의 확정 과정을 기록한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 수행 번호는 위에서 아래 순서로 유지한다.
-- 각 수행은 독립 영역으로 표시한다.
-- 제목은 좌측 정렬을 유지한다.
-- 설정 입력은 제목보다 반칸 들여쓴다.
-5. 확장 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 신규 옵션은 해당 수행 내부에 추가한다.
-- 수행 번호 체계는 유지한다.
-- 수행 간 역할을 중복하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-6. 반영 원칙 본 구조는 실제 UI 시제품 검토를 거쳐 확정된 흐름이며, 향후
- 매도설정 UI의 기본 골격으로 유지한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_누락보강_50_히스토리기반_반복이탈조건_도입배경_설계목적.txt
-================================================================================
-MASTER_SPEC 누락보강 50 주제 : 히스토리 기반 반복이탈조건 도입 배경 및
-설계 목적
-출처 : 작업진행상황대화히스토리_8 비교 반영
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 매도 진행 과정에서 반복 수행이 무한정 지속되는 상황을 방지하고,
- 후속 처리 시점을 명확하게 정의하기 위해 반복이탈조건을 도입한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-2. 도입 배경 기존 구조는 반복 수행은 가능했지만, 언제 반복을 종료하고
- 다음 단계로 넘어갈 것인지에 대한 기준이 부족하였다.
-3. 역할 반복이탈조건은 새로운 매도 조건이 아니라 반복 수행 종료 여부를
- 판단하는 보조 정책이다.
-4. 구성 요소
-- 가격 비교 조건
-- 반복 횟수
-- 제한 시간
-세 요소를 조합하여 반복 종료 여부를 결정한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-5. 처리 흐름 ① 매도 수행 시작 ② 반복 수행 ③ 반복이탈조건 확인 ④ 조건
- 충족 시 반복 종료 ⑤ 매도완료정책으로 진행
-6. 연계 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 체크박스로 활성 여부를 제어한다.
-- 세부 설정은 반칸 들여쓰기 형태를 유지한다.
-- 가격비교, 반복횟수, 제한시간을 동일 형식으로 배치한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-8. 반영 원칙 본 내용은 매도설정 UI 검토 과정에서 확정된 구조이며, 반복
- 수행 종료를 위한 공식 정책으로 사용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_누락보강_51_히스토리기반_후속매도반복설정_반복이탈조건_연계규칙.txt
-================================================================================
-MASTER_SPEC 누락보강 51 주제 : 히스토리 기반 후속매도반복설정과
-반복이탈조건의 연계 규칙
-출처 : 작업진행상황대화히스토리_8 비교 반영
-1. 목적 후속매도반복설정과 반복이탈조건의 역할을 명확히 분리하고 상호
- 연계 순서를 표준화한다.
-2. 기본 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 후속매도반복설정은 반복 수행 방법을 정의한다.
-- 반복이탈조건은 반복 종료 여부를 판단한다.
-- 두 정책은 서로 대체하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-3. 처리 순서 ① 매도 신호 발생 ② 후속매도반복설정 수행 ③ 반복이탈조건
- 확인 ④ 반복 종료 ⑤ 매도완료정책 수행
-4. 역할 구분 후속매도반복설정
-- 반복 방식
-- 반복 간격
-- 반복 조건
-반복이탈조건 - 가격 비교 - 반복 횟수 - 제한 시간 - 종료 판정
-5. UI 구성 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 후속매도반복설정은 수행 3 영역에 배치한다.
-- 반복이탈조건은 수행 4 영역에 배치한다.
-- 두 영역은 동일한 들여쓰기와 행 구성 규칙을 따른다.
-6. 구현 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 반복 종료 판단은 반복이탈조건에서만 수행한다.
-- 완료정책은 반복 종료 이후에만 실행한다.
-- 정책 간 중복 판정을 금지한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-7. 검증 항목 □ 반복 수행 정상 □ 반복 종료 정상 □ 완료정책 연계 □ UI
- 표시 일치 □ 저장 구조 일치
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-8. 반영 원칙 본 내용은 실제 UI 설계 과정에서 확정된 연계 규칙이며, 향후
- 매도설정 구현의 공식 기준으로 유지한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-================================================================================
-파일:
-MASTER_SPEC_누락보강_52_히스토리기반_매도리셋_일괄취소_용어변경원칙.txt
-================================================================================
-MASTER_SPEC 누락보강 52 주제 : 히스토리 기반 매도리셋·일괄취소 용어 변경
-배경 및 적용 원칙
-출처 : 작업진행상황대화히스토리_8 비교 반영
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-1. 목적 매도 관련 정책에서 사용되는 용어를 실제 기능과 일치하도록
- 통일하고, 사용자가 의미를 직관적으로 이해할 수 있도록 표준화한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-2. 변경 배경 초기 용어인 ‘이전수행취소’, ’주문일괄취소’는 실제 동작을
- 충분히 설명하지 못하고 UI 가독성을 떨어뜨리는 문제가 확인되었다.
-3. 최종 용어
-- 이전수행취소 → 매도리셋
-- 주문일괄취소 → 일괄취소
-4. 적용 원칙
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-- 화면 표기는 변경된 용어를 사용한다.
-- 내부 코드 식별자는 필요 시 기존 이름을 유지할 수 있으나, 외부 표시
- 용어와 혼용하지 않는다.
-7. 검증 항목 □ UI 표기 일치 □ 문서 표기 일치 □ JSON 표기 일치 □ 기능
- 의미 일치
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
 
 Original Body Marker: END
 
@@ -3999,4 +2984,4 @@ Reference Navigation
 - Next: PART03_05_GUI.md
 - Full PART: PART03_GUI.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt

@@ -2,15 +2,286 @@
 
 Reference Edition
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
-Part Summary: Sequential Canonical body immediately before the 29.6 Execution Preview section.
+Part Summary: Legacy large part / Full part: Sequential original body before 29.6
 
 Original Body Marker: START
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+SOURCE: MASTER_SPEC_추가갱신_order_provenance_주문생성이력_2026-07-03.txt
+==================================================
+MASTER_SPEC_추가갱신_order_provenance_주문생성이력_2026-07-03
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+이 단계까지 오면서 주문 후보는 side, quantity, price, candidate_status, order_intent 등을 갖게 되었다.
+하지만 “왜 이 주문 후보가 만들어졌는가”를 설명하는 정보가 부족했다.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+2. order_intent와 order_provenance의 역할 차이
+==================================================
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+3. 구현 범위
+==================================================
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+변경 파일:
+- order_queue.py
+- tests/test_order_queue_approval_scenarios.py
+추가 함수:
+- build_order_provenance_from_signal(signal)
+추가 필드:
+- order["order_provenance"]
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+삽입 위치:
+- order_queue.signal_to_order_candidate(signal, index=0)
+- order_candidate_engine.build_order_candidate(signal) 결과 후보에 order_provenance를 추가한다.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+이 위치가 적절한 이유:
+- signal_record 원본과 order 후보를 동시에 알고 있다.
+- order_candidate_engine.py는 수량/금액/가격 후보 계산에 집중할 수 있다.
+- signal 출처 메타데이터는 order_queue.py에서 붙이는 것이 책임 분리에 맞다.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+signal_source
+- signal_record.source.
+- 예: routine_signal_probe, manual_verification.
+signal_created_at
+- signal 생성 시각.
+signal_updated_at
+- signal 갱신 시각이 있으면 기록.
+routine
+- signal_record.routine.
+- 예: 지표추종매매.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+unresolved
+- source_ui_path, rule_path, setting_set 등 핵심 출처가 아직 불명확하므로 true.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+6. unresolved 정책
+==================================================
+order_provenance.unresolved는 현재 true이다.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+- rule_path
+- source_ui_path
+- setting_set
+- source_candle_time
+- source_candle_close
+- engine
+- routine_path/rules_path
+- indicator_follow_ui_state snapshot/hash
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+8. 실행 로직과의 관계
+==================================================
+order_provenance는 실행 판단에 사용하지 않는다.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+결과:
+- py_compile 통과.
+- order_queue_approval_scenarios: 3 tests OK.
+- adapter preview + preflight single order: 10 tests OK.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+10. 향후 확장 방향
+==================================================
+향후 provenance 보강 후보:
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+5. candle snapshot 추가
+- source_candle_time
+- source_candle_close
+- source_candle_ohlcv
+- 단, 신호 발생 당시 snapshot을 안전하게 기록할 수 있을 때만 추가.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+6. GUI 상세보기 활용
+- 주문후보 상세보기에서 provenance를 표시.
+- “왜 이 주문이 만들어졌는가”를 운영자가 확인할 수 있도록 함.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+7. 로그/감사 추적
+- order_provenance를 runtime/order_execution_log.json 또는 별도 audit log와 연결 가능.
+- 단, 실행 판단과는 분리.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+11. MASTER SPEC 반영 요약
+==================================================
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+12. 최종 결론
+==================================================
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+order_provenance 추가로 주문 후보는 이제 “어떻게 주문할 것인가”뿐 아니라 “왜 이 주문 후보가 생겼는가”도 설명할 수 있게 되었다.
+현재 단계에서는 이 정보가 실행 판단에 영향을 주지 않는다.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+PENDING
+ ↓ Approval
+APPROVED
+ ↓ Policy
+EXECUTABLE
+ ↓ Preflight
+REAL_READY
+ ↓ Final Execution Guard
+ORDER_QUEUED
+ ↓ SendOrder
+ORDER_SENT
+ ↓ 서버응답
+ORDER_ACCEPTED / REJECTED
+ ↓ 체결
+PARTIAL_FILLED
+ ↓ 마지막 Fill
+FILLED
+ ↓ Position 종료 시
+CLOSED
+차단 상태
+- BLOCKED
+- BLOCKED_POLICY
+- BLOCKED_REAL
+종료 상태
+- CANCELLED
+- EXPIRED
+- ERROR
+3. 상태별 책임
+PENDING
+- OrderCandidateController
+APPROVED/BLOCKED
+- ApprovalController
+EXECUTABLE/BLOCKED_POLICY
+- OperationPolicyController
+REAL_READY/BLOCKED_REAL
+- RealPreflightController
+ORDER_QUEUED
+- ExecutionController
+ORDER_SENT
+- Kiwoom Boundary
+ORDER_ACCEPTED
+- Kiwoom 응답
+PARTIAL_FILLED/FILLED
+- FillEventController
+CLOSED
+- Close/Liquidation Controller
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+4. 금지 전이 예시
+- PENDING → REAL_READY
+- APPROVED → ORDER_SENT
+- EXECUTABLE → FILLED
+- REAL_READY → FILLED
+- BLOCKED → ORDER_SENT
+- ERROR → FILLED
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+9. 금지
+- Order만으로 Position 생성
+- SendOrder 성공만으로 Position 변경
+- 서버 확인 없는 자동 복원
+- Position 직접 수정으로 체결 이력 대체
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+SOURCE: MASTER_SPEC_추가갱신_Request_Hash_중복실행방지_설계_2026-07-03.txt
+==================================================
+MASTER_SPEC_추가갱신_Request_Hash_중복실행방지_설계_2026-07-03
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+2. 생성 시점
+ExecutionController가 Final Execution Guard를 모두 통과한 뒤,
+ORDER_QUEUED 생성 직전에 생성한다.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+3. 입력 후보
+- order_id
+- source_signal_id
+- code
+- side
+- quantity
+- price
+- account_no
+- order_type
+- hoga
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+7. 금지
+- Candidate 단계 생성
+- Approval 단계 생성
+- Policy 단계 생성
+- Preflight 단계 생성
+- Adapter Preview 단계 생성
+- GUI 직접 생성
+- Timer 직접 생성
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+8. 향후 구현 순서
+1) Request Hash 규격 확정
+2) Execution Request 연동
+3) Lock 연동
+4) Audit Log 기록
+5) SendOrder 직전 중복 검사
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+SOURCE: MASTER_SPEC_추가갱신_Review_Management_주문파이프라인연계_2026-07-03.txt
+==================================================
+MASTER_SPEC_추가갱신_Review_Management_주문파이프라인연계_2026-07-03
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+관계
+Signal -> Review
+Order -> Review
+Execution -> Review
+Fill -> Review
+Position -> Review
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+SOURCE: MASTER_SPEC_추가갱신_실주문실행책임_ORDER_QUEUED_주문생명주기_2026-07-03.txt
+==================================================
+MASTER_SPEC_추가갱신_실주문실행책임_ORDER_QUEUED_주문생명주기_2026-07-03
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+1. 현재 확정된 이전 단계
+==================================================
+현재 주문 파이프라인은 아래 단계까지 안전하게 고정되어 있다.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+execution_enabled는 "실제 주문 실행 허용 여부"를 나타내는 order 단위 최종 실행 플래그이다.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+허용 후보:
+1. 운영자 수동 승인 UI
+2. 명시적 최종 실행 함수
+3. 실매매 모드 전환 후 개별 order 승인
+4. 향후 별도 Approval + Guard + Lock을 모두 통과한 실행 컨트롤
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+금지:
+- routine_signal_probe가 true로 변경 금지.
+- routine_signal_consumer가 true로 변경 금지.
+- order_approval_engine이 true로 변경 금지.
+- operation_policy_gate가 true로 변경 금지.
+- real_order_preflight가 true로 변경 금지.
+- kiwoom_order_adapter preview가 true로 변경 금지.
+- Timer Tick에서 자동 true 전환 금지.
 2.3 true 전환 전 필수 조건
 execution_enabled=true 전환 전 아래 조건을 모두 확인해야 한다.
 
@@ -21445,4 +21716,4 @@ Reference Navigation
 - Previous PART: PART04_ROUTINE.md
 - Next PART: PART06_EXECUTION_PREVIEW.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt

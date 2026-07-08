@@ -2,9 +2,9 @@
 
 Reference Edition
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
@@ -402,6 +402,7 @@ Controller Contract는 `preview_execution_from_rule_apply_preview(...)`가 따�
 - 제거한 중복 문단 수는 4개 범주로 기록한다.
 - 기존 Canonical 내용은 삭제하지 않았다.
 
+
 Original Body Marker: END
 
 ---
@@ -411,4 +412,4 @@ Reference Navigation
 - Previous PART: PART06_EXECUTION_PREVIEW.md
 - Next PART: PART08_OPERATION_POLICY.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt

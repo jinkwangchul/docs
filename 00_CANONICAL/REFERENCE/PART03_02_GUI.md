@@ -1,16 +1,157 @@
-# PART03_02 GUI
+# PART03 02 GUI
 
 Reference Edition Subpart
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
 Source Full Part: PART03_GUI.md
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 하위 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 Original Body Marker: START
+설계 단계
+↓
+구현 준비 단계
+로 진입했다고 판단합니다.
+구현단계 작업순서 (확정)
+STEP 1
+문서 동결
+기준 문서
+MASTER_SPEC_v1.2_structure_phase2.md
+상태전이표_최종확정본_v5.md
+무결성검사_정책확정안_v1.md
+관제창_UI_정책확정안_v1.md
+STEP 2
+state_policy.py 정리
+목표
+구버전 상태 정리
+PAUSED 제거
+STOPPED 분류
+검토종목 표시명 통일
+STEP 3
+상태 표시 계층 분리
+내부 상태
+RUNNING
+REVIEW_REQUIRED
+EMERGENCY_STOPPED
+등
+화면 표시
+감시/대기
+매수/매도
+감시/매도
+조기마감
+긴급정지
+검토종목
+STEP 4
+관제창 상태 컬럼 정리
+목표
+운영자 친화 표시
+예
+검토종목(익일이월)
+조기마감(시장가)
+STEP 5
+검토종목 관리창
+추가
+검토위치
+상세원인
+최근검사결과
+무결성검사 버튼
+복귀 버튼
+STEP 6
+조기마감 메뉴
+상태컬럼 우클릭
+조기마감
+긴급정지
+검토종목 이동
+무결성검사
+STEP 7
+무결성 검사 엔진
+순서
+구조
+↓
+종목
+↓
+계좌
+STEP 8
+실행 테스트
+테스트 항목
+시간운영
+수동운영
+감시/매도
+조기마감
+검토종목
+긴급정지
+익일이월
+현재 판정
+다음 창에서 작업 시작 시
+MASTER_SPEC_v1.2
+를 기준으로
+STEP 2
+state_policy.py 정리
+부터 들어가면 됩니다.
+여기까지 오면 설계보다 구현 비중이 더 커지는 구간입니다.
+
+[출처: 작업진행상황대화히스토리.txt | 기준일: 2026-06-06 | 수정시각: 2026-06-06 23:18:38 | 분류: 대화히스토리]
+image(217).png
+image(218).png
+다시 비교해봐...그리고 내가 준 이미지에는 설정 재목과 옵션설정 부분이 같은 줄에 배치해서 자동마감과 조기마감이 같은 줄이 아니고 위아래 배치 했다..다시한번 이미지 정밀하가 분석해서 다른부분 분석부터해봐
+
+[출처: 운영시간정책_확정안_v1.md | 기준일: 2026-06-05 | 수정시각: 2026-06-06 06:46:58 | 분류: 운영정책]
+주의:
+- 15:20~15:30은 실시간 자동매매 가능 시간으로 보지 않는다.
+- 장마감 청산 기준시간은 `정규장 실시간 종료`를 따른다.
+### 2-2. 시간운영 전역시간
+```text
+기본 매수 시작
+기본 매수 종료
+```
+시간운영 종목이 개별시간을 쓰지 않을 때 적용한다.
+### 2-3. 추가시장 시간표
+추가시장은 정규장 시간이 아니다.
+대표 목적:
+- 넥스트장
+- 향후 추가 거래시장
+환경설정은 아래 시간표만 가진다.
+```text
+추가시장1 시작/종료
+추가시장2 시작/종료
+추가시장3 시작/종료
+```
+
+[출처: 운영시간정책_확정안_v1.md | 기준일: 2026-06-05 | 수정시각: 2026-06-06 06:46:58 | 분류: 운영정책]
+추가시장 사용 여부는 종목별 옵션으로 둔다.
+단, 추가시장 시간운영 정책은 별도 확정 전까지 실제 주문과 연결하지 않는다.
+### 3-3. 조기마감
+조기마감은 종목별 옵션이다.
+이유:
+```text
+A 종목은 조기마감
+B 종목은 정상운영
+```
+이 가능해야 한다.
+---
+## 4. 감시/매도 정책
+감시/매도는 시간운영에서 매수 종료 이후 정규장 실시간 종료 전까지의 상태다.
+선택 옵션:
+```text
+1. 루틴 매도신호에 따른 매도
+2. 익절
+3. 손절
+4. 즉시매도
+```
+즉시매도 방식:
+```text
+현재가
+시장가
+```
+---
+## 5. 장마감 청산정책
+환경설정에는 전역 기준을 둔다.
+```text
+사용 여부
+정규장 실시간 종료 N분 전
 청산방식: 현재가 / 시장가
 ```
 종목별로 사용할지 여부는 종목설정에서 결정한다.
@@ -6350,544 +6491,6 @@ Diff 표현도 다음처럼 바꿀 계획을 세워라:
  - _build_sell_add_signal_candidate(condition_c, warnings)
  - _get_preview_candidate_path_value(preview_result, path)
 
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-기존 구조에서 가장 중요한 변화:
-- preview_rules["buy"]["groups"] = ... 제거
-- signals["macd_sell"] = ... 제거
-- 기존 rules dict를 덮어쓰는 방식 중단
-- preview 전용 namespace 생성
-**2. 변경될 Preview 구조**
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-현재 구조:
-json
-{
- "preview_rules": {
- "bar": {
- "bar_minutes": 5
- },
- "buy": {
- "groups": [...]
- },
- "sell": {
- "signals": {
- "macd_sell": {...}
- }
- }
- }
-}
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-mapped_paths 변경 후보:
-json
-[
- "bar.bar_minutes",
- "buy.groups[0].conditions",
- "sell.signals.ui_preview_condition_c_macd_sell"
-]
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-- sell.signals.ui_preview_condition_c_macd_sell
- - current: 없음
- - preview: indicator_follow_rule_preview.candidates.sell.add_signal_candidate
- - status: add_signal_candidate
- - risk: low for preview, execution risk 별도 note
- - note: 기존 sell.signals.macd_sell 변경 없음
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-중요:
-- sell.signals.macd_sell은 mapped_paths에서 제거
-- 따라서 diff에 sell.signals.macd_sell changed가 나오면 실패
-- 기존 macd_sell은 변경 대상이 아니라 “unchanged by mapper preview”로 해석해야 함
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-기존 테스트 중 수정 필요:
-- test_mapped_paths_match_expected_preview_paths
-- test_buy_delay_bar_is_under_preview_buy
-- test_sell_delay_bar_is_under_preview_sell_macd_sell_only
-- diff 관련 테스트 일부
-새 테스트 방향:
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-5. sell add signal candidate
-python
-candidate = preview_rules["indicator_follow_rule_preview"]["candidates"]["sell"]["add_signal_candidate"]
-candidate["path"] == "sell.signals.ui_preview_condition_c_macd_sell"
-candidate["enabled"] is False
-candidate["preview_candidate"] is True
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-6. 기존 sell.signals.macd_sell 미변경
-python
-assert preview_rules["sell"]["signals"]["macd_sell"] == current_rules["sell"]["signals"]["macd_sell"]
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-다만 preview_rules가 current_rules deepcopy를 유지할 경우에만 해당. 만약 preview_rules를 후보만 담는 구조로 축소하면 이 테스트는 “preview namespace가 macd_sell을 포함하지 않는다”로 바꿔야 함.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-7. diff status
-text
-buy.groups[0].conditions → merge_candidate
-sell.signals.ui_preview_condition_c_macd_sell → add_signal_candidate
-sell.signals.macd_sell → changes에 없어야 함
-8. warnings ASCII 유지
-**5. 위험 요소**
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-구현 추천 여부:
-- **구현 추천: 예**
-- 단, 기존 실행 rules로 직접 매핑하지 말고 preview namespace 기반으로만 구현해야 합니다.
-- buy.groups 직접 대체와 sell.signals.macd_sell 직접 대체는 금지하는 방향이 맞습니다.
-분석 방향 좋습니다. 이제 구현 들어가도 됩니다.
-다만 범위는 아주 좁게 잡는 게 맞습니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-수정 범위:
-1. build_engine_rules_preview_from_ui_state()
-2. compare_engine_rules_preview()
-3. tests/test_indicator_follow_rule_mapper_preview.py
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-구현 내용:
-1. preview에서 buy.groups를 직접 덮어쓰지 않는다.
-2. preview에서 sell.signals.macd_sell을 직접 덮어쓰지 않는다.
-3. preview 전용 namespace를 추가한다.
-namespace:
-indicator_follow_rule_preview
-mode:
-merge_add_candidate
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-sell 후보:
-- 기존 sell.signals.macd_sell은 변경하지 않는다.
-- MACD <= -1.0 조건은 별도 signal candidate로 둔다.
-- path: sell.signals.ui_preview_condition_c_macd_sell
-- enabled: false
-- preview_candidate: true
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-mapped_paths:
-- bar.bar_minutes
-- buy.groups[0].conditions
-- sell.signals.ui_preview_condition_c_macd_sell
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-diff:
-- bar.bar_minutes: same/changed
-- buy.groups[0].conditions: merge_candidate
-- sell.signals.ui_preview_condition_c_macd_sell: add_signal_candidate
-- sell.signals.macd_sell은 changes에 나오면 안 됨
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-테스트:
-- current_rules 불변
-- preview namespace 존재
-- buy.groups 직접 대체 없음
-- buy merge candidate 확인
-- sell add signal candidate 확인
-- sell.signals.macd_sell 변경 없음
-- diff status 확인
-- warnings ASCII 유지
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-변경 내용:
-- buy.groups 직접 대체 제거
-- sell.signals.macd_sell 직접 대체 제거
-- preview 전용 namespace 추가:
- - indicator_follow_rule_preview
- - mode: merge_add_candidate
-- buy는 buy.groups[0].conditions에 대한 merge_candidate로 표현
- - 기존 OSC TURN_UP은 skip_existing
- - OSC <= -91.0만 add_conditions
-- sell은 기존 macd_sell 유지
- - sell.signals.ui_preview_condition_c_macd_sell 별도 signal 후보로 표현
- - enabled: false
- - preview_candidate: true
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-mapped_paths 변경:
-json
-[
- "bar.bar_minutes",
- "buy.groups[0].conditions",
- "sell.signals.ui_preview_condition_c_macd_sell"
-]
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-diff 변경:
-- bar.bar_minutes: same/changed
-- buy.groups[0].conditions: merge_candidate
-- sell.signals.ui_preview_condition_c_macd_sell: add_signal_candidate
-- sell.signals.macd_sell은 changes에 나오지 않음
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-replace preview 제거 완료
-merge/add candidate preview 적용 완료
-buy.groups 직접 대체 제거 OK
-sell.signals.macd_sell 직접 대체 제거 OK
-별도 preview namespace 적용 OK
-테스트 12개 통과 OK
-rules.json 미수정
-엔진 미연결
-다음 작업은 GUI 표시 확인입니다.
-코덱스 지시:
-파일 수정 금지.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-확인 대상:
-1. indicator_follow_rule_preview namespace가 보이는지
-2. mode가 merge_add_candidate인지
-3. buy.groups가 changed가 아니라 merge_candidate로 표시되는지
-4. sell.signals.macd_sell이 changes에 없는지
-5. sell.signals.ui_preview_condition_c_macd_sell이 add_signal_candidate로 표시되는지
-6. rules.json 수정 시간 변경 없는지
-이 출력 확인 후 문제가 없으면, 다음은 작업재개요약 / MASTER_SPEC 갱신자료 작성으로 한 번 끊는 게 좋습니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-text
-[Rule Mapper Preview]
-{
- "mapped_paths": [
- "bar.bar_minutes",
- "buy.groups[0].conditions",
- "sell.signals.ui_preview_condition_c_macd_sell"
- ],
- "warnings": [
- "sell condition C MACD is an add_signal_candidate and does not replace existing macd_sell",
- "buy method mapping is postponed",
- "repeat buy mapping is postponed",
- "price compare buy mapping is postponed",
- "situation response mapping is postponed",
- "additional feature mapping is postponed",
- "cycle setting mapping is postponed",
- "exit condition mapping is postponed",
- "sell method A/B/C mapping is postponed",
- "pending order policy mapping is postponed",
- "completion policy mapping is postponed"
- ],
- "preview_rules": {
- "bar": {
- "bar_minutes": 5
- },
- "buy": {
- "enabled": true,
- "groups_logic": "OR",
- "groups": [
- {
- "enabled": true,
- "name": " ż 1",
- "conditions_logic": "AND",
- "conditions": [
- {
- "enabled": true,
- "not": false,
- "target": "OSC",
- "operator": "TURN_UP",
- "description": "MACD Ƿ ϶ ȯ"
- }
- ]
- },
- {
- "enabled": false,
- "name": " ż 2",
- "conditions_logic": "AND",
- "conditions": []
- },
- {
- "enabled": false,
- "name": " ż 3",
- "conditions_logic": "AND",
- "conditions": []
- },
- {
- "enabled": false,
- "name": " ż 4",
- "conditions_logic": "AND",
- "conditions": []
- },
- {
- "enabled": false,
- "name": " ż 5",
- "conditions_logic": "AND",
- "conditions": []
- }
- ]
- },
- "sell": {
- "enabled": true,
- "signal_logic": "OR",
- "note": "MACD SELL ͷ SELL SELL ȣ . Ȱ ȭ signal_logic AND/OR Ѵ .",
- "signals": {
- "macd_sell": {
- "enabled": true,
- "delay_bar": 1,
- "groups_logic": "OR",
- "groups": [
- {
- "enabled": true,
- "name": " ŵ _MACD_OSC_TURN_DOWN",
- "conditions_logic": "AND",
- "conditions": [
- {
- "enabled": true,
- "not": false,
- "target": "OSC",
- "operator": "TURN_DOWN",
- "description": "MACD Ƿ ϶ ȯ"
- }
- ]
- }
- ]
- },
- "profit_rate_sell": {
- "enabled": false,
- "profit_rate_percent": null,
- "basis": "average_price",
- "description": " ͷ ۼ Ʈ ̻ SELL ȣ ĺ . ⺻ Ȱ ."
- }
- },
- "filters": {
- "rsi": {
- "enabled": false,
- "conditions": []
- },
- "moving_average": {
- "enabled": false,
- "conditions": []
- },
- "price_compare": {
- "enabled": false,
- "conditions": []
- }
- }
- }
- }
-}
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-확인 결과:
-- indicator_follow_rule_preview namespace: **현재 설정 검증 화면의 Rule Mapper Preview에는 보이지 않음**
-- mode = merge_add_candidate: **현재 설정 검증 화면에는 보이지 않음**
-- buy.groups: changed가 아니라 buy.groups[0].conditions가 merge_candidate로 표시됨
-- sell.signals.macd_sell: changes에 없음
-- sell.signals.ui_preview_condition_c_macd_sell: add_signal_candidate로 표시됨
-- rules.json 수정 시간 변경 없음: True
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-즉 diff 쪽은 의도대로 바뀌었지만, 설정 검증 화면의 [Rule Mapper Preview]가 아직 indicator_follow_rule_preview namespace를 표시하지 않고 있습니다.
-판정 맞습니다.
-현재 문제는 mapper 자체가 아니라 GUI 표시부입니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-검증:
-- py_compile
-- offscreen 설정창 생성
-- has_indicator_follow_rule_preview True
-- has_merge_add_candidate True
-- has_buy_merge_candidate True
-- has_sell_add_signal_candidate True
-- rules_mtime_unchanged True
-이것만 하면 Preview와 Diff가 같은 구조를 보여주는 상태가 됩니다.
-지금 수정과정들을 지켜보면 macd 구문들이 많이 보이는데 ?
-맞습니다. 지금 보이는 macd 구문은 그냥 넘기면 안 됩니다.
-다만 종류를 나눠서 봐야 합니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-1. 남아 있어도 되는 macd
-지표추종 루틴 내부에서 실제 계산 대상이 MACD/OSC라면 아래는 남아 있을 수 있습니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-target: MACD
-target: OSC
-sell.signals.macd_sell
-routine_macd_engine.py
-MACD <= -1.0
-OSC TURN_UP
-OSC TURN_DOWN
-이건 지표추종 루틴이 사용하는 지표 이름이라서 당장 금지 대상은 아닙니다.
-2. 정리해야 할 가능성이 큰 macd
-문제가 되는 건 이런 것들입니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-gui_macd_...
-MacdRoutineSettingsDialog
-routine_macd_engine.py
-macd_sell
-MACD매매루틴
-특히 UI/공통 구조에 붙은 macd는 현재 명칭 체계와 안 맞습니다.
-현재 기준은:
-지표추종매매루틴
-indicator_follow
-입니다.
-그래서 앞으로 정리 방향은 이겁니다.
-gui_macd_* 
-→ gui_indicator_follow_* 또는 gui_routine_*
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-MacdRoutineSettingsDialog
-→ IndicatorFollowRoutineSettingsDialog
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-routine_macd_engine.py
-→ routine_indicator_follow_logic.py 또는 routine_signal_logic.py 검토
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-macd_sell
-→ 당장 변경 금지. 기존 rules 호환 때문에 별도 검토 필요
-3. 지금 당장 할 일
-바로 이름 변경하면 위험합니다.
-먼저 macd 문자열 실태조사가 필요합니다.
-다음 코덱스 지시는 이렇게 가는 게 맞습니다.
-파일 수정 금지.
-현재 프로젝트에서 macd / MACD / Macd 문자열이 남아 있는 위치를 전수 조사해라.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-분류 기준:
-1. 지표 이름으로 유지 가능한 것
- - target: MACD
- - MACD 계산
- - OSC 계산
- - 조건 설명
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-2. 지표추종 루틴 전용 파일/클래스/함수라 이름 변경 후보인 것
- - gui_macd_*
- - MacdRoutineSettingsDialog
- - routine_macd_engine.py 등
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-산출:
-- 파일별 macd 문자열 목록
-- 분류
-- 변경 후보
-- 변경 금지 후보
-- 변경 시 영향 파일
-- 추천 작업 순서
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-업로드된 최신 압축본 기준으로 macd/MACD/Macd 문자열을 전수 조사하겠습니다. 파일은 수정하지 않고, 위치와 성격만 분류하겠습니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-46s 동안 생각함
-분석 결과, macd/MACD/Macd는 꽤 많이 남아 있습니다.
-다만 대부분은 당장 수정 대상이 아닙니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-전체 현황
-macd/MACD/Macd 포함 파일: 65개
-본문 발생 횟수: 3,186회
-파일명 자체 hit: 1개
-대부분은 과거 로그/리포트입니다.
-분류 결과
-1. 유지 가능
-지표명으로 쓰이는 MACD/OSC입니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-target: MACD
-target: OSC
-MACD선
-시그널선
-OSC TURN_UP
-OSC TURN_DOWN
-이건 지표추종 루틴이 MACD/OSC를 사용하는 한 유지 가능합니다.
-2. 핵심 검토 대상
-여기가 중요합니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-routines/지표추종매매/routine.py
-routines/지표추종매매/routine_macd_engine.py
-routines/지표추종매매/routine_rule_mapper.py
-routines/지표추종매매/rules.json
-특히 문제 후보:
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-routine_macd_engine.py
-evaluate_macd_routine
-DEFAULT_MACD_ROUTINE_CONFIG
-routine_type: MACD_OSC
-sell.signals.macd_sell
-여기는 지표명으로서 MACD인지, 루틴명 잔재인지 분리 검토가 필요합니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-macd_sell
-macd_kind_combo
-macd_value_line
-sell_signal_condition_c_macd_*
-같은 변수명이 남아 있습니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-이건 지표 MACD 조건을 의미하면 유지 가능하지만, macd_sell은 rules key라 신중해야 합니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-추천 순서
-1. routine_macd_engine.py가 실제로 지표추종 전용 로직인지 검토
-2. evaluate_macd_routine / DEFAULT_MACD_ROUTINE_CONFIG 명칭 변경 가능성 검토
-3. macd_sell key는 유지 또는 alias 전략 검토
-4. GUI 변수명은 마지막에 정리
-5. 로그/리포트는 보류
-결론:
-지금은 “MACD 명칭 전면 교체”가 아니라, routine_macd_engine.py와 macd_sell key를 어떻게 다룰지 먼저 결정해야 합니다.
-이전에 한번 정리 했는데 아직도 많이 남았어. 왜?
-이유는 크게 3가지입니다.
-첫째, 이전 정리는 하드코딩된 루틴명 제거가 중심이었습니다.
-그때 정리한 대상은 주로 이런 것들이었습니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-"지표추종매매만 지원"
-routine_name == "지표추종매매"
-routines/지표추종매매/rules.json 직접 참조
-설정창 호출 하드코딩
-Registry/routine.json 기반 전환
-즉 루틴 등록/호출 구조의 하드코딩 제거였지, macd 문자열 전체 제거 작업은 아니었습니다.
-둘째, 남아 있는 macd 중 상당수는 지표 이름입니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-MACD선
-OSC
-target: MACD
-operator: TURN_UP / TURN_DOWN
-macd_kind_combo
-sell condition C MACD
-이건 루틴명이 아니라 지표추종 루틴 내부에서 사용하는 지표 조건이라 남아 있을 수 있습니다.
-셋째, 일부는 기존 rules 호환 키라서 일부러 못 지운 겁니다.
-대표적으로:
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-sell.signals.macd_sell
-routine_macd_engine.py
-evaluate_macd_routine
-DEFAULT_MACD_ROUTINE_CONFIG
-이런 건 단순 치환하면 기존 rules.json, 테스트, mapper, 신호판단 경로가 깨질 수 있습니다.
-정리하면:
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-이전 정리 = 루틴명/경로 하드코딩 제거
-현재 남은 문제 = 파일명/함수명/rules key/지표명에 남은 macd 분류
-그래서 이번에는 바로 삭제가 아니라, 다음처럼 가야 합니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-1. 지표명 MACD → 유지
-2. rules key macd_sell → 호환 때문에 보류/alias 검토
-3. routine_macd_engine.py → 변경 후보
-4. evaluate_macd_routine → 변경 후보
-5. gui 내부 macd 변수명 → 후순위 정리
-즉, 아직 많이 남은 건 “정리가 실패했다”기보다 이전 작업 범위가 달랐고, 지금은 더 깊은 명칭 정리 단계로 들어온 것입니다.
-gui_indicator_follow_routine_settings_dialog.py만 최소 수정.
-목표:
-현재 Rule Mapper Preview 마무리.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-수정:
-[Rule Mapper Preview] 출력에 preview_rules["indicator_follow_rule_preview"] 내용을 포함한다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-MACD / macd / Macd 명칭 전수조사 결과를 바탕으로
-유지 / 변경 후보 / 변경 금지 항목을 세부 분류
-코덱스에 보낼 다음 지시는 이렇게 바꾸는 게 맞습니다.
-파일 수정 금지.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-프로젝트 전체에서 macd / MACD / Macd 문자열이 남아 있는 위치를 전수 조사하고,
 
 Original Body Marker: END
 
@@ -6899,4 +6502,4 @@ Reference Navigation
 - Next: PART03_03_GUI.md
 - Full PART: PART03_GUI.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt

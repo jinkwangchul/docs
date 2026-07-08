@@ -1,16 +1,87 @@
-# PART02_01 RUNTIME
+# PART02 01 RUNTIME
 
 Reference Edition Subpart
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
 Source Full Part: PART02_RUNTIME.md
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 하위 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 Original Body Marker: START
+- 만약 delay도 유지하려면 preview namespace 안에서 buy.delay_bar candidate, sell delay candidate로 분리해야 함.
+- 단, 현재 지시의 권장 구조 기준으로는 delay는 1차 변경에서 제외하는 것이 일관적입니다.
+**3. Diff 함수 영향**
+현재 diff 함수는 mapped_paths를 실제 preview_rules 경로에서 직접 읽습니다.
+현재 방식:
+text
+current_rules[path] vs preview_rules[path]
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+새 구조에서는 mapped_paths가 실제 엔진 rules 경로지만, preview 값은 preview 전용 namespace에 들어갑니다. 따라서 diff 함수가 경로별 candidate를 해석해야 합니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+세 번째 위험:
+- buy.groups[0]이 없거나 disabled인 경우.
+- 이때는 merge_into 불가 warning을 내고 add_group_candidate로 전환해야 함.
+- 1차 구현에서는 현재 구조 기준으로만 처리하고, 없으면 warning 처리하는 게 안전합니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+4. 변경 우선순위 낮음
+PROJECT_CHANGELOG.txt
+reports/blocked_actions/*
+tools/*
+_등록확인폴더/budget.json
+_지표추종매매/budget.json
+이건 과거 로그/리포트/레거시 데이터라 지금 건드릴 우선순위가 낮습니다.
+현재 판단
+바로 전체 이름 변경하면 위험합니다.
+특히 아래는 당장 변경 금지입니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+1. 지금 당장 바꿔도 되는 항목: 핵심 실행 경로에서는 거의 없음. 낮은 위험으로는 legacy 주석/도구 문자열뿐입니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+UI
+→ indicator_follow_ui_state
+→ Rule Mapper
+→ Preview
+→ Diff
+→ 운영자 검토
+→ (향후 승인)
+→ Engine Rule 생성
+으로 변경되었습니다.
+이건 구조 변경이므로 반드시 MASTER_SPEC에 들어가야 합니다.
+2. Replace 방식 폐기 (필수)
+기존 Preview는 기존 Rule을 대체하는 형태였지만,
+최종 확정은
+Replace Preview 금지
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+2. 현재 timer의 auto_trade_signal_probe_only_active()는 gui_auto_trade_runtime.get_stock_dirs_in_routine()이 아니라, gui_auto_trade_timer.py 내부 legacy 방식의 assigned_stock_dirs_in_routine()을 사용합니다. 
+ 이 함수는 루틴 폴더 하위 종목 폴더를 찾는 구조라 중앙 stocks/ 기반 종목을 감지하지 못하는 것으로 보입니다.
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+3. 이번 테스트의 probe 호출은 루틴 경로 문자열 문제로 routine.py 없음 에러가 발생했고 신규 신호는 생성되지 않았습니다. 다만 더 중요한 blocker는 위 1번, 즉 consumer 조건 자체가 false라는 점입니다.
+따라서 현재 상태에서는:
+
+[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
+- timer tick 자체는 호출됨
+- signal_probe_only start/stop은 정상
+- 주문/OrderQueue 안전성은 유지됨
+- 하지만 signal_probe_only=True 종목이 있을 때 consumer 자동 실행 조건이 실제 중앙 stocks 구조에서 동작하지 않음
+
+[출처: 작업재개요약서_2026-07-03_주문파이프라인_아키텍처설계_중간정리.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:02:24 | 분류: 작업재개요약]
+지금까지의 가장 중요한 성과:
+- 실주문 전에 모든 위험 단계를 분리했다.
+- 각 상태의 의미와 책임 주체를 문서화했다.
+- 데이터 관계와 ID 연결을 정의했다.
+- 검토관리/복구/Audit Log까지 운영 구조에 포함했다.
+다음 단계부터는 문서만 늘리기보다, 가장 안전한 작은 구현 단위부터 다시 선택해야 한다.
+
+[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\AutoTrading_System_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:16:58 | 분류: MASTER_SPEC]
 3.1 Program Starting
 - 프로그램 실행 직후
 - GUI/기본 객체 초기화 전후 상태
@@ -5704,298 +5775,6 @@ EXITING 실패
  {
  "file": "registry_migratio/stock_migration_dry_run.py",
  "line": 100,
- "text": "OUT_DIR.mkdir(exist_ok=True)"
- },
- {
- "file": "registry_migratio/stock_registry_step1_analyzer.py",
- "line": 282,
- "text": "output_dir.mkdir(parents=True, exist_ok=True)"
- },
- {
- "file": "registry_migratio/stock_repository.py",
- "line": 91,
- "text": "path.parent.mkdir(parents=True, exist_ok=True)"
- },
- {
- "file": "registry_migratio/stock_repository.py",
- "line": 286,
- "text": "path.mkdir(parents=True, exist_ok=True)"
- },
- {
- "file": "registry_migratio/stock_repository.py",
- "line": 287,
- "text": "(path / \"logs\").mkdir(exist_ok=True)"
- },
- {
- "file": "registry_migratio/stock_repository.py",
- "line": 342,
- "text": "기존 stock_runtime_dir_for_routine() 대체 후보 함수."
- },
- {
- "file": "stock_migration_to_central_stocks.py",
- "line": 54,
- "text": "path.parent.mkdir(parents=True, exist_ok=True)"
- },
- {
- "file": "stock_migration_to_central_stocks.py",
- "line": 211,
- "text": "dst.parent.mkdir(parents=True, exist_ok=True)"
- },
- {
- "file": "stock_migration_to_central_stocks.py",
- "line": 229,
- "text": "target_file.parent.mkdir(parents=True, exist_ok=True)"
- },
- {
- "file": "stock_migration_to_central_stocks.py",
- "line": 285,
- "text": "item.target_dir.mkdir(parents=True, exist_ok=True)"
- },
- {
- "file": "stock_migration_to_central_stocks.py",
- "line": 286,
- "text": "(item.target_dir / \"logs\").mkdir(exist_ok=True)"
- },
- {
- "file": "stock_migration_to_central_stocks.py",
- "line": 299,
- "text": "STOCKS_DIR.mkdir(exist_ok=True)"
- },
- {
- "file": "stock_repository.py",
- "line": 74,
- "text": "path.parent.mkdir(parents=True, exist_ok=True)"
- },
- {
- "file": "stock_repository.py",
- "line": 245,
- "text": "path.mkdir(parents=True, exist_ok=True)"
- },
- {
- "file": "stock_repository.py",
- "line": 246,
- "text": "(path / \"logs\").mkdir(exist_ok=True)"
- }
-]
-
-[출처: routine_folder_recreation_analysis_report.txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 18:19:20 | 분류: 기타문서/자료]
-================================================================================
-3. ensure_stock_runtime_files 호출 지점
-- docs/gui_windows(160).py:L116 ensure_stock_runtime_files,
-- docs/gui_windows(160).py:L3400 stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)
-- gui_auto_trade_setting_window.py:L102 ensure_stock_runtime_files,
-- gui_config_utils.py:L87 def ensure_stock_runtime_files(routine_dir: Path, code: str, name: str) -> Path:
-- gui_routine_assign_window.py:L43 from gui_config_utils import default_config, ensure_stock_runtime_files
-- gui_routine_assign_window.py:L1226 stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)
-- gui_schedule_window.py:L110 ensure_stock_runtime_files,
-- gui_schedule_window.py:L2308 stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)
-- gui_stock_register_window.py:L118 ensure_stock_runtime_files,
-- gui_windows_149_manual_ats_status_policy_fix.py:L116 ensure_stock_runtime_files,
-- gui_windows_149_manual_ats_status_policy_fix.py:L3217 stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)
-
-[출처: kiwoom32_cleanup_analysis_report.txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 16:32:54 | 분류: 기타문서/자료]
-## gui_windows.py
-- L71: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
-- L76: 기초종목.txt 에 종목 1개를 추가한다.
-- L78: existing_text = BASE_STOCK_PATH.read_text(encoding="utf-8") if BASE_STOCK_PATH.exists() else ""
-- L81: with BASE_STOCK_PATH.open("a", encoding="utf-8") as file:
-
-[출처: terminology_scan_report.txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 15:56:08 | 분류: 기타문서/자료]
-## gui_main_table_loader.py (12건)
-- L8: - 좌측 루틴표 정렬/로딩
-- L12: - MainWindow UI 생성/버튼 연결/긴급정지/검토관리 로직은 포함하지 않는다.
-- L49: """메인 관제창 좌측 루틴표 헤더 정렬."""
-- L97: read_base_stocks() 표준 반환값에서 종목의 루틴명 목록을 추출한다.
-- L99: 중앙 stocks/ 구조에서는 일반적으로 1종목 1루틴이지만,
-- L112: 메인 좌측 루틴표의 종목수를 중앙 종목관리 기준으로 계산한다.
-- L115: - 루틴 미지정 종목 제외
-- L116: - 검토관리/검토종목 상태 제외
-- L144: """budget.json이 있는 루틴 폴더를 메인 좌측 루틴표에 표시한다.
-- L146: 종목수는 더 이상 루틴폴더 안의 물리 종목폴더 개수로 계산하지 않는다.
-- L214: # 루틴 미지정 종목은 표시하지 않는다.
-- L246: "routine": routine_name or "미지정",
-
-[출처: kiwoom29_dependency_analysis_report.txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 14:58:42 | 분류: 기타문서/자료]
-### gui_windows.py
-발견: 기초종목.txt:2, BASE_STOCK_PATH:4, append_base_stock:1, get_routine_dirs:3
-L61: get_routine_dirs,
-L71: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
-L74: def append_base_stock(code: str, name: str) -> None:
-L76: 기초종목.txt 에 종목 1개를 추가한다.
-L78: existing_text = BASE_STOCK_PATH.read_text(encoding="utf-8") if BASE_STOCK_PATH.exists() else ""
-L81: with BASE_STOCK_PATH.open("a", encoding="utf-8") as file:
-L89: return {routine_display_name(path): path for path in get_routine_dirs()}
-L336: for routine_dir in get_routine_dirs():
-
-[출처: README_적용내용(16).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 13:29:16 | 분류: 기타문서/자료]
-확인:
-1. 세 파일 교체
-2. python gui_main.py 실행
-3. 메인창 루틴 수/우측 목록 확인
-4. 종목등록설정창 확인
-5. 매매루틴지정창에서 루틴 지정/해제 1회 확인
-6. 자동매매설정창 확인
-
-[출처: README_적용내용(14).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 12:22:48 | 분류: 기타문서/자료]
-# 메인 관제창 중앙 stocks 기준 표시 패치 v2
-적용 파일:
-- gui_main_table_loader.py
-
-[출처: README_적용내용(13).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 11:37:30 | 분류: 기타문서/자료]
-# 메인 관제창 중앙 stocks 기준 표시 패치
-적용 파일:
-- gui_main_table_loader.py
-
-[출처: README_적용내용(13).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 11:37:30 | 분류: 기타문서/자료]
-확인:
-1. 파일 교체
-2. python gui_main.py 실행
-3. 메인 좌측 MACD/등록확인 종목수 확인
-4. 우측 실행종목표 루틴 컬럼 확인
-
-[출처: README_적용내용(12).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 11:12:32 | 분류: 기타문서/자료]
-확인:
-1. 두 파일 교체
-2. `python gui_main.py` 실행
-3. 메인창 정상 실행 확인
-4. 종목등록설정/매매루틴지정/자동매매설정창 확인
-
-[출처: README_적용내용(11).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 11:03:14 | 분류: 기타문서/자료]
-확인:
-1. 두 파일 교체
-2. gui_main.py 실행
-3. 종목등록설정창에서 등록 루틴 표시 확인
-4. 매매루틴지정창에서 루틴 해제 재확인
-5. 자동매매설정창에서 상단 종목수와 하단 목록 일치 확인
-
-[출처: README_적용내용(4).txt | 기준일: 2026-06-14 | 수정시각: 2026-06-14 12:56:42 | 분류: 기타문서/자료]
-main_order_executor_dryrun_patch 적용 내용
-
-[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
-auto_trade_setting_remaining_methods_report(2).txt
-문서
-작업진행상황대화히스토리_3(2).txt
-문서
-MASTER_SPEC_v2.0_FULL_INTEGRATED_ARCHIVE_manifest(1).txt
-문서
-
-[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
-메인창(gui_windows)
-검토관리창
-Runtime 공통함수
-State 저장
-기초종목 서비스
-ATS 서비스
-현황 표시등
-컨텍스트 메뉴
-타이머
-정책 함수
-그리고 최근 며칠간 실제로 확인한 것:
-
-[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
-그리고 지금 ZIP 기준으로 보면, 더 쪼개는 건 얻는 것보다 잃는 것이 많아질 가능성이 높습니다. 이제는 실제 테스트하면서 정책 버그를 잡는 단계로 넘어가는 게 가장 효율적입니다.
-auto_trade_setting_remaining_methods_report(3).txt
-문서
-MASTER_SPEC_v2.0_FULL_INTEGRATED_ARCHIVE_manifest(2).txt
-문서
-
-[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
-현재 흐름상 제일 먼저 할 건 메인 관제창 기능 설계 정리입니다.
-코드 수정 전에 “메인창에 어떤 영역을 추가할지”부터 정해야 합니다.
-
-[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
-즉 루틴은 “살까?” 를 판단하고,
-메인 프로그램은 “얼마나 살 수 있고 실제로 주문할까?” 를 판단합니다.
-그래서 금액/주수 선택 기능은:
-
-[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
-메인 관제창 / 자금운영 설정
-↓
-종목별 주문수량 산정 정책
-↓
-최종 주문 실행부
-여기에 들어가는 게 맞습니다.
-추천 구조:
-
-[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
-루틴: 살까 말까 신호
-자동매매설정창: 이 종목을 어떻게 운영할지
-메인 관제창: 돈을 얼마나 쓰고 위험을 감당할지
-메인 엔진: 최종 주문 실행 여부 판단
-자금운영 개념은 이렇게 시작하면 됩니다.
-
-[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
-계좌
- │
- ├─ 운용예산(선택)
- │
- ├─ 전체 매수한도(선택)
- │
- └─ 루틴
- │
- ├─ 루틴 매수한도(선택)
- │
- └─ 종목
- │
- ├─ 종목 매수한도(선택)
- │
- └─ 주문방식
- ├ 금액
- └ 주수
-메인 관제창 초안 수정
-상단:
-계좌자산
-운용예산
-주문가능금액
-실현손익
-평가손익
-중앙:
-루틴명
-운용종목수
-사용금액
-평가금액
-실현손익
-루틴 매수한도
-상태
-하단:
-전체 매수한도
-운용예산
-긴급정지
-검토관리
-여기서 다음으로 확정해야 하는 것은 하나입니다.
-운용예산도 계층형으로 갈 것인가?
-예를 들면
-전체 운용예산
-3천만원
-루틴A
-1천만원
-루틴B
-2천만원
-처럼 예산도 루틴별 배분 기능을 가질지
-아니면
-운용예산은 전체만 존재
-배분은 매수한도로 처리
-할지입니다.
-
-[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
-자금운영의 기준은 평가금액이 아니라 예수금과 총매입금액이다.
-이걸 기준으로 메인 관제창 자금운영 설계를 진행하는 게 맞아 보입니다.
-
-[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
-100% 도달 시
-신규매수 차단 여부
-선택 가능
-특히 "운영자가 자리에 없을 때 대응시간을 주기 위한 기능" 이라는 목적은 매우 타당하고, 메인 관제창의 핵심 기능 중 하나로 들어갈 가치가 충분해 보입니다.
-다음 고고
-좋습니다.
-지금까지 나온 내용을 보면 메인 관제창은 단순히 자금 숫자만 보여주는 창이 아니라,
-자금 관제
-↓
-위험 관제
-↓
-운영 의사결정 지원
-까지 가야 합니다.
-그래서 다음 개념은 자금 상태 등급화입니다.
 
 Original Body Marker: END
 
@@ -6003,8 +5782,7 @@ Original Body Marker: END
 
 Reference Navigation
 
-- Previous: PART02_RUNTIME.md
 - Next: PART02_02_RUNTIME.md
 - Full PART: PART02_RUNTIME.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt

@@ -1,16 +1,50 @@
-# PART05_04 RULE_APPROVAL
+# PART05 04 RULE APPROVAL
 
 Reference Edition Subpart
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
 Source Full Part: PART05_RULE_APPROVAL.md
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 하위 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 Original Body Marker: START
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+금지:
+- PENDING/APPROVED/EXECUTABLE에서 생성 금지
+- Adapter Preview만으로 생성 금지
+- Timer 자동 생성 금지
+- GUI 직접 생성 금지, Controller 경유 필요
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+12. 구현 금지사항
+==================================================
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+정책:
+- GUI가 최종 실행 버튼을 제공하더라도 GUI는 ExecutionController를 호출해야 한다.
+- Timer는 Final Execution Guard를 자동 호출하면 안 된다.
+- signal_probe_only 흐름에서는 Final Execution Guard 호출 금지.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+금지:
+- Preflight에서 true 전환.
+- Adapter Preview에서 true 전환.
+- Timer에서 true 전환.
+- Approval/Policy에서 true 전환.
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+==================================================
+16. 금지사항
+==================================================
+
+[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
+작성 목적
+- 본 문서는 주문 후보 생성 단계에서 추가된 order_intent 필드의 의미, 현재 범위, 금지사항, 향후 확장 방향을 MASTER_SPEC에 반영하기 위한 추가 갱신자료이다.
+- order_intent는 현재 주문방식 확정값이 아니라, 주문방식이 아직 확정되지 않았음을 명시하는 진단 필드이다.
 - hoga/order_type 확정, UI state 매핑, Adapter/Executor/SendOrder 연결은 아직 수행하지 않는다.
 
 [출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
@@ -5312,4 +5346,4 @@ Reference Navigation
 - Next: PART05_RULE_APPROVAL.md
 - Full PART: PART05_RULE_APPROVAL.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt

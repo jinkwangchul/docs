@@ -1,26 +1,16 @@
-# PART03_01 GUI
+# PART03 01 GUI
 
 Reference Edition Subpart
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
 Source Full Part: PART03_GUI.md
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 하위 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 Original Body Marker: START
-21.6 메인의 책임 - 주문 실행 - 주문 취소 및 정정 - 체결 처리 - 계좌
-조회 - 자금 관리 - 종목 상태 관리 - 검토관리 - 운영시간 관리 - 마감 /
-청산 / 이월 - 안정성검사
-
-[출처: NEXT_CHAT_RESUME_STEP41_루틴설정창_UI작업연결요약_v2026-06-19.txt | 기준일: 2026-06-19 | 수정시각: 2026-06-20 09:01:57 | 분류: 구현로그/검증보고]
-각 세부항목에는 실제 QCheckBox가 들어가야 한다.
-현재 문자열 “☑” 방식은 폐기.
-비활성 체크박스도 폐기.
-더미라도 활성 QCheckBox로 둔다.
-
 [출처: STEP39_BUY설정창_UI초안_법전형배치_v2026-06-19.txt | 기준일: 2026-06-19 | 수정시각: 2026-06-19 14:56:46 | 분류: 구현로그/검증보고]
 규칙:
 - 완료조건 충족 → BUY 단계 완료
@@ -7780,147 +7770,6 @@ RUNNING
 오케이
 좋습니다.
 그럼 현재 프로젝트는 이제
-설계 단계
-↓
-구현 준비 단계
-로 진입했다고 판단합니다.
-구현단계 작업순서 (확정)
-STEP 1
-문서 동결
-기준 문서
-MASTER_SPEC_v1.2_structure_phase2.md
-상태전이표_최종확정본_v5.md
-무결성검사_정책확정안_v1.md
-관제창_UI_정책확정안_v1.md
-STEP 2
-state_policy.py 정리
-목표
-구버전 상태 정리
-PAUSED 제거
-STOPPED 분류
-검토종목 표시명 통일
-STEP 3
-상태 표시 계층 분리
-내부 상태
-RUNNING
-REVIEW_REQUIRED
-EMERGENCY_STOPPED
-등
-화면 표시
-감시/대기
-매수/매도
-감시/매도
-조기마감
-긴급정지
-검토종목
-STEP 4
-관제창 상태 컬럼 정리
-목표
-운영자 친화 표시
-예
-검토종목(익일이월)
-조기마감(시장가)
-STEP 5
-검토종목 관리창
-추가
-검토위치
-상세원인
-최근검사결과
-무결성검사 버튼
-복귀 버튼
-STEP 6
-조기마감 메뉴
-상태컬럼 우클릭
-조기마감
-긴급정지
-검토종목 이동
-무결성검사
-STEP 7
-무결성 검사 엔진
-순서
-구조
-↓
-종목
-↓
-계좌
-STEP 8
-실행 테스트
-테스트 항목
-시간운영
-수동운영
-감시/매도
-조기마감
-검토종목
-긴급정지
-익일이월
-현재 판정
-다음 창에서 작업 시작 시
-MASTER_SPEC_v1.2
-를 기준으로
-STEP 2
-state_policy.py 정리
-부터 들어가면 됩니다.
-여기까지 오면 설계보다 구현 비중이 더 커지는 구간입니다.
-
-[출처: 작업진행상황대화히스토리.txt | 기준일: 2026-06-06 | 수정시각: 2026-06-06 23:18:38 | 분류: 대화히스토리]
-image(217).png
-image(218).png
-다시 비교해봐...그리고 내가 준 이미지에는 설정 재목과 옵션설정 부분이 같은 줄에 배치해서 자동마감과 조기마감이 같은 줄이 아니고 위아래 배치 했다..다시한번 이미지 정밀하가 분석해서 다른부분 분석부터해봐
-
-[출처: 운영시간정책_확정안_v1.md | 기준일: 2026-06-05 | 수정시각: 2026-06-06 06:46:58 | 분류: 운영정책]
-주의:
-- 15:20~15:30은 실시간 자동매매 가능 시간으로 보지 않는다.
-- 장마감 청산 기준시간은 `정규장 실시간 종료`를 따른다.
-### 2-2. 시간운영 전역시간
-```text
-기본 매수 시작
-기본 매수 종료
-```
-시간운영 종목이 개별시간을 쓰지 않을 때 적용한다.
-### 2-3. 추가시장 시간표
-추가시장은 정규장 시간이 아니다.
-대표 목적:
-- 넥스트장
-- 향후 추가 거래시장
-환경설정은 아래 시간표만 가진다.
-```text
-추가시장1 시작/종료
-추가시장2 시작/종료
-추가시장3 시작/종료
-```
-
-[출처: 운영시간정책_확정안_v1.md | 기준일: 2026-06-05 | 수정시각: 2026-06-06 06:46:58 | 분류: 운영정책]
-추가시장 사용 여부는 종목별 옵션으로 둔다.
-단, 추가시장 시간운영 정책은 별도 확정 전까지 실제 주문과 연결하지 않는다.
-### 3-3. 조기마감
-조기마감은 종목별 옵션이다.
-이유:
-```text
-A 종목은 조기마감
-B 종목은 정상운영
-```
-이 가능해야 한다.
----
-## 4. 감시/매도 정책
-감시/매도는 시간운영에서 매수 종료 이후 정규장 실시간 종료 전까지의 상태다.
-선택 옵션:
-```text
-1. 루틴 매도신호에 따른 매도
-2. 익절
-3. 손절
-4. 즉시매도
-```
-즉시매도 방식:
-```text
-현재가
-시장가
-```
----
-## 5. 장마감 청산정책
-환경설정에는 전역 기준을 둔다.
-```text
-사용 여부
-정규장 실시간 종료 N분 전
 
 Original Body Marker: END
 
@@ -7928,8 +7777,7 @@ Original Body Marker: END
 
 Reference Navigation
 
-- Previous: PART03_GUI.md
 - Next: PART03_02_GUI.md
 - Full PART: PART03_GUI.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt

@@ -2,13 +2,13 @@
 
 Reference Edition
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
-Part Summary: Original Canonical start through early foundation sections before the next split boundary.
+Part Summary: Legacy large part / Full part: Original start to first split boundary
 
 Original Body Marker: START
 MASTER_SPEC_CANONICAL_2026-07-03
@@ -20795,77 +20795,6 @@ buy.groups
 주의:
 - buy.delay_bar와 sell.signals.macd_sell.delay_bar를 계속 포함할지 별도 판단 필요.
 - 이번 목표 구조에는 delay 경로가 빠져 있음.
-- 만약 delay도 유지하려면 preview namespace 안에서 buy.delay_bar candidate, sell delay candidate로 분리해야 함.
-- 단, 현재 지시의 권장 구조 기준으로는 delay는 1차 변경에서 제외하는 것이 일관적입니다.
-**3. Diff 함수 영향**
-현재 diff 함수는 mapped_paths를 실제 preview_rules 경로에서 직접 읽습니다.
-현재 방식:
-text
-current_rules[path] vs preview_rules[path]
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-새 구조에서는 mapped_paths가 실제 엔진 rules 경로지만, preview 값은 preview 전용 namespace에 들어갑니다. 따라서 diff 함수가 경로별 candidate를 해석해야 합니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-세 번째 위험:
-- buy.groups[0]이 없거나 disabled인 경우.
-- 이때는 merge_into 불가 warning을 내고 add_group_candidate로 전환해야 함.
-- 1차 구현에서는 현재 구조 기준으로만 처리하고, 없으면 warning 처리하는 게 안전합니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-4. 변경 우선순위 낮음
-PROJECT_CHANGELOG.txt
-reports/blocked_actions/*
-tools/*
-_등록확인폴더/budget.json
-_지표추종매매/budget.json
-이건 과거 로그/리포트/레거시 데이터라 지금 건드릴 우선순위가 낮습니다.
-현재 판단
-바로 전체 이름 변경하면 위험합니다.
-특히 아래는 당장 변경 금지입니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-1. 지금 당장 바꿔도 되는 항목: 핵심 실행 경로에서는 거의 없음. 낮은 위험으로는 legacy 주석/도구 문자열뿐입니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-UI
-→ indicator_follow_ui_state
-→ Rule Mapper
-→ Preview
-→ Diff
-→ 운영자 검토
-→ (향후 승인)
-→ Engine Rule 생성
-으로 변경되었습니다.
-이건 구조 변경이므로 반드시 MASTER_SPEC에 들어가야 합니다.
-2. Replace 방식 폐기 (필수)
-기존 Preview는 기존 Rule을 대체하는 형태였지만,
-최종 확정은
-Replace Preview 금지
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-2. 현재 timer의 auto_trade_signal_probe_only_active()는 gui_auto_trade_runtime.get_stock_dirs_in_routine()이 아니라, gui_auto_trade_timer.py 내부 legacy 방식의 assigned_stock_dirs_in_routine()을 사용합니다. 
- 이 함수는 루틴 폴더 하위 종목 폴더를 찾는 구조라 중앙 stocks/ 기반 종목을 감지하지 못하는 것으로 보입니다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-3. 이번 테스트의 probe 호출은 루틴 경로 문자열 문제로 routine.py 없음 에러가 발생했고 신규 신호는 생성되지 않았습니다. 다만 더 중요한 blocker는 위 1번, 즉 consumer 조건 자체가 false라는 점입니다.
-따라서 현재 상태에서는:
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-- timer tick 자체는 호출됨
-- signal_probe_only start/stop은 정상
-- 주문/OrderQueue 안전성은 유지됨
-- 하지만 signal_probe_only=True 종목이 있을 때 consumer 자동 실행 조건이 실제 중앙 stocks 구조에서 동작하지 않음
-
-[출처: 작업재개요약서_2026-07-03_주문파이프라인_아키텍처설계_중간정리.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:02:24 | 분류: 작업재개요약]
-지금까지의 가장 중요한 성과:
-- 실주문 전에 모든 위험 단계를 분리했다.
-- 각 상태의 의미와 책임 주체를 문서화했다.
-- 데이터 관계와 ID 연결을 정의했다.
-- 검토관리/복구/Audit Log까지 운영 구조에 포함했다.
-다음 단계부터는 문서만 늘리기보다, 가장 안전한 작은 구현 단위부터 다시 선택해야 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\AutoTrading_System_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:16:58 | 분류: MASTER_SPEC]
 
 Original Body Marker: END
 
@@ -20873,7 +20802,6 @@ Original Body Marker: END
 
 Reference Navigation
 
-- Previous PART: 00_REFERENCE_INDEX.md
 - Next PART: PART02_RUNTIME.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt

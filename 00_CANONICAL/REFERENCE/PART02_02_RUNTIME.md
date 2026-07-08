@@ -1,16 +1,308 @@
-# PART02_02 RUNTIME
+# PART02 02 RUNTIME
 
 Reference Edition Subpart
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
 Source Full Part: PART02_RUNTIME.md
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 하위 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 Original Body Marker: START
+ "text": "OUT_DIR.mkdir(exist_ok=True)"
+ },
+ {
+ "file": "registry_migratio/stock_registry_step1_analyzer.py",
+ "line": 282,
+ "text": "output_dir.mkdir(parents=True, exist_ok=True)"
+ },
+ {
+ "file": "registry_migratio/stock_repository.py",
+ "line": 91,
+ "text": "path.parent.mkdir(parents=True, exist_ok=True)"
+ },
+ {
+ "file": "registry_migratio/stock_repository.py",
+ "line": 286,
+ "text": "path.mkdir(parents=True, exist_ok=True)"
+ },
+ {
+ "file": "registry_migratio/stock_repository.py",
+ "line": 287,
+ "text": "(path / \"logs\").mkdir(exist_ok=True)"
+ },
+ {
+ "file": "registry_migratio/stock_repository.py",
+ "line": 342,
+ "text": "기존 stock_runtime_dir_for_routine() 대체 후보 함수."
+ },
+ {
+ "file": "stock_migration_to_central_stocks.py",
+ "line": 54,
+ "text": "path.parent.mkdir(parents=True, exist_ok=True)"
+ },
+ {
+ "file": "stock_migration_to_central_stocks.py",
+ "line": 211,
+ "text": "dst.parent.mkdir(parents=True, exist_ok=True)"
+ },
+ {
+ "file": "stock_migration_to_central_stocks.py",
+ "line": 229,
+ "text": "target_file.parent.mkdir(parents=True, exist_ok=True)"
+ },
+ {
+ "file": "stock_migration_to_central_stocks.py",
+ "line": 285,
+ "text": "item.target_dir.mkdir(parents=True, exist_ok=True)"
+ },
+ {
+ "file": "stock_migration_to_central_stocks.py",
+ "line": 286,
+ "text": "(item.target_dir / \"logs\").mkdir(exist_ok=True)"
+ },
+ {
+ "file": "stock_migration_to_central_stocks.py",
+ "line": 299,
+ "text": "STOCKS_DIR.mkdir(exist_ok=True)"
+ },
+ {
+ "file": "stock_repository.py",
+ "line": 74,
+ "text": "path.parent.mkdir(parents=True, exist_ok=True)"
+ },
+ {
+ "file": "stock_repository.py",
+ "line": 245,
+ "text": "path.mkdir(parents=True, exist_ok=True)"
+ },
+ {
+ "file": "stock_repository.py",
+ "line": 246,
+ "text": "(path / \"logs\").mkdir(exist_ok=True)"
+ }
+]
+
+[출처: routine_folder_recreation_analysis_report.txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 18:19:20 | 분류: 기타문서/자료]
+================================================================================
+3. ensure_stock_runtime_files 호출 지점
+- docs/gui_windows(160).py:L116 ensure_stock_runtime_files,
+- docs/gui_windows(160).py:L3400 stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)
+- gui_auto_trade_setting_window.py:L102 ensure_stock_runtime_files,
+- gui_config_utils.py:L87 def ensure_stock_runtime_files(routine_dir: Path, code: str, name: str) -> Path:
+- gui_routine_assign_window.py:L43 from gui_config_utils import default_config, ensure_stock_runtime_files
+- gui_routine_assign_window.py:L1226 stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)
+- gui_schedule_window.py:L110 ensure_stock_runtime_files,
+- gui_schedule_window.py:L2308 stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)
+- gui_stock_register_window.py:L118 ensure_stock_runtime_files,
+- gui_windows_149_manual_ats_status_policy_fix.py:L116 ensure_stock_runtime_files,
+- gui_windows_149_manual_ats_status_policy_fix.py:L3217 stock_dir = ensure_stock_runtime_files(selected_routine_dir, code, name)
+
+[출처: kiwoom32_cleanup_analysis_report.txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 16:32:54 | 분류: 기타문서/자료]
+## gui_windows.py
+- L71: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+- L76: 기초종목.txt 에 종목 1개를 추가한다.
+- L78: existing_text = BASE_STOCK_PATH.read_text(encoding="utf-8") if BASE_STOCK_PATH.exists() else ""
+- L81: with BASE_STOCK_PATH.open("a", encoding="utf-8") as file:
+
+[출처: terminology_scan_report.txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 15:56:08 | 분류: 기타문서/자료]
+## gui_main_table_loader.py (12건)
+- L8: - 좌측 루틴표 정렬/로딩
+- L12: - MainWindow UI 생성/버튼 연결/긴급정지/검토관리 로직은 포함하지 않는다.
+- L49: """메인 관제창 좌측 루틴표 헤더 정렬."""
+- L97: read_base_stocks() 표준 반환값에서 종목의 루틴명 목록을 추출한다.
+- L99: 중앙 stocks/ 구조에서는 일반적으로 1종목 1루틴이지만,
+- L112: 메인 좌측 루틴표의 종목수를 중앙 종목관리 기준으로 계산한다.
+- L115: - 루틴 미지정 종목 제외
+- L116: - 검토관리/검토종목 상태 제외
+- L144: """budget.json이 있는 루틴 폴더를 메인 좌측 루틴표에 표시한다.
+- L146: 종목수는 더 이상 루틴폴더 안의 물리 종목폴더 개수로 계산하지 않는다.
+- L214: # 루틴 미지정 종목은 표시하지 않는다.
+- L246: "routine": routine_name or "미지정",
+
+[출처: kiwoom29_dependency_analysis_report.txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 14:58:42 | 분류: 기타문서/자료]
+### gui_windows.py
+발견: 기초종목.txt:2, BASE_STOCK_PATH:4, append_base_stock:1, get_routine_dirs:3
+L61: get_routine_dirs,
+L71: BASE_STOCK_PATH = PROJECT_ROOT / "기초종목.txt"
+L74: def append_base_stock(code: str, name: str) -> None:
+L76: 기초종목.txt 에 종목 1개를 추가한다.
+L78: existing_text = BASE_STOCK_PATH.read_text(encoding="utf-8") if BASE_STOCK_PATH.exists() else ""
+L81: with BASE_STOCK_PATH.open("a", encoding="utf-8") as file:
+L89: return {routine_display_name(path): path for path in get_routine_dirs()}
+L336: for routine_dir in get_routine_dirs():
+
+[출처: README_적용내용(16).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 13:29:16 | 분류: 기타문서/자료]
+확인:
+1. 세 파일 교체
+2. python gui_main.py 실행
+3. 메인창 루틴 수/우측 목록 확인
+4. 종목등록설정창 확인
+5. 매매루틴지정창에서 루틴 지정/해제 1회 확인
+6. 자동매매설정창 확인
+
+[출처: README_적용내용(14).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 12:22:48 | 분류: 기타문서/자료]
+# 메인 관제창 중앙 stocks 기준 표시 패치 v2
+적용 파일:
+- gui_main_table_loader.py
+
+[출처: README_적용내용(13).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 11:37:30 | 분류: 기타문서/자료]
+# 메인 관제창 중앙 stocks 기준 표시 패치
+적용 파일:
+- gui_main_table_loader.py
+
+[출처: README_적용내용(13).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 11:37:30 | 분류: 기타문서/자료]
+확인:
+1. 파일 교체
+2. python gui_main.py 실행
+3. 메인 좌측 MACD/등록확인 종목수 확인
+4. 우측 실행종목표 루틴 컬럼 확인
+
+[출처: README_적용내용(12).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 11:12:32 | 분류: 기타문서/자료]
+확인:
+1. 두 파일 교체
+2. `python gui_main.py` 실행
+3. 메인창 정상 실행 확인
+4. 종목등록설정/매매루틴지정/자동매매설정창 확인
+
+[출처: README_적용내용(11).txt | 기준일: 2026-06-15 | 수정시각: 2026-06-15 11:03:14 | 분류: 기타문서/자료]
+확인:
+1. 두 파일 교체
+2. gui_main.py 실행
+3. 종목등록설정창에서 등록 루틴 표시 확인
+4. 매매루틴지정창에서 루틴 해제 재확인
+5. 자동매매설정창에서 상단 종목수와 하단 목록 일치 확인
+
+[출처: README_적용내용(4).txt | 기준일: 2026-06-14 | 수정시각: 2026-06-14 12:56:42 | 분류: 기타문서/자료]
+main_order_executor_dryrun_patch 적용 내용
+
+[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
+auto_trade_setting_remaining_methods_report(2).txt
+문서
+작업진행상황대화히스토리_3(2).txt
+문서
+MASTER_SPEC_v2.0_FULL_INTEGRATED_ARCHIVE_manifest(1).txt
+문서
+
+[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
+메인창(gui_windows)
+검토관리창
+Runtime 공통함수
+State 저장
+기초종목 서비스
+ATS 서비스
+현황 표시등
+컨텍스트 메뉴
+타이머
+정책 함수
+그리고 최근 며칠간 실제로 확인한 것:
+
+[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
+그리고 지금 ZIP 기준으로 보면, 더 쪼개는 건 얻는 것보다 잃는 것이 많아질 가능성이 높습니다. 이제는 실제 테스트하면서 정책 버그를 잡는 단계로 넘어가는 게 가장 효율적입니다.
+auto_trade_setting_remaining_methods_report(3).txt
+문서
+MASTER_SPEC_v2.0_FULL_INTEGRATED_ARCHIVE_manifest(2).txt
+문서
+
+[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
+현재 흐름상 제일 먼저 할 건 메인 관제창 기능 설계 정리입니다.
+코드 수정 전에 “메인창에 어떤 영역을 추가할지”부터 정해야 합니다.
+
+[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
+즉 루틴은 “살까?” 를 판단하고,
+메인 프로그램은 “얼마나 살 수 있고 실제로 주문할까?” 를 판단합니다.
+그래서 금액/주수 선택 기능은:
+
+[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
+메인 관제창 / 자금운영 설정
+↓
+종목별 주문수량 산정 정책
+↓
+최종 주문 실행부
+여기에 들어가는 게 맞습니다.
+추천 구조:
+
+[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
+루틴: 살까 말까 신호
+자동매매설정창: 이 종목을 어떻게 운영할지
+메인 관제창: 돈을 얼마나 쓰고 위험을 감당할지
+메인 엔진: 최종 주문 실행 여부 판단
+자금운영 개념은 이렇게 시작하면 됩니다.
+
+[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
+계좌
+ │
+ ├─ 운용예산(선택)
+ │
+ ├─ 전체 매수한도(선택)
+ │
+ └─ 루틴
+ │
+ ├─ 루틴 매수한도(선택)
+ │
+ └─ 종목
+ │
+ ├─ 종목 매수한도(선택)
+ │
+ └─ 주문방식
+ ├ 금액
+ └ 주수
+메인 관제창 초안 수정
+상단:
+계좌자산
+운용예산
+주문가능금액
+실현손익
+평가손익
+중앙:
+루틴명
+운용종목수
+사용금액
+평가금액
+실현손익
+루틴 매수한도
+상태
+하단:
+전체 매수한도
+운용예산
+긴급정지
+검토관리
+여기서 다음으로 확정해야 하는 것은 하나입니다.
+운용예산도 계층형으로 갈 것인가?
+예를 들면
+전체 운용예산
+3천만원
+루틴A
+1천만원
+루틴B
+2천만원
+처럼 예산도 루틴별 배분 기능을 가질지
+아니면
+운용예산은 전체만 존재
+배분은 매수한도로 처리
+할지입니다.
+
+[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
+자금운영의 기준은 평가금액이 아니라 예수금과 총매입금액이다.
+이걸 기준으로 메인 관제창 자금운영 설계를 진행하는 게 맞아 보입니다.
+
+[출처: 마스터스펙\작업진행상황대화히스토리\작업진행상황대화히스토리_4.txt | 기준일: 2026-06-11 | 수정시각: 2026-06-15 23:01:24 | 분류: 대화히스토리]
+100% 도달 시
+신규매수 차단 여부
+선택 가능
+특히 "운영자가 자리에 없을 때 대응시간을 주기 위한 기능" 이라는 목적은 매우 타당하고, 메인 관제창의 핵심 기능 중 하나로 들어갈 가치가 충분해 보입니다.
+다음 고고
+좋습니다.
+지금까지 나온 내용을 보면 메인 관제창은 단순히 자금 숫자만 보여주는 창이 아니라,
+자금 관제
+↓
+위험 관제
+↓
+운영 의사결정 지원
+까지 가야 합니다.
+그래서 다음 개념은 자금 상태 등급화입니다.
 현재까지
 운용예산
 5,000만원
@@ -5242,853 +5534,6 @@ Source documents
 [출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
 ==================================================
 11. runtime/review_items.json, 향후
-==================================================
-역할
-- 자동 처리하면 안 되는 상태를 검토관리로 격리한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-금지
-- 자동 복귀 금지.
-- 서버 확인 없이 해결 처리 금지.
-- review를 실행 상태 저장소로 사용 금지.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-12. runtime/audit_log.jsonl, 향후
-==================================================
-역할
-- 상태 전이와 주요 판단을 기록하는 감사 로그.
-- 실행 판단을 하지 않는다.
-생성 주체
-- 향후 AuditLogger
-- 각 Controller/Engine/Gate 호출 결과 기록
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-order_locks, order_executions, fills, positions, review_items, audit_log, close_history는 설계상 필요하지만 아직 구현 금지 상태이다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-상태 흐름:
-- PENDING
-- APPROVED / BLOCKED
-- EXECUTABLE / BLOCKED_POLICY
-- REAL_READY / BLOCKED_REAL
-- ORDER_QUEUED 이후는 실주문 위험 구간
-3.4 Execution Request
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-의미:
-- REAL_READY order를 실제 SendOrder 호출 대상으로 올린 실행 요청.
-- ORDER_QUEUED부터 Execution Request로 본다.
-현재 상태:
-- 아직 미구현.
-- 설계 대상.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-관계:
-- close_history.position_id -> Position
-- close_history.close_order_id -> Order Queue
-- close_history.close_fill_ids -> Fill
-3.9 Review Management
-의미:
-- 불일치/오류/검토 필요 상태를 관리하는 엔티티.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-logs/order_pipeline.log 또는 runtime/audit_log.jsonl, 향후
-- 상태 전이 감사 로그.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-7. 계약 검증
-==================================================
-□ 필수 필드 존재
-□ 타입 일관성
-□ 상태값 유효성
-□ 참조 무결성
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-2. Controller 계층
-==================================================
-역할
-- 전체 흐름 제어
-- 상태 전이
-- Runtime 갱신
-- Boundary 호출
-입력
-- GUI
-- Timer
-- Event
-출력
-- Engine
-- Runtime
-- Boundary
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-SOURCE: MASTER_SPEC_추가갱신_프로젝트_상태전이카탈로그_State_Transition_Catalog_2026-07-03.txt
-==================================================
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-MASTER_SPEC_추가갱신_프로젝트_상태전이카탈로그_State_Transition_Catalog_2026-07-03
-목적
-- 프로젝트 전반에서 사용되는 상태(State)와 허용되는 상태 전이 규칙을 표준화한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-2. Signal 상태
-==================================================
-PENDING
-→ APPROVED
-→ BLOCKED
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-4. Review 상태
-==================================================
-OPEN
-→ IN_PROGRESS
-→ RESOLVED
-→ CLOSED
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-5. Recovery 상태
-==================================================
-DETECTED
-→ ANALYZING
-→ RECOVERING
-→ VERIFIED
-→ COMPLETED
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-6. 상태 전이 검증
-==================================================
-□ 허용된 전이인가
-□ Controller를 통한 변경인가
-□ Runtime 기록이 남는가
-□ Audit 추적 가능한가
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-7. 금지 사항
-==================================================
-- 상태 건너뛰기
-- Runtime 직접 상태 수정
-- Controller 우회
-- 완료 상태에서 임의 재개
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-1. 이벤트 분류
-==================================================
-사용자 이벤트
-- 버튼 클릭
-- 설정 변경
-- 루틴 시작/정지
-시스템 이벤트
-- Timer Tick
-- Runtime 갱신
-- 상태 전이
-시장 이벤트
-- 시세 수신
-- 조건 신호
-- 주문 응답
-- 체결 통보(Chejan)
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-4. Controller ↔ Runtime
-==================================================
-입력
-- 상태 변경 요청
-출력
-- 저장 결과
-- 조회 결과
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\02_Runtime_Data_Model_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-6. 인터페이스 계약
-==================================================
-□ 입력 검증
-□ 반환값 명확화
-□ 예외 처리 규칙
-□ 상태 변경 주체 명확화
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-주의:
-- REAL_READY 이후 현재 단계에서는 ADAPTER_READY 파일 전이를 수행하지 않는다.
-- Adapter Request Preview는 메모리 dict 반환만 의미한다.
-- SendOrder는 연결하지 않는다.
-2. 상태 의미
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-PENDING
-- routine signal에서 생성된 order 후보의 최초 상태.
-- 아직 approval 미통과.
-- 실주문 불가.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-APPROVED
-- 후보 자체가 주문 후보로 적합하다고 approval engine이 판정한 상태.
-- 실주문 허용 상태가 아니다.
-- execution_enabled=false 유지.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-EXECUTABLE
-- operation policy gate를 통과한 상태.
-- Real Preflight 전 단계이다.
-- 실주문 허용 상태가 아니다.
-- execution_enabled=false 유지.
-BLOCKED_POLICY
-- operation policy gate에서 차단된 상태.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-BLOCKED_REAL
-- real_order_preflight에서 차단된 상태.
-- guard 실패, execution_enabled=false, 계좌 미선택, 로그인 미확인 등.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-- SendOrder 미연결
-- SetRealReg 미연결
-- send_order_stub 미호출 상태의 Adapter Request Preview 제공
-- Adapter/Executor 자동 연결 금지
-- GUI/Timer에서 Real Preflight/Adapter/Executor 자동 연결 금지
-- execution_enabled=false 유지
-- APPROVED는 실주문 가능 상태가 아님
-- EXECUTABLE은 실주문 가능 상태가 아님
-- REAL_READY도 현재 단계에서는 request preview까지만 허용
-- rules.json 변경 금지
-- orders.json/state.json 직접 변경 금지
-- real_trade_guard 자동 생성 또는 자동 완화 금지
-8. 아직 구현 금지
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-5) queue 상태 충돌
-- ADAPTER_READY는 현재 사양상 preview 이후 자동 상태가 아니다.
-- 실제 adapter 단계로 승격하기 전 별도 상태 전이 정책이 필요하다.
-10. 다음 구현 가능 최소 범위
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-아직 금지:
-- SendOrder 구현
-- Executor 자동 연결
-- Timer 자동 실주문 흐름
-- 파일 상태를 ADAPTER_READY/DONE/ERROR로 자동 변경하는 흐름
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-작성 목적
-- 본 문서는 주문 파이프라인 Preview 단계 이후, REAL_READY 다음 단계에서 ADAPTER_READY를 공식 주문 상태로 사용할지 여부를 검토한 결과를 MASTER_SPEC에 반영하기 위한 추가 갱신자료이다.
-- 결론은 ADAPTER_READY를 공식 상태로 사용하지 않는 것이다.
-- Adapter Request Preview는 상태 전이가 아니라 메모리 검토 결과로만 유지한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-1. 결론
-==================================================
-ADAPTER_READY는 공식 주문 상태로 사용하지 않는다.
-공식 흐름은 다음과 같이 고정한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-2. ADAPTER_READY를 공식 상태로 사용하지 않는 이유
-==================================================
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-1. REAL_READY와 역할이 겹친다.
-- REAL_READY는 이미 Real Preflight를 통과한 상태이다.
-- 이 상태는 실주문 직전 검토 가능 상태를 의미한다.
-- Adapter Request Preview는 REAL_READY 상태에서 요청 dict를 미리 확인하는 기능일 뿐이다.
-- 따라서 ADAPTER_READY를 별도 상태로 만들면 REAL_READY와 의미가 중복된다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-2. 실주문 직전 단계가 과도하게 세분화된다.
-- REAL_READY 이후는 실주문 위험 구간이다.
-- 이 구간에서 상태값이 늘어나면 운영자가 현재 상태를 잘못 해석할 수 있다.
-- ADAPTER_READY가 있으면 “주문 준비 완료”처럼 오해될 수 있다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-3. 파일 상태 변경이 불필요하다.
-- Adapter Preview는 메모리 dict 생성만으로 충분하다.
-- order_queue.json에 상태를 반영할 필요가 없다.
-- 파일 변경 없는 preview가 더 안전하다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-4. 기존 real_order_executor_stub.py의 ADAPTER_READY 전이는 위험하다.
-- SendOrder는 호출하지 않더라도 queue 파일 상태를 REAL_READY -> ADAPTER_READY로 변경한다.
-- 자동 연결 시 실주문은 아니더라도 상태가 진행된 것처럼 보인다.
-- 따라서 real_order_executor_stub.py는 자동 연결하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-3. Adapter Request Preview 정책
-==================================================
-Adapter Request Preview는 상태값이 아니다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-의미:
-- Real Preflight 통과.
-- Adapter Request Preview 가능.
-- 아직 SendOrder 아님.
-- 아직 ORDER_QUEUED 아님.
-- 아직 DONE 아님.
-REAL_READY 상태의 order는 아래 조건을 만족해야 다음 단계 검토가 가능하다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-5. ORDER_QUEUED 정책
-==================================================
-ORDER_QUEUED는 실제 SendOrder 직전 또는 SendOrder 요청 등록 상태로만 사용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-이유:
-- REAL_READY를 읽어 adapter stub을 호출할 수 있다.
-- SendOrder는 호출하지 않지만 queue 상태를 ADAPTER_READY로 변경할 수 있다.
-- ADAPTER_READY는 공식 상태로 사용하지 않기로 결정했으므로 자동 연결 금지이다.
-허용:
-- 별도 분석 대상.
-- 기존 코드 보존.
-- 자동 Timer/GUI 연결 금지.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-최종 결론
-==================================================
-ADAPTER_READY는 공식 상태로 사용하지 않는다.
-Adapter Request Preview는 파일 상태가 아니라 메모리 검토 결과이다.
-REAL_READY는 preview 이후에도 유지한다.
-ORDER_QUEUED는 실제 SendOrder 직전/요청 등록 상태로만 사용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-3. 필수 매핑 키
-- kiwoom_order_no
-- execution_id
-- order_id
-- source_signal_id
-- code
-4. 체결 상태 후보
-- 접수
-- 확인
-- 부분체결
-- 전량체결
-- 취소
-- 거부
-- 정정
-- 정정완료
-상태값 추가는 추후 별도 승인 후 구현한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-작성 목적
-- 본 문서는 ORDER_QUEUED 이후 실제 SendOrder 호출 직전/직후의 실행 요청 단위(Execution Request)를 정의하기 위한 MASTER_SPEC 추가 갱신자료이다.
-- 본 문서는 코드 구현 문서가 아니라 order_id, execution_id, kiwoom_order_no 관계를 고정하기 위한 데이터/상태 설계 문서이다.
-- 현재 단계에서 SendOrder, KiwoomOrderExecutor, order_executions.json 실제 생성, 상태값 코드 추가는 금지한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-status
-- Execution Request 자체 상태.
-- 현재 코드에는 추가하지 않는다.
-- 후보:
- - REQUEST_PREPARED
- - SENDORDER_CALLED
- - ACCEPTED
- - REJECTED
- - ERROR
-- 상태값 도입은 별도 승인 필요.
-created_at
-- Execution Request 생성 시각.
-requested_at
-- SendOrder 호출 시각.
-account_no
-- 실행 시점 계좌번호.
-code / side / quantity / price
-- 실행 요청의 핵심 주문 정보.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-정책:
-- order_queue는 현재 order 상태를 가진다.
-- order_executions는 실행 요청 이력을 가진다.
-- order_queue에 execution_id 요약 필드를 둘 수 있다.
-- 실행 이력 상세는 order_executions.json으로 분리하는 것이 안전하다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-9. Execution Request 상태와 Order Lifecycle 관계
-==================================================
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-관계:
-- Order status는 운영자가 보는 주문 생명주기 상태.
-- Execution status는 실제 SendOrder 요청 처리 상태.
-- 둘은 1:1로 완전히 같지 않다.
-- order_queue는 최신 상태 요약.
-- order_executions는 실행 요청 상세 기록.
-현재 단계에서는 Execution Request 상태값을 코드에 추가하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-권장 다음 작업:
-- hoga/order_type 매핑 설계.
-- 이유: Execution Request에는 order_type/hoga가 필수이며, 현재 UNDECIDED 상태이므로 다음 단계로 넘어갈 수 없다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-- SendOrder 호출 금지.
-- ORDER_QUEUED 생성 금지.
-- order status 변경은 기본 금지.
-- 실패 사유 summary만 반환.
-- 필요 시 향후 BLOCKED_EXECUTION 같은 상태를 검토할 수 있으나 현재 새 상태값 추가 금지.
-- 심각한 불일치/위험 조건은 검토관리 후보.
-현재 단계에서는 새 상태값을 만들지 않는다.
-권장 반환 구조, 향후:
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-현재 order_intent는 unresolved=true가 기본이므로 현재 운영 흐름에서는 ORDER_QUEUED로 갈 수 없다.
-이것이 안전한 상태이다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-14. 검토관리/운영상태 조건
-==================================================
-향후 Final Execution Guard는 운영상태와도 연결되어야 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-이유:
-- order_intent.unresolved=true
-- hoga/order_type 미확정
-- execution_enabled=false
-- operator_confirmed=false 기본
-- lock 미구현
-- execution request 미구현
-따라서 현재 상태는 안전하다.
-향후 SendOrder 구현은 Final Execution Guard가 완성된 뒤에만 검토한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-6. 금지
-- Boundary 내부에서 주문 판단
-- 전략 판단
-- Approval 수행
-- Policy 수행
-- Preflight 수행
-- Runtime 상태 직접 변경
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-8. Recovery 연계
-- Recovery는 Boundary를 통해 현재 서버 상태를 조회한다.
-- Boundary는 조회 결과만 제공한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-11. 기존 파이프라인과의 관계
-==================================================
-order_intent는 기존 상태 전이에 영향을 주지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-현재 금지:
-- hoga 확정
-- order_type 확정
-- SendOrder 연결
-- send_order_stub 호출
-- Adapter 실행 연결
-- Executor 연결
-- execution_enabled=true 전환
-- operator_confirmed=true 전환
-- source_ui_path 추정 입력
-- sell setting_a/b/c 추정
-- UI state 직접 읽기
-- rules.json 직접 읽기
-- 새 상태값 추가
-order_intent는 현재 주문방식 확정값이 아니다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-2. Lock 생성 시점
-REAL_READY 상태에서는 Lock 생성 금지.
-ExecutionController가 ORDER_QUEUED로 승격하기 직전에만 Lock 생성 가능.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-영향 없음:
-- Approval Engine
-- Operation Policy Gate
-- Real Preflight
-- Adapter Request Preview
-- execution_enabled
-- real_trade_guard
-- SendOrder
-order_provenance는 메타데이터이며, 기존 상태 전이를 변경하지 않는다.
-공식 상태 전이는 그대로 유지한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-확인 사항:
-- setting_a/b/c 추정 없음.
-- source_ui_path 임의 입력 없음.
-- rules.json 읽기 없음.
-- indicator_follow_ui_state 읽기 없음.
-- 새 상태값 없음.
-- execution_enabled=false 유지.
-- Adapter/Executor/SendOrder 연결 없음.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-SOURCE: MASTER_SPEC_추가갱신_Order_State_Machine_주문상태머신_설계_2026-07-03.txt
-==================================================
-MASTER_SPEC_추가갱신_Order_State_Machine_주문상태머신_설계_2026-07-03
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-목적
-- 주문(Order)의 전체 상태 전이(State Machine)를 하나의 기준으로 정의한다.
-- 각 상태는 단일 의미만 가지며, 허용된 전이만 가능하다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-6. 검토관리
-다음은 검토 후보
-- 허용되지 않은 상태 전이
-- 상태와 서버 정보 불일치
-- ORDER_SENT 이후 주문번호 없음
-- FILLED인데 Position 없음
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-7. Audit Log
-모든 상태 전이는
-- from_status
-- to_status
-- actor
-- timestamp
-를 기록한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-SOURCE: MASTER_SPEC_추가갱신_Position_Model_보유상태_설계_2026-07-03.txt
-==================================================
-MASTER_SPEC_추가갱신_Position_Model_보유상태_설계_2026-07-03
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-목적
-- 본 문서는 주문 파이프라인과 검토관리(Review Management)의 연계 기준을 정의한다.
-- 검토관리는 오류를 자동 복구하는 기능이 아니라, 운영자가 확인해야 하는 상태를 격리하는 운영 계층이다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-Recovery
-- 재시작 후 상태 복원 실패
-- Active Lock과 실제 주문 불일치
-- Execution 존재, 주문번호 없음
-3. 검토관리와 상태의 관계
-BLOCKED
-- 정상적인 정책 차단
-- 자동 검토관리 대상 아님
-BLOCKED_POLICY
-- 정책 차단
-- 반복 발생 시 검토 후보
-BLOCKED_REAL
-- Guard 차단
-- 일시적 차단이면 검토관리 아님
-ERROR
-- 원인에 따라 검토관리 후보
-Review
-- 운영자 확인이 필요한 상태
-- 자동 복귀 금지
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-현재 금지:
-- ADAPTER_READY 공식 상태 사용 금지.
-- ORDER_QUEUED 자동 생성 금지.
-- SendOrder 호출 금지.
-- execution_enabled 자동 true 전환 금지.
-- operator_confirmed 자동 true 전환 금지.
-- Executor/Adapter 자동 연결 금지.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-정책:
-- operator_confirmed는 order별 상태가 아니라 real_trade_guard.json의 전역 guard 항목이다.
-- APPROVED -> EXECUTABLE 단계에서는 변경하지 않는다.
-- EXECUTABLE -> REAL_READY 단계의 preflight guard에서 확인한다.
-- operator_confirmed=true 설정 UI/함수는 별도 설계 전까지 구현 금지이다.
-3.2 execution_enabled와의 차이
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-ORDER_QUEUED는 실제 SendOrder 호출 직전 또는 SendOrder 호출 요청이 등록된 상태이다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-정책:
-- ORDER_QUEUED는 preview 상태가 아니다.
-- ORDER_QUEUED는 adapter preview 상태가 아니다.
-- ORDER_QUEUED는 실제 주문 실행 파이프라인에 진입했다는 의미이다.
-- ORDER_QUEUED부터는 실주문 위험 구간이다.
-4.2 생성 조건
-ORDER_QUEUED는 아래 조건을 모두 만족할 때만 생성할 수 있다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-5. ORDER_QUEUED 이후 상태
-==================================================
-공식 후보 흐름:
-ORDER_QUEUED
- ↓ SendOrder 호출 결과
-DONE / ERROR
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-현재 1차 정의:
-- ORDER_QUEUED: SendOrder 호출 요청 등록 또는 호출 직전.
-- DONE: SendOrder 요청 성공 또는 주문 접수 확인 이후 상태로 사용할 수 있으나, 체결 완료와 동일시 금지.
-- ERROR: SendOrder 요청 실패, adapter request 생성 실패, API 오류, guard 실패, lock 실패 등.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-현재 단계에서는 새 상태값을 추가하지 않는다.
-다만 장기적으로 DONE 하나로 주문 접수/체결 완료를 모두 표현하는 것은 부정확하므로 후속 설계가 필요하다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-권장:
-- 별도 runtime/order_locks.json
-- order_queue.json에는 lock 상태 요약만 기록
-6.4 lock 상태 후보
-현재 새 상태값 추가는 금지이므로 lock은 order status가 아니라 별도 메타데이터로 둔다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-정책:
-- Preview helper와 Execution helper는 반드시 분리한다.
-- Preview 함수는 절대 queue 상태를 변경하지 않는다.
-- Execution 함수는 preview 결과를 재사용하더라도 guard와 lock을 다시 검사한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-- SendOrder 구현
-- KiwoomOrderExecutor 구현
-- real_order_executor_stub 자동 연결
-- REAL_READY -> ADAPTER_READY 전이
-- ADAPTER_READY 공식 상태 사용
-- REAL_READY -> ORDER_QUEUED 자동 전이
-- ORDER_QUEUED 자동 생성
-- execution_enabled=true 자동 전환
-- operator_confirmed=true 자동 설정
-- GUI 실행 버튼 구현
-- Timer 실행 연결
-- 체결/정정/취소 상태값 신규 추가
-- 실제 주문 재시도 로직 구현
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-ADAPTER_READY는 공식 상태로 사용하지 않는다.
-Adapter Preview는 메모리 검토 결과로만 유지한다.
-ORDER_QUEUED부터 실주문 위험 구간으로 본다.
-SendOrder는 위 조건이 모두 확정될 때까지 계속 금지한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\00_Final_Index_Reference_Map_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-ADR-004
-==================================================
-주제
-상태 전이는 State Machine만 따른다.
-결정
-- Controller만 상태를 변경한다.
-- 임의 상태 변경을 금지한다.
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-저장 버튼:
-- 기존 save_button을 활성화
-- 문구: UI 상태 저장
-- 클릭 시 save_indicator_follow_ui_state_to_rules() 호출
-
-[출처: 작업진행상황대화히스토리_9.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:55:05 | 분류: 대화히스토리]
-허용 변경:
-- runtime/routine_signals.json 신규 signal 추가/상태 전이
-- 테스트 목적의 state start/stop 후 복구
-
-[출처: MASTER_SPEC_최종_작업재개요약_2026-07-03.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:53:13 | 분류: 작업재개요약]
-==================================================
-현재 구현 상태
-==================================================
-실주문은 연결되어 있지 않다.
-
-[출처: 작업재개요약서_2026-07-03_주문파이프라인_아키텍처설계_중간정리.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:02:24 | 분류: 작업재개요약]
-==================================================
-4. Order Lifecycle 전체 상태 모델
-==================================================
-장기 상태 모델:
-
-[출처: 작업재개요약서_2026-07-03_주문파이프라인_아키텍처설계_중간정리.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:02:24 | 분류: 작업재개요약]
-보조 상태:
-- CANCEL_REQUESTED
-- CANCELLED
-- CANCEL_REJECTED
-- MODIFY_REQUESTED
-- MODIFIED
-- MODIFY_REJECTED
-- EXPIRED
-- ERROR
-현재 코드에 신규 상태값 추가는 금지.
-장기 설계 기준으로만 고정.
-
-[출처: 작업재개요약서_2026-07-03_주문파이프라인_아키텍처설계_중간정리.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:02:24 | 분류: 작업재개요약]
-현재 상태:
-- hoga/order_type은 미확정.
-- order_intent.unresolved=true가 정상.
-
-[출처: 작업재개요약서_2026-07-03_주문파이프라인_아키텍처설계_중간정리.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:02:24 | 분류: 작업재개요약]
-==================================================
-13. Audit Log
-==================================================
-역할:
-- 상태 전이와 주요 판단을 기록하는 감사 계층.
-- 실행 판단은 하지 않음.
-
-[출처: 작업재개요약서_2026-07-03_주문파이프라인_아키텍처설계_중간정리.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:02:24 | 분류: 작업재개요약]
-==================================================
-14. Review Management
-==================================================
-역할:
-- 자동 처리하면 안 되는 상태를 격리하는 운영 계층.
-
-[출처: 작업재개요약서_2026-07-03_주문파이프라인_아키텍처설계_중간정리.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:02:24 | 분류: 작업재개요약]
-==================================================
-18. Position Model
-==================================================
-Position 의미:
-- 실제 보유 상태.
-- Order가 아니라 Fill의 결과.
-
-[출처: 작업재개요약서_2026-07-03_주문파이프라인_아키텍처설계_중간정리.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 13:02:24 | 분류: 작업재개요약]
-상태 흐름:
-PENDING
- ↓
-APPROVED
- ↓
-EXECUTABLE
- ↓
-REAL_READY
- ↓
-ORDER_QUEUED
- ↓
-ORDER_SENT
- ↓
-ORDER_ACCEPTED / REJECTED
- ↓
-PARTIAL_FILLED
- ↓
-FILLED
- ↓
-CLOSED
-차단 상태:
-- BLOCKED
-- BLOCKED_POLICY
-- BLOCKED_REAL
-종료/예외:
-- CANCELLED
-- EXPIRED
-- ERROR
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\raw_extracted\MASTER_SPEC_추가갱신_Order_State_Machine_주문상태머신_설계_2026-07-03.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 12:53:14 | 분류: 갱신문서]
-MASTER_SPEC_추가갱신_Order_State_Machine_주문상태머신_설계_2026-07-03
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\raw_extracted\MASTER_SPEC_추가갱신_Position_Model_보유상태_설계_2026-07-03.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 12:51:30 | 분류: 갱신문서]
-MASTER_SPEC_추가갱신_Position_Model_보유상태_설계_2026-07-03
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\raw_extracted\MASTER_SPEC_추가갱신_order_intent_미확정진단필드_2026-07-03.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 11:12:46 | 분류: 갱신문서]
-현재 금지:
-- hoga 확정
-- order_type 확정
-- SendOrder 연결
-- send_order_stub 호출
-- Adapter 실행 연결
-- Executor 연결
-- execution_enabled=true 전환
-- operator_confirmed=true 전환
-- source_ui_path 추정 입력
-- sell setting_a/b/c 추정
-- UI state 직접 읽기
-- rules.json 직접 읽기
-- 새 상태값 추가
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\raw_extracted\MASTER_SPEC_갱신자료_2026-07-03_주문파이프라인_Preview.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 10:42:48 | 분류: 갱신문서]
-MASTER_SPEC 갱신자료
-작성일: 2026-07-03
-범위: 주문 파이프라인 Preview 단계
-1. 주문 파이프라인 상태 전이 사양
-현재 주문 파이프라인은 실주문 전송 전 Preview 단계까지만 구현한다.
-상태 전이:
-PENDING
- -> APPROVED
- -> BLOCKED
-APPROVED
- -> EXECUTABLE
- -> BLOCKED_POLICY
-EXECUTABLE
- -> REAL_READY
- -> BLOCKED_REAL
-REAL_READY
- -> Adapter Request Preview
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\Development_Specification_구현규약_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:19:04 | 분류: MASTER_SPEC]
-- Preview는 실행이 아니다.
-- Pending은 검토 대상이다.
-- Simulation은 저장하지 않는다.
-- Approved는 승인 기록이다.
-- Applied는 실제 Rule 반영이다.
-- Loaded는 엔진이 읽은 상태다.
-- Running만 실제 자동매매에 사용된다.
-이 규약은 향후 모든 기능 추가와 리팩터링의 최상위 기준으로 사용한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\AutoTrading_System_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:16:58 | 분류: MASTER_SPEC]
-본 문서는 Rule Life Cycle, Routine Life Cycle을 포함하여 자동매매 프로그램
-전체가 어떤 상태를 거쳐 실행·정지·복구되는지 정의한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\AutoTrading_System_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:16:58 | 분류: MASTER_SPEC]
-목적:
-- 프로그램 시작부터 종료까지의 최상위 상태를 정의한다.
-- Rule, Routine, Stock, Time Policy, Operation Policy를 실행 조건으로 연결한다.
-- 긴급정지, 재시작, 장마감, 다음 영업일 복구 흐름을 구분한다.
-- 실제 자동매매 실행 전 필수 조건을 명확히 한다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\AutoTrading_System_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:16:58 | 분류: MASTER_SPEC]
--------------------------------------------------------------------------------
-3.8 Ready
-- 자동매매 시작 가능 상태
-- 아직 실제 매매 실행 중은 아님
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\AutoTrading_System_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:16:58 | 분류: MASTER_SPEC]
--------------------------------------------------------------------------------
-3.10 Trading Running
-- 실제 자동매매 판단 및 주문 실행 가능 상태
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\AutoTrading_System_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:16:58 | 분류: MASTER_SPEC]
-================================================================================
-9. 현재 결론
-================================================================================
-전체 자동매매 시스템은 단일 상태로 판단하면 안 된다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\EngineRule_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:13:12 | 분류: MASTER_SPEC]
-주의:
-- Loaded 상태라도 실제 거래 판단에 사용 중인지 확인해야 한다.
-- 자동매매 시작 전이라면 Running이 아니다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\EngineRule_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:13:12 | 분류: MASTER_SPEC]
-전이 조건:
-- Loaded 상태
-- 자동매매/루틴 실행 활성
-- 시간정책/종목상태/운영정책 통과
-- 안정성검사 통과
-- 실제 evaluation 호출에서 loaded rules 사용 확인
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\EngineRule_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:13:12 | 분류: MASTER_SPEC]
-조건:
-- 자동매매 실행 상태
-- 루틴 활성
-- 종목 상태 정상
-- 시간 정책 통과
-- 안정성검사 통과
-- 실제 evaluation에서 loaded rules 사용
-현재 상태:
-- 아직 구현하지 않음
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\EngineRule_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:13:12 | 분류: MASTER_SPEC]
-상태: Loaded
-허용:
-- evaluation 준비
-- active rules hash 표시
-금지:
-- 자동매매 실행 중이라고 단정
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\EngineRule_LifeCycle_StateMachine_설계문서_2026-07-02.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-02 17:13:12 | 분류: MASTER_SPEC]
-가장 중요한 원칙:
-“생성됨”과 “승인됨”과 “저장됨”과 “엔진이 읽음”과 “실제로 실행 중”은 서로 다른 상태다.
-이 구분을 유지해야 이후 자동매매 동작에서 원인 추적과 안전 제어가 가능하다.
-
-[출처: 마스터스펙\MASTER_SPEC_단순통합_MACD_명칭_사용처_전수조사_및_일반화_기준_2026-07-02\MASTER_SPEC_단순통합_1차.txt | 기준일: 2026-07-02 | 수정시각: 2026-07-01 07:50:08 | 분류: MASTER_SPEC]
-비신호는 routine_signals.json에 저장하지 않는다. 비신호는
-order_queue.json 주문후보로 변환하지 않는다. 비신호는 사용자 상태값으로
 
 Original Body Marker: END
 
@@ -6100,4 +5545,4 @@ Reference Navigation
 - Next: PART02_03_RUNTIME.md
 - Full PART: PART02_RUNTIME.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt

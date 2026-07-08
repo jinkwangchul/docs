@@ -1,16 +1,2049 @@
-# PART04_04 ROUTINE
+# PART04 04 ROUTINE
 
 Reference Edition Subpart
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
 Source Full Part: PART04_ROUTINE.md
 
-생성일: 2026-07-07
+생성일: 2026-07-08
 
 주의: 본 문서는 AI 참조용 하위 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 Original Body Marker: START
+정정주문 여부
+내가 보기엔 이제 다음 주제는
+현재가 주문
+을 기준으로
+미체결 30주 발생
+↓
+언제 취소할 것인가?
+를 먼저 정하는 게 순서다.
+여기가 단일매수 정책의 핵심이다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+잘 생각해야해...생각보다 복잡한 상황이다. 단일 매수의 경우 단일 매수 주문만 내고 미체결 확인을 루틴에서 해야하는건지 아니면 메인에서 하는건지 , 만약 루틴에서 미체결 확인을 하고 다시 매수 신호를 낼경우 그사이 주문취소는 메인에서 하는 방식인지, 루틴에서 정해진 신호만 내고 나머지는 루틴에서 주문취소 다시 매수진행을 해야하는건지....루틴의 역할이 어디까지인지를 판단
+여기서는 진짜 조심해야 한다.
+왜냐하면 이걸 잘못 정하면 나중에 루틴 추가될 때마다 구조가 무너진다.
+나는 지금 다시 생각해보니 "루틴이 어디까지 책임질 것인가" 가 핵심이라고 본다.
+현재 선택지는 사실 3개다.
+안 A
+루틴 = 신호만
+BUY
+SELL
+만 발생.
+메인
+주문
+체결
+미체결
+취소
+재주문
+전부 담당.
+장점
+구조 단순
+단점
+루틴별 매매철학 반영 어려움
+안 B
+루틴 = 신호 + 미체결관리
+예:
+BUY
+↓
+주문
+↓
+미체결 발생
+↓
+루틴이 다시
+BUY
+발생.
+메인은
+취소
+주문
+만 수행.
+장점
+루틴 철학 반영 쉬움
+단점
+루틴이 체결정보를 알아야 함
+그 순간.
+주문번호
+미체결수량
+체결수량
+까지 루틴이 보기 시작한다.
+그러면.
+루틴 = 전략
+이 무너진다.
+안 C
+내가 현재 가장 맞다고 보는 구조.
+루틴:
+BUY
+SELL
+주문정책
+체결정책
+미체결정책
+결정.
+예:
+BUY
+현재가
+목표체결율 100%
+5초 후 취소
++1호가 재주문
+메인:
+실제 주문
+실제 취소
+실제 재주문
+실제 체결감시
+수행.
+이 경우.
+루틴은.
+어떻게 할지
+를 결정.
+메인은.
+실제로 처리
+한다.
+나는 지금 네 프로젝트 철학 기준으로는.
+루틴 = 정책결정
+메인 = 집행
+이 가장 맞다고 본다.
+왜냐하면.
+예를 들어 MACD 루틴은.
+미체결 5초
++1호가
+3회 재시도
+를 원할 수 있다.
+다른 루틴은.
+즉시 시장가 전환
+을 원할 수 있다.
+이건 루틴 철학이다.
+하지만.
+주문취소 API
+주문정정 API
+미체결조회 API
+는.
+모든 루틴 공통.
+즉.
+취소를 누가 실행하는가?
+는 메인.
+언제 취소해야 하는가?
+는 루틴.
+나는 현재까지 정립된
+루틴 = 신호
+메인 = 실행
+철학을 약간 확장해서.
+루틴 = 신호 + 정책
+메인 = 실행 + 트러블슈팅
+으로 보는 게 가장 자연스럽다고 본다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+그러면 루틴은 주문번호나 미체결수량을 직접 볼 필요가 없고, 메인은 전략을 몰라도 된다. 이 분리가 나중에 MACD 루틴, RSI 루틴, 조건검색식 루틴이 수십 개 생겨도 유지된다.
+그러면 루틴은 셀,바이,캔슬 ?
+나는 지금은 아니다 쪽으로 기운다.
+아까는 중간에 흔들렸는데 다시 생각해보면.
+루틴 = BUY
+루틴 = SELL
+까지만 가는 게 맞다.
+왜냐하면 CANCEL은 성격이 다르다.
+예를 들어.
+BUY 발생
+↓
+100주 주문
+↓
+70주 체결
+30주 미체결
+↓
+5초 경과
+↓
+CANCEL
+여기서 취소가 발생한 이유는.
+```text
+매수전략 때문인가?
+아니다.
+실제로는.
+주문관리 때문
+이다.
+그래서 나는.
+BUY
+SELL
+는 루틴.
+CANCEL
+MODIFY
+REORDER
+는 메인.
+대신 루틴은.
+BUY
+정책:
+5초 대기
++1호가 허용
+3회 재시도
+목표체결율 100%
+을 같이 넘긴다.
+그러면 메인은.
+정책 확인
+↓
+5초 경과
+↓
+취소
+↓
+재주문
+↓
+체결
+수행.
+즉.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+루틴
+=
+BUY
+SELL
++
+주문정책
+메인
+=
+ORDER
+CANCEL
+MODIFY
+REORDER
+이렇게 분리하는 게 더 자연스럽다.
+왜냐하면 만약 루틴이:
+BUY
+SELL
+CANCEL
+까지 내기 시작하면.
+결국 루틴이:
+체결상태
+미체결상태
+주문번호
+를 알아야 한다.
+그 순간 루틴이 전략엔진이 아니라 주문엔진이 되어버린다.
+그래서 현재 시점의 내 결론은:
+루틴 신호
+=
+BUY
+SELL
+루틴 정책
+=
+목표체결율
+취소조건
+재주문조건
+주문방식
+메인 실행
+=
+ORDER
+CANCEL
+MODIFY
+REORDER
+이 분리가 가장 안정적이다.
+실제 캔슬을 시행하는게 아니라 셀신호,바이신호,캔슬신호를 내게 개념 확장
+난이도는 중상급으로 봐야 한다.
+이유는 기능 추가라기보다 구조 변경에 가깝다.
+현재 개념대로 가면 메인파트는 단순 주문 실행기가 아니라:
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+BUY / SELL / CANCEL 신호 수신
+↓
+주문번호 추적
+↓
+체결/미체결 추적
+↓
+취소/정정/재주문 실행
+↓
+상태 불일치 검출
+↓
+검토관리 이동
+까지 해야 한다.
+가장 어려운 부분은 3개다.
+주문 상태 추적
+주문번호, 원주문번호, 체결수량, 미체결수량, 취소가능수량을 정확히 관리해야 함.
+중복 주문 방지
+CANCEL 신호가 왔는데 기존 주문이 이미 체결됐거나 취소됐을 수 있음.
+BUY 재신호가 왔을 때 기존 미체결 주문이 살아 있으면 중복매수 위험.
+서버 정보와 내부 상태 불일치
+키움 체결 이벤트 누락, 지연, 조회값 불일치가 생기면 바로 검토관리 후보.
+다만 좋은 점은 있다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+루틴이 BUY / SELL / CANCEL 신호만 내고, 실제 실행은 메인이 맡으면 메인 구조는 복잡해지지만 공통 엔진으로 한 번만 제대로 만들면 이후 루틴은 확장하기 쉬워진다.
+내 판단:
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+1단계: BUY / SELL만 처리
+2단계: 주문번호·체결·미체결 추적
+3단계: CANCEL 신호 처리
+4단계: 취소 확인 후 재주문
+5단계: 불일치 시 검토관리
+핵심은 먼저 주문 상태머신을 작게 만드는 거다.
+현재 판단:
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+구현 가능
+난이도 높음
+순서 잘못 잡으면 위험
+반드시 단계별 테스트 필요
+바로 다음은 코드가 아니라, 먼저 ORDER_STATE 정의부터 잡는 게 맞다.
+루틴부터 구현해서 그신호를 받는 구조로 시작하는건 어떤가?
+나는 오히려 그게 더 안전하다고 본다.
+지금 메인을 먼저 건드리면 위험한 이유가 있다.
+현재 우리는:
+BUY
+SELL
+CANCEL
+개념도 막 정립 중이고,
+단일매수
+다중매수
+능동매수
+도 완전히 확정된 상태가 아니다.
+그런데 메인부터 만들면.
+주문상태머신
+을 만들어 놓고.
+나중에 루틴 요구사항이 바뀔 때마다.
+메인 수정
+메인 수정
+메인 수정
+반복될 가능성이 크다.
+오히려 지금은.
+1단계
+루틴 엔진
+구현.
+예:
+BUY_SIGNAL
+SELL_SIGNAL
+CANCEL_SIGNAL
+출력.
+그리고.
+신호 발생 이유
+신호 발생 시각
+신호 정책
+까지 로그로 출력.
+실제 주문은 안 함.
+2단계
+가상 메인
+만듦.
+예:
+BUY_SIGNAL 수신
+↓
+가상 체결
+CANCEL_SIGNAL 수신
+↓
+가상 취소
+이렇게 시뮬레이션.
+3단계
+루틴 철학 확정
+여기서.
+어?
+CANCEL 필요 없네?
+혹은.
+다중매수 구조 바꿔야겠네?
+가 나올 수 있음.
+4단계
+그때 메인 구현.
+현재 프로젝트 상태를 보면.
+루틴 설계
+= 60~70%
+메인 주문상태머신
+= 아직 설계중
+수준이다.
+그래서 내 판단은.
+지금은 루틴 먼저
+가 맞다.
+특히.
+현재 MACD 루틴은.
+매수신호
+매도신호
+RSI
+이평선 기울기
+0봉/1봉
+단일매수
+다중매수
+체결목표
+만 구현해도 테스트할 게 엄청 많다.
+그래서 순서는.
+MACD 루틴 완성
+↓
+가상 신호 테스트
+↓
+신호 규격 확정
+↓
+메인 주문상태머신 설계
+↓
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+READY
+↓
+BUY 발생
+↓
+RUNNING
+↓
+SELL 발생
+↓
+EXITING
+↓
+RESETTING
+↓
+READY
+핵심은 SELL 주문이 나갔다고 리셋 완료가 아니다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+메인 ↔ 루틴 권한분리
+BUY 구조
+SELL 구조
+Position 구조
+Exit Strategy
+Cancel Policy
+Cycle State
+Reset 개념
+마감/청산 연계
+그래서 다음은 진짜 중요한 것만 남았다.
+1순위
+Position Policy 세부 설계
+우리가 계속 언급했지만 아직 완전히 확정 안 된 것.
+최초진입예산
+연속 BUY
+회차 증가
+X2
+X3
+고정금액
+고정비율
+스킵
+예산소진
+완충영역
+즉.
+BUY 발생
+↓
+이번 회차 얼마를 살 것인가
+를 결정하는 엔진.
+사실 지금 구조에서 가장 미완성인 부분이다.
+2순위
+완충(Buffer) 정책 상세화
+이건 이미 철학은 확정됐다.
+전체예산 위험
+↓
+선택과 집중
+↓
+수익률 최저 종목 조기마감
+↓
+청산
+하지만.
+몇 %에서 진입?
+복수 종목이면?
+연속 진입이면?
+등은 아직 미정.
+3순위
+검토관리 → 트러블관리 승격
+이건 예전에 네가 말한 것.
+현재
+검토관리
+인데.
+실제 역할은.
+예외상황 관리
+에 가깝다.
+그래서.
+트러블관리
+로 승격할지.
+검토관리 유지
+할지.
+내 판단
+지금은 무조건
+Position Policy
+부터 가야 한다.
+이유.
+현재 구조에서.
+BUY 신호
+는 있는데.
+얼마를 사는가
+가 아직 제대로 확정 안 됐다.
+그리고 이게.
+최초진입예산
+연속 BUY
+X2
+X3
+마틴
+고정금액
+고정비율
+스킵
+전부 연결된다.
+그래서 다음 논의는:
+최초진입예산 = 100만원
+BUY #1
+BUY #2
+BUY #3
+BUY #4
+일 때.
+기본 디폴트를
+고정금액
+으로 볼지.
+고정비율
+로 볼지.
+배수증가(X2/X3)
+로 볼지.
+이걸 먼저 정해야 한다.
+내 기억으로는 네가 예전에 말한 방향은
+최초진입예산
+=
+메인
+회차증가 방식
+=
+루틴
+이었다.
+그래서 다음 스텝은 Position Policy 세부 설계가 가장 합리적이다.
+동의 고고
+좋다.
+이제부터는 사실상 Position Policy 핵심부다.
+여기서 잘못 잡으면 나중에 X2, X3, 마틴, 고정금액, 능동매수 전부 꼬인다.
+우선 현재까지 확정된 것부터.
+메인 담당
+전체예산
+루틴예산
+종목예산
+최초진입예산
+즉.
+이 종목 첫 진입에
+얼마를 투입할 수 있는가
+는 메인 담당.
+루틴 담당
+추가매수
+회차증가
+X2
+X3
+고정금액
+고정비율
+능동매수
+즉.
+BUY #2
+BUY #3
+BUY #4
+를 어떻게 운영할지는 루틴 담당.
+그러면 다음 질문.
+최초 BUY
+예)
+최초진입예산
+100만원
+BUY #1
+100만원
+진입.
+그 다음.
+BUY #2 발생.
+이때 루틴은.
+A
+100만원
+100만원
+100만원
+고정금액.
+B
+100만원
+200만원
+400만원
+배수증가.
+C
+100만원
+50만원
+50만원
+50만원
+잔여예산 분할.
+D
+사용자 직접입력
+현재까지 네가 여러 번 말한 철학을 보면.
+디폴트는
+고정금액
+이 맞다.
+왜냐하면.
+X2
+X3
+마틴
+은 전략이다.
+반면.
+고정금액
+은 가장 중립적이다.
+즉.
+Position Policy 디폴트.
+최초진입
+100만원
+↓
+BUY #2
+100만원
+↓
+BUY #3
+100만원
+옵션.
+배수증가
+고정비율
+사용자배열
+그리고 여기서 하나.
+예전에 네가 말했던.
+BUY 신호 발생
+↓
+스킵
+은 회차 증가 안 한다.
+즉.
+BUY #1
+↓
+BUY #2 스킵
+↓
+BUY #2
+이다.
+이 부분은 이미 거의 확정 상태.
+그래서 다음 확정해야 할 것은.
+배수증가 기준
+예)
+100
+200
+400
+800
+처럼
+직전 회차 기준으로 증가할 것인지.
+아니면.
+100
+300
+900
+2700
+처럼
+최초진입예산 기준 X3로 갈 것인지.
+이 부분이다.
+내 기억으로는 너는 예전 계산에서도
+100
+300
+900
+같은 방식으로 많이 검증했었다.
+즉 "회차별 배수" 쪽에 가까웠다.
+이걸 Position Policy 기본 구조에 넣어야 한다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+09:01 BUY
+09:04 BUY
+09:07 BUY
+09:10 BUY
+09:13 BUY
+5번 연속 BUY.
+이때.
+A안
+BUY 나오면 무조건 매수
+B안
+회차간 최소시간
+예)
+최소 10분
+C안
+최초 BUY 기준
+-2%
+하락해야 추가매수
+D안
+최소시간
++
+가격조건
+여기서 우리가 예전에 이미 이야기했던 게 있다.
+너는
+최초 BUY 기준가
+를 중심으로
+3분마다
+10분내 n회
+최초 BUY 대비 -2%
+같은 구조를 말했었다.
+즉.
+추가매수 허용조건
+도 Position Policy 영역이다.
+그래서 Position Policy는 사실 2단계다.
+1단계
+수량결정
+고정금액
+고정주수
+X2
+X3
+사용자배열
+2단계
+진입허용
+BUY 신호만
+최소시간
+가격조건
+시간+가격 조합
+내 판단은.
+디폴트는
+BUY 신호만
+이다.
+왜냐하면 MACD 오실레이터 루틴의 기본 철학 자체가
+신호가 나오면 진입
+이기 때문이다.
+그리고 옵션으로.
+회차간 최소시간
+최초 BUY 기준가 조건
+시간+가격 조합
+을 넣는다.
+이렇게 하면.
+보수형
+사용자는 제한을 걸고,
+공격형
+사용자는 신호만으로 운영 가능하다.
+그래서 다음 확정할 것은 이것이다.
+추가매수 허용조건의 기준가격
+후보는 두 개.
+A.
+최초 BUY 체결가 기준
+B.
+직전 BUY 체결가 기준
+나는 지금까지 네가 말한 방향을 보면
+최초 BUY 기준
+이 더 일관적이라고 본다.
+왜냐하면 너는 여러 번
+최초 신호 발생 현재가 대비
+를 기준으로 예를 들었기 때문이다.
+오키 고고
+좋다.
+그럼 이제 Position Policy에서 가장 중요한 경계선을 하나 정해야 한다.
+우리는 지금까지
+추가매수 조건
+=
+최초 BUY 기준
+으로 가고 있다.
+그런데 여기서 문제가 하나 생긴다.
+예)
+최초 BUY
+10000원
+BUY #2 조건
+-2%
+BUY #3 조건
+-4%
+BUY #4 조건
+-6%
+그런데 실제 상황.
+10000
+↓
+9800
+(BUY #2)
+↓
+9600
+(BUY #3)
+↓
+9500
+이때 다시 BUY 신호가 10번 나와도.
+최초 BUY 기준
+만 사용하면
+BUY #3 조건 충족
+상태가 계속 유지된다.
+그래서 Position Policy에는
+회차 진입 판정 방식
+이 하나 더 필요하다.
+A안
+조건 충족 상태면
+BUY 신호마다 진입
+B안
+회차별 조건
+1회만 사용
+예)
+-2%
+한번 사용
+↓
+다음부터 무효
+↓
+다음 회차 조건으로 이동
+나는 B가 맞다.
+즉.
+1회차
+10000
+2회차
+9800 이하
+3회차
+9600 이하
+4회차
+9400 이하
+각 회차 조건은
+한번만 발동
+한다.
+그래야.
+9600에서 횡보
+중에
+BUY
+BUY
+BUY
+BUY
+BUY
+나와도
+3회차만 실행
+되고
+4회차 조건
+9400
+도달 전까지는 추가진입 안 한다.
+이 구조가 되면.
+최초 BUY 기준
+철학도 유지되고.
+무한추가매수
+도 방지된다.
+그래서 현재 Position Policy는.
+기준가격
+=
+최초 BUY 기준
+회차조건
+=
+1회 사용 후 소멸
+다음 회차 조건으로 이동
+회차증가
+=
+루틴 담당
+예산승인
+=
+메인 담당
+여기까지 오면 상당히 안정된다.
+다음으로 넘어가면 최대 회차수를 논의해야 한다.
+예를 들어.
+무제한
+5회
+10회
+20회
+이걸 루틴이 관리할지, 메인이 관리할지 정해야 한다.
+내 판단은 지금까지 철학대로라면
+회차수 자체
+=
+루틴
+예산한도
+=
+메인
+이 가장 일관적이다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+바이 신호 1개는 그거하나로 독립신호로 보는게 맞고 최초 신호에 이후 신호를 종속시키이 위한 장치는 분할매수의 개념으로 생각을 해볼필요가 있다..상황을 유추해보면 연속신호는 매매싸이클의 시작이후 몇번이 될지 모르는 바이를 수행해야 하는 예측이 어려운 분야이다. 비율제한을 건다면 최초 바이 다음바이는 n%이하 그리고 그다음 바이는 2회차 바이의 n%이하....이래야 중간에 충족을 못하는 바이는 패쓰.v 평단관리 유리
+오...
+이건 지금까지 이야기한 것 중에서 꽤 중요한 관점 전환이다.
+내가 방금까지는
+BUY #1
+BUY #2
+BUY #3
+를 회차 중심으로 생각했는데,
+네 말은 사실상
+BUY 신호
+=
+독립사건
+이다.
+예를 들어.
+09:00 BUY
+09:03 BUY
+09:06 BUY
+09:09 BUY
+가 발생.
+지금까지 생각.
+1회차
+2회차
+3회차
+4회차
+그런데 네 관점은.
+BUY 신호는 각각 독립
+다만
+Position Policy가
+얼마를 살지 결정
+이다.
+이게 왜 중요하냐면.
+예를 들어.
+최초 BUY
+100만원
+설정.
+다음 BUY는
+직전 BUY 금액의 80% 이하
+그 다음은
+직전 BUY의 80% 이하
+그러면.
+100
+80
+64
+51
+40
+...
+이런 식으로 간다.
+반대로.
+100
+50
+25
+12
+도 가능.
+즉.
+추가매수는
+회차증가
+가 아니라.
+분할매수 계획
+에 더 가까워진다.
+이 방식의 장점.
+신호 예측 불필요
+우리는.
+앞으로 BUY가
+몇 번 나올지
+모름
+그래서.
+10회 나올 수도 있음
+그런데.
+100
+300
+900
+2700
+같은 구조는.
+4번째부터
+예산 폭발
+가능.
+반면.
+100
+80
+64
+51
+40
+32
+...
+은.
+신호가 많이 나올수록
+진입규모 감소
+한다.
+그리고 네가 말한.
+조건 충족 못하면
+패스
+도 중요.
+예)
+1차
+100만원
+2차
+80만원 이하
+현재 예산부족
+↓
+PASS
+↓
+다음 BUY 대기
+즉.
+BUY 신호
+와
+실제 진입
+를 분리하는 개념.
+이렇게 보면 Position Policy도 사실 2개로 갈린다.
+신호관리
+↓
+분할매수 계획
+↓
+메인 예산 승인
+솔직히 지금 이 방향은 꽤 마음에 든다.
+왜냐하면.
+몇 회차까지 갈지 모르는
+연속 BUY
+라는 MACD 특성과도 잘 맞고.
+평단관리
+측면에서도.
+100
+80
+64
+51
+...
+같은 감쇠형 구조가
+100
+200
+400
+800
+...
+보다 훨씬 안전하다.
+그래서 Position Policy를 단순 "회차 증가 엔진"이 아니라
+분할매수 계획 엔진
+으로 재정의하는 것이 더 합리적으로 보인다.
+이 관점이면 예전에 이야기했던
+X2
+X3
+고정금액
+고정비율
+사용자배열
+도 전부 "분할매수 계획 방식"으로 깔끔하게 흡수된다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+0% 조건
+= 최초 BUY 현재가 이하
+즉 0%도 “아무 가격이나 매수”가 아니라, 최초 신호가보다 같거나 낮을 때만 허용하는 효과가 있다.
+그래서 구조는:
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+BUY 신호 발생
+↓
+다음 미사용 진입 슬롯 확인
+↓
+현재가 <= 최초 BUY 현재가 × 슬롯 조건%
+↓
+충족하면 해당 슬롯 실행
+↓
+미충족이면 BUY 스킵, 슬롯 유지
+이걸 position_policy의 핵심 원리로 잡으면 된다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+이거를 회차수마다 비율을 정해줄수 있는게 아니다..바이가 몇번이 나올줄알고....비율은 고정 비교대상은 적횽현재와 직전 현재가다....내가 이야기한 최초현재가는 이후 바이 가격이 아무리 높아도 최초바이의 가격을 넘을수 없다는거다 이 알고리즘 이해해?
+이제 이해했다. 내가 또 “회차별 % 테이블”로 잘못 끌고 갔다.
+정확한 알고리즘은 이거다.
+기준 1: 최초 BUY 현재가
+기준 2: 직전 실제 BUY 현재가
+비율: 고정값 1개
+예:
+고정조건 = 직전 BUY 현재가 대비 -10% 이하
+최초 BUY 현재가 = 10,000원
+동작:
+BUY #1
+10,000원
+→ 진입
+BUY #2
+9,500원
+→ 직전 BUY 10,000원의 -10% 이하 아님
+→ 스킵
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+BUY #3
+8,500원
+→ 직전 BUY 10,000원의 -10% 이하
+→ 실질 2회차 진입
+→ 직전 BUY 현재가 갱신 = 8,500원
+다음 BUY
+8,000원
+→ 8,500원의 -10% 이하 아님
+→ 스킵
+다음 BUY
+7,600원
+→ 8,500원의 -10% 이하
+→ 실질 3회차 진입
+그리고 추가 안전조건:
+이후 BUY 가격은 최초 BUY 현재가를 초과하면 안 됨.
+즉:
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+BUY 신호는 독립적으로 계속 들어오지만, 실제 추가진입은 “최초가 이하 + 직전 실제 진입가 대비 고정비율 이하”일 때만 발생한다.
+다음 고고
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+좋다. 지금은 position_policy를 바로 고쳐야 한다. 핵심은 회차별 %가 아니라, 고정 비율 + 최초 BUY 현재가 상한 + 직전 실제 BUY 현재가 비교로 정정하는 것이다.
+5s 동안 생각함
+생성이 끊겨서 v9 파일만 다시 만들겠습니다. 방금 정정한 알고리즘 그대로 반영합니다.
+v9 작성 완료.
+정책 초안 v9 ZIP 다운로드
+추가/수정:
+position_policy.json
+개념정리 v9
+다음 뭐?
+지금 흐름상 다음은 3개 후보가 있다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+A. Position Policy 완성
+B. Exit Strategy 고도화
+C. 트러블(검토)관리
+그런데 우선순위는 A가 맞다.
+왜냐하면 지금 Position Policy가 거의 완성 직전인데 아직 핵심 하나가 안 정해졌다.
+현재 확정된 것.
+최초 BUY 현재가 = 기준점
+추가 BUY
+=
+최초 BUY 현재가 이하
+AND
+직전 실제 BUY 현재가 대비 -n%
+예)
+최초 BUY
+10000
+비율
+10%
+이면
+10000
+↓
+8500
+(실질 2회차)
+↓
+7600
+(실질 3회차)
+그런데 아직 안 정한 것.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+추가 BUY 간격 비율
+직전 실제 BUY 대비
+몇 % 하락 시
+다음 진입 허용?
+이걸 단일 값으로 둘지, 범위로 둘지다.
+나는 현재는
+단일 값
+이 맞다고 본다.
+예)
+5%
+10%
+15%
+20%
+운영자가 하나 선택.
+이게 지금 Position Policy 마지막 핵심에 가깝다.
+%는 실상 +-를모두 대응한는걸로 단일 가..
+오. 그게 더 맞다.
+내가 계속 하락장 추가매수 관점으로만 보고 있었네.
+실제로는 루틴마다 방향이 다를 수 있다.
+예를 들면.
+하락추종 추가진입
+=
+직전 BUY 대비 -10%
+도 있고.
+상승추종 추가진입
+=
+직전 BUY 대비 +10%
+도 있다.
+심지어.
+±0%
+도 가능.
+즉.
+현재가 >= 직전 BUY
+이면 진입.
+그러면 구조는.
+추가 BUY 가격조건
+기준
+=
+직전 실제 BUY 현재가
+변동률
+=
+사용자 입력
+예)
+-10%
+↓
+현재가 <= 직전 BUY × 0.9
+예)
++10%
+↓
+현재가 >= 직전 BUY × 1.1
+예)
+0%
+↓
+현재가 >= 직전 BUY
+또는
+현재가 <= 직전 BUY
+방향설정 필요.
+그러면 사실 옵션은 2개다.
+방향
+하락추종
+상승추종
+비율
+0~100%
+사용자 입력.
+그리고 최초 BUY 현재가 상한은 나는 여전히 유지하는 게 맞다고 봤는데...
+여기서 다시 생각해보니
+상승추종 전략
+을 허용하면
+현재가 <= 최초 BUY 현재가
+이 조건은 충돌한다.
+예)
+최초 BUY
+10000
+상승추종
++10%
+이면
+11000
+에서 진입해야 하는데
+최초 BUY 이하
+조건 때문에 영원히 진입 못 한다.
+그래서 여기서 중요한 질문이 하나 생긴다.
+최초 BUY 현재가 제한
+은
+하락추종 전략에서만 사용
+할 것인가?
+아니면
+상승추종 전략에서는 비활성
+할 것인가?
+내 생각에는 후자가 더 자연스럽다.
+왜냐하면 지금 논의하다 보니
+최초 BUY 현재가 이하
+는 사실 "평단관리형 추가매수" 전용 안전장치에 가깝고,
+상승추종 추가매수
+와는 철학 자체가 다르기 때문이다.
+이 부분이 Position Policy에서 다음 확정 포인트 같다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+가격제한 정책
+비활성
+BUY 신호 발생
+↓
+가격조건 검사 없음
+↓
+BUY
+최초 BUY 상한
+현재가 <= 최초 BUY 가격
+최초 BUY 하한
+현재가 >= 최초 BUY 가격
+양방향 범위
+최초 BUY 기준
+상승 +n%
+하락 -n%
+범위 내만 허용.
+직전 BUY 기준 변동률
+직전 실제 BUY 기준
++n%
+-n%
+도달 시 허용.
+그리고 지금 보니.
+최초 BUY 기준 제한
+과
+직전 BUY 기준 제한
+은 사실 서로 다른 계층이다.
+그래서 나중에 구현할 때는.
+가격제한 정책
+과
+추가진입 트리거 정책
+을 분리하는 게 더 깔끔할 것 같다.
+왜냐하면.
+최초 BUY 상한 활성
+AND
+직전 BUY -10%
+같이 조합해서 쓰고 싶을 가능성이 매우 높기 때문이다.
+이건 다음 Position Policy 정리 때 반영해야 할 사항으로 보인다.
+다음 고고
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+그래서 다음 단계는 사실상 완충(Buffer) 정책 세부 로직으로 넘어가도 될 수준이다. BUY, SELL, Cycle, Exit, Reset은 큰 뼈대가 거의 정리됐다.
+오케이 고고
+좋다.
+그럼 이제 남은 큰 덩어리인 완충(Buffer) 정책으로 가자.
+사실 완충은 이미 철학은 거의 확정되어 있다.
+완충의 존재 이유
+우리는 원래.
+BUY 신호
+=
+제한 없이 허용
+철학을 갖고 있다.
+즉.
+신호가 좋으면
+계속 진입
+이다.
+그런데 현실은.
+전체예산
+1억
+이라 해도.
+A종목
+B종목
+C종목
+D종목
+가 동시에 돈을 먹는다.
+그러면 어느 순간.
+예산부족
+이 발생.
+그래서 완충의 존재 이유는.
+신규 BUY 차단
+이 아니다.
+핵심은.
+선택과 집중
+이다.
+현재까지 확정된 철학
+예산 사용률.
+70%
+80%
+90%
+경고.
+설정 완충영역 진입.
+예)
+85%
+그러면.
+가장 성과가 나쁜 종목
+을 정리하기 시작.
+즉.
+수익률 최저
+종목을.
+조기마감
+으로 보냄.
+중요.
+이건.
+즉시 시장가 청산
+이 아니다.
+우리가 이미 정한 것.
+조기마감
+=
+마지막 SELL 대기
+이다.
+그래서 흐름.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+BUY 정책
+SELL 정책
+Exit Strategy
+Cycle State
+Position Policy
+Buffer Policy
+Trouble Policy(v1)
+여기까지 왔다.
+이 정도면 구조 설계는 상당히 높은 수준까지 올라온 상태다.
+다음부터는 예산엔진 세부화 또는 실제 구현 단계에서 검증하면서 수정하는 쪽이 더 효율적일 가능성이 크다.
+이름은 트러블관리보다는 다른 이름이 좋을듯
+나도 그렇게 생각한다.
+사실 "트러블관리"는 개발자 입장에서는 이해되는데,
+실제 운영자가 매일 보는 화면 이름으로는 좀 거칠다.
+우리가 지금 정의한 역할은 단순히 문제종목 모음이 아니다.
+진단
+복구
+응급조치
+격리
+관리
+까지 포함한다.
+그래서 후보를 생각해보면.
+1안 검토관리 (기존)
+장점
+익숙함
+거부감 없음
+단점
+기능이 너무 커졌는데 이름이 약함
+2안 복구관리
+장점
+현재 역할과 가장 가까움
+단점
+문제 발견 기능이 안보임
+3안 안정성관리
+장점
+현재 철학과 가장 잘 맞음
+안정성검사
+안정성관리
+연결도 자연스러움.
+단점
+조금 딱딱함
+4안 운영관리
+장점
+포괄적
+단점
+너무 범위가 넓음
+관제창과 역할 충돌.
+5안 예외관리
+장점
+정확함
+단점
+복구 기능 느낌이 약함
+6안 복구센터
+장점
+직관적
+단점
+UI 명칭으로는 다소 가벼움
+7안 안정성센터
+장점
+철학과 일치
+안정성검사
+↓
+안정성센터
+흐름 좋음.
+내가 지금까지 논의된 역할을 기준으로 보면.
+검토관리
+→ 안정성관리
+가 가장 자연스럽다.
+왜냐하면 이 창의 목적이
+문제종목 보관
+이 아니라.
+운영 안정성 확보
+이기 때문이다.
+그래서 현재 1순위 후보는.
+안정성관리
+2순위는.
+복구관리
+정도라고 본다.
+개인적으로는 지금까지 네가 강조해온
+안정성검사
+와 이어지는
+안정성관리
+가 가장 일관성이 좋아 보인다.
+그냥 검토관리로...차후 방향성에 맞는 이름이있으면 그거로 변경
+동의.
+지금은 굳이 이름 바꾸려고 애쓸 필요가 없어 보인다.
+오히려 지금의 검토관리는 프로젝트 전체에서 이미 많이 사용되고 있고,
+검토관리 이동
+검토관리 창
+검토관리 종목
+검토관리 복귀
+등이 전부 정착되어 있다.
+지금 단계에서
+검토관리 → 안정성관리
+검토관리 → 트러블관리
+검토관리 → 복구관리
+로 바꾸면 얻는 이득보다,
+문서/정책/UI/대화기록 수정량이 더 커진다.
+그래서 현재 확정안은.
+명칭:
+검토관리
+역할:
+문제종목 보관소
++
+안정성 확보
++
+복구 지원
++
+응급조치
++
+운영자 확인
+그리고 중요한 점.
+이름 = 검토관리
+기능 = 확장
+이다.
+즉 예전의 검토관리는
+문제종목 모아놓는 곳
+이었지만,
+현재의 검토관리는
+안정성검사 결과 수용
+미체결 취소
+현재가 청산
+시장가 청산
+재동기화
+루틴 재지정
+복귀
+까지 포함하는 개념으로 확장.
+그래서 현 시점에서는
+검토관리 유지
+가 가장 합리적이다.
+차후 실제 키움 연동 후 운영하면서
+"검토"보다 "복구" 역할이 훨씬 크다.
+라고 판단되면 그때 명칭 변경 검토.
+현재 상태 기준으로 보면 구조 설계 영역은 거의 끝이 보인다.
+남은 핵심은
+예산엔진 최종 정리
+실제 구현
+키움 연동 테스트
+실전 검증 후 보정
+정도다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+BUY 신호
+→ 가격조건
+→ 실제진입
+→ 회차증가
+→ X2/X3
+흐름이 이미 회차기준으로 완전히 맞물려 있기 때문이다.
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+- BUY 신호 생성 검증 완료
+- SELL 신호 생성 검증 완료
+- BUY 신호는 주문후보 생성기로 전달
+- SELL 신호는 보유수량 검증 후 주문후보 생성기로 전달
+- SELL 후보 생성 시 실제 보유수량과 mock_position 보유수량을 모두 참조
+- mock_position 기반 SELL 후보 생성 검증 완료
+PART 08. 주문엔진 정책
+(지금 ZIP에서 아직 안 열어본 08 파트)
+이게 가장 중요하다.
+STEP08~STEP20의 70% 이상이 여기 들어간다.
+추가될 내용:
+주문 파이프라인
+
+[출처: 마스터스펙_갱신자료_STEP44\작업진행상황대화히스토리_5.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-18 17:43:02 | 분류: 대화히스토리]
+1. 사고 개요
+MACD 루틴 구현 검토 과정에서 기존 마스터스펙, 작업진행상황대화히스토리, 확정 참조문서에 존재하지 않는 개념이 AI에 의해 삽입되었다.
+삽입된 대표 개념:
+HOLD 신호
+position_status 구조
+trade_set_id 구조
+STEP21 평단포지션구축 엔진
+STEP22 상태관리 설계
+능동매수 엔진 선행 구현
+이 개념들은 당시 확정 문서에 존재하지 않았으며 사용자 승인도 받지 않은 상태였다.
+그럼에도 AI가 일반적인 자동매매 시스템 구조를 기준으로 추론하여 프로젝트 개념처럼 설명하였다.
+결과적으로 프로젝트 방향과 무관한 설계 문서 및 코드가 생성되었다.
+2. 실제 발생한 문제
+2-1. HOLD 개념 삽입
+AI는 루틴 구조를 설명하면서:
+BUY
+SELL
+HOLD
+구조를 제안하였다.
+그러나 이후 검증 결과:
+작업진행상황대화히스토리
+마스터스펙
+확정 참조문서
+어느 곳에도 HOLD 신호 체계는 존재하지 않았다.
+이는 AI가 일반적인 매매 프로그램 구조를 프로젝트 구조로 착각한 사례이다.
+2-2. 상태관리 구조 선행 생성
+AI는:
+position_status
+trade_set_id
+buy_plan_status
+등을 포함한 상태관리 문서를 작성하였다.
+그러나 해당 구조는 프로젝트에서 확정된 적이 없었다.
+결과적으로 실제 구현보다 앞선 설계가 문서화되었다.
+2-3. 코드 오염
+다음 파일들이 생성되었다.
+macd_position_engine.py
+macd_signal_engine.py
+signal_result.py
+해당 파일들에는:
+HOLD
+position_plan
+buy_plan
+avg_adjustment
+등의 미확정 개념이 포함되었다.
+이후 프로젝트 기준본을 다시 확인한 결과 해당 파일들은 폐기 대상으로 판정되었다.
+3. 복구 작업
+복구 기준본:
+kiwoom_auto (41)(1).zip
+오염본:
+kiwoom_auto (42).zip
+판정:
+42 폐기
+41(1) 복귀
+으로 결정되었다.
+STEP21 문서 폐기
+STEP22 문서 폐기
+신규 생성 설계 문서 폐기
+신규 생성 엔진 파일 폐기
+조치가 수행되었다.
+4. 절대 금지 규칙
+규칙 1
+확정 문서에 없는 개념을 생성하지 말 것.
+예:
+HOLD
+POSITION_ACTIVE
+trade_set_id
+등.
+문서 근거 없이 생성 금지.
+규칙 2
+일반적인 업계 구조를 프로젝트 구조로 착각하지 말 것.
+예:
+다른 자동매매 프로그램에서 흔한 개념이라도 프로젝트 문서에 없으면 존재하지 않는 것으로 간주한다.
+규칙 3
+추론보다 문서 검증을 우선한다.
+순서:
+마스터스펙 확인
+작업진행상황대화히스토리 확인
+확정 참조문서 확인
+사용자 확인
+구현
+이 순서를 반드시 따른다.
+규칙 4
+설계 문서 작성은 구현 필요성이 검증된 이후에만 수행한다.
+문서를 먼저 만들고 구현 방향을 끌고 가는 행위를 금지한다.
+규칙 5
+사용자 승인 없는 신규 철학 추가 금지
+예:
+HOLD 도입
+상태머신 도입
+포지션 엔진 도입
+능동매수 엔진 도입
+등.
+반드시 기존 문서 근거 또는 사용자 승인 필요.
+5. 최종 결론
+본 사고는 구현 실패가 아니라 검증 실패 사고이다.
+문제의 원인은:
+문서 확인 이전에 AI 추론을 우선 적용한 것이다.
+향후 프로젝트에서는:
+문서 근거 없는 개념 생성 금지
+문서 근거 없는 코드 생성 금지
+문서 근거 없는 설계 문서 생성 금지
+를 최상위 안전 원칙으로 적용한다.
+
+[출처: routine_policy_draft_v3\sell_policy.json | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:45:08 | 분류: 기타문서/자료]
+{
+ "version": "1.1",
+ "policy_type": "sell_policy",
+ "description": "SELL 실행정책 v3 초안: 단일가격/다중호가 + 단일지점/다중지점 조합 및 다중지점 3개 모드 지원",
+ "sell_execution_axis": {
+ "price_axis": "single_price",
+ "time_axis": "single_point",
+ "available_price_axis": [
+ "single_price",
+ "multi_quote"
+ ],
+ "available_time_axis": [
+ "single_point",
+ "multi_point"
+ ]
+ },
+ "reference": {
+ "main_signal_price": {
+ "source": "current_price_at_main_sell_signal",
+ "fixed_during_signal_plan": true
+ },
+ "average_price": {
+ "source": "kiwoom_server_average_price",
+ "use_internal_average_price_for_validation": true
+ }
+ },
+ "sell_signal_condition": {
+ "oscillator_turn_down": true,
+ "profit_rate_reached": true,
+ "condition_operator": "or",
+ "target_profit_percent": 3.0
+ },
+ "single_price": {
+ "enabled": true,
+ "order_price_type": "current_price",
+ "order_basis": "holding_quantity"
+ },
+ "multi_quote": {
+ "enabled": false,
+ "quote_side": "sell",
+ "quote_levels": [
+ 1,
+ 3,
+ 5
+ ],
+ "quantity_distribution_percent": [
+ 40,
+ 30,
+ 30
+ ],
+ "order_basis": "holding_quantity",
+ "purpose": "가격의 종축 배치. 매도호가 분산으로 체결과 가격 개선 균형 조절."
+ },
+ "single_point": {
+ "enabled": true,
+ "trigger": "main_sell_signal",
+ "sell_quantity_percent": 100,
+ "purpose": "메인 SELL 신호 시점 1회 실행."
+ },
+ "multi_point": {
+ "enabled": false,
+ "reference_price": "main_signal_price",
+ "basis_description": "다중지점 비교 기준은 최초 메인 SELL 신호 발생 시 현재가로 고정한다.",
+ "mode": "interval_compare",
+ "available_modes": [
+ "fixed_time_split",
+ "interval_compare",
+ "time_window_price_condition"
+ ],
+ "common_limits": {
+ "max_rounds": 3,
+ "total_time_limit_minutes": 15,
+ "round_quantity_distribution_percent": [
+ 50,
+ 30,
+ 20
+ ],
+ "stop_when_position_closed": true,
+ "stop_when_buy_signal_occurs": true,
+ "stop_when_system_close_or_liquidation": true
+ },
+ "fixed_time_split": {
+ "enabled": false,
+ "description": "정해진 시간 안에 정해진 횟수로 분할 매도한다.",
+ "example": "10분 안에 3번 매도",
+ "split_count": 3,
+ "total_time_minutes": 10,
+ "interval_minutes": 3,
+ "price_filter": {
+ "enabled": false,
+ "basis": "main_signal_price",
+ "operator": "current_price_gte_reference_percent",
+ "percent": 0.0
+ }
+ },
+ "interval_compare": {
+ "enabled": true,
+ "description": "최초 매도 이후 일정 시간/봉마다 최초신호가 대비 현재가를 비교 후 매도한다.",
+ "example": "최초매도 이후 3분에 한 번 비교 매도",
+ "compare_interval": {
+ "type": "minute",
+ "minutes": 3,
+ "candles": null
+ },
+ "condition": {
+ "basis": "main_signal_price",
+ "operator": "current_price_gte_reference_percent",
+ "percent": 0.0
+ },
+ "max_compare_count": 3
+ },
+ "time_window_price_condition": {
+ "enabled": false,
+ "description": "정해진 시간 안에서 최초신호가 대비 특정 상승률 이상이면 회차 매도한다.",
+ "example": "15분 내 최초현재가 대비 +2% 이상이면 최대 3번 매도",
+ "time_limit_minutes": 15,
+ "condition": {
+ "basis": "main_signal_price",
+ "operator": "current_price_gte_reference_percent",
+ "percent": 2.0
+ },
+ "max_sell_count": 3,
+ "cooldown_between_orders_seconds": 10
+ }
+ }
+}
+
+[출처: routine_policy_draft_v3\buy_policy.json | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:45:08 | 분류: 기타문서/자료]
+{
+ "version": "1.1",
+ "policy_type": "buy_policy",
+ "description": "BUY 실행정책 v3 초안: 단일가격/다중호가 + 단일지점/다중지점 조합 및 다중지점 3개 모드 지원",
+ "buy_execution_axis": {
+ "price_axis": "single_price",
+ "time_axis": "single_point",
+ "available_price_axis": [
+ "single_price",
+ "multi_quote"
+ ],
+ "available_time_axis": [
+ "single_point",
+ "multi_point"
+ ]
+ },
+ "reference": {
+ "main_signal_price": {
+ "source": "current_price_at_main_buy_signal",
+ "fixed_during_signal_plan": true
+ },
+ "average_price": {
+ "source": "kiwoom_server_average_price",
+ "use_internal_average_price_for_validation": true
+ }
+ },
+ "single_price": {
+ "enabled": true,
+ "order_price_type": "current_price",
+ "order_basis": "amount"
+ },
+ "multi_quote": {
+ "enabled": false,
+ "quote_side": "buy",
+ "quote_levels": [
+ 1,
+ 3,
+ 5
+ ],
+ "budget_distribution_percent": [
+ 40,
+ 30,
+ 30
+ ],
+ "order_basis": "amount",
+ "purpose": "가격의 종축 배치. 순간 파동 속 체결 효율 제고."
+ },
+ "single_point": {
+ "enabled": true,
+ "trigger": "main_buy_signal",
+ "purpose": "메인 BUY 신호 시점 1회 실행."
+ },
+ "multi_point": {
+ "enabled": false,
+ "reference_price": "main_signal_price",
+ "basis_description": "다중지점 비교 기준은 최초 메인 BUY 신호 발생 시 현재가로 고정한다.",
+ "mode": "interval_compare",
+ "available_modes": [
+ "fixed_time_split",
+ "interval_compare",
+ "time_window_price_condition"
+ ],
+ "common_limits": {
+ "max_rounds": 5,
+ "total_time_limit_minutes": 15,
+ "round_budget_distribution_percent": [
+ 20,
+ 20,
+ 20,
+ 20,
+ 20
+ ],
+ "stop_when_budget_exhausted": true,
+ "stop_when_sell_signal_occurs": true,
+ "stop_when_system_close_or_liquidation": true
+ },
+ "fixed_time_split": {
+ "enabled": false,
+ "description": "정해진 시간 안에 정해진 횟수로 분할 매수한다.",
+ "example": "10분 안에 5번 매수",
+ "split_count": 5,
+ "total_time_minutes": 10,
+ "interval_minutes": 2,
+ "price_filter": {
+ "enabled": false,
+ "basis": "main_signal_price",
+ "operator": "current_price_lte_reference_percent",
+ "percent": 0.0
+ }
+ },
+ "interval_compare": {
+ "enabled": true,
+ "description": "최초 매수 이후 일정 시간/봉마다 최초신호가 대비 현재가를 비교 후 매수한다.",
+ "example": "최초매수 이후 3분에 한 번 비교 매수",
+ "compare_interval": {
+ "type": "minute",
+ "minutes": 3,
+ "candles": null
+ },
+ "condition": {
+ "basis": "main_signal_price",
+ "operator": "current_price_lte_reference_percent",
+ "percent": 0.0
+ },
+ "max_compare_count": 5
+ },
+ "time_window_price_condition": {
+ "enabled": false,
+ "description": "정해진 시간 안에서 최초신호가 대비 특정 하락률 이하가 되면 회차 매수한다.",
+ "example": "15분 내 최초현재가 대비 -2% 이하면 최대 10번 구매",
+ "time_limit_minutes": 15,
+ "condition": {
+ "basis": "main_signal_price",
+ "operator": "current_price_lte_reference_percent",
+ "percent": -2.0
+ },
+ "max_buy_count": 10,
+ "cooldown_between_orders_seconds": 10
+ }
+ }
+}
+
+[출처: routine_policy_draft_v3\루틴실행정책_개념정리_v3.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:45:08 | 분류: 운영정책]
+핵심 변경:
+- 다중지점의 기준가격을 최초 메인신호 발생 시 현재가로 확정한다.
+- 다중지점은 다음 BUY/SELL 신호를 기다리는 구조가 아니라, 최초 메인신호 이후 특정 시간/봉 안에서 해당 신호 가격에 최대한 근접하거나 더 유리한 가격에 체결되도록 실행 효율을 높이는 구조다.
+- 백테스트 전 다양한 방식의 검증이 가능하도록 다중지점 3개 모드를 모두 정책 파일에서 표현 가능하게 한다.
+1. 다중지점 기준가격
+
+[출처: routine_policy_draft_v3\루틴실행정책_개념정리_v3.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:45:08 | 분류: 운영정책]
+BUY 다중지점:
+- 기준가격 = 최초 메인 BUY 신호 발생 시 현재가
+- 이후 비교대상 = 현재가 vs 최초 BUY 신호 현재가
+
+[출처: routine_policy_draft_v3\루틴실행정책_개념정리_v3.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:45:08 | 분류: 운영정책]
+SELL 다중지점:
+- 기준가격 = 최초 메인 SELL 신호 발생 시 현재가
+- 이후 비교대상 = 현재가 vs 최초 SELL 신호 현재가
+2. 다중지점 3개 모드
+
+[출처: routine_policy_draft_v3\루틴실행정책_개념정리_v3.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:45:08 | 분류: 운영정책]
+메인:
+- BUY/SELL/CANCEL 신호 수신 후 주문/취소/체결추적 수행
+- 서버 평단, 현재가, 호가, 잔고 제공
+- 검토관리, 마감, 청산, 긴급정지 등 시스템 안전정책 우선
+
+[출처: routine_policy_draft_v3\루틴실행정책_개념정리_v3.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:45:08 | 분류: 운영정책]
+루틴:
+- BUY/SELL/CANCEL 신호 판단
+- 단일가격/다중호가/단일지점/다중지점 조합 결정
+- 다중지점 모드와 회차별 예산/수량 결정
+6. CANCEL
+
+[출처: routine_policy_draft_v3\루틴실행정책_개념정리_v3.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:45:08 | 분류: 운영정책]
+미체결은 즉시 실패가 아니다.
+기본은 시간/봉 제한을 우선하며, 가격 이탈만으로 즉시 취소하는 것은 기본값으로 사용하지 않는다.
+CANCEL은 루틴 입장에서는 신호이고, 메인 입장에서는 주문취소 행동이다.
+
+[출처: routine_policy_draft_v3\execution_policy.json | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:45:08 | 분류: 기타문서/자료]
+{
+ "version": "1.1",
+ "policy_type": "execution_policy",
+ "description": "루틴별 BUY/SELL/CANCEL 신호를 메인 주문 행동으로 변환하기 위한 공통 실행정책 v3 초안",
+ "order_basis": {
+ "buy_default_basis": "amount",
+ "sell_default_basis": "holding_quantity",
+ "support_quantity_order": true,
+ "support_amount_order": true,
+ "support_holding_quantity_order": true
+ },
+ "order_price_type": {
+ "default_buy_price_type": "current_price",
+ "default_sell_price_type": "current_price",
+ "supported_types": [
+ "market_price",
+ "current_price",
+ "limit_price",
+ "quote_price"
+ ]
+ },
+ "quote_data_usage": {
+ "enabled": true,
+ "source": "kiwoom_server_quote_data",
+ "max_quote_depth": 10,
+ "buy_quote_side": "buy",
+ "sell_quote_side": "sell",
+ "use_quote_quantity_for_reference": true,
+ "quote_quantity_is_reference_only": true
+ },
+ "signal_plan_record": {
+ "enabled": true,
+ "record_main_signal_price": true,
+ "record_main_signal_time": true,
+ "record_main_signal_candle_index": true,
+ "reference_price_is_fixed_during_plan": true
+ },
+ "fill_tracking": {
+ "enabled": true,
+ "track_partial_fill": true,
+ "track_remaining_quantity": true,
+ "track_remaining_budget": true,
+ "partial_fill_is_not_failure": true
+ },
+ "unfilled_handling": {
+ "enabled": true,
+ "delegate_to_cancel_policy": true,
+ "default_wait_seconds": 10,
+ "default_wait_candles": 1,
+ "price_escape_cancel_default": false
+ },
+ "retry": {
+ "enabled": true,
+ "max_retry_count": 3,
+ "retry_interval_seconds": 1,
+ "retry_target_buy": "remaining_budget",
+ "retry_target_sell": "remaining_quantity",
+ "on_retry_exhausted": "review_required"
+ },
+ "average_price_reference": {
+ "primary_source": "kiwoom_server_average_price",
+ "internal_average_price_usage": "validation_only",
+ "mismatch_action": "review_required"
+ },
+ "safety_rules": {
+ "reject_order_when_review_required": true,
+ "reject_buy_when_closing_or_liquidating": true,
+ "reject_new_buy_after_early_close": true,
+ "reject_new_buy_after_auto_close": true,
+ "system_cancel_has_priority_over_routine_cancel": true
+ },
+ "logging": {
+ "enabled": true,
+ "log_order_create": true,
+ "log_fill_update": true,
+ "log_cancel_signal": true,
+ "log_cancel_action": true,
+ "log_retry_order": true,
+ "log_policy_decision": true,
+ "log_multi_point_round": true,
+ "log_multi_quote_order": true
+ }
+}
+
+[출처: routine_policy_draft_v3\cancel_policy.json | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:45:08 | 분류: 기타문서/자료]
+{
+ "version": "1.1",
+ "policy_type": "cancel_policy",
+ "description": "BUY/SELL 미체결 대응용 CANCEL 정책 v3 초안",
+ "cancel_identity": {
+ "routine_cancel": "signal",
+ "main_cancel": "action",
+ "system_cancel_has_priority": true
+ },
+ "default_principle": {
+ "unfilled_is_not_immediate_failure": true,
+ "prefer_time_or_candle_limit_over_price_escape": true,
+ "cancel_remaining_only": true,
+ "partial_fill_is_valid": true
+ },
+ "buy_cancel": {
+ "enabled": true,
+ "target": "unfilled_buy_orders",
+ "trigger": {
+ "time_limit_enabled": true,
+ "time_limit_seconds": 10,
+ "candle_limit_enabled": true,
+ "candle_limit_count": 1,
+ "price_escape_enabled": false,
+ "price_escape_basis": "main_signal_price",
+ "price_escape_percent": 1.0
+ },
+ "partial_fill": {
+ "allow_partial_fill": true,
+ "cancel_remaining_only": true
+ },
+ "after_cancel": {
+ "action": "re_buy",
+ "target": "remaining_budget",
+ "max_retry_count": 3
+ }
+ },
+ "sell_cancel": {
+ "enabled": true,
+ "target": "unfilled_sell_orders",
+ "trigger": {
+ "time_limit_enabled": true,
+ "time_limit_seconds": 10,
+ "candle_limit_enabled": true,
+ "candle_limit_count": 1,
+ "price_escape_enabled": false,
+ "price_escape_basis": "main_signal_price",
+ "price_escape_percent": 1.0
+ },
+ "partial_fill": {
+ "allow_partial_fill": true,
+ "cancel_remaining_only": true
+ },
+ "after_cancel": {
+ "action": "re_sell",
+ "target": "remaining_quantity",
+ "max_retry_count": 3
+ }
+ }
+}
+
+[출처: routine_policy_draft_v2\루틴실행정책_개념정리_v2.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:31:32 | 분류: 운영정책]
+작성 목적:
+- MACD 오실레이터 루틴을 시작점으로 하되, 볼린저밴드/엔벨로프/RSI 등 다른 루틴에서도 재사용 가능한 실행정책 구조를 정의한다.
+- 메인파트는 고정 실행 행동을 담당하고, 루틴은 기법별 신호와 실행정책을 담당한다.
+- v2에서는 execution_policy.json을 추가하여 BUY/SELL/CANCEL 신호가 실제 주문 행동으로 변환되는 공통 실행 계층을 분리한다.
+1. 기본 역할 분리
+
+[출처: routine_policy_draft_v2\루틴실행정책_개념정리_v2.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:31:32 | 분류: 운영정책]
+루틴파트:
+- BUY / SELL / CANCEL 신호 판단
+- 단일가격, 다중호가, 단일지점, 다중지점 조합 결정
+- 미체결 대응 조건 판단
+- 루틴별 실행정책 커스터마이징
+2. BUY / SELL / CANCEL 정체성
+BUY:
+- 포지션 구축 또는 확대 신호
+SELL:
+- 포지션 축소 또는 청산 신호
+
+[출처: routine_policy_draft_v2\루틴실행정책_개념정리_v2.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:31:32 | 분류: 운영정책]
+CANCEL:
+- 루틴 입장에서는 신호
+- 메인 입장에서는 주문취소 행동
+- 미체결 주문을 정리하고 재 BUY 또는 재 SELL로 이어가기 위한 실행정책 신호
+3. 매수/매도 실행축
+가격축:
+- 단일가격
+- 다중호가
+시간축:
+- 단일지점
+- 다중지점
+
+[출처: routine_policy_draft_v2\루틴실행정책_개념정리_v2.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:31:32 | 분류: 운영정책]
+다중호가는 가격의 종축 개념이다.
+BUY 또는 SELL 신호 시 여러 호가에 주문을 배치하여 순간 파동 속에서 체결 효율을 높이는 기법이다.
+5. 다중지점 개념
+
+[출처: routine_policy_draft_v2\루틴실행정책_개념정리_v2.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:31:32 | 분류: 운영정책]
+다중지점은 시간의 횡축 개념이다.
+다음 BUY/SELL 신호를 기다리는 것이 아니라, 최초 메인 신호 발생 이후 특정 시간 또는 봉 안에서 해당 신호 가격에 최대한 근접하거나 더 유리한 가격에 체결되도록 실행 효율을 높이는 기법이다.
+
+[출처: routine_policy_draft_v2\루틴실행정책_개념정리_v2.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:31:32 | 분류: 운영정책]
+BUY 주문 후 부분체결 또는 미체결 발생:
+- 미체결 잔량만 CANCEL
+- 잔여 예산 기준 재 BUY 가능
+- 부분체결은 인정
+- 목표는 해당 BUY 신호의 실행 효율 제고
+9. 매도 미체결 대응
+
+[출처: routine_policy_draft_v2\루틴실행정책_개념정리_v2.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:31:32 | 분류: 운영정책]
+SELL 주문 후 부분체결 또는 미체결 발생:
+- 미체결 잔량만 CANCEL
+- 잔여 수량 기준 재 SELL 가능
+- 전량매도는 주문 의도이며, 실제 체결은 부분체결될 수 있음
+- 최종 목표는 보유수량 0 또는 루틴이 정한 잔여수량
+10. execution_policy.json 역할
+execution_policy.json은 루틴별 신호와 메인 주문행동 사이의 공통 실행 규칙이다.
+
+[출처: routine_policy_draft_v2\루틴실행정책_개념정리_v2.txt | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:31:32 | 분류: 운영정책]
+권장 파일:
+- buy_policy.json
+- sell_policy.json
+- cancel_policy.json
+- execution_policy.json
+
+[출처: routine_policy_draft_v2\execution_policy.json | 기준일: 2026-06-16 | 수정시각: 2026-06-16 23:31:32 | 분류: 기타문서/자료]
+{
+ "version": "1.0",
+ "policy_type": "execution_policy",
+ "identity": {
+ "description": "루틴별 BUY/SELL/CANCEL 신호를 메인 주문 행동으로 변환하기 위한 공통 실행정책 초안",
+ "main_role": "fixed_order_execution",
+ "routine_role": "signal_and_execution_strategy"
+ },
+ "order_basis": {
+ "buy_default_basis": "amount",
+ "sell_default_basis": "holding_quantity",
+ "support_quantity_order": true,
+ "support_amount_order": true,
+ "support_holding_quantity_order": true
+ },
+ "order_price_type": {
+ "default_buy_price_type": "current_price",
+ "default_sell_price_type": "current_price",
+ "supported_types": [
+ "market_price",
+ "current_price",
+ "limit_price",
+ "quote_price"
+ ]
+ },
+ "quote_data_usage": {
+ "enabled": true,
+ "source": "kiwoom_server_quote_data",
+ "max_quote_depth": 10,
+ "buy_quote_side": "buy",
+ "sell_quote_side": "sell",
+ "use_quote_quantity_for_reference": true,
+ "quote_quantity_is_reference_only": true
+ },
+ "fill_tracking": {
+ "enabled": true,
+ "track_partial_fill": true,
+ "track_remaining_quantity": true,
+ "track_remaining_budget": true,
+ "partial_fill_is_not_failure": true
+ },
  "unfilled_handling": {
  "enabled": true,
  "delegate_to_cancel_policy": true,
@@ -3599,277 +5632,6 @@ lock.order_id -> order_queue.order_id
 lock.source_signal_id -> routine_signals.signal_id
 lock.execution_id -> execution.execution_id(향후)
 
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-SOURCE: MASTER_SPEC_추가갱신_order_provenance_주문생성이력_2026-07-03.txt
-==================================================
-MASTER_SPEC_추가갱신_order_provenance_주문생성이력_2026-07-03
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-이 단계까지 오면서 주문 후보는 side, quantity, price, candidate_status, order_intent 등을 갖게 되었다.
-하지만 “왜 이 주문 후보가 만들어졌는가”를 설명하는 정보가 부족했다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-2. order_intent와 order_provenance의 역할 차이
-==================================================
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-3. 구현 범위
-==================================================
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-변경 파일:
-- order_queue.py
-- tests/test_order_queue_approval_scenarios.py
-추가 함수:
-- build_order_provenance_from_signal(signal)
-추가 필드:
-- order["order_provenance"]
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-삽입 위치:
-- order_queue.signal_to_order_candidate(signal, index=0)
-- order_candidate_engine.build_order_candidate(signal) 결과 후보에 order_provenance를 추가한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-이 위치가 적절한 이유:
-- signal_record 원본과 order 후보를 동시에 알고 있다.
-- order_candidate_engine.py는 수량/금액/가격 후보 계산에 집중할 수 있다.
-- signal 출처 메타데이터는 order_queue.py에서 붙이는 것이 책임 분리에 맞다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-signal_source
-- signal_record.source.
-- 예: routine_signal_probe, manual_verification.
-signal_created_at
-- signal 생성 시각.
-signal_updated_at
-- signal 갱신 시각이 있으면 기록.
-routine
-- signal_record.routine.
-- 예: 지표추종매매.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-unresolved
-- source_ui_path, rule_path, setting_set 등 핵심 출처가 아직 불명확하므로 true.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-6. unresolved 정책
-==================================================
-order_provenance.unresolved는 현재 true이다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-- rule_path
-- source_ui_path
-- setting_set
-- source_candle_time
-- source_candle_close
-- engine
-- routine_path/rules_path
-- indicator_follow_ui_state snapshot/hash
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-8. 실행 로직과의 관계
-==================================================
-order_provenance는 실행 판단에 사용하지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-결과:
-- py_compile 통과.
-- order_queue_approval_scenarios: 3 tests OK.
-- adapter preview + preflight single order: 10 tests OK.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-10. 향후 확장 방향
-==================================================
-향후 provenance 보강 후보:
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-5. candle snapshot 추가
-- source_candle_time
-- source_candle_close
-- source_candle_ohlcv
-- 단, 신호 발생 당시 snapshot을 안전하게 기록할 수 있을 때만 추가.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-6. GUI 상세보기 활용
-- 주문후보 상세보기에서 provenance를 표시.
-- “왜 이 주문이 만들어졌는가”를 운영자가 확인할 수 있도록 함.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-7. 로그/감사 추적
-- order_provenance를 runtime/order_execution_log.json 또는 별도 audit log와 연결 가능.
-- 단, 실행 판단과는 분리.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-11. MASTER SPEC 반영 요약
-==================================================
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-12. 최종 결론
-==================================================
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-order_provenance 추가로 주문 후보는 이제 “어떻게 주문할 것인가”뿐 아니라 “왜 이 주문 후보가 생겼는가”도 설명할 수 있게 되었다.
-현재 단계에서는 이 정보가 실행 판단에 영향을 주지 않는다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-PENDING
- ↓ Approval
-APPROVED
- ↓ Policy
-EXECUTABLE
- ↓ Preflight
-REAL_READY
- ↓ Final Execution Guard
-ORDER_QUEUED
- ↓ SendOrder
-ORDER_SENT
- ↓ 서버응답
-ORDER_ACCEPTED / REJECTED
- ↓ 체결
-PARTIAL_FILLED
- ↓ 마지막 Fill
-FILLED
- ↓ Position 종료 시
-CLOSED
-차단 상태
-- BLOCKED
-- BLOCKED_POLICY
-- BLOCKED_REAL
-종료 상태
-- CANCELLED
-- EXPIRED
-- ERROR
-3. 상태별 책임
-PENDING
-- OrderCandidateController
-APPROVED/BLOCKED
-- ApprovalController
-EXECUTABLE/BLOCKED_POLICY
-- OperationPolicyController
-REAL_READY/BLOCKED_REAL
-- RealPreflightController
-ORDER_QUEUED
-- ExecutionController
-ORDER_SENT
-- Kiwoom Boundary
-ORDER_ACCEPTED
-- Kiwoom 응답
-PARTIAL_FILLED/FILLED
-- FillEventController
-CLOSED
-- Close/Liquidation Controller
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-4. 금지 전이 예시
-- PENDING → REAL_READY
-- APPROVED → ORDER_SENT
-- EXECUTABLE → FILLED
-- REAL_READY → FILLED
-- BLOCKED → ORDER_SENT
-- ERROR → FILLED
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-9. 금지
-- Order만으로 Position 생성
-- SendOrder 성공만으로 Position 변경
-- 서버 확인 없는 자동 복원
-- Position 직접 수정으로 체결 이력 대체
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-SOURCE: MASTER_SPEC_추가갱신_Request_Hash_중복실행방지_설계_2026-07-03.txt
-==================================================
-MASTER_SPEC_추가갱신_Request_Hash_중복실행방지_설계_2026-07-03
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-2. 생성 시점
-ExecutionController가 Final Execution Guard를 모두 통과한 뒤,
-ORDER_QUEUED 생성 직전에 생성한다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-3. 입력 후보
-- order_id
-- source_signal_id
-- code
-- side
-- quantity
-- price
-- account_no
-- order_type
-- hoga
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-7. 금지
-- Candidate 단계 생성
-- Approval 단계 생성
-- Policy 단계 생성
-- Preflight 단계 생성
-- Adapter Preview 단계 생성
-- GUI 직접 생성
-- Timer 직접 생성
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-8. 향후 구현 순서
-1) Request Hash 규격 확정
-2) Execution Request 연동
-3) Lock 연동
-4) Audit Log 기록
-5) SendOrder 직전 중복 검사
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-SOURCE: MASTER_SPEC_추가갱신_Review_Management_주문파이프라인연계_2026-07-03.txt
-==================================================
-MASTER_SPEC_추가갱신_Review_Management_주문파이프라인연계_2026-07-03
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-관계
-Signal -> Review
-Order -> Review
-Execution -> Review
-Fill -> Review
-Position -> Review
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-SOURCE: MASTER_SPEC_추가갱신_실주문실행책임_ORDER_QUEUED_주문생명주기_2026-07-03.txt
-==================================================
-MASTER_SPEC_추가갱신_실주문실행책임_ORDER_QUEUED_주문생명주기_2026-07-03
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-==================================================
-1. 현재 확정된 이전 단계
-==================================================
-현재 주문 파이프라인은 아래 단계까지 안전하게 고정되어 있다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-execution_enabled는 "실제 주문 실행 허용 여부"를 나타내는 order 단위 최종 실행 플래그이다.
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-허용 후보:
-1. 운영자 수동 승인 UI
-2. 명시적 최종 실행 함수
-3. 실매매 모드 전환 후 개별 order 승인
-4. 향후 별도 Approval + Guard + Lock을 모두 통과한 실행 컨트롤
-
-[출처: 마스터스펙\MASTER_SPEC_통합본_2026-07-03_FINAL_REVISED\merged_by_index\01_Order_Pipeline_merged.txt | 기준일: 2026-07-03 | 수정시각: 2026-07-03 15:22:26 | 분류: MASTER_SPEC]
-금지:
-- routine_signal_probe가 true로 변경 금지.
-- routine_signal_consumer가 true로 변경 금지.
-- order_approval_engine이 true로 변경 금지.
-- operation_policy_gate가 true로 변경 금지.
-- real_order_preflight가 true로 변경 금지.
-- kiwoom_order_adapter preview가 true로 변경 금지.
-- Timer Tick에서 자동 true 전환 금지.
 
 Original Body Marker: END
 
@@ -3881,4 +5643,4 @@ Reference Navigation
 - Next: PART04_ROUTINE.md
 - Full PART: PART04_ROUTINE.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-07_RULE_APPLY_PREVIEW_EXECUTION_PREVIEW_CONTROLLER.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
