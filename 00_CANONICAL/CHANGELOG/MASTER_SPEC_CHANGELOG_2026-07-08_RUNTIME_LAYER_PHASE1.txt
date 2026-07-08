@@ -1,0 +1,122 @@
+MASTER_SPEC_CHANGELOG_2026-07-08_RUNTIME_LAYER_PHASE1
+
+작성일: 2026-07-09
+
+문서 목적
+- Runtime Layer Phase1 Canonical 병합 내용을 CHANGELOG로 기록한다.
+- 본 CHANGELOG는 Canonical, UPDATE, REFERENCE를 추가 수정하지 않고 이미 병합/이동/아카이브 처리된 산출물을 기준으로 작성한다.
+
+1. 기준 Canonical
+- 기준 Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt`
+- 아카이브된 중복 Canonical 후보: `20_ARCHIVE/CANONICAL_CANDIDATES/MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_PROJECTION_PERSISTENCE_RECOVERY_RECONCILIATION.txt`
+
+2. 병합된 UPDATE
+- `10_UPDATE/MERGED/UPDATE_20260708_LIFECYCLE_RUNTIME_PROJECTION.txt`
+- `10_UPDATE/MERGED/UPDATE_20260708_RUNTIME_LAYER_PHASE1_PROJECTION_PERSISTENCE_RECOVERY_RECONCILIATION.txt`
+- Projection 단독 UPDATE와 Runtime Layer Phase1 UPDATE의 중복 검토 결과, Phase1 Canonical은 Projection 상세 규격을 통합한 병합본으로 기록한다.
+
+3. Runtime Layer Phase1 병합 요약
+- Runtime Layer Phase1은 lifecycle 처리 이후 runtime 상태를 직접 쓰기 전 Projection, Persistence Preview, Recovery Preview, Reconciliation Preview를 분리하는 preview-only runtime 보호 계층으로 반영되었다.
+- Runtime 상태는 즉시 write하지 않고 projection/persistence/recovery/reconciliation preview 결과로 분리한다.
+- position, balance, runtime 파일 변경은 실제 commit 계층과 분리한다.
+- GUI update, SendOrder, Chejan 호출은 Runtime Layer Phase1에서 수행하지 않는 것으로 기록한다.
+
+4. Projection 상세 규격 통합
+- Projection 단독 UPDATE의 상세 규격을 Phase1 Canonical에 통합했다.
+- 반영 위치 후보는 `02_Runtime_Data_Model`의 상세 규격이며, Canonical에는 `02.10 Runtime Projection (상세 규격)`으로 정리되었다.
+- Projection은 lifecycle/fill/evidence 기반 runtime 후보를 계산하는 계층으로 기록한다.
+- positions, fills, balances, runtime snapshot 후보를 기준으로 position/balance/runtime state candidate를 계산한다.
+- Projection은 계산/후보 생성 계층이며 실제 runtime file write를 수행하지 않는다.
+- Projection 결과는 Persistence Preview, Recovery Preview, Reconciliation Preview의 입력 후보가 된다.
+
+5. Persistence Preview
+- Canonical에는 `02.11 Runtime Persistence Preview`로 반영되었다.
+- Persistence Preview는 Projection 결과를 runtime 저장 대상으로 반영하기 전 persistence plan candidate를 검토하는 계층이다.
+- 실제 파일 저장은 수행하지 않는다.
+- runtime file write는 별도 Runtime Commit Executor 계층에서만 수행해야 한다.
+- Persistence Preview 결과는 Review 또는 Commit 후보로만 전달한다.
+
+6. Recovery Preview
+- Canonical에는 `02.12 Runtime Recovery Preview`로 반영되었다.
+- Recovery Preview는 runtime 상태가 없거나 불완전하거나 재시작 후 재구성이 필요한 상황에서 복구 후보를 계산하는 계층이다.
+- recovery candidate, recoverable 여부, blocked/invalid reason, recovery evidence, preview safety flags를 기록하는 후보 구조로 정리한다.
+- Recovery Preview는 자동 복구 commit이 아니다.
+- 실제 runtime 파일 생성/수정은 수행하지 않는다.
+
+7. Reconciliation Preview
+- Canonical에는 `02.13 Runtime Reconciliation Preview`로 반영되었다.
+- Reconciliation Preview는 projection, persistence, recovery 결과와 기존 runtime 기준 사이의 불일치를 검토하는 계층이다.
+- mismatch list, reconciliation candidate, review_required 여부, blocked/invalid reason, preview safety flags를 기록하는 후보 구조로 정리한다.
+- Reconciliation Preview는 자동 보정 계층이 아니다.
+- 불일치가 있어도 runtime 파일을 직접 수정하지 않는다.
+
+8. Preview Safety
+- Canonical에는 `02.14 Preview 안전선 (Preview Safety)`로 반영되었다.
+- 필수 safety flag:
+  - `runtime_write=False`
+  - `position_write=False`
+  - `balance_write=False`
+  - `gui_update_called=False`
+  - `send_order_called=False`
+  - `chejan_called=False`
+- Runtime Layer Phase1은 preview-only 계층이며 runtime, position, balance, GUI, SendOrder, Chejan 호출 금지선을 유지한다.
+
+9. 실행 흐름 교차참조
+- 상세 규격은 `02_Runtime_Data_Model`에 반영한다.
+- 실행 흐름 요약과 교차참조는 `29.x Execution` 장에 반영한다.
+- 후보 흐름은 다음 구조로 기록한다.
+
+```text
+Chejan / Lifecycle Preview
+↓
+Runtime Projection
+↓
+Runtime Persistence Preview
+↓
+Runtime Recovery Preview
+↓
+Runtime Reconciliation Preview
+↓
+Runtime Commit Executor Preview 후보
+```
+
+10. 구현 파일 및 테스트 파일
+- 구현 파일:
+  - `lifecycle_runtime_projection.py`
+  - `lifecycle_runtime_persistence.py`
+  - `lifecycle_runtime_recovery.py`
+  - `lifecycle_runtime_reconciliation.py`
+- 테스트 파일:
+  - `tests/test_lifecycle_runtime_projection.py`
+  - `tests/test_lifecycle_runtime_persistence.py`
+  - `tests/test_lifecycle_runtime_recovery.py`
+  - `tests/test_lifecycle_runtime_reconciliation.py`
+
+11. 테스트 결과
+- Runtime Layer Phase1 관련 테스트: 29 OK
+- 전체 unittest: 2563 OK
+- Projection 계층 테스트는 runtime projection 후보 계산과 preview safety flag 검증으로 기록한다.
+- Persistence/Recovery/Reconciliation Preview 테스트는 실제 파일 write 없이 preview-only 결과 생성 검증으로 기록한다.
+
+12. UPDATE 2개 MERGED 이동
+- Projection 단독 UPDATE는 Phase1 병합 과정에서 상세 규격으로 흡수되어 MERGED 대상으로 관리한다.
+- Runtime Layer Phase1 UPDATE는 Projection/Persistence/Recovery/Reconciliation Preview 전체 묶음으로 MERGED 대상으로 관리한다.
+- 두 UPDATE 모두 `10_UPDATE/MERGED` 경로 기준으로 CHANGELOG에 기록한다.
+
+13. 중복 Canonical 후보 아카이브 처리
+- `MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_PROJECTION_PERSISTENCE_RECOVERY_RECONCILIATION.txt` 후보는 중복 Canonical 후보로 아카이브 처리된 것으로 기록한다.
+- 보관 위치: `20_ARCHIVE/CANONICAL_CANDIDATES/`
+- 최종 기준 Canonical은 `MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt`로 기록한다.
+
+14. 유지된 금지선
+- Canonical 추가 수정 없음
+- UPDATE 추가 수정 없음
+- REFERENCE 수정 없음
+- Python/kiwoom_auto 수정 없음
+- runtime/rules.json 수정 없음
+- Git commit/push 없음
+- `temp_merge.py` add 없음
+
+생성 파일
+- `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-08_RUNTIME_LAYER_PHASE1.txt`
+- `00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-08_RUNTIME_LAYER_PHASE1.txt`

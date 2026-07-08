@@ -1,16 +1,21 @@
-# PART02_RUNTIME
+MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED
 
-Reference Edition
+작성일: 2026-07-08
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt
+원본 업데이트:
+- 10_UPDATE/INBOX/UPDATE_20260708_LIFECYCLE_RUNTIME_PROJECTION.txt
+- 10_UPDATE/INBOX/UPDATE_20260708_RUNTIME_LAYER_PHASE1_PROJECTION_PERSISTENCE_RECOVERY_RECONCILIATION.txt
 
-생성일: 2026-07-09
+참고 기준 Canonical:
+- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_EXECUTION_SENDORDER_CHEJAN_LIFECYCLE_PIPELINE.txt
 
-주의: 본 문서는 AI 참조용 분할본이며 공식 원본은 CURRENT의 Canonical이다.
+요약
+본 문서는 Runtime Layer Phase 1 관련 두 건의 UPDATE 문서(Projection 규격 초안, Phase1 구현/프리뷰 규격)를 하나의 Canonical 규격으로 통합한 결과물이다.
+통합 원칙에 따라 Projection 규격(데이터 모델, Projection 스키마, fills → positions → balances 계산 규칙, idempotency, 트리거/검증/테스트 시나리오)은 그대로 유지되며,
+Phase1 UPDATE의 Projection / Persistence Preview / Recovery Preview / Reconciliation Preview / Preview Safety / Runtime Layer 구조 / 구현 파일 목록 및 테스트 항목을 함께 포함한다.
 
-Part Summary: 02_Runtime_Data_Model: Runtime Projection, Persistence Preview, Recovery Preview, Reconciliation Preview, and Preview Safety.
+이 파일은 새로운 Canonical 산출물로서 02_Runtime_Data_Model 및 29.x Execution 장에 반영될 상세/요약 규격을 포함한다. 기존 Canonical 파일은 직접 수정하지 않았다.
 
-Original Body Marker: START
 ==================================================
 02_Runtime_Data_Model
 ==================================================
@@ -135,14 +140,74 @@ Idempotency
 설계 원칙 요약(02 장)
 - Projection은 계산/후보 생성 계층이며, Persistence/Recovery/Reconciliation Preview는 write를 수행하지 않는 안전한 검토 계층이다.
 
+==================================================
+29.x Execution (요약 및 교차참조)
+==================================================
 
-Original Body Marker: END
+29.x.1 Runtime Layer Phase 1 요약
 
----
+목적
+- Lifecycle 처리가 생성한 상태 후보를 runtime에 즉시 쓰지 않고 Preview 계층으로 분리하여
+  저장/복구/조정 가능성 및 안전성을 사전 검토하는 보호 계층을 제공한다.
 
-Reference Navigation
+핵심 방향
+- runtime state를 즉시 write하지 않고 projection/persistence/recovery/reconciliation preview 결과로 분리한다.
+- position, balance, runtime 파일 변경은 Runtime Commit Executor 등 별도 commit 계층에서만 수행한다.
+- GUI update, SendOrder, Chejan 호출 등 외부 연계 호출은 Phase 1에서 수행하지 않는다.
 
-- Previous PART: PART01_SYSTEM_FOUNDATION.md
-- Next PART: PART03_GUI.md
-- INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt
+권장 실행 흐름
+Lifecycle / Evidence Review Result
+↓
+Runtime Projection
+↓
+Runtime Persistence Preview
+↓
+Runtime Recovery Preview
+↓
+Runtime Reconciliation Preview
+↓
+Runtime Commit 후보 또는 Review 후보
+
+교차참조
+- 02_Runtime_Data_Model: Projection 상세 규격, Persistence/Recovery/Reconciliation Preview 상세
+- 04_Implementation_Test_Verification: 테스트 시나리오 및 검증 기준
+
+29.x.2 구현 파일(추천)
+- lifecycle_runtime_projection.py  -- lifecycle/fill/evidence 기반 runtime projection 후보 계산
+- lifecycle_runtime_persistence.py -- projection 결과의 저장 가능성 및 persistence plan preview
+- lifecycle_runtime_recovery.py    -- runtime 재구성/복구 후보 preview
+- lifecycle_runtime_reconciliation.py -- 불일치/조정 후보 preview
+
+29.x.3 테스트 파일(추천)
+- tests/test_lifecycle_runtime_projection.py
+- tests/test_lifecycle_runtime_persistence.py
+- tests/test_lifecycle_runtime_recovery.py
+- tests/test_lifecycle_runtime_reconciliation.py
+
+29.x.4 MASTER_SPEC 반영 위치(권고)
+- 세부 규격: 02_Runtime_Data_Model (Runtime Projection, Persistence/Recovery/Reconciliation Preview, 데이터 계약, preview safety flags)
+- 운영/운용 요약: 29.x Execution (Phase 1 요약, Execution ↔ Runtime Layer 교차참조)
+
+29.x.5 Preview 안전성 및 실행 금지선(요약)
+- Preview 실행은 항상 preview safety flags를 포함해야 하며, 모든 preview 단계에서 runtime_write=False 등의 금지선이 준수되어야 한다.
+
+==================================================
+부록: 구현 기준/참조
+==================================================
+
+기준 구현 커밋(참고)
+- Runtime Projection: 50f84ec34f9fd586a7f7d26006777521d6cffece
+- Runtime Persistence Preview: c816c1092ba30e5a72fea51f275671ec414ea517
+- Runtime Recovery Preview: c6ebafe702cf7bae90b8522fa7f9c1504b822e7a
+- Runtime Reconciliation Preview: 27806cd55a377e17e706efea49778e0d1727ce8f
+
+검토 및 테스트 기록(권장)
+- Projection 계층 테스트: runtime projection 후보 계산과 preview safety flag 검증
+- Persistence/Recovery/Reconciliation Preview 테스트: 실제 파일 write 없이 preview-only 결과 생성 검증
+- 통합 테스트: Phase 1 전체 흐름(Projection → Persistence Preview → Recovery Preview → Reconciliation Preview → Commit 후보)에서 safety flags 유지 여부 검증
+
+주의 사항
+- 본 Canonical 파일은 두 UPDATE 문서를 Canonical 형식으로 통합한 결과물이다. 기존 Canonical/Reference 파일은 직접 수정하지 않았으며,
+  실제 MASTER_SPEC 반영(정식 승인 및 반영 절차)은 별도의 승인/검토 프로세스를 거쳐야 한다.
+
+끝.

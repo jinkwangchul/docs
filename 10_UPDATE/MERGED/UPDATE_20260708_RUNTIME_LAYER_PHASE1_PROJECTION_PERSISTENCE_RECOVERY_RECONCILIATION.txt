@@ -1,0 +1,418 @@
+# UPDATE_20260708_RUNTIME_LAYER_PHASE1_PROJECTION_PERSISTENCE_RECOVERY_RECONCILIATION
+
+문서 목적:
+
+이 문서는 `kiwoom_auto`에 반영된 Runtime Layer Phase 1 구현 내용을
+MASTER_SPEC Canonical 반영 후보 UPDATE로 정리한다.
+
+이 문서는 Canonical이 아니다.
+이 문서는 CHANGELOG가 아니다.
+이 문서는 Reference Edition이 아니다.
+이 문서는 구현 코드가 아니다.
+
+MASTER_SPEC 병합 전 검토 후보로만 사용한다.
+
+작성 기준:
+
+- 작성일: 2026-07-08
+- 작성 프로젝트: `docs`
+- 작성 위치: `10_UPDATE/INBOX`
+- 생성 파일: `UPDATE_20260708_RUNTIME_LAYER_PHASE1_PROJECTION_PERSISTENCE_RECOVERY_RECONCILIATION.txt`
+- 기준 구현 범위: Runtime Layer Phase 1
+- 기준 구현 성격: Projection, Persistence Preview, Recovery Preview, Reconciliation Preview
+
+기준 구현 커밋:
+
+1. Runtime Projection: `50f84ec34f9fd586a7f7d26006777521d6cffece`
+2. Runtime Persistence Preview: `c816c1092ba30e5a72fea51f275671ec414ea517`
+3. Runtime Recovery Preview: `c6ebafe702cf7bae90b8522fa7f9c1504b822e7a`
+4. Runtime Reconciliation Preview: `27806cd55a377e17e706efea49778e0d1727ce8f`
+
+보호 원칙:
+
+- 이번 UPDATE 작성 작업은 `docs` 프로젝트에서 문서 생성만 수행한다.
+- Canonical을 수정하지 않는다.
+- CHANGELOG를 생성하거나 수정하지 않는다.
+- Reference Edition을 수정하지 않는다.
+- `kiwoom_auto` 로컬 프로젝트를 수정하지 않는다.
+- Python 파일을 수정하지 않는다.
+- runtime 파일을 수정하지 않는다.
+- `rules.json`을 수정하지 않는다.
+- Git commit/push를 수행하지 않는다.
+- 파일 삭제를 수행하지 않는다.
+
+## 1. Runtime Layer Phase 1 개요
+
+Runtime Layer Phase 1은 lifecycle 처리 이후 runtime 상태를 직접 쓰기 전에,
+projection, persistence preview, recovery preview, reconciliation preview를 분리하여
+runtime 반영 가능성과 복구 가능성을 검토하는 보호 계층이다.
+
+이번 Phase 1의 핵심 방향:
+
+- runtime state를 즉시 write하지 않고 preview 결과로 분리한다.
+- position, balance, runtime 파일 변경은 실제 commit 계층과 분리한다.
+- runtime projection은 lifecycle/fill/evidence 기반 상태 후보를 계산한다.
+- persistence preview는 저장 후보와 저장 계획을 검토한다.
+- recovery preview는 재시작 또는 불일치 상황에서 복구 후보를 계산한다.
+- reconciliation preview는 projection 결과와 기존 runtime/외부 기준 간 불일치를 검토한다.
+- GUI update, SendOrder, Chejan 호출은 Runtime Layer Phase 1에서 수행하지 않는다.
+
+Runtime Layer Phase 1의 후보 흐름:
+
+```text
+Lifecycle / Evidence Review Result
+↓
+Runtime Projection
+↓
+Runtime Persistence Preview
+↓
+Runtime Recovery Preview
+↓
+Runtime Reconciliation Preview
+↓
+Runtime Commit 후보 또는 Review 후보
+```
+
+정책 후보:
+
+- Runtime Layer Phase 1은 runtime write 계층이 아니라 preview 계층이다.
+- Projection 결과는 runtime 파일에 즉시 반영하지 않는다.
+- Persistence는 preview 성격으로만 기록하며 실제 파일 write는 수행하지 않는다.
+- Recovery는 복구 후보를 계산하지만 자동 복구 commit을 수행하지 않는다.
+- Reconciliation은 불일치와 조정 후보를 제시하지만 자동 보정 write를 수행하지 않는다.
+
+## 2. 구현 파일 목록
+
+Runtime Layer Phase 1 구현 파일:
+
+- `lifecycle_runtime_projection.py`
+- `lifecycle_runtime_persistence.py`
+- `lifecycle_runtime_recovery.py`
+- `lifecycle_runtime_reconciliation.py`
+
+파일별 역할 후보:
+
+- `lifecycle_runtime_projection.py`: lifecycle/fill/evidence 기반 runtime projection 후보를 계산한다.
+- `lifecycle_runtime_persistence.py`: projection 결과의 저장 가능성과 persistence plan을 preview한다.
+- `lifecycle_runtime_recovery.py`: runtime 재구성 또는 복구 후보를 preview한다.
+- `lifecycle_runtime_reconciliation.py`: projection, persistence, recovery 결과 사이의 불일치와 조정 후보를 preview한다.
+
+## 3. 테스트 파일 목록
+
+Runtime Layer Phase 1 테스트 파일:
+
+- `tests/test_lifecycle_runtime_projection.py`
+- `tests/test_lifecycle_runtime_persistence.py`
+- `tests/test_lifecycle_runtime_recovery.py`
+- `tests/test_lifecycle_runtime_reconciliation.py`
+
+테스트 기록 후보:
+
+- Projection 계층 테스트는 runtime projection 후보 계산과 preview safety flag를 검증한다.
+- Persistence Preview 테스트는 runtime write 없이 저장 계획 후보만 생성하는지 검증한다.
+- Recovery Preview 테스트는 runtime write 없이 복구 후보만 생성하는지 검증한다.
+- Reconciliation Preview 테스트는 runtime write 없이 불일치/조정 후보만 생성하는지 검증한다.
+
+## 4. Projection 계층
+
+Projection 계층은 lifecycle 처리 결과 또는 fill/evidence 기반 입력으로부터
+runtime 상태 후보를 계산하는 계층이다.
+
+대상 파일:
+
+- `lifecycle_runtime_projection.py`
+
+역할 후보:
+
+- lifecycle transition 결과를 runtime projection 후보로 변환한다.
+- position 후보를 계산한다.
+- balance 후보를 계산한다.
+- fill/evidence 기반 상태 재구성 후보를 계산한다.
+- 계산 결과를 실제 runtime 파일에 쓰지 않고 preview payload로 반환한다.
+
+입력 후보:
+
+- lifecycle transition preview/review 결과
+- chejan evidence review 결과
+- fill 또는 execution evidence
+- 기존 runtime snapshot 후보
+
+출력 후보:
+
+- projected position candidate
+- projected balance candidate
+- projected runtime state candidate
+- projection status
+- projection evidence
+- preview safety flags
+
+정책 후보:
+
+- Projection은 계산 계층이며 write 계층이 아니다.
+- Projection은 position/balance 변경 후보를 만들 수 있지만 실제 파일을 수정하지 않는다.
+- Projection 결과는 Persistence Preview 또는 Reconciliation Preview의 입력 후보가 된다.
+
+## 5. Persistence Preview 계층
+
+Persistence Preview 계층은 Projection 결과를 runtime 저장 대상으로 반영하기 전,
+어떤 파일 또는 상태에 어떤 변경 후보가 생기는지 검토하는 계층이다.
+
+대상 파일:
+
+- `lifecycle_runtime_persistence.py`
+
+역할 후보:
+
+- projection 결과의 저장 가능성을 검토한다.
+- runtime persistence plan 후보를 만든다.
+- 저장 대상과 변경 후보를 분리해 기록한다.
+- 실제 runtime write 없이 persistence preview 결과만 반환한다.
+
+입력 후보:
+
+- runtime projection result
+- projected position candidate
+- projected balance candidate
+- projected runtime state candidate
+- runtime snapshot candidate
+
+출력 후보:
+
+- persistence preview result
+- persistence plan candidate
+- target runtime file candidate
+- changed field candidate
+- blocked reason 또는 invalid reason
+- preview safety flags
+
+정책 후보:
+
+- Persistence Preview는 실제 파일 저장을 수행하지 않는다.
+- runtime file write는 별도 Runtime Commit Executor 계층에서만 다뤄야 한다.
+- Persistence Preview 결과는 Review 또는 Commit 후보로만 전달한다.
+
+## 6. Recovery Preview 계층
+
+Recovery Preview 계층은 runtime 상태가 없거나 불완전하거나 재시작 후 재구성이 필요한 상황에서,
+복구 후보를 계산하는 계층이다.
+
+대상 파일:
+
+- `lifecycle_runtime_recovery.py`
+
+역할 후보:
+
+- runtime snapshot 또는 projection 결과를 기준으로 복구 후보를 계산한다.
+- missing position, missing balance, missing fill/evidence 상태를 검토한다.
+- 복구 가능/불가 상태를 preview result로 반환한다.
+- 실제 runtime 복구 write를 수행하지 않는다.
+
+입력 후보:
+
+- runtime projection result
+- persistence preview result
+- runtime snapshot candidate
+- lifecycle/evidence history candidate
+
+출력 후보:
+
+- recovery preview result
+- recovery candidate
+- recoverable 여부
+- blocked reason 또는 invalid reason
+- recovery evidence
+- preview safety flags
+
+정책 후보:
+
+- Recovery Preview는 자동 복구 commit이 아니다.
+- Recovery Preview는 runtime 파일을 생성하거나 수정하지 않는다.
+- 복구 후보는 Review 또는 Runtime Commit Executor Preview의 입력 후보로만 전달한다.
+
+## 7. Reconciliation Preview 계층
+
+Reconciliation Preview 계층은 projection, persistence, recovery 결과와 기존 runtime 기준 사이의
+불일치 여부를 검토하는 계층이다.
+
+대상 파일:
+
+- `lifecycle_runtime_reconciliation.py`
+
+역할 후보:
+
+- projection 결과와 runtime snapshot 후보를 비교한다.
+- persistence plan 후보와 recovery candidate의 충돌 여부를 검토한다.
+- position/balance/fill/evidence 불일치를 preview한다.
+- 조정 후보를 만들되 실제 보정 write를 수행하지 않는다.
+
+입력 후보:
+
+- runtime projection result
+- persistence preview result
+- recovery preview result
+- runtime snapshot candidate
+- external balance 또는 broker 기준 후보
+
+출력 후보:
+
+- reconciliation preview result
+- mismatch list
+- reconciliation candidate
+- review required 여부
+- blocked reason 또는 invalid reason
+- preview safety flags
+
+정책 후보:
+
+- Reconciliation Preview는 자동 보정 계층이 아니다.
+- 불일치가 있어도 runtime 파일을 직접 수정하지 않는다.
+- Reconciliation 결과는 Review 또는 Runtime Commit 후보로만 전달한다.
+
+## 8. 전체 Preview 안전선
+
+Runtime Layer Phase 1은 다음 안전선을 유지한다.
+
+필수 safety flags:
+
+- `runtime_write=False`
+- `position_write=False`
+- `balance_write=False`
+- `gui_update_called=False`
+- `send_order_called=False`
+- `chejan_called=False`
+
+정책 의미:
+
+- `runtime_write=False`: runtime 파일을 쓰지 않았음을 의미한다.
+- `position_write=False`: position 상태를 실제 저장하지 않았음을 의미한다.
+- `balance_write=False`: balance 상태를 실제 저장하지 않았음을 의미한다.
+- `gui_update_called=False`: GUI 표시 또는 상태 갱신 호출을 수행하지 않았음을 의미한다.
+- `send_order_called=False`: SendOrder 또는 broker/Kiwoom 주문 호출이 없었음을 의미한다.
+- `chejan_called=False`: Chejan 이벤트 호출 또는 자동 연결이 없었음을 의미한다.
+
+금지선:
+
+- runtime write 금지
+- position write 금지
+- balance write 금지
+- GUI update 호출 금지
+- SendOrder 호출 금지
+- Chejan 호출 금지
+- rules.json write 금지
+- runtime/*.json write 금지
+- 자동 복구 commit 금지
+- 자동 reconciliation commit 금지
+
+## 9. 테스트 결과
+
+기준 테스트 결과:
+
+- Runtime 묶음 테스트: 29 OK
+- 전체 unittest: 2563 OK
+
+테스트 반영 후보:
+
+- Runtime Projection 테스트 통과를 기록한다.
+- Runtime Persistence Preview 테스트 통과를 기록한다.
+- Runtime Recovery Preview 테스트 통과를 기록한다.
+- Runtime Reconciliation Preview 테스트 통과를 기록한다.
+- Runtime Layer Phase 1 전체가 preview-only 안전선을 유지한다는 기준으로 기록한다.
+
+검토 필요:
+
+- 테스트 실행 환경, 실행 명령, 실제 로그 원문은 MASTER_SPEC 병합 전 별도 확인할 수 있다.
+- 이번 UPDATE 문서 작성 작업에서는 `kiwoom_auto` 로컬 프로젝트를 수정하거나 테스트를 새로 실행하지 않았다.
+
+## 10. 보호 파일 변경 없음
+
+보호 파일 변경 없음으로 기록할 후보:
+
+- `runtime/*.json`
+- `routines/*/rules.json`
+
+보호 의미:
+
+- Runtime Layer Phase 1 구현은 preview 계층으로 기록한다.
+- runtime JSON 파일은 이번 계층에서 직접 수정하지 않는다.
+- routine rules JSON 파일은 이번 계층에서 직접 수정하지 않는다.
+- position/balance persistence는 preview 후보로만 기록한다.
+
+검토 필요:
+
+- 실제 GitHub commit 기준 변경 파일 목록에서 `runtime/*.json`과 `routines/*/rules.json`이 변경되지 않았는지 병합 전 재확인할 수 있다.
+
+## 11. MASTER_SPEC 반영 위치 후보
+
+상세 반영 후보:
+
+- `02_Runtime_Data_Model`
+
+상세 반영 내용:
+
+- Runtime Projection 규칙
+- Runtime Persistence Preview 규칙
+- Runtime Recovery Preview 규칙
+- Runtime Reconciliation Preview 규칙
+- position/balance/fill/evidence 후보 데이터 계약
+- runtime preview safety flags
+- runtime write 금지선
+
+실행 흐름 요약/교차참조 후보:
+
+- `29.x Execution` 장
+
+교차참조 반영 내용:
+
+- Lifecycle Preview 이후 Runtime Projection으로 이어지는 후보 흐름
+- Runtime Commit 이전 preview 계층
+- Runtime Persistence Preview와 Runtime Commit Executor Preview의 분리
+- Recovery/Reconciliation Preview가 자동 commit이 아님을 명시
+- SendOrder, Chejan, GUI와 Runtime Layer Phase 1의 비연결 상태
+
+후보 흐름:
+
+```text
+Chejan / Lifecycle Preview
+↓
+Runtime Projection
+↓
+Runtime Persistence Preview
+↓
+Runtime Recovery Preview
+↓
+Runtime Reconciliation Preview
+↓
+Runtime Commit Executor Preview 후보
+```
+
+## 12. 다음 구현 후보
+
+다음 구현 후보:
+
+1. Runtime Commit Executor Preview
+2. Atomic Runtime Apply Preview
+3. Runtime State Update
+4. GUI Notification Preview
+
+후속 검토 기준:
+
+- Runtime Commit Executor Preview는 preview 결과를 실제 commit 가능 후보로 검토하는 계층으로 분리한다.
+- Atomic Runtime Apply Preview는 여러 runtime 변경 후보를 원자적 적용 계획으로 preview한다.
+- Runtime State Update는 실제 state update 계층으로 넘어갈지 여부를 별도 승인/검토 대상으로 둔다.
+- GUI Notification Preview는 runtime 상태 변경 후보를 GUI 알림 후보로 변환하되 실제 GUI update를 호출하지 않는 계층으로 둔다.
+
+## 작성 작업 기록
+
+- 작성일: 2026-07-08
+- 작성 프로젝트: `docs`
+- 작성 위치: `10_UPDATE/INBOX`
+- 생성 파일: `UPDATE_20260708_RUNTIME_LAYER_PHASE1_PROJECTION_PERSISTENCE_RECOVERY_RECONCILIATION.txt`
+- Canonical 수정 여부: 수행하지 않음
+- CHANGELOG 생성/수정 여부: 수행하지 않음
+- Reference 수정 여부: 수행하지 않음
+- 로컬 `kiwoom_auto` 수정 여부: 수행하지 않음
+- Python 수정 여부: 수행하지 않음
+- runtime 수정 여부: 수행하지 않음
+- `rules.json` 수정 여부: 수행하지 않음
+- Git commit/push 여부: 수행하지 않음
+- 파일 삭제 여부: 수행하지 않음
