@@ -1,0 +1,62 @@
+MASTER_SPEC CHANGELOG
+작성일: 2026-07-09
+
+1. 기준 Canonical
+- 병합 기준 Canonical 파일명: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+- 신규 Canonical 파일명: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
+
+2. 추가된 MASTER_SPEC 내용
+- Runtime Commit Boundary
+  - Runtime Commit Boundary (02.20)
+  - Runtime Commit Eligibility (02.21)
+  - Runtime Commit Contract (02.22)
+    - Atomic Apply Plan (02.23)
+    - Verification Plan (02.24)
+    - Rollback Plan (02.25)
+  - Runtime Commit Safety Gate (02.26)
+  - Runtime Commit Review (02.27)
+- 29.x Execution 연결
+  - Execution Preview Orchestrator 이후 Runtime Commit Boundary 연결 (29.x.9)
+- Milestone
+  - M5 Runtime Commit Boundary Complete 추가
+- 운영/AI 협업 정책
+  - 문서 반영 책임 (MASTER_SPEC Documentation Authority) 반영
+
+3. 테스트 결과
+- Runtime Commit Boundary 단일 테스트: 14 tests OK
+- 최신 전체 unittest: 2858 tests OK
+
+4. 보호 파일 변경 없음
+- runtime/order_queue.json
+- runtime/order_executions.json
+- runtime/order_locks.json
+- routines/*/rules.json
+
+5. 유지된 금지선
+- runtime/*.json 실제 write 없음
+- routines/*/rules.json 수정 없음
+- SQLite write 없음
+- Broker 연결 없음
+- Order Router 실제 연결 없음
+- SendOrder 호출 없음
+- Chejan 연결 없음
+- GUI update 없음
+- 실제 Runtime Commit 수행 없음
+- 실제 Runtime Apply 수행 없음
+
+6. 다음 구현 후보
+- Real Runtime Commit Architecture
+- Runtime Commit Executor Preview / Real Commit Gate 설계
+
+금지:
+- Canonical 수정 금지
+- UPDATE 수정 금지
+- REFERENCE 수정 금지
+- Python 수정 금지
+- Git commit/push 금지
+
+보고:
+- 생성 파일명:
+  - 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
+  - 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
+- 주요 기록 내용: Runtime Commit Boundary, Eligibility, Contract, Safety Gate, Review, M5 Milestone, 문서 반영 책임 반영
