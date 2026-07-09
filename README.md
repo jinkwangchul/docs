@@ -15,7 +15,7 @@ AI_SESSION_START_PROTOCOL.md.
 - MASTER_SPEC Canonical을 기준 문서로 관리한다.
 - CHANGELOG로 Canonical 변경 이력을 보존한다.
 - UPDATE 문서로 신규 변경 후보를 수집한다.
-- 운영 매뉴얼과 docs 운영 표준으로 ChatGPT/Codex 협업 절차를 고정한다.
+- 운영 매뉴얼과 docs 운영 표준으로 ChatGPT / Codex / 일반 코드 모델 3모델 협업 절차를 고정한다.
 - ARCHIVE와 REPORTS를 통해 과거 문서와 관리 보고서를 보존한다.
 
 ## 기본 구조

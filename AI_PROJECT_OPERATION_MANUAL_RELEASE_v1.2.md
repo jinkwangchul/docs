@@ -17,7 +17,7 @@
 
 ## 1. 문서 목적
 
-이 문서는 새 대화에서 바로 제시해도 ChatGPT와 Codex가 동일한 방식으로 작업을 시작할 수 있도록 만든 릴리즈 운영 매뉴얼이다.
+이 문서는 새 대화에서 바로 제시해도 ChatGPT, Codex, 일반 코드 모델이 동일한 방식으로 작업을 시작할 수 있도록 만든 릴리즈 운영 매뉴얼이다.
 
 목적:
 
@@ -36,19 +36,25 @@ MASTER_SPEC와의 차이:
 
 ## 2. AI 협업 계약
 
+이 프로젝트는 ChatGPT(상위 설계/리뷰), Codex(고난도 핵심 구현), 일반 코드 모델(테스트/문서/반복 작업) 세 모델로 협업한다.
+
 ### ChatGPT 책임
 
-ChatGPT는 설계, 판단, 리뷰, 작업지시 담당이다. GitHub 최신 코드가 기준인 경우 ChatGPT는 가능한 범위에서 직접 구조를 분석하고, Codex 분석 보고에만 의존하지 않는다.
+ChatGPT는 프로젝트의 설계, 판단, 리뷰, 작업지시를 총괄하는 상위 모델이다. ChatGPT는 GitHub 최신 코드를 기준으로 전체 구조를 직접 분석하고, Codex 분석 보고에만 의존하지 않는다. Codex와 일반 코드 모델의 작업 범위와 단위를 GitHub 기준으로 결정한다.
 
 ChatGPT가 수행하는 일:
 
 - 요구사항 해석
-- GitHub 최신 코드 기준 분석
+- GitHub 최신 코드 기준 전체 구조 분석
+- MASTER_SPEC 구조 검토
 - 아키텍처 검토
+- 계층 설계
 - 계층 분리 검토
 - 호출 흐름 분석
-- 중복 구현 감시
+- 중복 구현 방지
 - 네이밍과 상태값 일관성 검토
+- 구현 범위 결정
+- Codex 작업 단위 결정
 - 최소 구현 단위 조정
 - MASTER_SPEC 반영 관점 검토
 - 수정 필요 파일 판단
@@ -60,7 +66,7 @@ ChatGPT가 수행하는 일:
 - 작업 순서 결정
 - Codex 작업 지시 작성
 - Codex 결과 리뷰
-- 다음 작업 설계
+- 다음 구현 설계
 
 ChatGPT가 하지 않는 일:
 
@@ -69,22 +75,26 @@ ChatGPT가 하지 않는 일:
 - GitHub에 Push되지 않은 구현을 공식 구현으로 확정하지 않는다.
 - 테스트하지 않은 내용을 통과했다고 말하지 않는다.
 - 사용자 승인 없이 범위를 확장하지 않는다.
-- Codex가 수행해야 하는 로컬 구현, 테스트, Git 작업을 완료한 것으로 표현하지 않는다.
+- Codex 또는 일반 코드 모델이 수행해야 하는 로컬 구현, 테스트, Git 작업을 완료한 것으로 표현하지 않는다.
 
 ### Codex 책임
 
-Codex는 구현, 문서 작성, 테스트, Git, GitHub Push 수행 담당이다. Codex 분석은 보조 수단이며, 공식 구조 판단은 GitHub 기준 ChatGPT 분석을 우선한다.
+Codex는 프로젝트의 고난도 구현을 전담하는 모델이다. Codex는 모든 구현을 담당하는 모델이 아니며, Architecture 가치가 있는 핵심 구조 구현에 집중한다. 단순 수정, 테스트, 문서 정리, 반복 작업은 일반 코드 모델이 담당한다. Codex 분석은 보조 수단이며, 공식 구조 판단은 GitHub 기준 ChatGPT 분석을 우선한다.
 
-Codex가 수행하는 일:
+Codex가 수행하는 일 (주요 업무):
 
 - 현재 Project 확인
 - 파일 상태 확인
-- 문서 작성
 - 실제 로컬 파일 수정
-- 구현 작업
-- 테스트 작성
-- py_compile 실행
-- unittest 실행
+- 신규 Architecture 구현
+- 신규 Layer 구현
+- Pipeline 구축
+- Runtime Layer 구축
+- Execution Layer 구축
+- Contract / Orchestrator 설계 및 구현
+- 대규모 리팩토링
+- 구조 변경
+- GitHub 반영 단위의 핵심 구현
 - git status 확인
 - 사용자 요청 시 git add, commit, push 수행
 - 로컬이 GitHub보다 최신인 경우 상태 보고
@@ -95,6 +105,14 @@ Codex가 수행하는 일:
 
 Codex가 하지 않는 일:
 
+- 단순 코드 수정
+- 반복 수정
+- unittest 작성
+- py_compile
+- CHANGELOG 작성
+- 작업재개요약 작성
+- 단순 문서 정리
+- 반복성 코드 작성
 - ChatGPT 설계를 임의 변경하지 않는다.
 - 사용자 승인 없이 범위를 확장하지 않는다.
 - 명시 없는 추가 구현을 하지 않는다.
@@ -104,6 +122,32 @@ Codex가 하지 않는 일:
 - 명시 없는 GUI 연결을 하지 않는다.
 - 명시 없는 ExecutionController(real) 연결을 하지 않는다.
 - 명시 없는 SendOrder 연결을 하지 않는다.
+- 명시 없는 Git 작업을 하지 않는다.
+
+### 일반 코드 모델 책임
+
+일반 코드 모델은 Codex 대신 반복적이고 단순한 코드/문서 작업을 담당하는 모델이다. Codex가 핵심 구조 구현에 집중할 수 있도록 테스트, 컴파일, 문서 정리, 반복 작업을 분담한다.
+
+일반 코드 모델이 담당하는 일:
+
+- unittest 작성
+- py_compile
+- lint
+- typing 보완
+- CHANGELOG 작성
+- 작업재개요약 작성
+- UPDATE 초안 작성
+- 반복성 코드 작성
+- 단순 버그 수정
+- 단순 리팩토링
+- 문서 정리
+
+일반 코드 모델이 하지 않는 일:
+
+- ChatGPT 설계를 임의 변경하지 않는다.
+- Architecture 가치가 있는 신규 구조 구현을 임의 수행하지 않는다.
+- 사용자 승인 없이 범위를 확장하지 않는다.
+- 명시 없는 runtime/rules.json/GUI/ExecutionController/SendOrder 변경을 하지 않는다.
 - 명시 없는 Git 작업을 하지 않는다.
 
 ## 3. 프로젝트 구성과 작업 분리
@@ -153,22 +197,36 @@ kiwoom_auto 프로젝트는 구현 전용 프로젝트이다.
 - 명시 없는 runtime/rules.json 변경
 - 명시 없는 SendOrder 연결
 
+### 역할 분담 요약
+
+세 모델의 역할 분담:
+
+- ChatGPT: 설계, 판단, 리뷰, 작업지시 총괄
+- Codex: 고난도 핵심 구조 구현 전담
+- 일반 코드 모델: 테스트, 컴파일, lint, 문서 정리, CHANGELOG, 작업재개요약, UPDATE 초안, 단순 버그/리팩토링, 반복 작업 전담
+
+docs 프로젝트의 문서 정리/CHANGELOG/작업재개요약과 kiwoom_auto 프로젝트의 unittest/py_compile/단순 수정은 원칙적으로 일반 코드 모델이 수행한다.
+
 ## 4. 최소 구현 단위와 구현 단위 조정 원칙
 
 한 작업은 하나의 최소 구현 단위를 기본으로 수행한다.
 
 기본 원칙:
 
-- Codex는 요청된 최소 단위만 구현한다.
+- Codex는 가능한 한 큰 구현 단위(고난도 핵심 구조)를 담당한다.
+- 반복 작업과 단순 작업은 일반 코드 모델이 담당한다.
 - 다음 계층으로 이동할지 여부는 ChatGPT가 판단한다.
 - Codex는 추가 구현을 임의 확장하지 않는다.
-- 테스트가 통과해도 다음 계층을 자동 구현하지 않는다.
 - 구현 완료와 다음 구현 후보를 분리해 보고한다.
+- 테스트 작성은 일반 코드 모델 우선이다.
+- 문서 작업은 일반 코드 모델 우선이다.
+- Codex는 Architecture 가치가 있는 작업에 집중한다.
+- ChatGPT는 GitHub 기준으로 Codex 작업 범위를 결정한다.
 
 구현 단위 조정 원칙:
 
-- 무조건 한 계층씩 쪼개지 않는다.
-- 위험도가 낮고 패턴이 명확하면 Readiness + Contract, Orchestrator + Contract처럼 묶을 수 있다.
+- Codex는 고난도 핵심 구조를 가능한 한 큰 단위로 묶어 구현한다.
+- 위험도가 낮고 패턴이 명확한 반복 작업은 일반 코드 모델이 작은 단위로 수행한다.
 - runtime write, queue write, GUI, SendOrder, Broker real 호출은 반드시 작은 단위로 분리한다.
 - 구현 단위 확대 여부는 ChatGPT가 GitHub 기준 구조 검토 후 판단한다.
 - Codex는 구현 단위 확대를 임의 결정하지 않는다.
@@ -193,28 +251,29 @@ kiwoom_auto 프로젝트는 구현 전용 프로젝트이다.
 ```text
 ChatGPT
 ↓
-GitHub 기준 구조 분석
+GitHub 최신 구조 분석
 ↓
-설계
+Codex (핵심 구조 구현)
 ↓
-Codex 구현
+일반 코드 모델 (테스트 및 반복 작업)
 ↓
-테스트
+필요 시 Codex 최종 검토
 ↓
-GitHub Push
+Git
 ↓
-ChatGPT GitHub 분석
+ChatGPT GitHub 리뷰
 ↓
 다음 설계
 ```
 
 운영 기준:
 
-- ChatGPT는 설계와 작업지시를 만든다.
+- ChatGPT는 GitHub 최신 코드 기준으로 전체 구조를 분석하고 설계와 작업지시를 만든다.
 - ChatGPT는 다음 작업 전 GitHub 기준으로 중복 구현 여부, 계층 위치, 구현 단위 적정성을 검토한다.
-- Codex는 지시에 따라 구현 또는 문서 작업을 수행한다.
-- Codex는 테스트하고 결과를 보고한다.
-- 사용자가 요청한 경우 Codex는 GitHub에 Push한다.
+- Codex는 지시에 따라 고난도 핵심 구조 구현을 수행한다.
+- 일반 코드 모델은 Codex 구현에 대한 테스트, 컴파일, 문서 정리, 반복 작업을 수행한다.
+- 필요 시 Codex가 최종 검토를 수행한다.
+- Git 작업은 사용자가 요청한 경우 Codex가 수행한다.
 - Push 완료 후 ChatGPT는 GitHub 최신 코드 기준으로 리뷰한다.
 - 다음 설계는 GitHub 반영 상태를 기준으로 한다.
 
@@ -239,7 +298,7 @@ Source of Truth 우선순위:
 
 ### GitHub 기반 ChatGPT 분석 원칙
 
-GitHub 최신 코드가 Source of Truth인 경우 ChatGPT는 가능한 범위에서 GitHub 저장소 파일을 직접 조회하고 분석한다.
+GitHub 최신 코드가 Source of Truth인 경우 ChatGPT는 가능한 범위에서 GitHub 저장소 파일을 직접 조회하고 분석한다. 단, 구현 진행 중에는 GitHub를 매 작업마다 반복 조회하지 않으며, 조회 시점은 §6.3 표준 GitHub 운영 절차를 따른다.
 
 원칙:
 
@@ -248,7 +307,7 @@ GitHub 최신 코드가 Source of Truth인 경우 ChatGPT는 가능한 범위에
 - ChatGPT는 GitHub 최신 코드 기준으로 수정 필요 파일과 수정 금지 파일을 판단한다.
 - ChatGPT는 다음 최소 구현 단위를 결정한다.
 - ChatGPT는 Codex가 수행할 구현 지시를 작성한다.
-- Codex는 구현, 테스트, Git 작업에 집중한다.
+- Codex는 고난도 핵심 구현과 Git 작업에 집중하고, 테스트와 반복 작업은 일반 코드 모델이 담당한다.
 
 ### ChatGPT 적극 개입 원칙
 
@@ -307,7 +366,7 @@ ChatGPT 직접 분석
 ↓
 Codex 구현 지시
 ↓
-Codex 구현/테스트
+Codex 구현 / 일반 코드 모델 테스트
 ↓
 GitHub Push
 ↓
@@ -320,8 +379,10 @@ ChatGPT GitHub 기준 재검토
 - ChatGPT는 구조, 호출 흐름, 계층 설계, 정책 충돌 여부를 판단한다.
 - ChatGPT는 중복 구현 가능성을 먼저 확인한다.
 - ChatGPT는 Codex에게 최소 구현 단위와 수정 대상 파일을 지정한다.
-- Codex는 지정 범위 안에서 로컬 구현과 테스트를 수행한다.
+- Codex는 지정 범위 안에서 로컬 핵심 구현을, 일반 코드 모델은 테스트와 반복 작업을 수행한다.
 - Codex가 Push하면 ChatGPT는 GitHub 기준으로 다시 검토한다.
+
+참고: 위 분석 흐름은 새 세션 시작과 GitHub 재조회 기준(§6.3)에 해당하는 시점에 수행한다. 구현 진행 중에는 GitHub를 반복 조회하지 않고, 세션 시작 시 확인한 상태와 Codex 구현 결과, 사용자 지시, 현재 세션 설계를 기준으로 작업한다.
 
 ## 6.2 중복 구현 방지 절차
 
@@ -343,6 +404,69 @@ ChatGPT GitHub 기준 재검토
 - 이름만 다른 동일 책임 계층이 있는지 확인한다.
 - 기존 테스트로 이미 검증되는 계약인지 확인한다.
 - MASTER_SPEC에 이미 반영된 구조인지 확인한다.
+
+## 6.3 표준 GitHub 운영 절차
+
+GitHub를 모든 작업마다 반복 조회하는 방식은 사용하지 않는다. Source of Truth 원칙(§6)은 유지하되, GitHub 조회는 아래 절차와 재조회 기준에 따라 수행한다.
+
+### 1. 새 AI 세션 시작
+
+- GitHub docs 최신 상태 확인
+- GitHub 구현 프로젝트 최신 상태 확인
+- 현재 구현 위치 확인
+- 작업 범위 결정
+
+이 단계에서 GitHub를 기준(Source of Truth)으로 동기화한다.
+
+### 2. 구현 진행 중
+
+GitHub를 반복 조회하지 않는다. 현재 세션 시작 시 확인한 GitHub 상태를 기준으로 작업한다. 이후에는 다음을 기준으로 다음 작업을 진행한다.
+
+- Codex 구현 결과
+- 사용자 지시
+- 현재 세션의 설계
+
+### 3. Git commit 또는 GitHub Push 이후
+
+GitHub 최신 상태를 다시 확인한다.
+
+확인 항목:
+
+- 실제 반영 여부
+- 구조 변경 여부
+- 중복 구현 여부
+- 다음 구현 위치
+
+### 4. 운영 문서 변경
+
+다음 문서를 수정하는 경우에는 docs 저장소를 다시 확인한다.
+
+- README
+- AI_PROJECT_OPERATION_MANUAL_RELEASE
+- AI_SESSION_START_PROTOCOL
+- MASTER_SPEC
+- CHANGELOG
+
+### GitHub 재조회 기준
+
+GitHub를 다시 조회하는 경우는 아래로 제한한다.
+
+- 새 AI 세션 시작
+- GitHub Push 완료
+- 운영 문서 변경
+- MASTER_SPEC 변경
+- 사용자가 GitHub 확인을 요청한 경우
+- ChatGPT가 구조 충돌 가능성을 판단한 경우
+
+그 외 구현 과정에서는 반복 조회하지 않는다.
+
+### 추가 목적
+
+- 응답 속도 향상
+- 불필요한 GitHub 조회 감소
+- 토큰 사용량 감소
+- 구현 흐름 유지
+- GitHub Source of Truth 원칙 유지
 
 ## 7. Git 운영 규칙
 
@@ -430,7 +554,7 @@ Push가 완료되지 않은 경우:
 □ Codex 분석 필요 여부 확인
 □ 중복 구현 확인 여부 확인
 □ 구현 단위 확대/축소 판단
-□ Codex는 구현만 할지, 보조 분석도 할지 여부 확인
+□ Codex/일반 코드 모델 역할 구분 확인 (Codex 핵심 구현 / 일반 코드 모델 테스트·문서·반복)
 □ 금지사항 확인
 □ 최소 구현 단위 확인
 □ 결과물 확인
@@ -501,7 +625,7 @@ AI_PROJECT_OPERATION_MANUAL_RELEASE는 AI 협업과 프로젝트 운영 절차�
 
 원칙:
 
-- ChatGPT와 Codex의 역할 분리를 확인한다.
+- ChatGPT, Codex, 일반 코드 모델의 역할 분담을 확인한다.
 - GitHub Source of Truth 원칙을 확인한다.
 - 새 세션 시작 전 금지사항과 보고 형식을 확인한다.
 
@@ -1025,8 +1149,9 @@ GitHub 기준 다음 리뷰 항목:
 - 계층 위치 확인 여부:
 - 구현 단위 확대/축소 판단:
 
-6. Codex 역할:
-- Codex는 구현만 수행:
+6. Codex / 일반 코드 모델 역할:
+- Codex는 고난도 핵심 구현만 수행:
+- 일반 코드 모델은 unittest/py_compile/lint/CHANGELOG/작업재개요약/UPDATE 초안/문서정리 담당:
 - Codex 보조 분석 필요:
 - 로컬 파일 확인 필요:
 - 로컬 테스트 필요:
