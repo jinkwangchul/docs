@@ -1,0 +1,60 @@
+PROJECT_RESUME_REFERENCE_2026-07-09_RUNTIME_COMMIT_BOUNDARY
+
+작성일: 2026-07-09
+
+1. 현재 완료 판정
+- Runtime Commit Boundary 구현 완료
+  - Runtime Commit Eligibility (02.21)
+  - Runtime Commit Contract (02.22)
+    - Atomic Apply Plan (02.23)
+    - Verification Plan (02.24)
+    - Rollback Plan (02.25)
+  - Runtime Commit Safety Gate (02.26)
+  - Runtime Commit Review (02.27)
+- Milestone M5 Runtime Commit Boundary Complete
+
+2. 유지해야 할 불변 상태
+- Runtime Commit Boundary는 preview_only=True 상태 유지
+- runtime/*.json 실제 write 없음 유지
+- routines/*/rules.json 수정 없음 유지
+- SQLite write 없음 유지
+- Broker/Order Router/SendOrder/Chejan/GUI 연결 없음 유지
+- 실제 Runtime Commit/Apply 수행 없음 유지
+
+3. 검증 상태
+- Commit: 6886a01
+- Runtime Commit Boundary unittest: 14 tests OK
+- 전체 unittest: 2858 tests OK
+- 보호 파일 변경 없음:
+  - runtime/order_queue.json
+  - runtime/order_executions.json
+  - runtime/order_locks.json
+  - routines/*/rules.json
+
+4. 다음 작업 후보
+- M6 Real Runtime Commit Architecture 분석
+- Runtime Commit Executor Preview / Real Commit Gate 설계
+- Architecture 분석 필수 후 구현 진행
+
+5. 다음 작업 금지선
+- runtime/*.json 실제 write 금지
+- routines/*/rules.json 수정 금지
+- SQLite write 금지
+- Broker 연결 금지
+- Order Router 실제 연결 금지
+- SendOrder 호출 금지
+- Chejan 연결 금지
+- GUI update 호출 금지
+- 실제 Runtime Commit 수행 금지
+- 실제 Runtime Apply 수행 금지
+
+6. Architecture Decision 기록
+- Runtime Commit Boundary는 Execution Preview Orchestrator 이후, Real Runtime Commit 이전에 위치
+- Execution Commit Preview와 Execution Runtime Apply Preview 사이에 삽입하지 않음
+- Runtime Apply Preview를 중복 생성하지 않음
+- Atomic Apply Plan은 독립 Preview Layer가 아닌 Runtime Commit Contract 내부 구성
+- Dry-run은 Runtime Commit Safety Gate / Runtime Commit Review 내부 검증으로 처리
+- Runtime Commit Result Review는 별도 Preview Layer가 아닌 Runtime Commit Review로 단순화
+- Preview Layer 추가 확장을 억제하고 Commit Boundary에서 실제 Runtime Commit 진입 여부 결정
+
+끝.

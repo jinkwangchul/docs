@@ -1,0 +1,429 @@
+MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR
+
+작성일: 2026-07-09
+
+원본 업데이트:
+- 10_UPDATE/INBOX/UPDATE_20260708_LIFECYCLE_RUNTIME_PROJECTION.txt
+- 10_UPDATE/INBOX/UPDATE_20260708_RUNTIME_LAYER_PHASE1_PROJECTION_PERSISTENCE_RECOVERY_RECONCILIATION.txt
+- 10_UPDATE/MERGED/UPDATE_20260709_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+
+참고 기준 Canonical:
+- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt
+
+요약
+본 문서는 Runtime Layer Phase 1 관련 두 건의 UPDATE 문서(Projection 규격 초안, Phase1 구현/프리뷰 규격)와
+Runtime Apply Preview/Gate Pipeline 및 Execution Preview Phase1/Phase2/Orchestrator 관련 UPDATE 문서를 하나의 Canonical 규격으로 통합한 결과물이다.
+통합 원칙에 따라 Projection 규격(데이터 모델, Projection 스키마, fills → positions → balances 계산 규칙, idempotency, 트리거/검증/테스트 시나리오)은 그대로 유지되며,
+Phase1 UPDATE의 Projection / Persistence Preview / Recovery Preview / Reconciliation Preview / Preview Safety / Runtime Layer 구조 / 구현 파일 목록 및 테스트 항목을 함께 포함한다.
+추가로 Runtime Apply Preview/Gate Pipeline(적용 후보 검토 및 실행 준비 게이팅), Execution Preview Phase1(실행 트랜잭션/브로커 연계 후보 검토),
+Execution Preview Phase2(최종 승인/디스패치/커밋/런타임 적용 후보 검토), Execution Preview Orchestrator(11단계 단일 진입점 오케스트레이션)를 포함한다.
+또한 운영/AI 협업 정책(3모델 역할 재정의)과 구현 검증 부록(커밋 hash, 테스트 수, 보호 파일 검증, 금지선)을 포함한다.
+이 파일은 새로운 Canonical 산출물로서 02_Runtime_Data_Model, 29.x Execution, 운영/AI 협업 정책, 부록 장에 반영될 상세/요약 규격을 포함한다. 기존 Canonical 파일은 직접 수정하지 않았다.
+
+==================================================
+02_Runtime_Data_Model
+==================================================
+
+02.10 Runtime Projection (상세 규격)
+
+목적
+- runtime 데이터(positions, fills, balances 등)로부터 Projection을 통해 후보 Position/Balance 상태를 계산하여
+  Recovery/Audit/Review 절차에서 근거로 사용할 수 있도록 일관된 규칙을 제공한다.
+
+적용 범위
+- runtime/positions.json, runtime/fills.json, runtime/order_executions.json, runtime/review_items.json
+- Recovery 시점 Projection 재계산, 주기적 Projection(운영 sanity check), Projection 결과 검증
+
+데이터 모델(요약)
+- positions: position_id, code, holding_qty, available_qty, avg_price, realized_pnl, source_fill_ids
+- fills: fill_id, order_id, execution_id, quantity, price, kiwoom_order_no, created_at
+- balances: account_id, cash, reserved_cash, updated_at
+
+Projection 스키마(출력 후보)
+- projected_position_candidate: { position_id, code, holding_qty, available_qty, avg_price, realized_pnl, source_fill_ids }
+- projected_balance_candidate: { account_id, cash, reserved_cash, updated_at }
+- projected_runtime_state_candidate: (필요 시 전체 runtime snapshot 후보)
+- projection_status: { ok | mismatch | invalid }
+- projection_evidence: 관련 fill/evidence 목록
+- preview_safety_flags: 안전선 플래그 집합(아래 참조)
+
+Projection 계산 원칙
+- Projection은 Fill 이벤트를 근거로 Position을 재구성한다.
+- 기본 알고리즘: fills 그룹화 → fill 합산 → 종목별 holding_qty/realized_pnl 재계산 → positions 상태 후보 생성
+- fills의 정렬/처리 순서는 created_at, execution_id, fill_id 등의 deterministic 키를 사용하여 결정적(Deterministic) 결과를 보장한다.
+
+Idempotency
+- 각 fill은 고유한 fill_id를 가진다. 동일 fill_id가 재처리되더라도 Projection 출력은 동일해야 한다.
+- Projection 실행 시 이미 적용된 source_fill_ids를 추적하여 중복 적용을 방지한다.
+
+트리거와 타이밍
+- 즉시 Projection: 재시작 복구, evidence 기반 finalize 작업 시 즉시 실행.
+- 주기적 Projection: 운영 중 1분 등 주기(운영 정책에 따름)으로 sanity check를 실행하여 runtime 불일치 탐지.
+
+검증 및 불일치 처리
+- 검증 항목:
+  (a) positions와 fills 합계 정합성 (총 매수·매도 수량 합계 일치)
+  (b) Kiwoom(브로커) 잔고와 balances 일치 여부
+  (c) duplicate evidence / duplicate fill 탐지
+- 불일치 시 처리:
+  (a) Audit Log에 상세 기록
+  (b) 복구 플래그 설정 및 Review Management(검토관리)로 이관
+
+복구(Recovery) 절차(Projection 관점)
+- 재시작 복구 시: 최신 journal/history 및 transitions 를 이용해 마지막 정상 시점 이후의 fill을 식별
+  → 발견된 fills를 deterministic 순서로 재적용하여 Projection 수행
+- 자동/수동 복구 정책: 자동 복구는 위험도가 낮은 범위에서만 허용하며 Review 기준을 만족해야 자동 적용 가능
+
+테스트 케이스(권장)
+- 재시작 후 Projection 재계산(부분체결 포함) 검증
+- duplicate fill / duplicate evidence 처리 검증
+- executor 실패로 인한 aborted 상태에서 Projection 재시도 검증
+
+02.11 Runtime Persistence Preview
+
+정의 및 목적
+- Projection 결과를 실제 runtime 파일에 쓰기 전, 저장 후보와 저장 계획을 검토하기 위한 preview 계층이다.
+
+입력/출력
+- 입력: runtime projection result, projected position candidate, projected balance candidate, runtime snapshot candidate
+- 출력: persistence preview result, persistence plan candidate, target runtime file candidate, changed field candidate, blocked/invalid reason, preview safety flags
+
+정책
+- Persistence Preview는 실제 파일 저장을 수행하지 않는다. runtime file write는 Runtime Commit Executor 계층에서만 수행해야 한다.
+- Persistence Preview 결과는 Review 또는 Commit 후보로만 전달한다.
+
+안전성 검토 항목
+- 어떤 필드가 변경되는지, 변경 범위(종목별/전체), 변경으로 인한 외부 영향(예: GUI/SendOrder 연계) 여부
+
+02.12 Runtime Recovery Preview
+
+정의 및 목적
+- runtime 상태가 없거나 불완전하거나 재시작 후 재구성이 필요한 상황에서 복구 후보를 계산하는 계층.
+
+입력/출력
+- 입력: runtime projection result, persistence preview result, runtime snapshot candidate, lifecycle/evidence history candidate
+- 출력: recovery preview result, recovery candidate, recoverable 여부, blocked/invalid reason, recovery evidence, preview safety flags
+
+정책
+- Recovery Preview는 자동 복구 commit이 아니다. 실제 runtime 파일 생성/수정은 수행하지 않는다.
+
+02.13 Runtime Reconciliation Preview
+
+정의 및 목적
+- projection, persistence, recovery 결과와 기존 runtime 기준(또는 외부 브로커 잔고) 사이의 불일치를 검토하고 조정 후보를 제시하는 계층.
+
+입력/출력
+- 입력: runtime projection result, persistence preview result, recovery preview result, runtime snapshot candidate, external balance/broker 기준 후보
+- 출력: reconciliation preview result, mismatch list, reconciliation candidate, review_required 여부, blocked/invalid reason, preview safety flags
+
+정책
+- Reconciliation Preview는 자동 보정 계층이 아니다. 불일치가 있어도 runtime 파일을 직접 수정하지 않는다.
+
+02.14 Preview 안전선 (Preview Safety)
+
+필수 safety flags
+- runtime_write=False
+- position_write=False
+- balance_write=False
+- gui_update_called=False
+- send_order_called=False
+- chejan_called=False
+
+금지선
+- runtime write 금지
+- position write 금지
+- balance write 금지
+- GUI update 호출 금지
+- SendOrder 호출 금지
+- Chejan 호출 금지
+- rules.json write 금지
+- runtime/*.json write 금지
+- 자동 복구 commit 금지
+- 자동 reconciliation commit 금지
+
+설계 원칙 요약(02 장)
+- Projection은 계산/후보 생성 계층이며, Persistence/Recovery/Reconciliation Preview는 write를 수행하지 않는 안전한 검토 계층이다.
+
+02.15 Runtime Apply Preview/Gate Pipeline
+
+정의 및 목적
+- Runtime Layer Phase1(Persistence/Recovery/Reconciliation Preview) 이후, 실제 runtime 반영 직전에 적용 후보를 검토하고
+  실행 준비 상태를 게이팅하는 Preview 전용 보호 계층이다.
+
+반영 항목
+- Runtime Apply Engine Contract
+- Runtime Apply Engine
+- Runtime Transaction Preview
+- Runtime File Writer Preview
+- Runtime State Commit Preview
+- Runtime Synchronizer Preview
+- Runtime Execution Readiness Gate Preview
+
+핵심 정책
+- 전 단계 preview_only=True
+- runtime_write=False
+- position_write=False
+- balance_write=False
+- audit_write=False
+- file_write_called=False
+- backup_created=False
+- rollback_executed=False
+- gui_update_called=False
+- send_order_called=False
+- chejan_called=False
+- 실제 runtime/rules write 없음
+
+계약 방향
+- Runtime Apply Engine은 실제 write를 수행하지 않는다. 모든 단계는 preview_only=True 로 실행된다.
+- Runtime Transaction Preview는 적용 트랜잭션 후보를 구성하되 커밋하지 않는다.
+- Runtime File Writer Preview는 대상 파일 후보와 변경 필드 후보만 생성한다.
+- Runtime State Commit Preview는 커밋 후보 상태를 계산하되 실제 상태를 갱신하지 않는다.
+- Runtime Synchronizer Preview는 동기화 후보를 계산하되 외부/GUI 동기화를 호출하지 않는다.
+- Runtime Execution Readiness Gate Preview는 모든 safety flag가 False일 때만 READY 후보를 생성한다.
+
+권장 실행 흐름
+Runtime Projection
+↓
+Runtime Persistence Preview
+↓
+Runtime Recovery Preview
+↓
+Runtime Reconciliation Preview
+↓
+Runtime Apply Engine (preview_only)
+↓
+Runtime Transaction Preview
+↓
+Runtime File Writer Preview
+↓
+Runtime State Commit Preview
+↓
+Runtime Synchronizer Preview
+↓
+Runtime Execution Readiness Gate Preview (READY 후보)
+
+교차참조
+- 29.x Execution: Execution Preview Phase1/Phase2/Orchestrator (런타임 적용 후보는 Execution Runtime Apply Preview와 연계)
+- 부록: 구현 커밋/테스트/보호 파일 검증
+
+==================================================
+29.x Execution (요약 및 교차참조)
+==================================================
+
+29.x.1 Runtime Layer Phase 1 요약
+
+목적
+- Lifecycle 처리가 생성한 상태 후보를 runtime에 즉시 쓰지 않고 Preview 계층으로 분리하여
+  저장/복구/조정 가능성 및 안전성을 사전 검토하는 보호 계층을 제공한다.
+
+핵심 방향
+- runtime state를 즉시 write하지 않고 projection/persistence/recovery/reconciliation preview 결과로 분리한다.
+- position, balance, runtime 파일 변경은 Runtime Commit Executor 등 별도 commit 계층에서만 수행한다.
+- GUI update, SendOrder, Chejan 호출 등 외부 연계 호출은 Phase 1에서 수행하지 않는다.
+
+권장 실행 흐름
+Lifecycle / Evidence Review Result
+↓
+Runtime Projection
+↓
+Runtime Persistence Preview
+↓
+Runtime Recovery Preview
+↓
+Runtime Reconciliation Preview
+↓
+Runtime Commit 후보 또는 Review 후보
+
+교차참조
+- 02_Runtime_Data_Model: Projection 상세 규격, Persistence/Recovery/Reconciliation Preview 상세
+- 04_Implementation_Test_Verification: 테스트 시나리오 및 검증 기준
+
+29.x.2 구현 파일(추천)
+- lifecycle_runtime_projection.py  -- lifecycle/fill/evidence 기반 runtime projection 후보 계산
+- lifecycle_runtime_persistence.py -- projection 결과의 저장 가능성 및 persistence plan preview
+- lifecycle_runtime_recovery.py    -- runtime 재구성/복구 후보 preview
+- lifecycle_runtime_reconciliation.py -- 불일치/조정 후보 preview
+
+29.x.3 테스트 파일(추천)
+- tests/test_lifecycle_runtime_projection.py
+- tests/test_lifecycle_runtime_persistence.py
+- tests/test_lifecycle_runtime_recovery.py
+- tests/test_lifecycle_runtime_reconciliation.py
+
+29.x.4 MASTER_SPEC 반영 위치(권고)
+- 세부 규격: 02_Runtime_Data_Model (Runtime Projection, Persistence/Recovery/Reconciliation Preview, 데이터 계약, preview safety flags)
+- 운영/운용 요약: 29.x Execution (Phase 1 요약, Execution ↔ Runtime Layer 교차참조)
+
+29.x.5 Preview 안전성 및 실행 금지선(요약)
+- Preview 실행은 항상 preview safety flags를 포함해야 하며, 모든 preview 단계에서 runtime_write=False 등의 금지선이 준수되어야 한다.
+
+29.x.6 Execution Preview Phase1
+
+목적
+- 실제 주문 실행 전, 실행 트랜잭션과 브로커 연계 후보를 검토하는 Preview 전용 계층.
+
+반영 항목
+- Execution Transaction Contract
+- Execution Engine Preview
+- Broker Adapter Contract Preview
+- Order Router Contract Preview
+- SendOrder Contract Preview
+- SendOrder Call Preview
+- SendOrder Result Review Preview
+
+핵심 정책
+- 실제 Broker 연결 금지
+- 실제 Order Router 연결 금지
+- 실제 SendOrder 호출 금지
+- 실제 Chejan 연결 금지
+- 실행 결과 기록/recorder 호출 금지
+- READY/BLOCKED/INVALID 상태 계약 고정
+
+계약 방향
+- Execution Engine Preview는 실행 트랜잭션 후보를 구성하되 실제 실행을 수행하지 않는다.
+- Broker Adapter Contract Preview는 브로커 어댑터 후보 인터페이스를 정의하되 실제 연결을 수행하지 않는다.
+- Order Router Contract Preview는 라우팅 후보를 계산하되 실제 라우터에 전달하지 않는다.
+- SendOrder Contract Preview는 주문 후보 페이로드를 구성하되 실제 SendOrder를 호출하지 않는다.
+- SendOrder Call Preview는 호출 후보 단계를 기록하되 send_order_called=False 를 유지한다.
+- SendOrder Result Review Preview는 결과 후보를 검토하되 recorder/Chejan 연결을 수행하지 않는다.
+- 모든 단계는 READY/BLOCKED/INVALID 상태 계약을 고정하여 반환한다.
+
+29.x.7 Execution Preview Phase2
+
+목적
+- Phase1 결과를 바탕으로 최종 승인/디스패치/커밋/런타임 적용 후보를 검토하는 Preview 전용 계층.
+
+반영 항목
+- Execution Final Approval Preview
+- Execution Dispatcher Preview
+- Execution Commit Preview
+- Execution Runtime Apply Preview
+
+핵심 정책
+- 실제 승인 처리 금지
+- 실제 dispatch 금지
+- 실제 execution commit 금지
+- 실제 runtime apply 금지
+- execution_allowed=False
+- dispatch_allowed=False
+- execution_commit_allowed=False
+- runtime_apply_allowed=False
+
+계약 방향
+- Execution Final Approval Preview는 최종 승인 후보를 계산하되 실제 승인 처리를 수행하지 않는다.
+- Execution Dispatcher Preview는 디스패치 후보를 구성하되 실제 dispatch를 수행하지 않는다.
+- Execution Commit Preview는 실행 커밋 후보를 계산하되 실제 execution commit을 수행하지 않는다.
+- Execution Runtime Apply Preview는 런타임 적용 후보를 계산하되 실제 runtime apply를 수행하지 않는다.
+
+29.x.8 Execution Preview Orchestrator
+
+목적
+- 기존 Execution Phase1 + Phase2 11단계 체인을 단일 진입점에서 순차 호출하는 오케스트레이션 계층.
+
+반영 항목
+- Execution Preview Orchestrator
+- 기존 Execution Phase1 + Phase2 11단계 체인을 단일 진입점에서 순차 호출
+- 중간 BLOCKED/INVALID 발생 시 이후 단계 중단
+- orchestrator_steps
+- orchestrator_summary
+- final_orchestrator_decision
+
+핵심 정책
+- 신규 세부 Preview 계층 추가 없이 기존 체인 통합
+- 기존 모듈 status/safety flag 집계
+- ORCHESTRATOR_READY는 모든 단계 READY일 때만 생성
+- execution_allowed=False
+- runtime_write=False
+- send_order_called=False
+
+계약 방향
+- Orchestrator는 단일 진입점에서 Phase1(7단계) + Phase2(4단계) = 11단계를 순차 호출한다.
+- 각 단계는 status(READY/BLOCKED/INVALID)와 safety flag를 반환한다.
+- 중간 단계에서 BLOCKED 또는 INVALID가 발생하면 이후 단계 호출을 중단한다.
+- orchestrator_steps는 각 단계의 이름/status/flag 집계를 기록한다.
+- orchestrator_summary는 전체 진행 요약을 기록한다.
+- final_orchestrator_decision은 모든 단계 READY일 때만 ORCHESTRATOR_READY를 생성한다.
+- Orchestrator는 실제 실행/디스패치/커밋/런타임 적용을 수행하지 않는다.
+
+==================================================
+운영/AI 협업 정책
+==================================================
+
+정책 목적
+- MASTER_SPEC 반영 범위 결정 및 구현/검증 작업을 수행하는 AI 모델 간 역할을 재정의하여
+  책임 소재를 명확히 하고 금지선/보호 파일 준수를 안정적으로 유지한다.
+
+3모델 협업 역할 재정의
+
+- ChatGPT:
+  - 로직 설계
+  - 계층 설계
+  - 작업 범위 결정
+  - MASTER_SPEC 반영 범위 지정
+- Kilo / 일반 코드 모델:
+  - 1차 구현
+  - 반복 Preview 모듈 생성
+  - 테스트 작성
+  - Git commit/push 가능
+- Codex:
+  - 검증
+  - 실패 원인 분석
+  - 오류 수정
+  - 테스트 안정화
+  - 구조 검토
+- Codex는 기본 구현 담당으로 고정하지 않는다.
+- Git commit/push는 Codex 전담이 아니다.
+
+운영 원칙
+- 모든 모델은 runtime/*.json write 금지, routines/*/rules.json write 금지, SQLite write 금지를 준수한다.
+- 모든 모델은 실제 Broker/Order Router/SendOrder/Chejan/GUI 연결 및 실제 Execution/Dispatch/Commit/Runtime Apply 실행을 금지한다.
+- 작업 범위와 반영 위치는 ChatGPT가 지정한 MASTER_SPEC 반영 범위를 기준으로 한다.
+
+==================================================
+부록: 구현 기준/참조
+==================================================
+
+기준 구현 커밋(참고)
+- Runtime Projection: 50f84ec34f9fd586a7f7d26006777521d6cffece
+- Runtime Persistence Preview: c816c1092ba30e5a72fea51f275671ec414ea517
+- Runtime Recovery Preview: c6ebafe702cf7bae90b8522fa7f9c1504b822e7a
+- Runtime Reconciliation Preview: 27806cd55a377e17e706efea49778e0d1727ce8f
+- Runtime Apply Preview/Gate Pipeline: 8ec129e
+- Execution Preview Phase1: 9b7ed52
+- Execution Preview Phase2: cd4b2d9
+- Execution Preview Orchestrator: (작업 완료 보고 기준 커밋 hash 반영 — 미확정)
+
+검토 및 테스트 기록(권장)
+- Projection 계층 테스트: runtime projection 후보 계산과 preview safety flag 검증
+- Persistence/Recovery/Reconciliation Preview 테스트: 실제 파일 write 없이 preview-only 결과 생성 검증
+- Runtime Apply Preview/Gate Pipeline 테스트: preview_only=True, runtime_write=False 등 safety flag 유지 검증
+- Execution Preview Phase1 테스트: 실제 Broker/Order Router/SendOrder/Chejan 연결 없이 후보 생성 및 READY/BLOCKED/INVALID 상태 고정 검증
+- Execution Preview Phase2 테스트: execution_allowed=False, dispatch_allowed=False, execution_commit_allowed=False, runtime_apply_allowed=False 유지 검증
+- Execution Preview Orchestrator 테스트: 11단계 순차 호출, 중간 BLOCKED/INVALID 중단, ORCHESTRATOR_READY는 모든 단계 READY일 때만 생성 검증
+- 통합 테스트: 전체 흐름(Preview → Apply Preview/Gate → Execution Preview Orchestrator)에서 safety flags 유지 여부 검증
+
+테스트 결과
+- 최신 전체 unittest: 2844 tests OK
+
+보호 파일 변경 없음
+- runtime/order_queue.json
+- runtime/order_executions.json
+- runtime/order_locks.json
+- routines/*/rules.json
+
+금지선 명시
+- runtime/*.json write 금지
+- routines/*/rules.json write 금지
+- SQLite write 금지
+- 실제 Broker 연결 금지
+- 실제 Order Router 연결 금지
+- 실제 SendOrder 호출 금지
+- 실제 Chejan 연결 금지
+- GUI 연결 금지
+- 실제 Execution/Dispatch/Commit/Runtime Apply 실행 금지
+
+주의 사항
+- 본 Canonical 파일은 Runtime Layer Phase1 UPDATE와 Runtime Apply Preview/Execution Preview Orchestrator UPDATE를 Canonical 형식으로 통합한 결과물이다. 기존 Canonical/Reference 파일은 직접 수정하지 않았으며,
+  실제 MASTER_SPEC 반영(정식 승인 및 반영 절차)은 별도의 승인/검토 프로세스를 거쳐야 한다.
+
+끝.

@@ -1,0 +1,66 @@
+MASTER_SPEC READABLE CHANGELOG
+작성일: 2026-07-09
+
+이번 변경 요약
+- 새 Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
+- Runtime Commit Boundary 구조 추가 (Execution Preview Orchestrator 이후, Real Runtime Commit 이전)
+
+주요 추가 내용(간략)
+- Runtime Commit Boundary (02.20)
+  - Execution Preview Orchestrator 이후, Real Runtime Commit 이전 경계 계층
+  - Preview Layer 추가 확장 억제, 실제 write 직전 Boundary로 단순화
+- Runtime Commit Eligibility (02.21)
+  - 진입 자격 요건: ORCHESTRATOR_READY, safety flags 전체 False, write 없음, 등
+- Runtime Commit Contract (02.22)
+  - Atomic Apply Plan, Verification Plan, Rollback Plan으로 구성
+  - Atomic Apply Plan은 독립 Preview Layer가 아닌 Contract 내부 구성
+- Runtime Commit Safety Gate (02.26)
+  - Contract 실행 직전 안전성 최종 검증
+  - Dry-run은 Safety Gate / Review 내부 검증으로 처리
+- Runtime Commit Review (02.27)
+  - Result Review를 별도 Preview Layer가 아닌 Runtime Commit Review로 단순화
+- 29.x.9 Execution Preview Orchestrator 이후 Runtime Commit Boundary 연결
+- Milestone: M5 Runtime Commit Boundary Complete
+- 운영/AI 협업 정책: 문서 반영 책임 추가 (MASTER_SPEC Documentation Authority)
+
+Architecture Decision
+- Runtime Commit Boundary는 Execution Preview Orchestrator 이후, Real Runtime Commit 이전에 위치
+- Execution Commit Preview와 Execution Runtime Apply Preview 사이에 삽입하지 않음
+- Runtime Apply Preview를 중복 생성하지 않음
+- Atomic Apply Plan은 독립 Preview Layer가 아닌 Runtime Commit Contract 내부 구성
+- Dry-run은 Runtime Commit Safety Gate / Runtime Commit Review 내부 검증으로 처리
+- Runtime Commit Result Review는 별도 Preview Layer가 아닌 Runtime Commit Review로 단순화
+- Preview Layer 추가 확장을 억제하고 Commit Boundary에서 실제 Runtime Commit 진입 여부 결정
+
+검증
+- Commit: 6886a01
+- Runtime Commit Boundary unittest: 14 tests OK
+- 전체 unittest: 2858 tests OK
+- 보호 파일 변경 없음:
+  - runtime/order_queue.json
+  - runtime/order_executions.json
+  - runtime/order_locks.json
+  - routines/*/rules.json
+
+Milestone
+- M5 Runtime Commit Boundary Complete
+
+Next Architecture Candidate
+- M6 Real Runtime Commit Architecture
+- 구현 전 Architecture 분석 필수
+
+금지
+- Canonical 수정 금지
+- UPDATE 수정 금지
+- REFERENCE 수정 금지
+- Python 수정 금지
+- Git commit/push 금지
+
+보고
+- 생성 파일명:
+  - 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
+  - 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
+  - 00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
+- 주요 기록 내용: Runtime Commit Boundary, Eligibility, Contract, Safety Gate, Review, M5 Milestone, 문서 반영 책임 반영
+
+끝.

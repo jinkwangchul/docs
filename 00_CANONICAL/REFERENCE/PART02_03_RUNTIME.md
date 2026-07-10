@@ -2,7 +2,7 @@
 
 Reference Edition Subpart
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
 
 Source Full Part: PART02_RUNTIME.md
 
@@ -11,45 +11,60 @@ Source Full Part: PART02_RUNTIME.md
 주의: 본 문서는 AI 참조용 하위 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 Original Body Marker: START
-- 재시작 후 Projection 재계산(부분체결 포함) 검증
-- duplicate fill / duplicate evidence 처리 검증
-- executor 실패로 인한 aborted 상태에서 Projection 재시도 검증
-
-02.11 Runtime Persistence Preview
-
-정의 및 목적
-- Projection 결과를 실제 runtime 파일에 쓰기 전, 저장 후보와 저장 계획을 검토하기 위한 preview 계층이다.
-
-입력/출력
-- 입력: runtime projection result, projected position candidate, projected balance candidate, runtime snapshot candidate
-- 출력: persistence preview result, persistence plan candidate, target runtime file candidate, changed field candidate, blocked/invalid reason, preview safety flags
+- 출력: reconciliation preview result, mismatch list, reconciliation candidate, review_required 여부, blocked/invalid reason, preview safety flags
 
 정책
-- Persistence Preview는 실제 파일 저장을 수행하지 않는다. runtime file write는 Runtime Commit Executor 계층에서만 수행해야 한다.
-- Persistence Preview 결과는 Review 또는 Commit 후보로만 전달한다.
+- Reconciliation Preview는 자동 보정 계층이 아니다. 불일치가 있어도 runtime 파일을 직접 수정하지 않는다.
 
-안전성 검토 항목
-- 어떤 필드가 변경되는지, 변경 범위(종목별/전체), 변경으로 인한 외부 영향(예: GUI/SendOrder 연계) 여부
+02.14 Preview 안전선 (Preview Safety)
 
-02.12 Runtime Recovery Preview
+필수 safety flags
+- runtime_write=False
+- position_write=False
+- balance_write=False
+- gui_update_called=False
+- send_order_called=False
+- chejan_called=False
+
+금지선
+- runtime write 금지
+- position write 금지
+- balance write 금지
+- GUI update 호출 금지
+- SendOrder 호출 금지
+- Chejan 호출 금지
+- rules.json write 금지
+- runtime/*.json write 금지
+- 자동 복구 commit 금지
+- 자동 reconciliation commit 금지
+
+설계 원칙 요약(02 장)
+- Projection은 계산/후보 생성 계층이며, Persistence/Recovery/Reconciliation Preview는 write를 수행하지 않는 안전한 검토 계층이다.
+
+02.15 Runtime Apply Preview/Gate Pipeline
 
 정의 및 목적
-- runtime 상태가 없거나 불완전하거나 재시작 후 재구성이 필요한 상황에서 복구 후보를 계산하는 계층.
+- Runtime Layer Phase1(Persistence/Recovery/Reconciliation Preview) 이후, 실제 runtime 반영 직전에 적용 후보를 검토하고
+  실행 준비 상태를 게이팅하는 Preview 전용 보호 계층이다.
 
-입력/출력
-- 입력: runtime projection result, persistence preview result, runtime snapshot candidate, lifecycle/evidence history candidate
-- 출력: recovery preview result, recovery candidate, recoverable 여부, blocked/invalid reason, recovery evidence, preview safety flags
+반영 항목
+- Runtime Apply Engine Contract
+- Runtime Apply Engine
+- Runtime Transaction Preview
+- Runtime File Writer Preview
+- Runtime State Commit Preview
+- Runtime Synchronizer Preview
+- Runtime Execution Readiness Gate Preview
 
-정책
-
+핵심 정책
+- 전 단계 preview_only=True
 Original Body Marker: END
 
 ---
 
 Reference Navigation
 
-- Previous: PART02_02_RUNTIME.md
 - Next: PART02_04_RUNTIME.md
 - Full PART: PART02_RUNTIME.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt

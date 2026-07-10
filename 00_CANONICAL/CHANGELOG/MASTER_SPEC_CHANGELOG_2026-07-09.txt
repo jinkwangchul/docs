@@ -1,0 +1,93 @@
+MASTER_SPEC CHANGELOG
+작성일: 2026-07-09
+
+1. 기준 Canonical
+- 병합 기준 Canonical 파일명: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt
+- 신규 Canonical 파일명: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+
+2. 병합된 UPDATE
+- 파일명: UPDATE_20260709_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+- 경로: 10_UPDATE/MERGED/UPDATE_20260709_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+
+3. 추가된 MASTER_SPEC 내용
+- Runtime Apply Preview/Gate Pipeline
+  - Runtime Apply Engine Contract
+  - Runtime Apply Engine
+  - Runtime Transaction Preview
+  - Runtime File Writer Preview
+  - Runtime State Commit Preview
+  - Runtime Synchronizer Preview
+  - Runtime Execution Readiness Gate Preview
+  - 02.15 Runtime Apply Preview/Gate Pipeline (02_Runtime_Data_Model)
+- Execution Preview Phase1
+  - Execution Transaction Contract
+  - Execution Engine Preview
+  - Broker Adapter Contract Preview
+  - Order Router Contract Preview
+  - SendOrder Contract Preview
+  - SendOrder Call Preview
+  - SendOrder Result Review Preview
+  - 29.x.6 Execution Preview Phase1
+- Execution Preview Phase2
+  - Execution Final Approval Preview
+  - Execution Dispatcher Preview
+  - Execution Commit Preview
+  - Execution Runtime Apply Preview
+  - 29.x.7 Execution Preview Phase2
+- Execution Preview Orchestrator
+  - 단일 진입점 11단계 체인 호출
+  - orchestrator_steps / orchestrator_summary / final_orchestrator_decision
+  - 29.x.8 Execution Preview Orchestrator
+- 운영/AI 협업 정책 (신규 장)
+  - 3모델 역할 재정의 (ChatGPT / Kilo / Codex)
+  - Codex 기본 구현 담당 고정 해제
+  - Git commit/push Codex 전담 해제
+- 부록 확장
+  - 구현 커밋 hash (8ec129e, 9b7ed52, cd4b2d9, Orchestrator 미확정)
+  - 최신 전체 unittest: 2844 tests OK
+  - 보호 파일 변경 없음 (runtime/order_queue.json, runtime/order_executions.json, runtime/order_locks.json, routines/*/rules.json)
+  - 금지선 명시 (runtime/*.json, rules.json, SQLite, Broker/Order Router/SendOrder/Chejan/GUI, 실제 Execution/Dispatch/Commit/Runtime Apply)
+
+4. 테스트 결과
+- Runtime Apply Preview/Gate Pipeline 커밋: 8ec129e
+- Execution Preview Phase1 커밋: 9b7ed52
+- Execution Preview Phase2 커밋: cd4b2d9
+- Execution Preview Orchestrator 커밋: (작업 완료 보고 기준 커밋 hash 반영 — 미확정)
+- 최신 전체 unittest: 2844 tests OK
+
+5. 유지된 금지선
+- runtime/*.json write 금지
+- routines/*/rules.json write 금지
+- SQLite write 금지
+- 실제 Broker 연결 금지
+- 실제 Order Router 연결 금지
+- 실제 SendOrder 호출 금지
+- 실제 Chejan 연결 금지
+- GUI 연결 금지
+- 실제 Execution/Dispatch/Commit/Runtime Apply 실행 금지
+- runtime_write=False / position_write=False / balance_write=False / audit_write=False
+- file_write_called=False / backup_created=False / rollback_executed=False / gui_update_called=False / send_order_called=False / chejan_called=False
+- execution_allowed=False / dispatch_allowed=False / execution_commit_allowed=False / runtime_apply_allowed=False
+- preview_only=True 유지
+
+6. 다음 구현 후보
+- Execution Preview Orchestrator 커밋 hash 확정 및 부록 반영
+- Runtime Apply 실제 commit 계층 분리 설계
+- Execution 실제 승인/디스패치/커밋 계층 분리 설계
+- Preview 단계별 recorder/audit 통합 검토
+
+금지:
+- Canonical 수정 금지
+- UPDATE 수정 금지
+- REFERENCE 수정 금지
+- Python 수정 금지
+- Git commit/push 금지
+
+보고:
+- 생성 파일명:
+  - 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-09.txt
+  - 00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-09.txt
+  - 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+  - 10_UPDATE/MERGED/UPDATE_20260709_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+- 주요 기록 내용: Runtime Apply Preview/Gate Pipeline, Execution Preview Phase1/Phase2/Orchestrator, 운영/AI 협업 정책(3모델 역할), 구현 검증 부록을 MASTER_SPEC Canonical에 병합
+- docs git status: (아래 git status --porcelain 실행 결과를 참조)

@@ -2,13 +2,13 @@
 
 Reference Edition
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
 
 생성일: 2026-07-09
 
 주의: 본 문서는 AI 참조용 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
-Part Summary: 02_Runtime_Data_Model: Runtime Projection, Persistence Preview, Recovery Preview, Reconciliation Preview, and Preview Safety.
+Part Summary: 02_Runtime_Data_Model: Runtime Projection, Persistence/Recovery/Reconciliation Preview, Preview Safety, Runtime Apply Preview/Gate Pipeline
 
 Original Body Marker: START
 ==================================================
@@ -135,6 +135,68 @@ Idempotency
 설계 원칙 요약(02 장)
 - Projection은 계산/후보 생성 계층이며, Persistence/Recovery/Reconciliation Preview는 write를 수행하지 않는 안전한 검토 계층이다.
 
+02.15 Runtime Apply Preview/Gate Pipeline
+
+정의 및 목적
+- Runtime Layer Phase1(Persistence/Recovery/Reconciliation Preview) 이후, 실제 runtime 반영 직전에 적용 후보를 검토하고
+  실행 준비 상태를 게이팅하는 Preview 전용 보호 계층이다.
+
+반영 항목
+- Runtime Apply Engine Contract
+- Runtime Apply Engine
+- Runtime Transaction Preview
+- Runtime File Writer Preview
+- Runtime State Commit Preview
+- Runtime Synchronizer Preview
+- Runtime Execution Readiness Gate Preview
+
+핵심 정책
+- 전 단계 preview_only=True
+- runtime_write=False
+- position_write=False
+- balance_write=False
+- audit_write=False
+- file_write_called=False
+- backup_created=False
+- rollback_executed=False
+- gui_update_called=False
+- send_order_called=False
+- chejan_called=False
+- 실제 runtime/rules write 없음
+
+계약 방향
+- Runtime Apply Engine은 실제 write를 수행하지 않는다. 모든 단계는 preview_only=True 로 실행된다.
+- Runtime Transaction Preview는 적용 트랜잭션 후보를 구성하되 커밋하지 않는다.
+- Runtime File Writer Preview는 대상 파일 후보와 변경 필드 후보만 생성한다.
+- Runtime State Commit Preview는 커밋 후보 상태를 계산하되 실제 상태를 갱신하지 않는다.
+- Runtime Synchronizer Preview는 동기화 후보를 계산하되 외부/GUI 동기화를 호출하지 않는다.
+- Runtime Execution Readiness Gate Preview는 모든 safety flag가 False일 때만 READY 후보를 생성한다.
+
+권장 실행 흐름
+Runtime Projection
+↓
+Runtime Persistence Preview
+↓
+Runtime Recovery Preview
+↓
+Runtime Reconciliation Preview
+↓
+Runtime Apply Engine (preview_only)
+↓
+Runtime Transaction Preview
+↓
+Runtime File Writer Preview
+↓
+Runtime State Commit Preview
+↓
+Runtime Synchronizer Preview
+↓
+Runtime Execution Readiness Gate Preview (READY 후보)
+
+교차참조
+- 29.x Execution: Execution Preview Phase1/Phase2/Orchestrator (런타임 적용 후보는 Execution Runtime Apply Preview와 연계)
+- 부록: 구현 커밋/테스트/보호 파일 검증
+
 
 Original Body Marker: END
 
@@ -145,4 +207,4 @@ Reference Navigation
 - Previous PART: PART01_SYSTEM_FOUNDATION.md
 - Next PART: PART03_GUI.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt

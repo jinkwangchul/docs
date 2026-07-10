@@ -2,7 +2,7 @@
 
 Reference Edition Subpart
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
 
 Source Full Part: PART02_RUNTIME.md
 
@@ -11,44 +11,50 @@ Source Full Part: PART02_RUNTIME.md
 주의: 본 문서는 AI 참조용 하위 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 Original Body Marker: START
-- Recovery Preview는 자동 복구 commit이 아니다. 실제 runtime 파일 생성/수정은 수행하지 않는다.
-
-02.13 Runtime Reconciliation Preview
-
-정의 및 목적
-- projection, persistence, recovery 결과와 기존 runtime 기준(또는 외부 브로커 잔고) 사이의 불일치를 검토하고 조정 후보를 제시하는 계층.
-
-입력/출력
-- 입력: runtime projection result, persistence preview result, recovery preview result, runtime snapshot candidate, external balance/broker 기준 후보
-- 출력: reconciliation preview result, mismatch list, reconciliation candidate, review_required 여부, blocked/invalid reason, preview safety flags
-
-정책
-- Reconciliation Preview는 자동 보정 계층이 아니다. 불일치가 있어도 runtime 파일을 직접 수정하지 않는다.
-
-02.14 Preview 안전선 (Preview Safety)
-
-필수 safety flags
 - runtime_write=False
 - position_write=False
 - balance_write=False
+- audit_write=False
+- file_write_called=False
+- backup_created=False
+- rollback_executed=False
 - gui_update_called=False
 - send_order_called=False
 - chejan_called=False
+- 실제 runtime/rules write 없음
 
-금지선
-- runtime write 금지
-- position write 금지
-- balance write 금지
-- GUI update 호출 금지
-- SendOrder 호출 금지
-- Chejan 호출 금지
-- rules.json write 금지
-- runtime/*.json write 금지
-- 자동 복구 commit 금지
-- 자동 reconciliation commit 금지
+계약 방향
+- Runtime Apply Engine은 실제 write를 수행하지 않는다. 모든 단계는 preview_only=True 로 실행된다.
+- Runtime Transaction Preview는 적용 트랜잭션 후보를 구성하되 커밋하지 않는다.
+- Runtime File Writer Preview는 대상 파일 후보와 변경 필드 후보만 생성한다.
+- Runtime State Commit Preview는 커밋 후보 상태를 계산하되 실제 상태를 갱신하지 않는다.
+- Runtime Synchronizer Preview는 동기화 후보를 계산하되 외부/GUI 동기화를 호출하지 않는다.
+- Runtime Execution Readiness Gate Preview는 모든 safety flag가 False일 때만 READY 후보를 생성한다.
 
-설계 원칙 요약(02 장)
-- Projection은 계산/후보 생성 계층이며, Persistence/Recovery/Reconciliation Preview는 write를 수행하지 않는 안전한 검토 계층이다.
+권장 실행 흐름
+Runtime Projection
+↓
+Runtime Persistence Preview
+↓
+Runtime Recovery Preview
+↓
+Runtime Reconciliation Preview
+↓
+Runtime Apply Engine (preview_only)
+↓
+Runtime Transaction Preview
+↓
+Runtime File Writer Preview
+↓
+Runtime State Commit Preview
+↓
+Runtime Synchronizer Preview
+↓
+Runtime Execution Readiness Gate Preview (READY 후보)
+
+교차참조
+- 29.x Execution: Execution Preview Phase1/Phase2/Orchestrator (런타임 적용 후보는 Execution Runtime Apply Preview와 연계)
+- 부록: 구현 커밋/테스트/보호 파일 검증
 
 
 Original Body Marker: END
@@ -57,8 +63,7 @@ Original Body Marker: END
 
 Reference Navigation
 
-- Previous: PART02_03_RUNTIME.md
-- Next: PART02_RUNTIME.md
+- Next: PART03_01_GUI.md
 - Full PART: PART02_RUNTIME.md
 - INDEX: 00_REFERENCE_INDEX.md
-- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-08_RUNTIME_LAYER_PHASE1_RUNTIME_PROJECTION_MERGED.txt
+- Original Canonical: ../CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt

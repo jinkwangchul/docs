@@ -1,0 +1,54 @@
+MASTER_SPEC READABLE CHANGELOG
+작성일: 2026-07-09
+
+이번 변경 요약
+- 새 Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+- 반영된 UPDATE: UPDATE_20260709_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt (10_UPDATE/MERGED)
+
+주요 추가 내용(간략)
+- Runtime Apply Preview/Gate Pipeline 규격화 (02.15)
+  - Runtime Apply Engine / Transaction / File Writer / State Commit / Synchronizer / Execution Readiness Gate Preview
+  - 전 단계 preview_only=True, runtime_write=False 등 safety flag 고정
+- Execution Preview Phase1 규격화 (29.x.6)
+  - Execution Transaction / Engine / Broker Adapter / Order Router / SendOrder Contract·Call·Result Review Preview
+  - 실제 Broker/Order Router/SendOrder/Chejan 연결 금지, READY/BLOCKED/INVALID 상태 고정
+- Execution Preview Phase2 규격화 (29.x.7)
+  - Execution Final Approval / Dispatcher / Commit / Runtime Apply Preview
+  - execution_allowed=False, dispatch_allowed=False, execution_commit_allowed=False, runtime_apply_allowed=False
+- Execution Preview Orchestrator 규격화 (29.x.8)
+  - Phase1(7단계)+Phase2(4단계)=11단계 단일 진입점 순차 호출
+  - 중간 BLOCKED/INVALID 시 이후 단계 중단, ORCHESTRATOR_READY는 모든 단계 READY일 때만 생성
+- 운영/AI 협업 정책 신규 장
+  - 3모델 역할 재정의 (ChatGPT 설계/범위, Kilo 1차구현/테스트/commit, Codex 검증/수정/안정화)
+  - Codex 기본 구현 담당 고정 해제, Git commit/push Codex 전담 해제
+- 부록 확장
+  - 구현 커밋 hash (8ec129e, 9b7ed52, cd4b2d9, Orchestrator 미확정)
+  - 최신 전체 unittest: 2844 tests OK
+  - 보호 파일 변경 없음 (runtime/order_queue.json, runtime/order_executions.json, runtime/order_locks.json, routines/*/rules.json)
+  - 금지선 명시 (runtime/*.json, rules.json, SQLite, Broker/Order Router/SendOrder/Chejan/GUI, 실제 Execution/Dispatch/Commit/Runtime Apply)
+
+테스트 요약
+- Runtime Apply Preview/Gate Pipeline 커밋: 8ec129e
+- Execution Preview Phase1 커밋: 9b7ed52
+- Execution Preview Phase2 커밋: cd4b2d9
+- Execution Preview Orchestrator 커밋: (작업 완료 보고 기준 커밋 hash 반영 — 미확정)
+- 최신 전체 unittest: 2844 tests OK
+
+유지된 금지선
+- runtime/*.json write 금지
+- routines/*/rules.json write 금지
+- SQLite write 금지
+- 실제 Broker/Order Router/SendOrder/Chejan/GUI 연결 금지
+- 실제 Execution/Dispatch/Commit/Runtime Apply 실행 금지
+- preview_only=True, runtime_write=False 등 safety flag 유지
+
+추가 구현 권장 항목
+- Execution Preview Orchestrator 커밋 hash 확정 및 부록 반영
+- Runtime Apply 실제 commit 계층 분리 설계
+- Execution 실제 승인/디스패치/커밋 계층 분리 설계
+- Preview 단계별 recorder/audit 통합 검토
+
+금지 및 주의
+- Canonical 및 UPDATE 파일은 직접 수정하지 마십시오. 본 변경은 후보 문서 추가 목적입니다.
+
+끝.

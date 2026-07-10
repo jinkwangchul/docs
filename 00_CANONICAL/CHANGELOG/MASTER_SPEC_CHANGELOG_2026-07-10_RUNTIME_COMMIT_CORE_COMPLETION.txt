@@ -1,0 +1,67 @@
+MASTER_SPEC CHANGELOG
+작성일: 2026-07-10
+
+1. 기준 Canonical
+- 병합 기준 Canonical 파일명: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+- 신규 Canonical 파일명: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
+
+2. 병합된 UPDATE
+- 해당 없음 (신규 구현 완료 기록)
+
+3. 추가된 MASTER_SPEC 내용
+- M6 Runtime Commit Core Completion
+  - M6-11 Runtime Commit Transaction Contract
+    - Atomic Apply Plan
+    - Verification Plan
+    - Rollback Plan
+  - M6-13 Runtime Commit Transaction Persistence
+  - M6-14 Runtime Commit Guard
+  - M6-15 Runtime Commit Approval Token Store
+  - M6-16 Runtime Commit Real Executor
+    - Guard 연동
+    - Approval Token Store 연동
+    - Persistence 연동
+    - Recovery Journal 연동
+  - M6-17 Runtime Commit Recovery Journal
+- 구현 위치: kiwoom_auto 프로젝트 runtime_commit_*.py
+
+4. 테스트 결과
+- 구현 커밋: kiwoom_auto master 649127c
+- py_compile: runtime_commit_*.py 12개 + tests/test_runtime_commit_*.py 14개 통과
+- 전체 unittest: 3409 tests OK
+- 보호 파일 변경 없음 (runtime/order_queue.json, runtime/order_executions.json, runtime/order_locks.json, routines/*/rules.json)
+
+5. 유지된 금지선
+- runtime/*.json write 금지
+- routines/*/rules.json write 금지
+- SQLite write 금지
+- 실제 Broker 연결 금지
+- 실제 Order Router 연결 금지
+- 실제 SendOrder 호출 금지
+- 실제 Chejan 연결 금지
+- GUI 연결 금지
+- 실제 Execution/Dispatch/Commit/Runtime Apply 실행 금지
+- runtime_write=False / position_write=False / balance_write=False / audit_write=False
+- file_write_called=False / backup_created=False / rollback_executed=False / gui_update_called=False / send_order_called=False / chejan_called=False
+- execution_allowed=False / dispatch_allowed=False / execution_commit_allowed=False / runtime_apply_allowed=False
+- preview_only=True 유지
+
+6. 다음 구현 후보
+- Runtime Commit 실제 적용 계층 연결 설계
+- Runtime Commit Core 통합/부하 검증
+- 운영 매뉴얼 §20 실제 적용 점검
+
+금지:
+- Canonical 수정 금지
+- UPDATE 수정 금지
+- REFERENCE 수정 금지
+- Python 수정 금지
+- Git commit/push 금지
+
+보고:
+- 생성 파일명:
+  - 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
+  - 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
+  - 20_ARCHIVE/RESUME/PROJECT_RESUME_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
+- 주요 기록 내용: M6 Runtime Commit Core Completion(M6-11~M6-17) 구현 및 Real Executor 연동(Guard/Token/Persistence/Recovery Journal) 완료 기록, kiwoom_auto master 649127c 반영
+- docs git status: (아래 git status --porcelain 실행 결과를 참조)

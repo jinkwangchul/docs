@@ -1,0 +1,256 @@
+# UPDATE_20260709_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR
+
+문서 목적:
+
+이 문서는 `kiwoom_auto`에 반영된 Runtime Apply Preview/Gate Pipeline, Execution Preview Phase1/Phase2, Execution Preview Orchestrator 구현 내용을
+MASTER_SPEC Canonical 반영 후보 UPDATE로 정리한다.
+
+이 문서는 Canonical이 아니다.
+이 문서는 CHANGELOG가 아니다.
+이 문서는 Reference Edition이 아니다.
+이 문서는 구현 코드가 아니다.
+
+MASTER_SPEC 병합 전 검토 후보로만 사용한다.
+
+작성 기준:
+
+- 작성일: 2026-07-09
+- 작성 프로젝트: `docs`
+- 작성 위치: `10_UPDATE/MERGED`
+- 생성 파일: `UPDATE_20260709_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt`
+- 기준 구현 범위: Runtime Apply Preview/Gate Pipeline, Execution Preview Phase1, Execution Preview Phase2, Execution Preview Orchestrator
+- 기준 구현 성격: Preview 전용 계층(실제 write/연결/실행 금지), 단일 진입점 오케스트레이션, 안전선 집계
+
+기준 구현 커밋:
+
+1. Runtime Apply Preview/Gate Pipeline: `8ec129e`
+2. Execution Preview Phase1: `9b7ed52`
+3. Execution Preview Phase2: `cd4b2d9`
+4. Execution Preview Orchestrator: (작업 완료 보고 기준 커밋 hash 반영 — 본 UPDATE 작성 시점에는 미확정)
+
+보호 원칙:
+
+- 이번 UPDATE 작성 작업은 `docs` 프로젝트에서 문서 생성만 수행한다.
+- Canonical을 수정하지 않는다.
+- CHANGELOG를 생성하거나 수정하지 않는다.
+- Reference Edition을 수정하지 않는다.
+- `kiwoom_auto` 로컬 프로젝트를 수정하지 않는다.
+- Python 파일을 수정하지 않는다.
+- runtime 파일을 수정하지 않는다.
+- `rules.json`을 수정하지 않는다.
+- SQLite를 수정하지 않는다.
+- Git commit/push를 수행하지 않는다.
+- 파일 삭제를 수행하지 않는다.
+
+## 1. Runtime Apply Preview/Gate Pipeline
+
+Runtime Apply Preview/Gate Pipeline은 Runtime Layer Phase1(Persistence/Recovery/Reconciliation Preview) 이후,
+실제 runtime 반영 직전에 적용 후보를 검토하고 실행 준비 상태를 게이팅하는 Preview 전용 보호 계층이다.
+
+반영 항목:
+
+- Runtime Apply Engine Contract
+- Runtime Apply Engine
+- Runtime Transaction Preview
+- Runtime File Writer Preview
+- Runtime State Commit Preview
+- Runtime Synchronizer Preview
+- Runtime Execution Readiness Gate Preview
+
+핵심 정책:
+
+- 전 단계 preview_only=True
+- runtime_write=False
+- position_write=False
+- balance_write=False
+- audit_write=False
+- file_write_called=False
+- backup_created=False
+- rollback_executed=False
+- gui_update_called=False
+- send_order_called=False
+- chejan_called=False
+- 실제 runtime/rules write 없음
+
+계약 방향:
+
+- Runtime Apply Engine은 실제 write를 수행하지 않는다. 모든 단계는 preview_only=True 로 실행된다.
+- Runtime Transaction Preview는 적용 트랜잭션 후보를 구성하되 커밋하지 않는다.
+- Runtime File Writer Preview는 대상 파일 후보와 변경 필드 후보만 생성한다.
+- Runtime State Commit Preview는 커밋 후보 상태를 계산하되 실제 상태를 갱신하지 않는다.
+- Runtime Synchronizer Preview는 동기화 후보를 계산하되 외부/GUI 동기화를 호출하지 않는다.
+- Runtime Execution Readiness Gate Preview는 모든 safety flag가 False일 때만 READY 후보를 생성한다.
+
+## 2. Execution Preview Phase1
+
+Execution Preview Phase1은 실제 주문 실행 전, 실행 트랜잭션과 브로커 연계 후보를 검토하는 Preview 전용 계층이다.
+
+반영 항목:
+
+- Execution Transaction Contract
+- Execution Engine Preview
+- Broker Adapter Contract Preview
+- Order Router Contract Preview
+- SendOrder Contract Preview
+- SendOrder Call Preview
+- SendOrder Result Review Preview
+
+핵심 정책:
+
+- 실제 Broker 연결 금지
+- 실제 Order Router 연결 금지
+- 실제 SendOrder 호출 금지
+- 실제 Chejan 연결 금지
+- 실행 결과 기록/recorder 호출 금지
+- READY/BLOCKED/INVALID 상태 계약 고정
+
+계약 방향:
+
+- Execution Engine Preview는 실행 트랜잭션 후보를 구성하되 실제 실행을 수행하지 않는다.
+- Broker Adapter Contract Preview는 브로커 어댑터 후보 인터페이스를 정의하되 실제 연결을 수행하지 않는다.
+- Order Router Contract Preview는 라우팅 후보를 계산하되 실제 라우터에 전달하지 않는다.
+- SendOrder Contract Preview는 주문 후보 페이로드를 구성하되 실제 SendOrder를 호출하지 않는다.
+- SendOrder Call Preview는 호출 후보 단계를 기록하되 send_order_called=False 를 유지한다.
+- SendOrder Result Review Preview는 결과 후보를 검토하되 recorder/Chejan 연결을 수행하지 않는다.
+- 모든 단계는 READY/BLOCKED/INVALID 상태 계약을 고정하여 반환한다.
+
+## 3. Execution Preview Phase2
+
+Execution Preview Phase2는 Phase1 결과를 바탕으로 최종 승인/디스패치/커밋/런타임 적용 후보를 검토하는 Preview 전용 계층이다.
+
+반영 항목:
+
+- Execution Final Approval Preview
+- Execution Dispatcher Preview
+- Execution Commit Preview
+- Execution Runtime Apply Preview
+
+핵심 정책:
+
+- 실제 승인 처리 금지
+- 실제 dispatch 금지
+- 실제 execution commit 금지
+- 실제 runtime apply 금지
+- execution_allowed=False
+- dispatch_allowed=False
+- execution_commit_allowed=False
+- runtime_apply_allowed=False
+
+계약 방향:
+
+- Execution Final Approval Preview는 최종 승인 후보를 계산하되 실제 승인 처리를 수행하지 않는다.
+- Execution Dispatcher Preview는 디스패치 후보를 구성하되 실제 dispatch를 수행하지 않는다.
+- Execution Commit Preview는 실행 커밋 후보를 계산하되 실제 execution commit을 수행하지 않는다.
+- Execution Runtime Apply Preview는 런타임 적용 후보를 계산하되 실제 runtime apply를 수행하지 않는다.
+
+## 4. Execution Preview Orchestrator
+
+Execution Preview Orchestrator는 기존 Execution Phase1 + Phase2 11단계 체인을 단일 진입점에서 순차 호출하는 오케스트레이션 계층이다.
+
+반영 항목:
+
+- Execution Preview Orchestrator
+- 기존 Execution Phase1 + Phase2 11단계 체인을 단일 진입점에서 순차 호출
+- 중간 BLOCKED/INVALID 발생 시 이후 단계 중단
+- orchestrator_steps
+- orchestrator_summary
+- final_orchestrator_decision
+
+핵심 정책:
+
+- 신규 세부 Preview 계층 추가 없이 기존 체인 통합
+- 기존 모듈 status/safety flag 집계
+- ORCHESTRATOR_READY는 모든 단계 READY일 때만 생성
+- execution_allowed=False
+- runtime_write=False
+- send_order_called=False
+
+계약 방향:
+
+- Orchestrator는 단일 진입점에서 Phase1(7단계) + Phase2(4단계) = 11단계를 순차 호출한다.
+- 각 단계는 status(READY/BLOCKED/INVALID)와 safety flag를 반환한다.
+- 중간 단계에서 BLOCKED 또는 INVALID가 발생하면 이후 단계 호출을 중단한다.
+- orchestrator_steps는 각 단계의 이름/status/flag 집계를 기록한다.
+- orchestrator_summary는 전체 진행 요약을 기록한다.
+- final_orchestrator_decision은 모든 단계 READY일 때만 ORCHESTRATOR_READY를 생성한다.
+- Orchestrator는 실제 실행/디스패치/커밋/런타임 적용을 수행하지 않는다.
+
+## 5. 테스트 및 검증 현황
+
+Runtime Apply Preview/Gate Pipeline 커밋:
+
+- `8ec129e`
+
+Execution Preview Phase1 커밋:
+
+- `9b7ed52`
+
+Execution Preview Phase2 커밋:
+
+- `cd4b2d9`
+
+Execution Preview Orchestrator 커밋:
+
+- (작업 완료 보고 기준 커밋 hash 반영 — 본 UPDATE 작성 시점에는 미확정)
+
+최신 전체 unittest:
+
+- 2844 tests OK
+
+보호 파일 변경 없음:
+
+- runtime/order_queue.json
+- runtime/order_executions.json
+- runtime/order_locks.json
+- routines/*/rules.json
+
+## 6. 작업 방식 변경 반영
+
+3모델 협업 역할 재정의:
+
+- ChatGPT:
+  - 로직 설계
+  - 계층 설계
+  - 작업 범위 결정
+  - MASTER_SPEC 반영 범위 지정
+- Kilo / 일반 코드 모델:
+  - 1차 구현
+  - 반복 Preview 모듈 생성
+  - 테스트 작성
+  - Git commit/push 가능
+- Codex:
+  - 검증
+  - 실패 원인 분석
+  - 오류 수정
+  - 테스트 안정화
+  - 구조 검토
+- Codex는 기본 구현 담당으로 고정하지 않는다.
+- Git commit/push는 Codex 전담이 아니다.
+
+## 7. MASTER_SPEC 반영 위치(권고)
+
+- 02_Runtime_Data_Model: Runtime Apply Preview/Gate Pipeline 상세
+- 29.x Execution: Execution Preview Phase1 / Phase2 / Orchestrator 상세
+- Appendix 또는 구현 검증 장: 커밋 hash, 테스트 수, 보호 파일 검증, 금지선 유지
+- 운영/AI 협업 정책 장이 있다면: 3모델 역할 재정의 반영
+
+## 8. 금지선 명시
+
+반드시 포함:
+
+- runtime/*.json write 금지
+- routines/*/rules.json write 금지
+- SQLite write 금지
+- 실제 Broker 연결 금지
+- 실제 Order Router 연결 금지
+- 실제 SendOrder 호출 금지
+- 실제 Chejan 연결 금지
+- GUI 연결 금지
+- 실제 Execution/Dispatch/Commit/Runtime Apply 실행 금지
+
+주의 사항:
+
+- 본 UPDATE는 `docs` 프로젝트의 문서 생성 결과물이며, 실제 `kiwoom_auto` 코드/런타임/DB 변경을 수반하지 않는다.
+- 실제 MASTER_SPEC 반영(정식 승인 및 반영 절차)은 별도의 승인/검토 프로세스를 거쳐야 한다.
+
+끝.

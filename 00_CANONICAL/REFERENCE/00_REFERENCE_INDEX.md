@@ -1,4 +1,4 @@
-# MASTER_SPEC AI Reference Edition Index
+# MASTER_SPEC AI Reference Edition Index (Runtime Commit Boundary Edition)
 
 Reference Edition
 
@@ -10,7 +10,9 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
 
 ## Reference 구조
 
-이 디렉터리는 Runtime Commit Boundary MASTER_SPEC Canonical을 AI 참조용으로 분할한 Reference Edition이다. 기존 Canonical은 수정하지 않았으며 공식 Source of Truth는 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt 이다.
+이 디렉터리는 Runtime Commit Boundary MASTER_SPEC Canonical을 AI 참조용으로 분할한 Reference Edition이다.
+기존 Canonical은 수정하지 않았으며 공식 Source of Truth는
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt 이다.
 
 원본 순서 보존 방식:
 
@@ -27,7 +29,7 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
 | PART | 포함 섹션 | 파일 크기 |
 |---|---|---:|
 | PART01_SYSTEM_FOUNDATION.md | Canonical preface and Runtime Apply Preview / Execution Preview Orchestrator integration summary | 2688 bytes |
-| PART02_RUNTIME.md | 02_Runtime_Data_Model: Runtime Projection, Persistence/Recovery/Reconciliation Preview, Preview Safety, Runtime Apply Preview/Gate Pipeline | 8951 bytes |
+| PART02_RUNTIME.md | 02_Runtime_Data_Model: Runtime Projection, Persistence/Recovery/Reconciliation Preview, Preview Safety, Runtime Apply Preview/Gate Pipeline, Runtime Commit Boundary | 7236 bytes |
 | PART03_GUI.md | Reserved; no original body assigned | 618 bytes |
 | PART04_ROUTINE.md | Reserved; no original body assigned | 624 bytes |
 | PART05_RULE_APPROVAL.md | Reserved; no original body assigned | 638 bytes |
@@ -44,10 +46,11 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
 | PART01_02_SYSTEM_FOUNDATION.md | PART01_SYSTEM_FOUNDATION.md | 2/4 | 991 bytes | AI 우선 참조 |
 | PART01_03_SYSTEM_FOUNDATION.md | PART01_SYSTEM_FOUNDATION.md | 3/4 | 1552 bytes | AI 우선 참조 |
 | PART01_04_SYSTEM_FOUNDATION.md | PART01_SYSTEM_FOUNDATION.md | 4/4 | 1233 bytes | AI 우선 참조 |
-| PART02_01_RUNTIME.md | PART02_RUNTIME.md | 1/4 | 3196 bytes | AI 우선 참조 |
-| PART02_02_RUNTIME.md | PART02_RUNTIME.md | 2/4 | 3222 bytes | AI 우선 참조 |
-| PART02_03_RUNTIME.md | PART02_RUNTIME.md | 3/4 | 2145 bytes | AI 우선 참조 |
-| PART02_04_RUNTIME.md | PART02_RUNTIME.md | 4/4 | 2129 bytes | AI 우선 참조 |
+| PART02_01_RUNTIME.md | PART02_RUNTIME.md | 1/5 | 3196 bytes | AI 우선 참조 |
+| PART02_02_RUNTIME.md | PART02_RUNTIME.md | 2/5 | 3222 bytes | AI 우선 참조 |
+| PART02_03_RUNTIME.md | PART02_RUNTIME.md | 3/5 | 2145 bytes | AI 우선 참조 |
+| PART02_04_RUNTIME.md | PART02_RUNTIME.md | 4/5 | 2129 bytes | AI 우선 참조 |
+| PART02_05_RUNTIME.md | PART02_RUNTIME.md | 5/5 | 2412 bytes | AI 우선 참조 (Runtime Commit Boundary) |
 | PART03_01_GUI.md | PART03_GUI.md | 1/5 | 604 bytes | AI 우선 참조 |
 | PART03_02_GUI.md | PART03_GUI.md | 2/5 | 604 bytes | AI 우선 참조 |
 | PART03_03_GUI.md | PART03_GUI.md | 3/5 | 604 bytes | AI 우선 참조 |
@@ -64,8 +67,9 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
 
 ## 주요 위치
 
-- Runtime Layer Phase1 + Runtime Apply Preview/Gate Pipeline 병합 요약: PART01_SYSTEM_FOUNDATION.md
-- 02.10~02.15 Runtime Projection / Persistence / Recovery / Reconciliation / Preview Safety / Runtime Apply Preview/Gate: PART02_RUNTIME.md
+- Runtime Apply Preview/Gate Pipeline 요약: PART01_SYSTEM_FOUNDATION.md
+- 02.10~02.15 Runtime Projection / Persistence / Recovery / Reconciliation / Preview Safety / Runtime Apply Preview/Gate: PART02_01~04_RUNTIME.md
+- 02.20~02.28 Runtime Commit Boundary: PART02_05_RUNTIME.md
 - 29.x.1~29.x.8 Execution Preview Phase1/Phase2/Orchestrator: PART06_EXECUTION_PREVIEW.md
 - 운영/AI 협업 정책(3모델 역할): PART08_OPERATION_POLICY.md
 - 구현 커밋/테스트/보호 파일/금지선 부록: PART09_APPENDIX.md
@@ -73,16 +77,38 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
 ## AI 세션 참조 순서
 
 1. README.md
-2. AI_PROJECT_OPERATION_MANUAL_RELEASE_v1.2.md
+2. AI_PROJECT_OPERATION_MANUAL_RELEASE_v1.4.md
 3. AI_SESSION_START_PROTOCOL.md
 4. 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
 5. Runtime 상세 규격 확인 시 PART02_RUNTIME.md 또는 PART02 SUBPART
 6. Execution Preview 교차참조 확인 시 PART06_EXECUTION_PREVIEW.md
 7. 운영/AI 협업 정책 확인 시 PART08_OPERATION_POLICY.md
-8. 필요한 경우 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+8. 필요한 경우 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
 9. 10_UPDATE/MERGED
 10. 00_CANONICAL/CHANGELOG
 11. 20_ARCHIVE
+
+## Git Operation Policy 위치 안내
+
+Git Commit / Push 운영 정책(수행 시점, Session Closing Procedure, 금지사항, 예외)은
+AI_PROJECT_OPERATION_MANUAL_RELEASE_v1.4.md §19 Git Operation Policy에 공식 운영 규칙으로 정의되어 있다.
+
+- 본 REFERENCE INDEX는 MASTER_SPEC 참조용 분할본이므로 Git Operation Policy 본문을 중복 기재하지 않는다.
+- 운영 매뉴얼 계열 문서(AI_SESSION_START_PROTOCOL, RELEASE)에서 §19를 교차참조한다.
+- PART08_OPERATION_POLICY는 MASTER_SPEC의 3모델 역할 재정의이므로, Git 타이밍 정책(§19)과 혼동하지 않는다.
+
+## Runtime Commit Core Completion 위치 안내
+
+M6 Runtime Commit Core Completion(Contract / Persistence / Guard / Approval Token Store / Real Executor / Recovery Journal 구현 및 Real Executor 연동)은
+kiwoom_auto 프로젝트(master)에 구현 완료되었다.
+
+- 완료 범위: M6-11 Runtime Commit Transaction Contract, M6-13 Runtime Commit Transaction Persistence, M6-14 Runtime Commit Guard, M6-15 Runtime Commit Approval Token Store, M6-16 Runtime Commit Real Executor, M6-17 Runtime Commit Recovery Journal
+- Real Executor 연동 완료: Guard, Approval Token Store, Persistence, Recovery Journal
+- 구현 커밋: kiwoom_auto master 649127c
+- 완료 기록 Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
+- 완료 기록 CHANGELOG: 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
+- 완료 기록 RESUME: 20_ARCHIVE/RESUME/PROJECT_RESUME_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
+- 본 REFERENCE INDEX는 MASTER_SPEC 참조용 분할본이므로 본문을 중복 기재하지 않으며, 위치만 교차참조한다.
 
 ## 검증 기준
 
@@ -96,7 +122,7 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
 
 ## 재생성 검증 결과
 
-- Canonical 문자 수: 14593
-- PART01~PART09 Original Body 재조립 문자 수: 14593
+- Canonical 문자 수: 7236
+- PART01~PART09 Original Body 재조립 문자 수: 7236
 - 문자 수 차이: 0
 - 재조립 본문 일치: OK
