@@ -167,6 +167,81 @@ Eligibility 평가 결과
 - rules.json write 금지
 - SQLite write 금지
 
+==================================================
+02.29 M6 Runtime Commit Core (Runtime Commit Core Completion)
+==================================================
+
+M6 Runtime Commit Core는 Runtime Commit Boundary 계약을 기반으로 실제 Runtime Commit 수행에 필요한 핵심 구성요소를 구현한다.
+
+02.29.1 Runtime Commit Transaction Contract (M6-11, runtime_commit_transaction_contract.py)
+- 원자적 적용 계획(Atomic Apply Plan) 포함
+- 검증 계획(Verification Plan) 포함
+- 롤백 계획(Rollback Plan) 포함
+- 계약 위반 시 커밋 진입 차단
+
+02.29.2 Runtime Commit Transaction Persistence (M6-13, runtime_commit_transaction_persistence.py)
+- 커밋 상태 영속화 담당
+- Runtime Commit Boundary preview_only 상태와 분리하여 실제 상태 기록
+
+02.29.3 Runtime Commit Guard (M6-14, runtime_commit_guard.py)
+- 실행 전 안전 게이트
+- Real Executor 진입 여부 결정
+- 금지선/보호 파일 위반 시 차단
+
+02.29.4 Runtime Commit Approval Token Store (M6-15, runtime_commit_approval_token_store.py)
+- 승인 토큰 발급/검증 담당
+- 커밋 승인 무결성 보장
+
+02.29.5 Runtime Commit Real Executor (M6-16, runtime_commit_real_executor.py)
+- 실제 Runtime Commit 수행 핵심 구성요소
+- Guard 연동: 실행 전 안전 게이트 통과 확인
+- Approval Token Store 연동: 승인 토큰 검증
+- Persistence 연동: 커밋 상태 영속화
+- Recovery Journal 연동: 커밋 복구 이력 기록
+
+02.29.6 Runtime Commit Recovery Journal (M6-17, runtime_commit_recovery_journal.py)
+- 커밋 복구 이력 기록 담당
+- 장애 발생 시 복구 기준 제공
+
+실행 흐름
+1. Gate 결과 검증 (gate_result.gate_status == APPROVED)
+2. Transaction Manifest 식별 (commit_id, transaction_id)
+3. Guard 평가 및 Lock 획득 (acquire_runtime_commit_lock)
+4. Approval Token 검증 (read_runtime_commit_approval_token + validate)
+5. 대상 파일 Backup (복사본 저장)
+6. Atomic Write (write_json_atomic)
+7. Post-write Verify (verify_runtime_commit)
+8. 성공 시 Token Consume (consume_runtime_commit_approval_token)
+9. Lock Release (release_runtime_commit_lock)
+
+실패 처리
+- Write 전 실패 → ABORTED
+- Write 후 Verify 실패 → ROLLED_BACK (백업 복원)
+- Rollback 실패 → MANUAL_RESTORE_REQUIRED
+- Lock 중복/토큰 소비됨 → BLOCKED
+
+구현 위치
+- kiwoom_auto 프로젝트 runtime_commit_*.py
+
+검증
+- 구현 커밋: kiwoom_auto master 649127c
+- py_compile: runtime_commit_*.py 12개 + tests/test_runtime_commit_*.py 14개 통과
+- 전체 unittest: 3409 tests OK
+- 보호 파일 변경 없음 (runtime/*.json, routines/*/rules.json)
+
+금지선 (유지)
+- runtime/*.json write 금지
+- routines/*/rules.json write 금지
+- SQLite write 금지
+- 실제 Broker/Order Router/SendOrder/Chejan/GUI 연결 금지
+- 실제 Runtime Commit/Apply 수행 금지
+- preview_only=True 유지
+
+다음 단계
+- M6 이후 Runtime Commit 실제 적용 계층 연결 검토
+- Runtime Commit Core 단위 통합 테스트/부하 검증
+- 운영 매뉴얼 §20 Development Execution Policy 실제 적용 점검
+
 --------------------------------------------------
 Original Body Marker: END
 

@@ -105,9 +105,14 @@ kiwoom_auto 프로젝트(master)에 구현 완료되었다.
 - 완료 범위: M6-11 Runtime Commit Transaction Contract, M6-13 Runtime Commit Transaction Persistence, M6-14 Runtime Commit Guard, M6-15 Runtime Commit Approval Token Store, M6-16 Runtime Commit Real Executor, M6-17 Runtime Commit Recovery Journal
 - Real Executor 연동 완료: Guard, Approval Token Store, Persistence, Recovery Journal
 - 구현 커밋: kiwoom_auto master 649127c
+- 대상 파일: runtime_commit_transaction_contract.py, runtime_commit_transaction_persistence.py, runtime_commit_guard.py, runtime_commit_approval_token_store.py, runtime_commit_real_executor.py, runtime_commit_recovery_journal.py
+- 전체 unittest: 3409 tests OK
+- 보호 파일 변경 없음 (runtime/*.json, routines/*/rules.json)
 - 완료 기록 Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
 - 완료 기록 CHANGELOG: 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
 - 완료 기록 RESUME: 20_ARCHIVE/RESUME/PROJECT_RESUME_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
+- Reference Edition 반영: PART02_05_RUNTIME.md (02.29 절 추가)
+- REFERENCE_EDITION: REFERENCE_EDITION_runtime_commit_boundary.md (00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt 기준)
 - 본 REFERENCE INDEX는 MASTER_SPEC 참조용 분할본이므로 본문을 중복 기재하지 않으며, 위치만 교차참조한다.
 
 ## 검증 기준

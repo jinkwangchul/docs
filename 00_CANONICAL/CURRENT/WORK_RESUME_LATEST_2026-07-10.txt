@@ -1,0 +1,45 @@
+WORK_RESUME_LATEST_2026-07-10
+
+기준 출처: 20_ARCHIVE/RESUME/PROJECT_RESUME_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
+현재 시작 기준: M6 Runtime Commit Core Completion (M6-11~M6-17)
+
+1. 현재 완료 판정
+- M6 Runtime Commit Core Completion 구현 완료
+  - M6-11 Runtime Commit Transaction Contract
+  - M6-13 Runtime Commit Transaction Persistence
+  - M6-14 Runtime Commit Guard
+  - M6-15 Runtime Commit Approval Token Store
+  - M6-16 Runtime Commit Real Executor
+  - M6-17 Runtime Commit Recovery Journal
+- Real Executor 연동 완료: Guard, Approval Token Store, Persistence, Recovery Journal
+- Milestone M6 Runtime Commit Core Complete
+
+2. 유지해야 할 불변 상태
+- Runtime Commit Boundary는 preview_only=True 상태 유지
+- runtime/*.json 실제 write 없음 유지
+- routines/*/rules.json 수정 없음 유지
+- SQLite write 없음 유지
+- Broker/Order Router/SendOrder/Chejan/GUI 연결 없음 유지
+- 실제 Runtime Commit/Apply 수행 없음 유지
+
+3. 검증 상태
+- 구현 커밋: kiwoom_auto master 649127c
+- 전체 unittest: 3409 tests OK
+- 보호 파일 변경 없음 (runtime/*.json, routines/*/rules.json)
+
+4. 다음 작업 후보
+- M6 이후 Runtime Commit 실제 적용 계층 연결 검토
+- Runtime Commit Core 단위 통합 테스트/부하 검증
+- 운영 매뉴얼 §20 Development Execution Policy 실제 적용 점검
+
+5. 다음 작업 금지선
+- runtime/*.json 실제 write 금지
+- routines/*/rules.json 수정 금지
+- SQLite write 금지
+- Broker 연결 금지
+- Order Router 실제 연결 금지
+- SendOrder 호출 금지
+- Chejan 연결 금지
+- GUI update 호출 금지
+- 실제 Runtime Commit 수행 금지
+- 실제 Runtime Apply 수행 금지
