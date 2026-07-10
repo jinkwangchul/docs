@@ -1,0 +1,61 @@
+MASTER_SPEC CHANGELOG
+작성일: 2026-07-10
+
+1. 기준 Canonical
+- 병합 기준 Canonical 파일명: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
+- 신규 Canonical 파일명: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
+
+2. 병합된 UPDATE
+- 해당 없음 (신규 구현 완료 기록)
+
+3. 추가된 MASTER_SPEC 내용
+- M7 Lifecycle Runtime Commit 연결
+  - Lifecycle Runtime Commit Adapter (lifecycle_runtime_commit_adapter.py)
+  - Runtime Commit Adapter Request Builder (lifecycle_runtime_commit_builder.py)
+  - Lifecycle Commit Service → Adapter 라우팅 (lifecycle_commit_service.py)
+  - Real Executor 계약 무결성 강화 (runtime_commit_real_executor.py, ea968c4)
+  - Lifecycle Commit → Adapter → Request Builder → Runtime Commit Real Executor 흐름
+  - 종단간 계약 검증 테스트 추가
+- 승인된 RSI 매수 필터 평가
+  - 적용 위치: routines/지표추종매매/routine_macd_engine.py (_evaluate_buy_rsi_filter)
+  - 공식 승인 설정: buy.filters.rsi
+  - 지원 연산: 이하/<= , 이상/>=
+  - period/threshold/operator 검증, 데이터 부족 시 BUY 차단
+  - BUY 주조건 통과 후 RSI 필터 평가, 불충족 시 signal=None reason="BUY RSI filter blocked"
+  - pending UI 값 실행 제외: indicator_follow_rule_pending/pending UI 후보값은 실행 결과에 영향 없음 (buy.filters.rsi 공식 설정만 적용)
+  - 매도 필터/다른 매수 필터는 이번 범위 아님
+
+4. 테스트 결과
+- 구현 커밋: kiwoom_auto master f81ae3b (이전 기준 649127c)
+- 전체 unittest: 3489 tests OK (py -m unittest discover -s tests -p "test_*.py")
+- 신규 테스트: test_lifecycle_runtime_commit_adapter.py, test_lifecycle_runtime_commit_end_to_end.py, test_runtime_commit_real_executor_integration.py, test_lifecycle_commit_writer_service.py, test_condition_engine.py(RSI 필터)
+- 보호 파일 변경 없음 (runtime/*.json, routines/*/rules.json)
+
+5. 유지된 금지선
+- runtime/*.json write 금지
+- routines/*/rules.json write 금지
+- SQLite write 금지
+- 실제 Broker/Order Router/SendOrder/Chejan/GUI 연결 금지
+- 실제 Runtime Commit/Apply 수행 금지
+- preview_only=True 유지
+- Adapter/Builder IO 수행 금지 (Real Executor 위임)
+
+6. 다음 구현 후보
+- MACD선 위치 필터
+- 나머지 적용 매수 필터 구현
+- Runtime Commit 실제 적용 계층 연결 설계
+
+금지:
+- Canonical 수정 금지
+- UPDATE 수정 금지
+- REFERENCE 수정 금지
+- Python 수정 금지
+- Git commit/push 금지
+
+보고:
+- 생성 파일명:
+  - 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
+  - 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
+  - 20_ARCHIVE/RESUME/PROJECT_RESUME_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
+- 주요 기록 내용: M7 Lifecycle Runtime Commit 연결(Adapter/Builder/Service 라우팅/Real Executor 무결성 강화/E2E 테스트) 및 승인된 RSI 매수 필터 평가(buy.filters.rsi, <=/>=, BUY RSI filter blocked) 구현 완료, kiwoom_auto f81ae3b 반영, 전체 unittest 3489 OK
+- docs git status: (아래 git status --porcelain 실행 결과를 참조)

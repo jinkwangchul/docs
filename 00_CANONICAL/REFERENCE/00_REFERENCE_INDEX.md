@@ -1,18 +1,18 @@
-# MASTER_SPEC AI Reference Edition Index (Runtime Commit Boundary Edition)
+# MASTER_SPEC AI Reference Edition Index (Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter Edition)
 
 Reference Edition
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
 
-생성일: 2026-07-09
+생성일: 2026-07-10
 
 주의: 본 문서는 AI 참조용 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 ## Reference 구조
 
-이 디렉터리는 Runtime Commit Boundary MASTER_SPEC Canonical을 AI 참조용으로 분할한 Reference Edition이다.
+이 디렉터리는 Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter MASTER_SPEC Canonical을 AI 참조용으로 분할한 Reference Edition이다.
 기존 Canonical은 수정하지 않았으며 공식 Source of Truth는
-00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt 이다.
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt 이다.
 
 원본 순서 보존 방식:
 
@@ -37,6 +37,7 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
 | PART07_EXECUTION_CONTROLLER.md | Reserved; no original body assigned | 654 bytes |
 | PART08_OPERATION_POLICY.md | 운영/AI 협업 정책: 3모델 역할 재정의 | 1895 bytes |
 | PART09_APPENDIX.md | Appendix: implementation commits, tests, protected files, prohibition lines | 3208 bytes |
+| PART02_06_RUNTIME_FILTER_ENGINE.md | Runtime Commit Architecture, Filter Engine, RSI Buy Filter | NEW |
 
 ## SUBPART 목록
 
@@ -51,6 +52,7 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
 | PART02_03_RUNTIME.md | PART02_RUNTIME.md | 3/5 | 2145 bytes | AI 우선 참조 |
 | PART02_04_RUNTIME.md | PART02_RUNTIME.md | 4/5 | 2129 bytes | AI 우선 참조 |
 | PART02_05_RUNTIME.md | PART02_RUNTIME.md | 5/5 | 2412 bytes | AI 우선 참조 (Runtime Commit Boundary) |
+| PART02_06_RUNTIME_FILTER_ENGINE.md | PART02_RUNTIME.md | 신규 | - | Runtime Commit Architecture / RSI Filter |
 | PART03_01_GUI.md | PART03_GUI.md | 1/5 | 604 bytes | AI 우선 참조 |
 | PART03_02_GUI.md | PART03_GUI.md | 2/5 | 604 bytes | AI 우선 참조 |
 | PART03_03_GUI.md | PART03_GUI.md | 3/5 | 604 bytes | AI 우선 참조 |
@@ -70,6 +72,7 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
 - Runtime Apply Preview/Gate Pipeline 요약: PART01_SYSTEM_FOUNDATION.md
 - 02.10~02.15 Runtime Projection / Persistence / Recovery / Reconciliation / Preview Safety / Runtime Apply Preview/Gate: PART02_01~04_RUNTIME.md
 - 02.20~02.28 Runtime Commit Boundary: PART02_05_RUNTIME.md
+- 02.29~02.30 Runtime Commit Architecture / Filter Engine: PART02_06_RUNTIME_FILTER_ENGINE.md
 - 29.x.1~29.x.8 Execution Preview Phase1/Phase2/Orchestrator: PART06_EXECUTION_PREVIEW.md
 - 운영/AI 협업 정책(3모델 역할): PART08_OPERATION_POLICY.md
 - 구현 커밋/테스트/보호 파일/금지선 부록: PART09_APPENDIX.md
@@ -83,37 +86,40 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
 5. Runtime 상세 규격 확인 시 PART02_RUNTIME.md 또는 PART02 SUBPART
 6. Execution Preview 교차참조 확인 시 PART06_EXECUTION_PREVIEW.md
 7. 운영/AI 협업 정책 확인 시 PART08_OPERATION_POLICY.md
-8. 필요한 경우 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY.txt
+8. 필요한 경우 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
 9. 10_UPDATE/MERGED
 10. 00_CANONICAL/CHANGELOG
 11. 20_ARCHIVE
 
-## Git Operation Policy 위치 안내
-
-Git Commit / Push 운영 정책(수행 시점, Session Closing Procedure, 금지사항, 예외)은
-AI_PROJECT_OPERATION_MANUAL_RELEASE_v1.4.md §19 Git Operation Policy에 공식 운영 규칙으로 정의되어 있다.
-
-- 본 REFERENCE INDEX는 MASTER_SPEC 참조용 분할본이므로 Git Operation Policy 본문을 중복 기재하지 않는다.
-- 운영 매뉴얼 계열 문서(AI_SESSION_START_PROTOCOL, RELEASE)에서 §19를 교차참조한다.
-- PART08_OPERATION_POLICY는 MASTER_SPEC의 3모델 역할 재정의이므로, Git 타이밍 정책(§19)과 혼동하지 않는다.
-
-## Runtime Commit Core Completion 위치 안내
+## Runtime Commit Core 위치 안내
 
 M6 Runtime Commit Core Completion(Contract / Persistence / Guard / Approval Token Store / Real Executor / Recovery Journal 구현 및 Real Executor 연동)은
-kiwoom_auto 프로젝트(master)에 구현 완료되었다.
+kiwoom_auto 프로젝트 master f81ae3b에 구현 완료되었다.
 
-- 완료 범위: M6-11 Runtime Commit Transaction Contract, M6-13 Runtime Commit Transaction Persistence, M6-14 Runtime Commit Guard, M6-15 Runtime Commit Approval Token Store, M6-16 Runtime Commit Real Executor, M6-17 Runtime Commit Recovery Journal
+- 완료 범위: M6-11~M6-17 Runtime Commit Core 전체
 - Real Executor 연동 완료: Guard, Approval Token Store, Persistence, Recovery Journal
-- 구현 커밋: kiwoom_auto master 649127c
-- 대상 파일: runtime_commit_transaction_contract.py, runtime_commit_transaction_persistence.py, runtime_commit_guard.py, runtime_commit_approval_token_store.py, runtime_commit_real_executor.py, runtime_commit_recovery_journal.py
-- 전체 unittest: 3409 tests OK
-- 보호 파일 변경 없음 (runtime/*.json, routines/*/rules.json)
-- 완료 기록 Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
-- 완료 기록 CHANGELOG: 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
-- 완료 기록 RESUME: 20_ARCHIVE/RESUME/PROJECT_RESUME_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
-- Reference Edition 반영: PART02_05_RUNTIME.md (02.29 절 추가)
-- REFERENCE_EDITION: REFERENCE_EDITION_runtime_commit_boundary.md (00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt 기준)
-- 본 REFERENCE INDEX는 MASTER_SPEC 참조용 분할본이므로 본문을 중복 기재하지 않으며, 위치만 교차참조한다.
+- 구현 커밋: kiwoom_auto master f81ae3b
+- 전체 unittest: 3489 tests OK
+- 보호 파일 변경 없음
+
+## M7 Lifecycle Runtime Commit 위치 안내
+
+M7 Lifecycle Runtime Commit(Lifecycle Commit Service → Runtime Commit Adapter → Request Builder → Real Executor 연결, Adapter/Builder 신규 추가, Real Executor 계약 무결성 강화, E2E 계약 검증)은
+kiwoom_auto 프로젝트 master f81ae3b에 구현 완료되었다.
+
+- 완료 범위: M7 Lifecycle Runtime Commit 연결 전체(Service 라우팅, Adapter, Builder, Real Executor 무결성, E2E 테스트)
+- 신규 파일: lifecycle_runtime_commit_adapter.py, lifecycle_runtime_commit_builder.py
+- Service 라우팅: lifecycle_commit_service.commit_lifecycle() → Builder(build_lifecycle_runtime_commit_adapter_request) → Adapter(adapt_and_execute_lifecycle_runtime_commit) → Real Executor
+- 계약 무결성 강화: runtime_commit_real_executor.py(매니페스트 identity 검증, 저널 append 실패 차단, lock_released 추적)
+- E2E 검증: test_lifecycle_runtime_commit_end_to_end.py
+- 구현 커밋: kiwoom_auto master f81ae3b
+- 전체 unittest: 3489 tests OK
+- 보호 파일 변경 없음
+
+## Filter 구현률 위치 안내
+
+RSI Buy Filter는 routines/지표추종매매/routine_macd_engine.py의 _evaluate_buy_rsi_filter()에 구현되어 있다(공식 설정 경로: buy.filters.rsi, pending UI 후보값은 실행 결과에 영향 없음).
+Filter 구현률은 MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt의 "현재 필터 구현률" 섹션을 참조한다.
 
 ## 검증 기준
 
@@ -127,7 +133,6 @@ kiwoom_auto 프로젝트(master)에 구현 완료되었다.
 
 ## 재생성 검증 결과
 
-- Canonical 문자 수: 7236
-- PART01~PART09 Original Body 재조립 문자 수: 7236
-- 문자 수 차이: 0
-- 재조립 본문 일치: OK
+- Canonical 문자 수: 측정 예정
+- PART01~PART09 Original Body 재조립 문자 수: 측정 예정
+- 문자 수 차이: 참조 PART02_06 추가 후 재측정 필요

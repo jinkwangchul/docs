@@ -1,0 +1,172 @@
+MASTER_SPEC CANONICAL — M7 LIFECYCLE RUNTIME COMMIT + RSI BUY FILTER
+생성일: 2026-07-10
+원본 기준: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
+
+본 Canonical은 M6 Runtime Commit Core Completion 상태를 유지하고, M7 Lifecycle Runtime Commit 연결 및 승인된 RSI 매수 필터 평가 구현 완료를 MASTER_SPEC에 반영한 기록이다. 기존 Canonical은 수정하지 않았으며, 본 파일은 kiwoom_auto master f81ae3b 시점의 상태를 고정한다.
+
+== 02.29 Runtime Commit Core (M6 Runtime Commit Core Completion) ==
+
+M6 Runtime Commit Core는 Runtime Commit Boundary 계약을 기반으로 실제 Runtime Commit 수행에 필요한 핵심 구성요소를 구현한다.
+
+02.29.1 Runtime Commit Transaction Contract (M6-11)
+- 원자적 적용 계획(Atomic Apply Plan) 포함
+- 검증 계획(Verification Plan) 포함
+- 롤백 계획(Rollback Plan) 포함
+- 계약 위반 시 커밋 진입 차단
+
+02.29.2 Runtime Commit Transaction Persistence (M6-13)
+- 커밋 상태 영속화 담당
+- Runtime Commit Boundary preview_only 상태와 분리하여 실제 상태 기록
+
+02.29.3 Runtime Commit Guard (M6-14)
+- 실행 전 안전 게이트
+- Real Executor 진입 여부 결정
+- 금지선/보호 파일 위반 시 차단
+
+02.29.4 Runtime Commit Approval Token Store (M6-15)
+- 승인 토큰 발급/검증 담당
+- 커밋 승인 무결성 보장
+
+02.29.5 Runtime Commit Real Executor (M6-16)
+- 실제 Runtime Commit 수행 핵심 구성요소
+- Guard 연동: 실행 전 안전 게이트 통과 확인
+- Approval Token Store 연동: 승인 토큰 검증
+- Persistence 연동: 커밋 상태 영속화
+- Recovery Journal 연동: 커밋 복구 이력 기록
+
+02.29.6 Runtime Commit Recovery Journal (M6-17)
+- 커밋 복구 이력 기록 담당
+- 장애 발생 시 복구 기준 제공
+
+== 02.30 M7 Lifecycle Runtime Commit 연결 ==
+
+M7은 Lifecycle Commit Service가 Runtime Commit Core(M6)로 연결되는 구조를 완성한다.
+
+02.30.1 Lifecycle Runtime Commit Adapter (lifecycle_runtime_commit_adapter.py)
+- Lifecycle commit 요청을 M6 runtime commit executor 호출로 번역하는 thin adapter
+- adapt_and_execute_lifecycle_runtime_commit() 진입점
+- 입력 검증: REQUIRED_LIFECYCLE_FIELDS(lifecycle_id, commit_id, transaction_id, requested_action, source_stage, runtime_commit_boundary_status, preview_only, metadata)
+- preview_only는 반드시 True, metadata는 dict
+- 실제 IO/backup/rollback/verify/lock/token/journal/GUI/broker/runtime path 선택을 수행하지 않음 (모든 실제 동작은 runtime_commit_real_executor.execute_runtime_commit 에 위임)
+- runtime 결과 상태 매핑: COMMITTED/BLOCKED/INVALID/ABORTED/ROLLED_BACK, MANUAL_RESTORE_REQUIRED → REVIEW_REQUIRED
+- safety_flags 전체 False 고정 (direct_write_called, backup_called_by_adapter, rollback_called_by_adapter, verify_called_by_adapter, lock_called_by_adapter, token_called_by_adapter, gui_update_called, send_order_called, broker_called, chejan_called, sqlite_write, rules_write)
+
+02.30.2 Runtime Commit Adapter Request Builder (lifecycle_runtime_commit_builder.py)
+- build_lifecycle_runtime_commit_adapter_request() / build_adapter_request() 진입점
+- Lifecycle 입력에서 adapter 요청 전체를 구성
+  - gate_result: build_gate_result(commit_contract_preview) — gate_status=APPROVED, preview_only=True
+  - transaction_manifest: build_transaction_manifest() — contract_version=M6_RUNTIME_TRANSACTION_V1, safety_flags 전체 False
+  - storage_plan: build_storage_plan(storage_root, commit_id, transaction_id)
+  - guard_plan: build_guard_plan(owner_id, storage_root, target_set_hash) — lock_key는 sha256({"commit_id","target_set_hash"})
+  - token_storage_plan: build_token_storage_plan(token_id, storage_root)
+  - expected_targets / new_targets: planned_targets 정규화(경로 소문자/슬래시 통일)
+  - consumer_id: owner_id 또는 consumer_override
+- Builder는 파일 쓰기/검증/backup/rollback/lock/token 소비를 수행하지 않음
+
+02.30.3 Lifecycle Commit Service 라우팅 (lifecycle_commit_service.py)
+- commit_lifecycle()가 기본 runtime 경로를 Builder + Adapter로 위임
+- 명시적 executor가 없고 planned_records가 있으면 needs_runtime 판단
+- adapter payload가 없고 context에 storage_root가 없으면 RUNTIME_COMMIT_ADAPTER_INPUT_REQUIRED로 BLOCKED
+- _runtime_wrapper: build_lifecycle_runtime_commit_adapter_request()로 payload 구성 → adapt_and_execute_lifecycle_runtime_commit(**payload)
+- 결과 해석: adapter_status == COMMITTED → ok, 그 외는 issues 와 함께 실패
+
+02.30.4 Real Executor 계약 무결성 강화 (runtime_commit_real_executor.py, ea968c4)
+- manifest identity 검증: transaction_manifest.commit_id ↔ storage_plan.commit_id 불일치 → BLOCKED
+- storage_plan.transaction_id ↔ guard_plan.transaction_id 불일치 → BLOCKED
+- transaction_manifest.target_set_hash 불일치 → BLOCKED
+- recovery journal create 실패 → BLOCKED
+- recovery journal EXECUTE_START append 실패 → BLOCKED
+- _persist_manifest()가 (bool, issues) 반환, 실패 시 BLOCKED + lock 해제
+- _append_tx_journal()이 (bool, issues) 반환, 실패 시 BLOCKED/ABORTED + lock 해제
+- backup journal append 실패 → ABORTED + lock 해제
+- lock_released 추적 추가
+
+02.30.5 흐름 및 보호 경계
+Lifecycle Commit → Adapter(adapt_and_execute_lifecycle_runtime_commit) → Request Builder(build_lifecycle_runtime_commit_adapter_request) → Runtime Commit Real Executor(execute_runtime_commit)
+- 실제 코드에서 확인되는 승인/검증/오류/롤백/보호 경계:
+  - 승인: gate_result(gate_status=APPROVED), Approval Token Store 검증
+  - 검증: manifest identity 검증, journal append 검증
+  - 오류: BLOCKED(identity/journal/manifest 실패), ABORTED(backup journal 실패)
+  - 롤백: 실패 시 _safe_release_lock 으로 lock 해제
+  - 보호 경계: adapter/builder는 IO 수행 안 함, preview_only=True 유지, safety_flags 전체 False
+
+02.30.6 종단간 계약 검증 테스트
+- tests/test_lifecycle_runtime_commit_adapter.py (신규)
+- tests/test_lifecycle_runtime_commit_end_to_end.py (신규)
+- tests/test_runtime_commit_real_executor_integration.py (신규)
+- tests/test_lifecycle_commit_writer_service.py (신규)
+- tests/test_runtime_commit_real_executor.py (기존, 15행 수정)
+
+== 02.31 승인된 RSI 매수 필터 평가 ==
+
+02.31.1 적용 위치
+- routines/지표추종매매/routine_macd_engine.py
+- _evaluate_buy_rsi_filter()
+
+02.31.2 공식 승인 설정 경로
+- buy.filters.rsi (buy_cfg["filters"]["rsi"]; fallback buy_cfg["rsi"])
+- 오직 이 경로의 설정만 실행 평가에 사용
+- indicator_follow_rule_pending 및 pending UI 후보값은 실행 결과에 영향 없음 (필터는 buy.filters.rsi 설정만 참조)
+
+02.31.3 지원 연산
+- 이하 / <= (별칭 LTE/LE/BELOW_OR_EQUAL/이하)
+- 이상 / >= (별칭 GTE/GE/ABOVE_OR_EQUAL/이상)
+- 그 외 연산자는 unsupported_operator → BUY 차단
+
+02.31.4 검증 항목
+- period: 정수, 1 이상 (None 또는 <=0 → invalid_period → BUY 차단)
+- threshold: 실수 (None → invalid_threshold → BUY 차단)
+- operator: 위 지원 연산만 (그 외 → unsupported_operator → BUY 차단)
+- 데이터 부족: rsi_values[evaluation_index]가 None → insufficient_data → BUY 차단
+
+02.31.5 평가 흐름
+- BUY 주조건 통과 후(buy_passed) RSI 필터를 평가
+- 필터 설정 없음 → 통과
+- enabled=False → 통과(disabled)
+- 평가값 = rsi(close_prices(candles), period)[evaluation_index]
+- passed = (evaluated_value <= threshold) if operator=="<=" else (evaluated_value >= threshold)
+- 필터 불충족 → signal=None, reason="BUY RSI filter blocked"
+- 평가 상세정보 기록: _rsi_detail(filter_type=RSI, enabled, period, operator, threshold, evaluated_value, passed, reason, evaluation_index)
+
+02.31.6 범위 한정
+- 매도 필터는 이번 구현 범위 아님
+- 다른 매수 필터(예: 볼륨, 가격 등)는 아직 구현 완료로 기록하지 않음
+
+== 구현 위치 ==
+
+kiwoom_auto 프로젝트 (f81ae3b):
+- lifecycle_runtime_commit_adapter.py (M7-02B Adapter)
+- lifecycle_runtime_commit_builder.py (M7-02D Request Builder)
+- lifecycle_commit_service.py (Lifecycle → Adapter 라우팅)
+- runtime_commit_real_executor.py (M6-16 계약 무결성 강화)
+- routines/지표추종매매/routine_macd_engine.py (RSI 매수 필터)
+- tests/test_lifecycle_runtime_commit_adapter.py
+- tests/test_lifecycle_runtime_commit_end_to_end.py
+- tests/test_runtime_commit_real_executor_integration.py
+- tests/test_lifecycle_commit_writer_service.py
+- tests/test_condition_engine.py (RSI 필터 테스트)
+- tests/test_runtime_commit_real_executor.py
+
+== 검증 ==
+
+- 구현 커밋: kiwoom_auto master f81ae3b
+- 이전 커밋 기준: 649127c (M6 Core Completion)
+- 전체 unittest: 3489 tests OK (명령: py -m unittest discover -s tests -p "test_*.py")
+- 신규 테스트 파일: test_lifecycle_runtime_commit_adapter.py, test_lifecycle_runtime_commit_end_to_end.py, test_runtime_commit_real_executor_integration.py, test_lifecycle_commit_writer_service.py, test_condition_engine.py(RSI 필터 추가)
+- 보호 파일 변경 없음 (runtime/*.json, routines/*/rules.json) — kiwoom_auto 작업 트리 클린 확인
+
+== 유지 금지선 ==
+
+- runtime/*.json write 금지
+- routines/*/rules.json write 금지
+- SQLite write 금지
+- 실제 Broker/Order Router/SendOrder/Chejan/GUI 연결 금지
+- 실제 Runtime Commit/Apply 수행 금지
+- preview_only=True 유지
+- Adapter/Builder는 IO 수행 안 함 (실제 동작은 Real Executor 위임)
+
+== 현재 필터 구현률 ==
+
+- RSI 매수 필터 1종 구현 완료 (buy.filters.rsi, <= / >=)
+- 나머지 적용 필터(다른 매수 필터, 매도 필터) 미구현
+- 전체 필터 진행률 숫자는 임의 계산하지 않음 (구현 항목 기준만 기록)
