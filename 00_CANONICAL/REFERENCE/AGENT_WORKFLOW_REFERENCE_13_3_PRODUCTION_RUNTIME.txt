@@ -1,0 +1,17 @@
+# AGENT_WORKFLOW_REFERENCE.txt
+
+==================================================
+13.3 Production Runtime 단계 운영 원칙
+==================================================
+
+Preview와 Production Runtime은 명확히 분리 운영한다.
+
+- Production Runtime 경로는 허용 리스트 기반으로 점진적으로 개방한다.
+- Production Runtime Write는 정확한 allowlist 설정 후 인가된 환경에서만 허용한다.
+- Production Runtime Write 전까지는 read-only 조사가 우선이다.
+- 단일 runtime 파일 Pilot 테스트를 완료한 후에 다중 타겟 확장한다.
+- rollback, verify, token, lock, journal 작업은 엄격한 검증과 정책 검토를 필요로 한다.
+- Production Runtime 작업은 Codex가 전담한다.
+- 일반 코드 모델은 문서화, Git 동기화, 소규모 검증 작업을 담당한다.
+- 실제 Production Runtime Write 작업은 사용자 승인 없이는 진행하지 않는다.
+- 기존 Dirty 파일은 수동으로 관리하며 자동 포함 금지한다.

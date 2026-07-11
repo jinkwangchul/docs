@@ -1,0 +1,35 @@
+# PROJECT_RESUME_2026-07-11_RUNTIME_COMMIT_PRODUCTION_TRANSITION
+
+작성일: 2026-07-11
+
+1. 현재 호출 흐름
+
+- BUY 필터 (OCR/OSC, RSI, Moving Average, Price Compare, Bollinger)
+- BUY Execution Policy: 승인 및 평가
+- 전체 Preview Pipeline
+- Tempfile Real Executor E2E
+
+2. 완료 계층
+
+- Preview Architecture: Runtime Commit 복잡 계층 구축 완료
+- Tempfile Real Executor E2E 검증 완료
+
+3. 각 계층 금지선
+
+- 실제 write는 tempfile 및 token store에 한정
+- 기존 runtime/*.json write 금지
+- Order Queue, SendOrder 등 연결 금지
+
+4. 실제 write 범위
+
+- tempfile runtime JSON before/after
+- Approval Token 처리
+
+5. 기존 dirty 파일 목록
+
+- 일부 미 구현 시점 dirty 파일 포함 가능
+
+6. 다음 작업 시작점
+
+- Production Runtime Allowlist 설계
+- 단일 runtime 파일 Pilot 구현

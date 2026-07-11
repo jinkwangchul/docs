@@ -1,0 +1,22 @@
+MASTER_SPEC_CHANGELOG_2026-07-11_RUNTIME_COMMIT_PRODUCTION_TRANSITION
+
+작성일: 2026-07-11
+
+변경 커밋 범위: e37bb00 이후부터 e32ee1a 기준까지
+
+주요 변경 사항:
+- Runtime Commit Preview 단계를 거쳐 tempfile Real Executor 단계 전환
+- BUY 필터 OCR/OSC, RSI, Moving Average, Price Compare, Bollinger 필터 완료
+- BUY Execution Policy 승인 및 평가 수행
+- Runtime Commit Preview Pipeline 구축 완료
+- Tempfile 기반 Runtime Commit Real Executor E2E 검증 완료
+- Production Runtime 전환 전 미개방 상태 유지
+- 신규 Preview → Real Executor 전환 구조 문서화
+- 전체 unittest 3730 tests OK, 1 skipped 달성
+
+차기 단계:
+- Production Runtime Allowlist 설계 및 단일 runtime 파일 Pilot
+- 입증된 rollback 및 복구 시나리오 강화
+- 다중 타겟 및 Order Queue 실제 연결
+
+본 로그는 기존 CHANGELOG에 새로운 전환점 내용을 이어 서술한 문서이다.

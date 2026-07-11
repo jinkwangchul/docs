@@ -1,6 +1,6 @@
 WORK_RESUME_LATEST_2026-07-10
 
-기준 Commit: e5ef4bc
+기준 Commit: e32ee1a
 
 1. 현재 완료 판정
 - Runtime Commit Infrastructure 구현 완료
@@ -17,8 +17,8 @@ WORK_RESUME_LATEST_2026-07-10
 - 실제 Runtime Commit 수행 없음 유지
 
 3. 검증 상태
-- Commit: e5ef4bc
-- 전체 unittest: 3492 tests OK
+- Commit: e32ee1a
+- 전체 unittest: 3730 tests OK, 1 skipped
 - 보호 파일 변경 없음:
   - runtime/order_queue.json
   - runtime/order_executions.json
@@ -41,7 +41,7 @@ WORK_RESUME_LATEST_2026-07-10
 6. Runtime Commit Architecture 위치
 - Original Canonical: MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
 - 상세 작업재개 문서: 20_ARCHIVE/RESUME/PROJECT_RESUME_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
-- M7 Lifecycle Runtime Commit + RSI Buy Filter: kiwoom_auto master e5ef4bc
+- M7 Lifecycle Runtime Commit + RSI Buy Filter: kiwoom_auto master e32ee1a
 - 참조: PART02_06_RUNTIME_FILTER_ENGINE.md
 
 끝.
