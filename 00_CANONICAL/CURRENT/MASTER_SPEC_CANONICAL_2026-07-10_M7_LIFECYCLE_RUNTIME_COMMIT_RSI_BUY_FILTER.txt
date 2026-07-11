@@ -2,7 +2,7 @@ MASTER_SPEC CANONICAL — M7 LIFECYCLE RUNTIME COMMIT + RSI BUY FILTER
 생성일: 2026-07-10
 원본 기준: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_RUNTIME_COMMIT_CORE_COMPLETION.txt
 
-본 Canonical은 M6 Runtime Commit Core Completion 상태를 유지하고, M7 Lifecycle Runtime Commit 연결 및 승인된 RSI 매수 필터 평가 구현 완료를 MASTER_SPEC에 반영한 기록이다. 기존 Canonical은 수정하지 않았으며, 본 파일은 kiwoom_auto master f81ae3b 시점의 상태를 고정한다.
+본 Canonical은 M6 Runtime Commit Core Completion 상태를 유지하고, M7 Lifecycle Runtime Commit 연결 및 승인된 RSI 매수 필터 평가 구현 완료를 MASTER_SPEC에 반영한 기록이다. 기존 Canonical은 수정하지 않았으며, 본 파일은 kiwoom_auto master e5ef4bc 시점의 상태를 고정한다.
 
 == 02.29 Runtime Commit Core (M6 Runtime Commit Core Completion) ==
 
@@ -82,7 +82,7 @@ M7은 Lifecycle Commit Service가 Runtime Commit Core(M6)로 연결되는 구조
 - lock_released 추적 추가
 
 02.30.5 흐름 및 보호 경계
-Lifecycle Commit → Adapter(adapt_and_execute_lifecycle_runtime_commit) → Request Builder(build_lifecycle_runtime_commit_adapter_request) → Runtime Commit Real Executor(execute_runtime_commit)
+- Lifecycle Commit → Adapter(adapt_and_execute_lifecycle_runtime_commit) → Request Builder(build_lifecycle_runtime_commit_adapter_request) → Runtime Commit Real Executor(execute_runtime_commit)
 - 실제 코드에서 확인되는 승인/검증/오류/롤백/보호 경계:
   - 승인: gate_result(gate_status=APPROVED), Approval Token Store 검증
   - 검증: manifest identity 검증, journal append 검증
@@ -95,7 +95,7 @@ Lifecycle Commit → Adapter(adapt_and_execute_lifecycle_runtime_commit) → Req
 - tests/test_lifecycle_runtime_commit_end_to_end.py (신규)
 - tests/test_runtime_commit_real_executor_integration.py (신규)
 - tests/test_lifecycle_commit_writer_service.py (신규)
-- tests/test_runtime_commit_real_executor.py (기존, 15행 수정)
+- tests/test_condition_engine.py (RSI 필터 테스트)
 
 == 02.31 승인된 RSI 매수 필터 평가 ==
 
@@ -134,7 +134,7 @@ Lifecycle Commit → Adapter(adapt_and_execute_lifecycle_runtime_commit) → Req
 
 == 구현 위치 ==
 
-kiwoom_auto 프로젝트 (f81ae3b):
+kiwoom_auto 프로젝트 (e5ef4bc):
 - lifecycle_runtime_commit_adapter.py (M7-02B Adapter)
 - lifecycle_runtime_commit_builder.py (M7-02D Request Builder)
 - lifecycle_commit_service.py (Lifecycle → Adapter 라우팅)
@@ -144,14 +144,14 @@ kiwoom_auto 프로젝트 (f81ae3b):
 - tests/test_lifecycle_runtime_commit_end_to_end.py
 - tests/test_runtime_commit_real_executor_integration.py
 - tests/test_lifecycle_commit_writer_service.py
-- tests/test_condition_engine.py (RSI 필터 테스트)
+- tests/test_condition_engine.py (RSI 필터 추가)
 - tests/test_runtime_commit_real_executor.py
 
 == 검증 ==
 
-- 구현 커밋: kiwoom_auto master f81ae3b
+- 구현 커밋: kiwoom_auto master e5ef4bc
 - 이전 커밋 기준: 649127c (M6 Core Completion)
-- 전체 unittest: 3489 tests OK (명령: py -m unittest discover -s tests -p "test_*.py")
+- 전체 unittest: 3492 tests OK (명령: py -m unittest discover -s tests -p "test_*.py")
 - 신규 테스트 파일: test_lifecycle_runtime_commit_adapter.py, test_lifecycle_runtime_commit_end_to_end.py, test_runtime_commit_real_executor_integration.py, test_lifecycle_commit_writer_service.py, test_condition_engine.py(RSI 필터 추가)
 - 보호 파일 변경 없음 (runtime/*.json, routines/*/rules.json) — kiwoom_auto 작업 트리 클린 확인
 
@@ -167,6 +167,6 @@ kiwoom_auto 프로젝트 (f81ae3b):
 
 == 현재 필터 구현률 ==
 
-- RSI 매수 필터 1종 구현 완료 (buy.filters.rsi, <= / >=)
+- RSI + Moving_average Buy Filter 완료
 - 나머지 적용 필터(다른 매수 필터, 매도 필터) 미구현
 - 전체 필터 진행률 숫자는 임의 계산하지 않음 (구현 항목 기준만 기록)

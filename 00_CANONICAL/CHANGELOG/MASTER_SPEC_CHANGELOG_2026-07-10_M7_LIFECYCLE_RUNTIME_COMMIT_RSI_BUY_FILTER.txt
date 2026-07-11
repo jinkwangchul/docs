@@ -26,8 +26,8 @@ MASTER_SPEC CHANGELOG
   - 매도 필터/다른 매수 필터는 이번 범위 아님
 
 4. 테스트 결과
-- 구현 커밋: kiwoom_auto master f81ae3b (이전 기준 649127c)
-- 전체 unittest: 3489 tests OK (py -m unittest discover -s tests -p "test_*.py")
+- 구현 커밋: kiwoom_auto master e5ef4bc (이전 기준 649127c)
+- 전체 unittest: 3492 tests OK (py -m unittest discover -s tests -p "test_*.py")
 - 신규 테스트: test_lifecycle_runtime_commit_adapter.py, test_lifecycle_runtime_commit_end_to_end.py, test_runtime_commit_real_executor_integration.py, test_lifecycle_commit_writer_service.py, test_condition_engine.py(RSI 필터)
 - 보호 파일 변경 없음 (runtime/*.json, routines/*/rules.json)
 

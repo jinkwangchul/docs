@@ -94,26 +94,26 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT
 ## Runtime Commit Core 위치 안내
 
 M6 Runtime Commit Core Completion(Contract / Persistence / Guard / Approval Token Store / Real Executor / Recovery Journal 구현 및 Real Executor 연동)은
-kiwoom_auto 프로젝트 master f81ae3b에 구현 완료되었다.
+kiwoom_auto 프로젝트 master e5ef4bc에 구현 완료되었다.
 
 - 완료 범위: M6-11~M6-17 Runtime Commit Core 전체
 - Real Executor 연동 완료: Guard, Approval Token Store, Persistence, Recovery Journal
-- 구현 커밋: kiwoom_auto master f81ae3b
-- 전체 unittest: 3489 tests OK
+- 구현 커밋: kiwoom_auto master e5ef4bc
+- 전체 unittest: 3492 tests OK
 - 보호 파일 변경 없음
 
 ## M7 Lifecycle Runtime Commit 위치 안내
 
-M7 Lifecycle Runtime Commit(Lifecycle Commit Service → Runtime Commit Adapter → Request Builder → Real Executor 연결, Adapter/Builder 신규 추가, Real Executor 계약 무결성 강화, E2E 계약 검증)은
-kiwoom_auto 프로젝트 master f81ae3b에 구현 완료되었다.
+M7 Lifecycle Runtime Commit(Lifecycle Commit Service → Builder → Adapter → Real Executor 연결, Adapter/Builder 신규 추가, Real Executor 계약 무결성 강화, E2E 계약 검증)은
+kiwoom_auto 프로젝트 master e5ef4bc에 구현 완료되었다.
 
 - 완료 범위: M7 Lifecycle Runtime Commit 연결 전체(Service 라우팅, Adapter, Builder, Real Executor 무결성, E2E 테스트)
 - 신규 파일: lifecycle_runtime_commit_adapter.py, lifecycle_runtime_commit_builder.py
 - Service 라우팅: lifecycle_commit_service.commit_lifecycle() → Builder(build_lifecycle_runtime_commit_adapter_request) → Adapter(adapt_and_execute_lifecycle_runtime_commit) → Real Executor
 - 계약 무결성 강화: runtime_commit_real_executor.py(매니페스트 identity 검증, 저널 append 실패 차단, lock_released 추적)
 - E2E 검증: test_lifecycle_runtime_commit_end_to_end.py
-- 구현 커밋: kiwoom_auto master f81ae3b
-- 전체 unittest: 3489 tests OK
+- 구현 커밋: kiwoom_auto master e5ef4bc
+- 전체 unittest: 3492 tests OK
 - 보호 파일 변경 없음
 
 ## Filter 구현률 위치 안내
