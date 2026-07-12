@@ -714,7 +714,7 @@ ACTIVE
 
 Version
 
-1.3
+1.4
 
 Last Updated
 
@@ -871,6 +871,31 @@ GitHub는 모든 작업마다 반복 조회하지 않는다.
 - 작업 전 MASTER_SPEC, 최신 Resume, 관련 runtime policy와 Git 상태를 재확인한다.
 - 설계 단계에서는 실제 runtime write, Order Queue 연결, SendOrder 연결을 금지한다.
 
-==================================================
+=
+=================================================
+19. Architecture Terminology Standard
+=================================================
+
+공식 호출 순서
+
+Lifecycle Runtime Commit 공식 호출 순서:
+
+Service
+→ Builder
+→ Adapter
+→ Runtime Commit Real Executor
+
+Glossary 우선 적용 원칙
+- 아키텍처 용어 해석은 ARCHITECTURE_GLOSSARY를 우선 적용한다.
+- Canonical 충돌 시 최신 Canonical을 우선한다.
+- 과거 Archive와 충돌 시 최신 Canonical / Glossary를 우선한다.
+- 기존 문서의 다른 호출 순서 표현은 삭제·수정하지 않고 공식 기준만 명시한다.
+
+코드 심볼 자동 변경 금지
+- 기존 코드 심볼명은 Glossary 정리를 이유로 변경하지 않는다.
+
+용어 정비를 이유로 구조 변경 금지
+- 용어 정비나 해석 기준 추가를 이유로 기존 구조나 구현을 변경하지 않는다.
+=================================================
 (End of AGENT_WORKFLOW_REFERENCE)
 ==================================================
