@@ -20,3 +20,45 @@ MASTER_SPEC_CHANGELOG_2026-07-11_RUNTIME_COMMIT_PRODUCTION_TRANSITION
 - 다중 타겟 및 Order Queue 실제 연결
 
 본 로그는 기존 CHANGELOG에 새로운 전환점 내용을 이어 서술한 문서이다.
+
+------------------------------------------------------------
+2026-07-12 Runtime Execution Preview Pipeline 구축
+------------------------------------------------------------
+
+변경 커밋 범위: e32ee1a 이후 ~ kiwoom_auto master 1482a88
+
+이번 작업의 핵심:
+- Production Runtime Execution Preview Pipeline 구축
+
+구축된 Runtime Execution Preview Chain:
+- Runtime Allowlist
+- Runtime Path Resolver
+- Readiness / Open Policy 연계
+- Commit Request Contract
+- Validation Gate
+- Handoff Preview
+- Commit Service Preview Route
+- Order Executions Pilot Boundary
+- Production Pilot Approval Gate
+- Pilot Approval Token Contract
+- Pilot Token Route Preview
+- Execution Gate Bridge Preview
+- Execution Gate Dry-run Adapter
+- Final Authorization Preview
+
+기록 원칙 (미연결 상태):
+- 실제 Runtime Write는 아직 미연결
+- Commit Service 실제 호출 없음
+- Execution Gate 실제 호출 없음
+- Order Queue 미연결
+- SendOrder 미연결
+- 전 구간 preview_only=True, dry_run_only=True, runtime_write=False, actual_execution_allowed=False 유지
+
+검증:
+- 전체 unittest 3847 tests OK, 1 skipped 달성
+- 보호 파일 변경 없음 (runtime/*.json, routines/*/rules.json)
+
+MASTER_SPEC 병합:
+- 본 작업은 MASTER_SPEC에 아직 병합하지 않음
+
+끝.

@@ -1,12 +1,20 @@
 WORK_RESUME_LATEST_2026-07-10
 
-기준 Commit: e32ee1a
+기준 Commit: 1482a88
 
 1. 현재 완료 판정
 - Runtime Commit Infrastructure 구현 완료
 - Lifecycle Integration 완료
 - Runtime Commit E2E 완료
 - RSI + moving_average Buy Filter 구현 완료
+- Production Runtime Execution Preview Pipeline 구축 완료
+  - Runtime Allowlist / Runtime Path Resolver / Readiness·Open Policy 연계
+  - Commit Request Contract / Validation Gate / Handoff Preview
+  - Commit Service Preview Route
+  - Order Executions Pilot Boundary
+  - Production Pilot Approval Gate / Pilot Approval Token Contract
+  - Pilot Token Route Preview / Execution Gate Bridge Preview
+  - Execution Gate Dry-run Adapter / Final Authorization Preview
 
 2. 유지해야 할 불변 상태
 - Runtime Commit은 preview_only=True 상태 유지
@@ -15,10 +23,14 @@ WORK_RESUME_LATEST_2026-07-10
 - SQLite write 없음 유지
 - Broker/Order Router/SendOrder/Chejan/GUI 연결 없음 유지
 - 실제 Runtime Commit 수행 없음 유지
+- Production Runtime Execution Preview Pipeline은 preview_only=True 유지
+- 실제 Runtime Write 미연결 유지
+- Commit Service / Execution Gate 실제 호출 없음 유지
+- Order Queue / SendOrder 미연결 유지
 
 3. 검증 상태
-- Commit: e32ee1a
-- 전체 unittest: 3730 tests OK, 1 skipped
+- Commit: 1482a88
+- 전체 unittest: 3847 tests OK, 1 skipped
 - 보호 파일 변경 없음:
   - runtime/order_queue.json
   - runtime/order_executions.json
@@ -27,6 +39,9 @@ WORK_RESUME_LATEST_2026-07-10
 
 4. 다음 작업 후보
 - 가격비교 BUY 필터
+- Production Runtime Execution Preview Pipeline 실제 Runtime Write 연결 검토
+- Execution Gate / Commit Service 실제 호출 연결 검토
+- Order Queue / SendOrder 실제 연결 검토
 
 5. 다음 작업 금지선
 - runtime/*.json 실제 write 금지
@@ -37,11 +52,15 @@ WORK_RESUME_LATEST_2026-07-10
 - SendOrder 호출 금지
 - Chejan 연결 금지
 - GUI update 호출 금지
+- Execution Preview Pipeline은 preview_only=True 유지 (실제 Runtime Write 미연결)
+- Commit Service / Execution Gate 실제 호출 금지
+- Order Queue / SendOrder 미연결 유지
 
 6. Runtime Commit Architecture 위치
 - Original Canonical: MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
 - 상세 작업재개 문서: 20_ARCHIVE/RESUME/PROJECT_RESUME_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
-- M7 Lifecycle Runtime Commit + RSI Buy Filter: kiwoom_auto master e32ee1a
+- M7 Lifecycle Runtime Commit + RSI Buy Filter: kiwoom_auto master 1482a88
+- Production Runtime Execution Preview Pipeline: kiwoom_auto master 1482a88
 - 참조: PART02_06_RUNTIME_FILTER_ENGINE.md
 
 끝.
