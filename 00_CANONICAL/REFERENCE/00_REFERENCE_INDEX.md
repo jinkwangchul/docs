@@ -1,18 +1,18 @@
-# MASTER_SPEC AI Reference Edition Index (Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter Edition)
+# MASTER_SPEC AI Reference Edition Index (SELL Preview Chain + Workflow v2 Edition)
 
 Reference Edition
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
+Original Canonical: MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
 
-생성일: 2026-07-10
+생성일: 2026-07-13
 
 주의: 본 문서는 AI 참조용 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 ## Reference 구조
 
-이 디렉터리는 Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter MASTER_SPEC Canonical을 AI 참조용으로 분할한 Reference Edition이다.
+이 디렉터리는 Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter Reference Edition을 유지하면서, 최신 SELL Preview Chain + Workflow v2 Canonical 위치를 함께 안내한다.
 기존 Canonical은 수정하지 않았으며 공식 Source of Truth는
-00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt 이다.
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt 이다.
 
 원본 순서 보존 방식:
 
@@ -76,6 +76,10 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT
 - 29.x.1~29.x.8 Execution Preview Phase1/Phase2/Orchestrator: PART06_EXECUTION_PREVIEW.md
 - 운영/AI 협업 정책(3모델 역할): PART08_OPERATION_POLICY.md
 - Workflow v2 (Pull Request & Agent Operation Policy, Workflow Priority): AGENT_WORKFLOW_REFERENCE.txt section 17.1
+- SELL Preview Chain + Workflow v2 최신 Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
+- SELL Preview 작업 재개 기준: 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-07-13.txt
+- SELL Preview Changelog: 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
+- SELL Preview Readable Changelog: 00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
 - 구현 커밋/테스트/보호 파일/금지선 부록: PART09_APPENDIX.md
 - 아키텍처 용어 해석 기준: ARCHITECTURE_GLOSSARY.md
 
@@ -91,10 +95,11 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT
 8. Runtime 상세 규격 확인 시 PART02_RUNTIME.md 또는 PART02 SUBPART
 9. Execution Preview 교차참조 확인 시 PART06_EXECUTION_PREVIEW.md
 10. 운영/AI 협업 정책 확인 시 PART08_OPERATION_POLICY.md
-11. 필요한 경우 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
-12. 10_UPDATE/MERGED
-13. 00_CANONICAL/CHANGELOG
-14. 20_ARCHIVE
+11. SELL Preview Chain / Workflow v2 최신 상태 확인 시 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
+12. 필요한 경우 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
+13. 10_UPDATE/MERGED
+14. 00_CANONICAL/CHANGELOG
+15. 20_ARCHIVE
 
 ## Runtime Commit Core 위치 안내
 
@@ -125,6 +130,22 @@ kiwoom_auto 프로젝트 master e5ef4bc에 구현 완료되었다.
 
 RSI Buy Filter는 routines/지표추종매매/routine_macd_engine.py의 _evaluate_buy_rsi_filter()에 구현되어 있다(공식 설정 경로: buy.filters.rsi, pending UI 후보값은 실행 결과에 영향 없음).
 Filter 구현률은 MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt의 "현재 필터 구현률" 섹션을 참조한다.
+
+## SELL Preview Chain 위치 안내
+
+SELL Preview Chain은 kiwoom_auto master 10884ce7a45278c86cd544958fa62cdc489dd5d6 기준 다음 단계까지 완료되었다.
+
+- SELL Method Preview
+- SELL Exit Policy Preview
+- SELL Completion Policy Preview
+- SELL Pending Policy Preview
+- SELL Order Candidate Preview
+- SELL Order Candidate Inspector
+- SELL REAL_READY Authorization Preview
+- SELL Execution Contract Preview
+- SELL REAL_READY Adapter Preview
+
+다음 섹터는 SELL Common Execution Preview Adapter부터 시작하며, 기존 공통 Execution Preview 계층 재사용을 우선 검토한다.
 
 ## 검증 기준
 

@@ -1,0 +1,201 @@
+MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2
+
+작성일: 2026-07-13
+
+기준 저장소:
+- kiwoom_auto master: 10884ce7a45278c86cd544958fa62cdc489dd5d6
+- docs main: 5a2e356daca65620d8b8ee5ecedcdb6a03322810
+
+최신 kiwoom_auto Merge Commit:
+- 10884ce Merge pull request #3 from jinkwangchul/feat/sell-real-ready-adapter-preview
+
+1. 문서 목적
+
+본 문서는 이번 Conversation 종료 시점의 공식 운영 정책, SELL Preview Chain 완료 상태, 다음 섹터 시작 경계를 처음부터 다시 정리한 최신 Canonical이다.
+
+이 문서는 이전 Canonical을 삭제하거나 대체하지 않는다. 다만 2026-07-13 기준 다음 작업의 Source of Truth는 본 문서를 우선 참조한다.
+
+2. Git Workflow v2 공식 승격
+
+kiwoom_auto 저장소의 공식 Git 운영은 Workflow v2를 따른다.
+
+공식 흐름:
+- master 최신화
+- Feature Branch 생성
+- 구현
+- 테스트
+- Commit
+- Push
+- Pull Request 생성
+- Review
+- Merge
+- Feature Branch 삭제
+- master 최신화
+
+운영 원칙:
+- master 직접 Commit 금지
+- master 직접 Push 금지
+- Feature 하나 = Branch 하나
+- Feature 하나 = Pull Request 하나
+- Merge 후 master와 origin/master 일치 확인
+- 긴급 Hotfix만 예외로 별도 승인 후 처리
+
+docs 저장소는 Canonical 운영 저장소이며 PR 의무 없이 main에 Commit/Push할 수 있다.
+
+3. Agent 역할 재정의
+
+Codex:
+- 구현
+- 테스트 작성
+- 테스트 수행
+- Commit
+- Push
+- Pull Request 생성
+- Pull Request Merge
+- 구현 결과 보고
+
+General Agent:
+- 구조 검토
+- 설계
+- 구현 범위 결정
+- Git 관리
+- 결과 검증
+- 체크리스트 기반 최종 확인
+
+High Reasoning:
+- 정책 판단
+- 계약 검토
+- 아키텍처 검토
+- Preview / Runtime / Execution 경계 검토
+- Canonical 구조 검토
+
+역할은 작업 성격에 따라 조정될 수 있으나, 계약과 아키텍처 의미 결정은 High Reasoning 검토 대상이며, 실제 코드 구현과 테스트는 Codex 중심으로 수행한다.
+
+4. SELL Preview Chain 완료 상태
+
+이번 Conversation에서 SELL Preview Chain은 실제 주문 실행 없이 Preview 중심으로 확장되었다.
+
+완료된 순서:
+1. SELL Method Preview
+2. SELL Exit Policy Preview
+3. SELL Completion Policy Preview
+4. SELL Pending Policy Preview
+5. SELL Order Candidate Preview
+6. SELL Order Candidate Inspector
+7. SELL REAL_READY Authorization Preview
+8. SELL Execution Contract Preview
+9. SELL REAL_READY Adapter Preview
+
+현재 진행률:
+- SELL Preview 전체: 약 90~93%
+- SELL 전용 Preview 계층: 거의 완료
+- 다음 섹터 시작점: 공통 Execution Preview 연결
+
+5. Merge 완료 PR
+
+PR #1:
+- 제목: feat: add SELL REAL_READY authorization preview
+- 기능: SELL 후보 Inspector 결과를 실제 REAL_READY 생성 없이 Authorization Preview로 평가
+- Merge Commit: 685361cab8358e017c6a100ee8a5b074a1f8a13c
+- master 반영: 완료
+
+PR #2:
+- 제목: feat: add SELL execution contract preview
+- 기능: 승인된 METHOD / COMPLETION 후보를 SELL Execution Contract Preview로 정규화
+- Merge Commit: 379e133b9b83374785841136200db408f473e521
+- master 반영: 완료
+
+PR #3:
+- 제목: feat: add SELL REAL_READY adapter preview
+- 기능: SELL Execution Contract를 공통 REAL_READY 후보 형태로 얇게 변환하는 preview-only Adapter 추가
+- Merge Commit: 10884ce7a45278c86cd544958fa62cdc489dd5d6
+- master 반영: 완료
+
+6. 현재 안전 경계
+
+현재까지 모든 SELL Preview 계층은 다음 금지선을 유지한다.
+
+- Runtime Write 금지
+- Queue Write 금지
+- SendOrder 금지
+- 실제 REAL_READY 상태 생성 금지
+- 실제 OrderRequest 생성 금지
+- Broker / Chejan 연결 금지
+- 후보 우선순위 자동 선택 금지
+- 다중 후보 자동 실행 금지
+
+Preview 결과는 구조 검증, 계약 정규화, 승인 가능성 표시까지만 수행한다.
+
+7. MARKET 정책
+
+SELL MARKET 후보는 price=None을 유지한다.
+
+현재 공통 Validator 계약은 price > 0을 요구하는 구간이 있어 MARKET 계약과 충돌한다.
+
+정책:
+- price=None 우회 금지
+- current_price 임의 대입 금지
+- 공통 Validator 계약 검토 전 MARKET은 BLOCKED 유지
+- price_required=False 의미 보존
+
+8. PENDING 정책
+
+PENDING은 일반 SELL Order 경로와 분리한다.
+
+정책:
+- Cancel Path 유지
+- 일반 METHOD / COMPLETION SELL 주문 후보와 병합 금지
+- 실제 CancelOrder 호출 금지
+- Queue / Runtime / SendOrder 연결 금지
+
+9. 다중 후보 정책
+
+METHOD, COMPLETION, PENDING 후보가 동시에 READY 또는 eligible일 수 있다.
+
+정책:
+- 후보 모두 유지
+- 우선순위 결정 금지
+- 자동 선택 금지
+- 실행 대상 결정은 별도 승인/Guard/Queue 단계로 분리
+
+10. 다음 구현 시작점
+
+다음 섹터는 SELL 전용 Preview 이후 공통 Execution Preview 재사용 지점부터 시작한다.
+
+우선 조사 및 연결 중심 파일:
+- execution_pipeline_controller.py
+- execution_controller.py
+- final_execution_guard.py
+- execution_candidate_inspector.py
+- execution_readiness_input_builder.py
+- signal_gate_execution_queue_bridge.py
+- order_execution_request.py
+- order_request_hash.py
+- order_lock_manager.py
+
+11. 남은 작업
+
+다음 작업 순서:
+1. SELL Common Execution Preview Adapter
+2. Execution Readiness Preview
+3. Signal Gate Preview
+4. Execution Queue Preview
+5. Execution Readiness Full Preview
+6. 통합 Preview 검증
+
+각 단계는 preview_only=True를 유지하며, Runtime/Queue/SendOrder 실제 연결은 별도 승인 전까지 금지한다.
+
+12. 보호 파일 및 운영 주의
+
+kiwoom_auto 보호 파일:
+- routines/지표추종매매/rules.json
+- stocks/*/state.json
+- runtime/*.json
+
+명시적 지시 없이는 위 파일을 stage, commit, restore, reset, stash, delete하지 않는다.
+
+13. 현재 결론
+
+SELL 전용 Preview Chain은 실제 실행 직전 계약 검증 단계까지 거의 완성되었다. 다음 단계는 새 SELL 전용 계층을 무조건 추가하는 것이 아니라, 기존 공통 Execution Preview 체인과의 최소 연결 지점을 확인하고 재사용하는 것이다.
+
+끝.

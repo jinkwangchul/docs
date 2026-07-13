@@ -1,0 +1,110 @@
+WORK_RESUME_LATEST_2026-07-13
+
+기준 저장소 상태:
+- kiwoom_auto master HEAD: 10884ce7a45278c86cd544958fa62cdc489dd5d6
+- kiwoom_auto origin/master: 10884ce7a45278c86cd544958fa62cdc489dd5d6
+- docs main HEAD 작성 전 기준: 5a2e356daca65620d8b8ee5ecedcdb6a03322810
+
+1. 현재 완료 판정
+
+- Git Workflow v2가 kiwoom_auto 공식 운영 방식으로 승격됨
+- Feature Branch → Pull Request → Merge → Branch Delete → master 최신화 흐름 확정
+- Agent 역할 재정의 완료
+- SELL Preview Chain이 REAL_READY Adapter Preview까지 확장됨
+
+완료된 SELL Preview Chain:
+1. SELL Method Preview
+2. SELL Exit Policy Preview
+3. SELL Completion Policy Preview
+4. SELL Pending Policy Preview
+5. SELL Order Candidate Preview
+6. SELL Order Candidate Inspector
+7. SELL REAL_READY Authorization Preview
+8. SELL Execution Contract Preview
+9. SELL REAL_READY Adapter Preview
+
+2. 이번 섹터 Merge 완료
+
+PR #1:
+- feat: add SELL REAL_READY authorization preview
+- Merge Commit: 685361cab8358e017c6a100ee8a5b074a1f8a13c
+- master 반영 완료
+
+PR #2:
+- feat: add SELL execution contract preview
+- Merge Commit: 379e133b9b83374785841136200db408f473e521
+- master 반영 완료
+
+PR #3:
+- feat: add SELL REAL_READY adapter preview
+- Merge Commit: 10884ce7a45278c86cd544958fa62cdc489dd5d6
+- master 반영 완료
+
+3. 현재 진행률
+
+- SELL Preview: 약 90~93%
+- SELL 전용 Preview 계층: 거의 완료
+- 공통 Execution Preview 연결: 다음 섹터 시작 대상
+- Runtime / Queue / SendOrder 실제 연결: 미개방
+
+4. 유지해야 할 불변 상태
+
+- Runtime Write 금지
+- Queue Write 금지
+- SendOrder 금지
+- 실제 REAL_READY 상태 생성 금지
+- 실제 OrderRequest 생성 금지
+- OrderRequest price 임의 보정 금지
+- MARKET price=None 유지
+- PENDING cancel path는 일반 SELL order path와 분리
+- 다중 후보 우선순위 자동 선택 금지
+- 후보 자동 실행 금지
+
+5. 다음 작업 시작점
+
+공통 Execution Preview 재사용 검토 파일:
+- execution_pipeline_controller.py
+- execution_controller.py
+- final_execution_guard.py
+- execution_candidate_inspector.py
+- execution_readiness_input_builder.py
+- signal_gate_execution_queue_bridge.py
+- order_execution_request.py
+- order_request_hash.py
+- order_lock_manager.py
+
+6. 다음 작업 순서
+
+1. SELL Common Execution Preview Adapter
+2. Execution Readiness Preview
+3. Signal Gate Preview
+4. Execution Queue Preview
+5. Execution Readiness Full Preview
+6. 통합 Preview 검증
+
+7. 다음 작업 금지선
+
+- Runtime Write 금지
+- Queue Write 금지
+- SendOrder 금지
+- Broker / Chejan 연결 금지
+- 실제 OrderRequest 생성 금지
+- 실제 REAL_READY 상태 변경 금지
+- PENDING cancel action을 일반 SELL order와 병합 금지
+- MARKET 후보에 current_price 대입 금지
+- 다중 후보 우선순위 결정 금지
+
+8. 보호 파일
+
+kiwoom_auto에서 다음 파일은 명시적 지시 없이 변경 금지:
+- routines/지표추종매매/rules.json
+- stocks/*/state.json
+- runtime/*.json
+
+9. 재개 시 첫 행동
+
+다음 Conversation에서는 kiwoom_auto master와 origin/master가 10884ce7a45278c86cd544958fa62cdc489dd5d6 이후 최신인지 확인한다.
+
+그 다음 SELL Common Execution Preview Adapter를 새 feature branch에서 시작한다.
+
+끝.

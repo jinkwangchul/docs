@@ -1,0 +1,108 @@
+MASTER_SPEC_CHANGELOG_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2
+
+작성일: 2026-07-13
+
+변경 범위:
+- kiwoom_auto master 10884ce7a45278c86cd544958fa62cdc489dd5d6 기준
+- docs main 5a2e356daca65620d8b8ee5ecedcdb6a03322810 기준
+
+1. 운영 정책 변경
+
+- Git Workflow v2를 kiwoom_auto 공식 Git 운영 방식으로 승격
+- Feature Branch → Pull Request → Merge → Branch Delete → master 최신화 흐름 확정
+- master 직접 Commit / Push 금지 원칙 확정
+- docs 저장소는 Canonical 운영 방식 유지
+
+2. Agent 역할 변경
+
+Codex:
+- 구현, 테스트, Commit, Push, PR, Merge 담당
+
+General Agent:
+- 구조검토, 설계, 구현범위결정, Git관리, 결과검증 담당
+
+High Reasoning:
+- 정책, 계약, 아키텍처 검토 담당
+
+3. SELL Preview Chain 변경
+
+다음 순서로 SELL Preview Chain이 확장되었다.
+
+1. SELL Method Preview
+2. SELL Exit Policy Preview
+3. SELL Completion Policy Preview
+4. SELL Pending Policy Preview
+5. SELL Order Candidate Preview
+6. SELL Order Candidate Inspector
+7. SELL REAL_READY Authorization Preview
+8. SELL Execution Contract Preview
+9. SELL REAL_READY Adapter Preview
+
+4. Merge 완료 PR
+
+PR #1:
+- 제목: feat: add SELL REAL_READY authorization preview
+- Merge Commit: 685361cab8358e017c6a100ee8a5b074a1f8a13c
+- 결과: master 반영 완료
+
+PR #2:
+- 제목: feat: add SELL execution contract preview
+- Merge Commit: 379e133b9b83374785841136200db408f473e521
+- 결과: master 반영 완료
+
+PR #3:
+- 제목: feat: add SELL REAL_READY adapter preview
+- Merge Commit: 10884ce7a45278c86cd544958fa62cdc489dd5d6
+- 결과: master 반영 완료
+
+5. 안전 경계 유지
+
+다음 항목은 계속 미연결 상태로 유지된다.
+
+- Runtime Write
+- Queue Write
+- SendOrder
+- 실제 REAL_READY 상태 생성
+- 실제 OrderRequest 생성
+- Broker / Chejan 연결
+- 후보 우선순위 자동 선택
+- 다중 후보 자동 실행
+
+6. MARKET / PENDING 정책
+
+MARKET:
+- price=None 유지
+- 공통 Validator의 price > 0 계약과 충돌
+- 우회 금지
+- 현재 BLOCKED 유지
+
+PENDING:
+- 일반 SELL Order와 분리
+- Cancel Path 유지
+- 실제 CancelOrder 호출 금지
+
+7. 다음 변경 예정
+
+남은 작업 순서:
+1. SELL Common Execution Preview Adapter
+2. Execution Readiness Preview
+3. Signal Gate Preview
+4. Execution Queue Preview
+5. Execution Readiness Full Preview
+6. 통합 Preview 검증
+
+8. 문서 반영
+
+신규 Canonical:
+- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
+
+신규 Work Resume:
+- 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-07-13.txt
+
+신규 Changelog:
+- 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
+
+신규 Readable Changelog:
+- 00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
+
+끝.

@@ -1,0 +1,61 @@
+MASTER_SPEC_READABLE_CHANGELOG_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2
+
+작성일: 2026-07-13
+
+이번 Conversation에서는 SELL 실행을 실제로 열지 않고, 실행 직전까지의 Preview 안전 계층을 거의 끝까지 쌓았다.
+
+핵심 변화는 두 가지다.
+
+첫째, kiwoom_auto의 Git 운영은 Workflow v2가 공식 기준이 되었다.
+
+앞으로 kiwoom_auto 기능 작업은 master에 바로 넣지 않는다. master를 최신화하고 feature branch를 만든 뒤, 구현과 테스트를 끝내고 Pull Request를 통해 master에 병합한다. 병합 후에는 feature branch를 정리하고 master를 다시 최신화한다.
+
+둘째, SELL Preview Chain이 REAL_READY 직전 Adapter까지 도달했다.
+
+완료된 흐름은 다음과 같다.
+
+SELL Method Preview
+→ SELL Exit Policy Preview
+→ SELL Completion Policy Preview
+→ SELL Pending Policy Preview
+→ SELL Order Candidate Preview
+→ SELL Order Candidate Inspector
+→ SELL REAL_READY Authorization Preview
+→ SELL Execution Contract Preview
+→ SELL REAL_READY Adapter Preview
+
+이번 섹터에서 병합된 Pull Request는 세 개다.
+
+PR #1은 SELL REAL_READY Authorization Preview를 추가했다.
+Merge Commit은 685361cab8358e017c6a100ee8a5b074a1f8a13c이다.
+
+PR #2는 SELL Execution Contract Preview를 추가했다.
+Merge Commit은 379e133b9b83374785841136200db408f473e521이다.
+
+PR #3은 SELL REAL_READY Adapter Preview를 추가했다.
+Merge Commit은 10884ce7a45278c86cd544958fa62cdc489dd5d6이다.
+
+현재 SELL Preview 진행률은 약 90~93%로 본다.
+
+다만 아직 실제 실행은 열지 않았다. Runtime Write, Queue Write, SendOrder, 실제 REAL_READY 상태 생성, 실제 OrderRequest 생성은 모두 금지 상태다.
+
+MARKET 후보는 price=None을 그대로 보존한다. 현재 공통 Validator가 price > 0을 요구하는 부분과 충돌하므로, 우회하지 않고 BLOCKED 상태를 유지한다.
+
+PENDING 후보는 일반 SELL Order와 섞지 않는다. Cancel Path로 분리해 두며, 실제 취소 호출은 아직 하지 않는다.
+
+다중 후보는 자동으로 고르지 않는다. METHOD, COMPLETION, PENDING 후보가 동시에 살아 있어도 모두 보존하고, 우선순위 결정은 다음 승인/Guard/Queue 단계로 넘긴다.
+
+다음 섹터는 SELL Common Execution Preview Adapter부터 시작한다.
+
+이후 순서는 다음과 같다.
+
+1. SELL Common Execution Preview Adapter
+2. Execution Readiness Preview
+3. Signal Gate Preview
+4. Execution Queue Preview
+5. Execution Readiness Full Preview
+6. 통합 Preview 검증
+
+다음 작업에서는 새 SELL 전용 계층을 무작정 만들기보다, execution_pipeline_controller.py, execution_controller.py, final_execution_guard.py, execution_candidate_inspector.py, execution_readiness_input_builder.py, signal_gate_execution_queue_bridge.py, order_execution_request.py, order_request_hash.py, order_lock_manager.py 중심으로 기존 공통 Execution Preview 구조를 재사용하는 것이 우선이다.
+
+끝.
