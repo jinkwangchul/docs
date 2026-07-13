@@ -5,7 +5,7 @@ MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2
 
 기준 저장소:
 - kiwoom_auto master: 21ccf004551f26120b362d3fe8f9183de3129395
-- docs main: b3fcd14d88990d4d9c827f4b9230f5571b4961e9 작성 이후 최종 갱신
+- docs main: 8a840059f5a672da4fdb46d89840b279df3b5ea6
 
 최신 kiwoom_auto Commit:
 - 21ccf00 Merge pull request #4 from jinkwangchul/feat/sell-common-execution-preview-adapter
@@ -44,26 +44,55 @@ docs 저장소는 Canonical 운영 저장소이며, 문서 갱신은 main 기준
 3. Agent 역할
 
 Codex:
+- 코드 조사
+- 영향 분석
 - 구현
 - 테스트
+- 리팩터링
+- Commit 직전 검증
+
+General Agent:
+General Agent는 AI의 추론, 사고, 구조 판단, 설계, 정책 결정이 필요하지 않은 입력과 출력이 명확한 기능적 작업만 수행한다.
+
+담당:
+- Git 상태 확인
+- HEAD / origin 동기화 확인
+- Branch 확인
+- Feature Branch 생성/삭제
+- Stage 확인
 - Commit
 - Push
 - Pull Request 생성
-- Pull Request Merge
+- Pull Request 상태 확인
+- Merge 수행
+- master 최신화 확인
+- 파일 존재 확인
+- Test-Path
+- Get-Item
+- 체크리스트 기반 검증
+- 결과 보고
 
-General Agent:
-- 구조검토
-- 설계검토
-- 구현범위결정
-- Git관리
-- 결과검증
+수행하지 않는 작업:
+- 설계
+- 정책 결정
+- 구조 판단
+- 영향 분석
+- 계약 설계
+- 코드 구현
+- Runtime 설계
+- Preview 설계
+- 구현 범위 결정
+- AI 추론이 필요한 작업
 
 High Reasoning:
 - 정책
 - 계약
 - 아키텍처
+- 프로젝트 방향
+- 대규모 구조 변경
+- 구현 범위 결정
 
-역할은 작업 목적에 따라 호출되지만, 실행 계약과 아키텍처 경계 변경은 High Reasoning 검토 대상으로 본다.
+Git 작업은 Codex와 General Agent가 협업할 수 있으나, Codex는 프로젝트 정책 결정을 하지 않는다. 실행 계약과 아키텍처 경계 변경은 High Reasoning 검토 대상으로 본다.
 
 4. SELL Preview Chain 최신 완료 상태
 
