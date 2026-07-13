@@ -75,7 +75,7 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT
 - 02.29~02.30 Runtime Commit Architecture / Filter Engine: PART02_06_RUNTIME_FILTER_ENGINE.md
 - 29.x.1~29.x.8 Execution Preview Phase1/Phase2/Orchestrator: PART06_EXECUTION_PREVIEW.md
 - 운영/AI 협업 정책(3모델 역할): PART08_OPERATION_POLICY.md
-- Workflow v2 (Pull Request & Agent Operation Policy): AGENT_WORKFLOW_REFERENCE.txt section 17.1
+- Workflow v2 (Pull Request & Agent Operation Policy, Workflow Priority): AGENT_WORKFLOW_REFERENCE.txt section 17.1
 - 구현 커밋/테스트/보호 파일/금지선 부록: PART09_APPENDIX.md
 - 아키텍처 용어 해석 기준: ARCHITECTURE_GLOSSARY.md
 
@@ -87,7 +87,7 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT
 4. AGENT_WORKFLOW_REFERENCE
 5. ARCHITECTURE_GLOSSARY
 6. 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
-7. Workflow v2 (Pull Request & Agent Operation Policy) 확인 시 AGENT_WORKFLOW_REFERENCE section 17.1
+7. Workflow v2 (Pull Request & Agent Operation Policy, Workflow Priority) 확인 시 AGENT_WORKFLOW_REFERENCE section 17.1
 8. Runtime 상세 규격 확인 시 PART02_RUNTIME.md 또는 PART02 SUBPART
 9. Execution Preview 교차참조 확인 시 PART06_EXECUTION_PREVIEW.md
 10. 운영/AI 협업 정책 확인 시 PART08_OPERATION_POLICY.md

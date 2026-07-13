@@ -870,6 +870,16 @@ GitHub는 모든 작업마다 반복 조회하지 않는다.
 본 섹션은 기존 Legacy Workflow를 삭제하거나 대체하지 않는다.
 기존 번호 체계와 기존 운영 규정은 유지하며, 최신 Pull Request 기반 운영 정책을 추가로 정의한다.
 
+단, kiwoom_auto 저장소의 Git 운영은 Workflow v2를 우선 적용한다.
+
+Legacy Workflow는 다음 목적을 위해 유지한다.
+
+- 과거 작업 기록
+- 호환성
+- 문서 참조
+
+Git 운영 규칙이 충돌하는 경우 Workflow v2를 우선한다.
+
 --------------------------------------------------
 17.1.1 Pull Request Workflow - kiwoom_auto
 --------------------------------------------------
@@ -897,6 +907,13 @@ master 최신화
 - Feature 하나 = Branch 하나
 - Feature 하나 = Pull Request 하나
 - Merge 후 master 최신화
+
+Merge 완료 후:
+
+master 전환
+→ origin/master 최신화
+→ feature branch 삭제 여부 확인
+→ 다음 작업 시작
 
 --------------------------------------------------
 17.1.2 Docs Workflow - docs
@@ -946,6 +963,9 @@ Canonical 갱신
 - HEAD/origin 확인
 - Pull Request 생성
 - Pull Request 상태 확인
+- Merge 확인
+- master 최신화 확인
+- feature branch 종료 확인
 - 체크리스트 기반 검증
 - 표준 보고 작성
 
@@ -995,6 +1015,7 @@ Canonical 갱신
 Codex는 다음 순서를 기본으로 한다.
 
 master 최신화
+→ origin/master 확인
 → feature branch 생성
 → 구현
 → 테스트
@@ -1010,7 +1031,24 @@ Commit
 → HEAD 확인
 → origin 확인
 → Pull Request 생성
+→ Merge 확인
+→ master 최신화
+→ feature branch 종료 확인
 → 최종 보고
+
+--------------------------------------------------
+17.1.7 Workflow Priority
+--------------------------------------------------
+
+우선순위:
+
+1. Workflow v2
+2. Legacy Workflow
+3. 기타 운영 메모
+
+Git 운영 규칙이 충돌하는 경우 Workflow v2를 따른다.
+
+Legacy Workflow는 기존 작업 기록과 호환성 보존을 위한 참조 규정으로 유지한다.
 
 ==================================================
 18. 다음 작업 기록
