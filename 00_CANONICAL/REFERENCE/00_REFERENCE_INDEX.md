@@ -2,7 +2,8 @@
 
 Reference Edition
 
-Original Canonical: MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
+Reference Base Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
 
 생성일: 2026-07-13
 
@@ -11,8 +12,10 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORK
 ## Reference 구조
 
 이 디렉터리는 Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter Reference Edition을 유지하면서, 최신 SELL Preview Chain + Workflow v2 Canonical 위치를 함께 안내한다.
-기존 Canonical은 수정하지 않았으며 공식 Source of Truth는
-00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt 이다.
+공식 Source of Truth는 00_CANONICAL/CURRENT의 최신 Canonical이다.
+PART01~PART09는 2026-07-09 Canonical 기반의 Legacy Reference Edition이며, 최신 2026-07-13 Canonical 전체와 일치하는 분할본으로 간주하지 않는다.
+Workflow v2 및 SELL Preview 최신 상태는 최신 Canonical과 AGENT_WORKFLOW_REFERENCE를 직접 참조한다.
+PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이며 PART01~PART09 재조립 대상이 아니다.
 
 원본 순서 보존 방식:
 
@@ -86,7 +89,7 @@ Original Canonical: MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORK
 ## AI 세션 참조 순서
 
 1. README.md
-2. AI_PROJECT_OPERATION_MANUAL_RELEASE_v1.4.md
+2. AI_PROJECT_OPERATION_MANUAL_RELEASE_v1.2.md
 3. AI_SESSION_START_PROTOCOL.md
 4. AGENT_WORKFLOW_REFERENCE
 5. ARCHITECTURE_GLOSSARY
@@ -164,10 +167,18 @@ SELL Preview Chain은 kiwoom_auto master 21ccf004551f26120b362d3fe8f9183de312939
 - Reference Edition 본문 생략 금지
 - Reference Edition 본문 순서 변경 금지
 - Reference Edition 본문 문장 수정 금지
-- 전체 Reference 재조립 시 원본 Canonical과 문자 수 차이 0
+- PART01~PART09는 각 파일 헤더에 지정된 2026-07-09 Reference Base Canonical을 기준으로 검증한다.
+- 줄바꿈 형식(CRLF/LF)을 정규화한 후 본문 일치 여부를 검증한다.
+- PART02_06_RUNTIME_FILTER_ENGINE.md는 재조립 대상에서 제외한다.
+- 최신 2026-07-13 Canonical과의 문자 수 일치는 보장하지 않는다.
 
 ## 재생성 검증 결과
 
-- Canonical 문자 수: 측정 예정
-- PART01~PART09 Original Body 재조립 문자 수: 측정 예정
-- 문자 수 차이: 참조 PART02_06 추가 후 재측정 필요
+- 검증 상태: 일치
+- 2026-07-09 Reference Base Canonical 정규화 문자 수: 14593
+- PART01~PART09 Original Body 재조립본 정규화 문자 수: 14593
+- 문자 수 차이: 0
+- 최초 불일치 위치: 없음
+- 완전 일치 여부: True
+- PART02_06_RUNTIME_FILTER_ENGINE.md 재조립 대상 포함 여부: False
+- 최신 2026-07-13 Canonical과의 문자 수 일치 보장 여부: False
