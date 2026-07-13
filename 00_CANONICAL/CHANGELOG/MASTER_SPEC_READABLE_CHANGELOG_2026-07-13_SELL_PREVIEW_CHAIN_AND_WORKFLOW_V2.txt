@@ -1,18 +1,39 @@
 MASTER_SPEC_READABLE_CHANGELOG_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2
 
 작성일: 2026-07-13
+상태: Conversation Closing Final
 
-이번 Conversation에서는 SELL 실행을 실제로 열지 않고, 실행 직전까지의 Preview 안전 계층을 거의 끝까지 쌓았다.
+이번 Conversation의 최종 결과는 SELL Preview Chain이 공통 Execution Preview Adapter까지 도달했다는 것이다.
 
-핵심 변화는 두 가지다.
+최신 kiwoom_auto master는 다음 commit이다.
 
-첫째, kiwoom_auto의 Git 운영은 Workflow v2가 공식 기준이 되었다.
+21ccf004551f26120b362d3fe8f9183de3129395
 
-앞으로 kiwoom_auto 기능 작업은 master에 바로 넣지 않는다. master를 최신화하고 feature branch를 만든 뒤, 구현과 테스트를 끝내고 Pull Request를 통해 master에 병합한다. 병합 후에는 feature branch를 정리하고 master를 다시 최신화한다.
+이 commit은 PR #4 병합 결과이며, SELL Common Execution Preview Adapter가 master에 반영된 상태다.
 
-둘째, SELL Preview Chain이 REAL_READY 직전 Adapter까지 도달했다.
+운영 방식도 확정됐다.
 
-완료된 흐름은 다음과 같다.
+kiwoom_auto는 Workflow v2를 따른다.
+
+master
+→ Feature Branch
+→ Commit
+→ Push
+→ Pull Request
+→ Review
+→ Merge
+→ Branch Delete
+→ master 최신화
+
+Agent 역할도 최종 정리했다.
+
+Codex는 구현, 테스트, Commit, Push, PR, Merge를 맡는다.
+
+General Agent는 구조검토, 설계검토, 구현범위결정, Git관리, 결과검증을 맡는다.
+
+High Reasoning은 정책, 계약, 아키텍처 판단을 맡는다.
+
+SELL Preview Chain은 다음 순서로 완료됐다.
 
 SELL Method Preview
 → SELL Exit Policy Preview
@@ -23,8 +44,11 @@ SELL Method Preview
 → SELL REAL_READY Authorization Preview
 → SELL Execution Contract Preview
 → SELL REAL_READY Adapter Preview
+→ SELL Common Execution Preview Adapter
 
-이번 섹터에서 병합된 Pull Request는 세 개다.
+현재 SELL Preview 진행률은 95%로 본다.
+
+이번 섹터에서 병합된 Pull Request는 네 개다.
 
 PR #1은 SELL REAL_READY Authorization Preview를 추가했다.
 Merge Commit은 685361cab8358e017c6a100ee8a5b074a1f8a13c이다.
@@ -35,27 +59,39 @@ Merge Commit은 379e133b9b83374785841136200db408f473e521이다.
 PR #3은 SELL REAL_READY Adapter Preview를 추가했다.
 Merge Commit은 10884ce7a45278c86cd544958fa62cdc489dd5d6이다.
 
-현재 SELL Preview 진행률은 약 90~93%로 본다.
+PR #4는 SELL Common Execution Preview Adapter를 추가했다.
+Merge Commit은 21ccf004551f26120b362d3fe8f9183de3129395이다.
 
-다만 아직 실제 실행은 열지 않았다. Runtime Write, Queue Write, SendOrder, 실제 REAL_READY 상태 생성, 실제 OrderRequest 생성은 모두 금지 상태다.
+이번 Conversation에는 중요한 운영 사례가 있었다.
 
-MARKET 후보는 price=None을 그대로 보존한다. 현재 공통 Validator가 price > 0을 요구하는 부분과 충돌하므로, 우회하지 않고 BLOCKED 상태를 유지한다.
+SELL Common Execution Preview Adapter는 처음에 구현 완료로 보고됐지만 실제 저장소에는 파일이 없었다. 그래서 Git history, worktree, reflog, dangling object, 파일시스템까지 조사했다. 복구 가능한 파일이나 commit은 찾지 못했고, 동일 범위를 재구현했다. 재구현 후 신규 테스트 42개, SELL 테스트 306개, Execution 테스트 1623개, 전체 unittest 4275개가 통과했고 PR #4로 병합했다.
 
-PENDING 후보는 일반 SELL Order와 섞지 않는다. Cancel Path로 분리해 두며, 실제 취소 호출은 아직 하지 않는다.
+이 사례는 Workflow v2에서 파일 실존 검증과 stage/commit 범위 검증이 왜 필요한지를 보여준다.
 
-다중 후보는 자동으로 고르지 않는다. METHOD, COMPLETION, PENDING 후보가 동시에 살아 있어도 모두 보존하고, 우선순위 결정은 다음 승인/Guard/Queue 단계로 넘긴다.
+안전 경계는 계속 유지된다.
 
-다음 섹터는 SELL Common Execution Preview Adapter부터 시작한다.
+Runtime Write 없음.
+Queue Write 없음.
+SendOrder 없음.
+Broker API 없음.
+실제 REAL_READY 변경 없음.
+OrderRequest 실제 생성 없음.
+Preview-only 유지.
 
-이후 순서는 다음과 같다.
+MARKET 후보는 price=None을 유지한다. 공통 Validator가 price > 0을 요구하는 계약과 충돌하므로 BLOCKED 상태를 유지한다. current_price를 임의로 넣어 우회하지 않는다.
 
-1. SELL Common Execution Preview Adapter
-2. Execution Readiness Preview
-3. Signal Gate Preview
-4. Execution Queue Preview
-5. Execution Readiness Full Preview
-6. 통합 Preview 검증
+PENDING 후보는 Cancel Path로 유지한다. 일반 SELL Order와 섞지 않는다.
 
-다음 작업에서는 새 SELL 전용 계층을 무작정 만들기보다, execution_pipeline_controller.py, execution_controller.py, final_execution_guard.py, execution_candidate_inspector.py, execution_readiness_input_builder.py, signal_gate_execution_queue_bridge.py, order_execution_request.py, order_request_hash.py, order_lock_manager.py 중심으로 기존 공통 Execution Preview 구조를 재사용하는 것이 우선이다.
+다중 후보는 모두 유지한다. 우선순위 결정과 자동 선택은 하지 않는다.
+
+다음 섹터는 Execution Readiness Preview부터 시작한다.
+
+다음 순서:
+
+1. Execution Readiness Preview
+2. Signal Gate Preview
+3. Execution Queue Preview
+4. Execution Readiness Full Preview
+5. 통합 Preview 검증
 
 끝.

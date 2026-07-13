@@ -133,7 +133,7 @@ Filter 구현률은 MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT
 
 ## SELL Preview Chain 위치 안내
 
-SELL Preview Chain은 kiwoom_auto master 10884ce7a45278c86cd544958fa62cdc489dd5d6 기준 다음 단계까지 완료되었다.
+SELL Preview Chain은 kiwoom_auto master 21ccf004551f26120b362d3fe8f9183de3129395 기준 다음 단계까지 완료되었다.
 
 - SELL Method Preview
 - SELL Exit Policy Preview
@@ -144,8 +144,17 @@ SELL Preview Chain은 kiwoom_auto master 10884ce7a45278c86cd544958fa62cdc489dd5d
 - SELL REAL_READY Authorization Preview
 - SELL Execution Contract Preview
 - SELL REAL_READY Adapter Preview
+- SELL Common Execution Preview Adapter
 
-다음 섹터는 SELL Common Execution Preview Adapter부터 시작하며, 기존 공통 Execution Preview 계층 재사용을 우선 검토한다.
+현재 SELL Preview 진행률은 95%이며, 다음 섹터는 Execution Readiness Preview부터 시작한다.
+
+다음 순서:
+
+1. Execution Readiness Preview
+2. Signal Gate Preview
+3. Execution Queue Preview
+4. Execution Readiness Full Preview
+5. 통합 Preview 검증
 
 ## 검증 기준
 
