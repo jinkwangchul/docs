@@ -115,7 +115,9 @@ UPDATE 생성
 ↓
 10_UPDATE/INBOX 저장
 ↓
-Codex가 Canonical 병합
+사용자 지시에 따라 지정된 문서 작업 에이전트가 Canonical 갱신
+↓
+역할과 Git 절차는 AGENT_WORKFLOW_REFERENCE Workflow v2를 따름
 ↓
 새 MASTER_SPEC Canonical 생성
 ↓
@@ -158,6 +160,8 @@ CHANGELOG는 `00_CANONICAL/CHANGELOG`에 보관한다.
 ## GitHub 운영 원칙
 
 - GitHub 최신 docs 저장소를 문서 Source of Truth로 사용한다.
+- docs 저장소는 PR 의무 없음.
 - commit/push는 사용자 승인 후 수행한다.
+- commit/push 전 diff와 Stage 대상 확인은 필수이다.
 - 백업 zip, TEMP, 로컬 캐시는 Git 포함을 피한다.
 - 문서 변경과 구현 코드 변경은 분리한다.

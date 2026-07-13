@@ -133,6 +133,9 @@
 - 최소 작업 단위를 정한다.
 - 테스트 범위를 정한다.
 - Git 작업 여부를 사용자 승인 기준으로 분리한다.
+- 세션 시작 및 상태 파악 단계와 실제 작업 단계를 구분한다.
+- 실제 작업 단계에서는 사용자 명시 승인과 작업 범위 확정 후 Git 작업을 수행할 수 있다.
+- `kiwoom_auto`와 `docs`의 Git 정책은 `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`의 Workflow v2를 따른다.
 
 ### 11. 구현 시작
 
@@ -187,3 +190,8 @@ UPDATE가 필요하면 `10_UPDATE/INBOX`에 신규 UPDATE 문서를 생성한다
 - Git push 금지
 - 파일 삭제 금지
 - 압축파일 생성 금지
+
+경계:
+
+- 위 Git commit / push 금지는 세션 시작 및 상태 파악 단계에 적용한다.
+- 실제 작업 단계에서는 사용자 명시 승인, 수정 범위 확정, diff 및 stage 대상 확인 후 저장소별 Workflow v2 정책에 따라 Git 작업을 수행할 수 있다.

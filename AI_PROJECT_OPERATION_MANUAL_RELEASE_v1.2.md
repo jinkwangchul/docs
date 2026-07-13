@@ -15,6 +15,12 @@
 - 기존 v1.0, v1.1, RELEASE, RELEASE_v1.1 문서는 삭제하거나 수정하지 않는다.
 - 이 문서는 구현 상세가 아니라 운영 절차를 정의한다.
 
+Workflow v2 주의:
+
+- 본 문서의 역할 정의가 최신 Workflow v2와 충돌하는 경우 `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`의 Workflow v2 조항을 우선 적용한다.
+- 정책, 계약, 아키텍처, 구현 범위 결정은 High Reasoning 역할이다.
+- Git 작업은 저장소별 정책과 사용자 명시 승인을 따른다.
+
 ## 1. 문서 목적
 
 이 문서는 새 대화에서 바로 제시해도 ChatGPT, Codex, 일반 코드 모델이 동일한 방식으로 작업을 시작할 수 있도록 만든 릴리즈 운영 매뉴얼이다.
