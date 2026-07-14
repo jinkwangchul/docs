@@ -203,6 +203,206 @@ Layer Architecture Policy
 9. 프로젝트의 유지보수성과 검증 가능성을 새 기능 추가보다 우선한다.
 
 ==================================================
+Backtest Audit Log Architecture
+==================================================
+
+Purpose
+
+Backtest audit logs are not designed primarily for human-readable text logging.
+
+The primary purpose is machine-readable analysis by AI and deterministic replay.
+
+Backtest audit logs must support:
+
+- AI analysis
+- Strategy comparison
+- Parameter comparison
+- Rule regression analysis
+- Automatic report generation
+- Real-trading comparison
+- Replay
+- Performance analysis
+
+Scope
+
+This policy defines architecture principles only.
+
+It does not implement a backtest engine, runtime writer, queue writer, trading executor, or report generator.
+
+Source of Truth
+
+The backtest audit log is a structured event ledger.
+
+The source of truth is the ordered event stream plus linked snapshots and identities.
+
+Human-readable summary text is secondary and must be derived from structured data.
+
+Identity Contract
+
+Each backtest event should preserve stable identities whenever available:
+
+- backtest_run_id
+- strategy_id
+- strategy_version
+- rules_hash
+- signal_id
+- candidate_id
+- execution_id
+- order_id
+- position_id
+- trade_id
+- snapshot_id
+
+Backtest identities should match real-trading Runtime identities whenever possible.
+
+Event Contract
+
+At minimum, the following event types must be representable:
+
+- BACKTEST_STARTED
+- SNAPSHOT_CREATED
+- SIGNAL_CREATED
+- FILTER_PASSED
+- FILTER_BLOCKED
+- CANDIDATE_CREATED
+- ORDER_APPROVED
+- ORDER_REJECTED
+- ORDER_SUBMITTED
+- ORDER_FILLED
+- PARTIAL_FILL
+- POSITION_OPENED
+- POSITION_UPDATED
+- POSITION_CLOSED
+- STOP_LOSS
+- TAKE_PROFIT
+- TIME_EXIT
+- RULE_BLOCKED
+- ERROR
+- BACKTEST_FINISHED
+
+Each event must be linkable by identity fields.
+
+Events without identity linkage are not acceptable as the primary audit record.
+
+Snapshot Contract
+
+Each event should reference a snapshot whenever possible.
+
+Market snapshots may include:
+
+- timestamp
+- candle
+- volume
+- quote
+- indicators
+
+Strategy snapshots may include:
+
+- indicator values
+- filter result
+- rule result
+- budget
+- position
+- holding
+
+Snapshot data must be structured and replayable.
+
+Performance Contract
+
+Backtest audit logs must preserve performance fields required for analysis:
+
+- realized pnl
+- unrealized pnl
+- mfe
+- mae
+- holding time
+- entry
+- exit
+- fee
+- slippage
+- win/loss
+- cumulative pnl
+- drawdown
+
+Replay Contract
+
+Backtest results must be replayable from structured audit data.
+
+The replay path must be reconstructable:
+
+Signal
+-> Candidate
+-> Order
+-> Position
+-> Exit
+
+Replay must not depend on informal text logs.
+
+AI Analysis Contract
+
+The audit log must allow AI analysis of:
+
+- win rate
+- profit/loss ratio
+- filter contribution
+- rule contribution
+- parameter comparison
+- time-of-day performance
+- per-symbol performance
+- market-regime performance
+- failure cause
+- block cause
+- unfilled cause
+- optimization candidates
+
+Export Contract
+
+The architecture must be schema-first.
+
+Future export targets may include:
+
+- JSON
+- CSV
+- Parquet
+
+Export formats must be generated from the same structured source data.
+
+Runtime Independence
+
+Backtest log generation must not affect strategy decisions.
+
+Backtest results, simulation behavior, replay behavior, and trading decisions must not change because logging fails.
+
+Real-Trading Compatibility
+
+Whenever possible, backtest logs and real-trading Runtime logs should share:
+
+- the same Event Contract
+- the same Identity Contract
+- compatible Snapshot structure
+
+The goal is to analyze backtests and real trading with the same analyzer.
+
+Prohibited Design
+
+The following are prohibited:
+
+- human-readable-log-first design
+- text-log-first design
+- logs without identity
+- logs where event linkage is impossible
+- logs that cannot support replay
+- logs that cannot support AI comparison or regression analysis
+
+Implementation Principles
+
+This section is an Architecture Policy.
+
+It does not authorize implementation work by itself.
+
+Any implementation must preserve runtime independence, schema-first design, stable identity linkage, and replayability.
+
+==================================================
 GitHub 최종 검증 규칙 (최상위)
 ==================================================
 
