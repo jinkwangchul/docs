@@ -1,9 +1,13 @@
-# MASTER_SPEC AI Reference Edition Index (SELL Preview Chain + Workflow v2 Edition)
+# MASTER_SPEC AI Reference Edition Index (SELL Runtime Commit Pipeline + Workflow v2 Edition)
 
 Reference Edition
 
 Reference Base Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
-Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
+Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
+Latest Work Resume: WORK_RESUME_LATEST_2026-07-14.txt
+Latest Changelog: MASTER_SPEC_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
+Latest Readable Changelog: MASTER_SPEC_READABLE_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
+Latest kiwoom_auto master: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
 
 생성일: 2026-07-13
 
@@ -11,10 +15,11 @@ Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_A
 
 ## Reference 구조
 
-이 디렉터리는 Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter Reference Edition을 유지하면서, 최신 SELL Preview Chain + Workflow v2 Canonical 위치를 함께 안내한다.
+이 디렉터리는 Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter Reference Edition을 유지하면서, 최신 SELL Preview Chain + Workflow v2 + Engine Ownership Canonical 위치를 함께 안내한다.
 공식 Source of Truth는 00_CANONICAL/CURRENT의 최신 Canonical이다.
 PART01~PART09는 2026-07-09 Canonical 기반의 Legacy Reference Edition이며, 최신 2026-07-13 Canonical 전체와 일치하는 분할본으로 간주하지 않는다.
 Workflow v2 및 SELL Preview 최신 상태는 최신 Canonical과 AGENT_WORKFLOW_REFERENCE를 직접 참조한다.
+2026-07-14 기준 SELL Execution Full Preview Orchestrator까지 master에 반영되었으며, 다음 작업은 SELL Integrated Preview Validation이다.
 PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이며 PART01~PART09 재조립 대상이 아니다.
 
 원본 순서 보존 방식:
@@ -79,10 +84,10 @@ PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이�
 - 29.x.1~29.x.8 Execution Preview Phase1/Phase2/Orchestrator: PART06_EXECUTION_PREVIEW.md
 - 운영/AI 협업 정책(3모델 역할): PART08_OPERATION_POLICY.md
 - Workflow v2 (Pull Request & Agent Operation Policy, Workflow Priority): AGENT_WORKFLOW_REFERENCE.txt section 17.1
-- SELL Preview Chain + Workflow v2 최신 Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
-- SELL Preview 작업 재개 기준: 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-07-13.txt
-- SELL Preview Changelog: 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
-- SELL Preview Readable Changelog: 00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
+- SELL Runtime Commit Pipeline latest Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
+- SELL Preview 작업 재개 기준: 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-07-14.txt
+- SELL Runtime Commit Pipeline Changelog: 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
+- SELL Runtime Commit Pipeline Readable Changelog: 00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
 - 구현 커밋/테스트/보호 파일/금지선 부록: PART09_APPENDIX.md
 - 아키텍처 용어 해석 기준: ARCHITECTURE_GLOSSARY.md
 
@@ -98,7 +103,7 @@ PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이�
 8. Runtime 상세 규격 확인 시 PART02_RUNTIME.md 또는 PART02 SUBPART
 9. Execution Preview 교차참조 확인 시 PART06_EXECUTION_PREVIEW.md
 10. 운영/AI 협업 정책 확인 시 PART08_OPERATION_POLICY.md
-11. SELL Preview Chain / Workflow v2 최신 상태 확인 시 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2.txt
+11. SELL Runtime Commit Pipeline / Workflow v2 / Engine Ownership latest state -> 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
 12. 필요한 경우 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
 13. 10_UPDATE/MERGED
 14. 00_CANONICAL/CHANGELOG
@@ -136,7 +141,7 @@ Filter 구현률은 MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT
 
 ## SELL Preview Chain 위치 안내
 
-SELL Preview Chain은 kiwoom_auto master 21ccf004551f26120b362d3fe8f9183de3129395 기준 다음 단계까지 완료되었다.
+SELL Preview Chain은 kiwoom_auto master 6ea4a56d10517328ea24ea8f223d598be193588b 기준 다음 단계까지 완료되었다.
 
 - SELL Method Preview
 - SELL Exit Policy Preview
@@ -149,7 +154,7 @@ SELL Preview Chain은 kiwoom_auto master 21ccf004551f26120b362d3fe8f9183de312939
 - SELL REAL_READY Adapter Preview
 - SELL Common Execution Preview Adapter
 
-현재 SELL Preview 진행률은 95%이며, 다음 섹터는 Execution Readiness Preview부터 시작한다.
+현재 SELL Preview preview-only 실행 체인은 Full Preview Orchestrator까지 완료되었으며, 다음 섹터는 SELL Integrated Preview Validation부터 시작한다.
 
 다음 순서:
 

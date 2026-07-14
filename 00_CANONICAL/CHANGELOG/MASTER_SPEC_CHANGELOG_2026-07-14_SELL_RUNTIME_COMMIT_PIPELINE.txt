@@ -1,0 +1,67 @@
+MASTER_SPEC_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE
+
+Baseline:
+- kiwoom_auto master / origin/master: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
+
+Summary:
+- Recorded completion of the SELL Runtime Commit preview-to-plan pipeline.
+- Added PR #10 through PR #14 history.
+- Added contracts for Runtime Commit Preview, Validator, Dry-run Executor, Approval Gate, and Execution Plan.
+- Preserved the preview-only and plan-only safety boundaries.
+
+Merged PR history:
+
+PR #10:
+- feat: add SELL runtime commit preview
+- Merge commit: 1b3a1a6e2b9a2d0764f3950afef2fc9bb7165396
+- Added SELL_RUNTIME_COMMIT_PREVIEW.
+
+PR #11:
+- feat: add SELL runtime commit validator
+- Merge commit: 8d6bc11be250cbb658da77efaf4ab148113f0240
+- Added SELL_RUNTIME_COMMIT_VALIDATOR.
+
+PR #12:
+- feat: add SELL runtime commit dry-run executor
+- Merge commit: 75dbf4bcef426323302b12f07c4fc2a76802cb92
+- Added SELL_RUNTIME_COMMIT_DRYRUN_EXECUTOR.
+
+PR #13:
+- feat: add SELL runtime commit approval gate
+- Merge commit: 077db4fd563682aa350e19a88e827903527e715c
+- Added SELL_RUNTIME_COMMIT_APPROVAL_GATE.
+
+PR #14:
+- feat: add SELL runtime commit execution plan
+- Merge commit: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
+- Added SELL_RUNTIME_COMMIT_EXECUTION_PLAN.
+
+Technical changes reflected:
+- Runtime Commit Preview validates SELL_EXECUTION_FULL_PREVIEW before commit-capable work.
+- Runtime Commit Validator checks commit readiness without side effects.
+- Dry-run Executor creates dry-run commit actions and rejects partial readiness.
+- Approval Gate grants approval only when every dry-run action is READY and counts match.
+- Execution Plan creates final RUNTIME_COMMIT plan actions and rejects partial plans.
+
+Tests recorded:
+- SELL Runtime Commit Execution Plan: 38 OK
+- SELL Runtime Commit Approval Gate: 36 OK
+- SELL Runtime Commit Dry-run Executor: 33 OK
+- SELL Runtime Commit Validator: 27 OK
+- SELL Runtime Commit Preview: 19 OK
+- SELL Preview: 514 OK
+- Full unittest: 4641 OK, 1 skipped
+
+Safety boundary unchanged:
+- No Runtime Write.
+- No Queue Write.
+- No Queue Commit.
+- No SendOrder.
+- No Broker API.
+- No actual OrderRequest creation.
+- No actual REAL_READY mutation.
+- No Runtime Commit execution.
+- No partial candidate approval or partial execution plan.
+
+Next work:
+- SELL Runtime Commit Real Executor Preview / Commit Boundary Review.

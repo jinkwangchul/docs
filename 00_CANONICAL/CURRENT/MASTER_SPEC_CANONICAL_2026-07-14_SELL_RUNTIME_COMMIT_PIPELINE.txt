@@ -1,0 +1,335 @@
+MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE
+
+Status:
+- Official Canonical for the SELL Runtime Commit preview-to-plan pipeline after PR #14.
+- This document is created from the current kiwoom_auto master state.
+- Older Canonical files are preserved and are not modified.
+
+Repository baseline:
+- kiwoom_auto master / origin/master: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
+- docs repository update branch: docs/sell-full-preview-ownership
+
+Test baseline:
+- SELL Runtime Commit Execution Plan tests: 38 OK
+- SELL Runtime Commit Approval Gate tests: 36 OK
+- SELL Runtime Commit Dry-run Executor tests: 33 OK
+- SELL Runtime Commit Validator tests: 27 OK
+- SELL Runtime Commit Preview tests: 19 OK
+- SELL Preview tests: 514 OK
+- Full unittest: 4641 OK, 1 skipped
+
+1. Purpose
+
+This Canonical records the latest SELL Runtime Commit pipeline implemented in this conversation.
+
+The pipeline remains preview-only and plan-only. It approaches the Runtime Commit boundary but still does not perform any real Runtime write, Queue commit, SendOrder, broker API call, OrderRequest creation, or REAL_READY mutation.
+
+2. Completed Runtime Commit Pipeline
+
+The current SELL Runtime Commit chain is:
+
+SELL Execution Full Preview Orchestrator
+-> SELL Runtime Commit Preview
+-> SELL Runtime Commit Validator
+-> SELL Runtime Commit Dry-run Executor
+-> SELL Runtime Commit Approval Gate
+-> SELL Runtime Commit Execution Plan
+
+3. Implemented PRs
+
+PR #10:
+- Title: feat: add SELL runtime commit preview
+- Merge commit: 1b3a1a6e2b9a2d0764f3950afef2fc9bb7165396
+- Function: validates SELL_EXECUTION_FULL_PREVIEW results at the Runtime Commit preview boundary.
+- Master reflected: yes
+
+PR #11:
+- Title: feat: add SELL runtime commit validator
+- Merge commit: 8d6bc11be250cbb658da77efaf4ab148113f0240
+- Function: validates Runtime Commit preview candidates before any commit-capable layer.
+- Master reflected: yes
+
+PR #12:
+- Title: feat: add SELL runtime commit dry-run executor
+- Merge commit: 75dbf4bcef426323302b12f07c4fc2a76802cb92
+- Function: creates dry-run commit actions and commit plans without performing a Runtime Commit.
+- Master reflected: yes
+
+PR #13:
+- Title: feat: add SELL runtime commit approval gate
+- Merge commit: 077db4fd563682aa350e19a88e827903527e715c
+- Function: grants final approval only when all dry-run commit actions are READY and internally consistent.
+- Master reflected: yes
+
+PR #14:
+- Title: feat: add SELL runtime commit execution plan
+- Merge commit: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
+- Function: creates the final RUNTIME_COMMIT execution plan from approved commit actions.
+- Master reflected: yes
+
+4. Ownership
+
+Ownership:
+- MASTER_ENGINE
+
+Domain:
+- Execution / Runtime Commit Preview
+- Execution / Runtime Commit Validator
+- Execution / Runtime Commit Dry Run Executor
+- Execution / Runtime Commit Approval Gate
+- Execution / Runtime Commit Execution Plan
+
+Routine dependency:
+- None
+
+5. Runtime Commit Preview Contract
+
+Module:
+- sell_runtime_commit_preview.py
+
+Input:
+- SELL_EXECUTION_FULL_PREVIEW
+
+Output:
+- preview_type = SELL_RUNTIME_COMMIT_PREVIEW
+- ownership = MASTER_ENGINE
+- domain = Execution / Runtime Commit Preview
+- routine_dependency = None
+
+Responsibility:
+- Validate the full SELL execution preview result at the Runtime Commit boundary.
+- Preserve candidate identity, source_signal_id, order_id, execution_request, request_hash, lock_id, summary, warnings, and reasons.
+- Keep commit_allowed aligned with preview-only readiness.
+
+Boundary:
+- No Runtime Commit.
+- No Runtime file write.
+- No Queue Commit.
+- No SendOrder.
+- No broker API.
+- No OrderRequest creation.
+- No REAL_READY mutation.
+
+6. Runtime Commit Validator Contract
+
+Module:
+- sell_runtime_commit_validator.py
+
+Input:
+- SELL_RUNTIME_COMMIT_PREVIEW
+
+Output:
+- validation_type = SELL_RUNTIME_COMMIT_VALIDATOR
+- commit_allowed = True | False
+- status = READY | BLOCKED | INVALID
+
+Responsibility:
+- Validate whether the Runtime Commit Preview can proceed to dry-run execution.
+- Reject identity gaps, safety flag violations, summary count mismatches, and partial candidate validity.
+- Preserve every candidate without priority selection.
+
+Boundary:
+- No Runtime Commit.
+- No Queue Commit.
+- No file write.
+- No external dispatch.
+
+7. Runtime Commit Dry-run Executor Contract
+
+Module:
+- sell_runtime_commit_dryrun_executor.py
+
+Input:
+- SELL_RUNTIME_COMMIT_VALIDATOR
+
+Output:
+- dryrun_type = SELL_RUNTIME_COMMIT_DRYRUN_EXECUTOR
+- dry_run = True
+- commit_allowed = True | False
+- commit_actions
+- blocked_commit_actions
+- validation_summary
+- execution_summary
+
+Responsibility:
+- Generate in-memory commit actions as if Runtime Commit would be performed later.
+- Require all candidates READY for overall READY.
+- Treat structural identity errors as INVALID.
+- Treat policy non-approval as BLOCKED.
+
+Boundary:
+- runtime_commit_executed = False
+- runtime_write = False
+- queue_write = False
+- queue_committed = False
+- send_order = False
+- broker_api_called = False
+
+8. Runtime Commit Approval Gate Contract
+
+Module:
+- sell_runtime_commit_approval_gate.py
+
+Input:
+- SELL_RUNTIME_COMMIT_DRYRUN_EXECUTOR
+
+Output:
+- approval_type = SELL_RUNTIME_COMMIT_APPROVAL_GATE
+- approval_granted = True | False
+- commit_allowed = True | False
+- approved_commit_actions
+- blocked_approval_actions
+
+Approval rule:
+- upstream status must be READY
+- upstream commit_allowed must be True
+- dry_run must be True
+- preview_only must be True
+- all commit_actions must be READY
+- blocked_commit_actions must be empty
+- dryrun_invalid_count must be 0
+- dryrun_blocked_count must be 0
+- dryrun_ready_count must equal len(commit_actions)
+
+Invalid rule:
+- READY dry-run with blocked_commit_actions is INVALID.
+- READY dry-run with blocked or invalid summary counts is INVALID.
+- ready_count mismatch is INVALID.
+- identity mismatch or missing fields are INVALID.
+
+Boundary:
+- No actual approval side effect.
+- No Runtime Commit.
+- No Queue Commit.
+- No SendOrder.
+
+9. Runtime Commit Execution Plan Contract
+
+Module:
+- sell_runtime_commit_execution_plan.py
+
+Input:
+- SELL_RUNTIME_COMMIT_APPROVAL_GATE
+
+Output:
+- plan_type = SELL_RUNTIME_COMMIT_EXECUTION_PLAN
+- plan_only = True
+- execution_plan_ready = True | False
+- commit_allowed = True | False
+- execution_actions
+- blocked_execution_actions
+- approval_snapshot
+
+Each execution action contains:
+- plan_action = RUNTIME_COMMIT
+- source_signal_id
+- order_id
+- candidate_id
+- queue_pending_id
+- execution_id
+- request_hash
+- lock_id
+- execution_request
+- order_queued_record_preview
+- source_approval_action
+
+Ready rule:
+- approval status must be READY
+- approval_granted must be True
+- commit_allowed must be True
+- approved_commit_actions must not be empty
+- blocked_approval_actions must be empty
+- all approved actions must be READY
+- all identities must match
+- summary counts must match
+- all safety flags must be False
+
+Invalid rule:
+- READY approval with empty approved_commit_actions is INVALID.
+- READY approval containing BLOCKED action is INVALID.
+- Any blocked_execution_actions make the whole plan INVALID.
+- If approved action count and execution_actions count differ, the plan is INVALID.
+- Partial execution plans are prohibited.
+
+10. Safety Boundary
+
+The following values must remain False in every layer:
+
+- execution_connected
+- runtime_write
+- queue_write
+- file_write
+- send_order
+- broker_api_called
+- queue_committed
+- actual_order_sent
+- order_request_created
+- real_ready_state_changed
+- runtime_commit_executed
+
+The following are prohibited:
+
+- actual Runtime Commit
+- Runtime file write
+- Queue write
+- Queue commit
+- SendOrder
+- broker API call
+- actual OrderRequest creation
+- actual REAL_READY mutation
+- partial candidate approval
+- partial execution planning
+- first-candidate-only processing
+- automatic priority selection
+
+11. Test Growth
+
+This conversation added the following focused test groups:
+
+- SELL Runtime Commit Preview: 19 OK
+- SELL Runtime Commit Validator: 27 OK
+- SELL Runtime Commit Dry-run Executor: 33 OK
+- SELL Runtime Commit Approval Gate: 36 OK
+- SELL Runtime Commit Execution Plan: 38 OK
+
+Latest broad result:
+- Full unittest: 4641 OK, 1 skipped
+
+12. Current Progress
+
+SELL Preview / Runtime Commit Pipeline progress:
+- Approximately 97%.
+
+Completed:
+- Preview-only SELL execution chain.
+- Integrated preview validation.
+- Runtime Commit Preview.
+- Runtime Commit Validator.
+- Runtime Commit Dry-run Executor.
+- Runtime Commit Approval Gate.
+- Runtime Commit Execution Plan.
+
+Not completed:
+- Real Runtime Commit execution.
+- Runtime file writer connection.
+- Queue commit connection.
+- SendOrder connection.
+- Broker API connection.
+- Production execution approval beyond preview/plan layers.
+
+13. Next Start Point
+
+The next window should start from:
+
+SELL Runtime Commit Real Executor Preview / Commit Boundary Review
+
+Before any real commit implementation, verify:
+- runtime commit boundary
+- runtime file writer contract
+- queue commit boundary
+- execution transaction boundary
+- rollback/recovery requirement
+- protected file and runtime state handling
+- whether approval token or user confirmation is required before real write
+
+No real Runtime Write should be introduced without an explicit new user instruction.

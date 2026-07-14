@@ -1,0 +1,117 @@
+WORK_RESUME_LATEST_2026-07-14
+
+Status:
+- kiwoom_auto master and origin/master are synchronized at 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc.
+- This conversation completed the SELL Runtime Commit preview-to-plan pipeline through Execution Plan.
+- Documentation was updated once at conversation closing, per Implementation First Policy.
+
+Current kiwoom_auto baseline:
+- master / origin/master: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
+
+Protected code repository files observed and preserved:
+- routines/지표추종매매/rules.json
+- stocks/*/state.json
+
+Completed PRs in this conversation:
+
+PR #10:
+- Title: feat: add SELL runtime commit preview
+- Merge commit: 1b3a1a6e2b9a2d0764f3950afef2fc9bb7165396
+- Result: SELL_RUNTIME_COMMIT_PREVIEW added.
+
+PR #11:
+- Title: feat: add SELL runtime commit validator
+- Merge commit: 8d6bc11be250cbb658da77efaf4ab148113f0240
+- Result: SELL_RUNTIME_COMMIT_VALIDATOR added.
+
+PR #12:
+- Title: feat: add SELL runtime commit dry-run executor
+- Merge commit: 75dbf4bcef426323302b12f07c4fc2a76802cb92
+- Result: SELL_RUNTIME_COMMIT_DRYRUN_EXECUTOR added.
+
+PR #13:
+- Title: feat: add SELL runtime commit approval gate
+- Merge commit: 077db4fd563682aa350e19a88e827903527e715c
+- Result: SELL_RUNTIME_COMMIT_APPROVAL_GATE added.
+
+PR #14:
+- Title: feat: add SELL runtime commit execution plan
+- Merge commit: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
+- Result: SELL_RUNTIME_COMMIT_EXECUTION_PLAN added.
+
+Runtime Pipeline completed status:
+
+1. SELL Execution Full Preview Orchestrator
+2. SELL Runtime Commit Preview
+3. SELL Runtime Commit Validator
+4. SELL Runtime Commit Dry-run Executor
+5. SELL Runtime Commit Approval Gate
+6. SELL Runtime Commit Execution Plan
+
+Current completed files:
+- sell_runtime_commit_preview.py
+- tests/test_sell_runtime_commit_preview.py
+- sell_runtime_commit_validator.py
+- tests/test_sell_runtime_commit_validator.py
+- sell_runtime_commit_dryrun_executor.py
+- tests/test_sell_runtime_commit_dryrun_executor.py
+- sell_runtime_commit_approval_gate.py
+- tests/test_sell_runtime_commit_approval_gate.py
+- sell_runtime_commit_execution_plan.py
+- tests/test_sell_runtime_commit_execution_plan.py
+
+Latest test record:
+- SELL Runtime Commit Execution Plan: 38 OK
+- SELL Runtime Commit Approval Gate: 36 OK
+- SELL Runtime Commit Dry-run Executor: 33 OK
+- SELL Runtime Commit Validator: 27 OK
+- SELL Runtime Commit Preview: 19 OK
+- SELL Preview: 514 OK
+- Full unittest: 4641 OK, 1 skipped
+
+Safety boundary still active:
+- preview_only=True where applicable
+- plan_only=True for Execution Plan
+- execution_connected=False
+- runtime_write=False
+- queue_write=False
+- file_write=False
+- send_order=False
+- broker_api_called=False
+- queue_committed=False
+- actual_order_sent=False
+- order_request_created=False
+- real_ready_state_changed=False
+- runtime_commit_executed=False
+
+Current progress:
+- SELL Preview / Runtime Commit Pipeline: approximately 97%.
+
+Completed:
+- Preview-only SELL execution chain.
+- Integrated preview validation.
+- Runtime Commit Preview.
+- Runtime Commit Validator.
+- Runtime Commit Dry-run Executor.
+- Runtime Commit Approval Gate.
+- Runtime Commit Execution Plan.
+
+Incomplete:
+- Real Runtime Commit execution.
+- Runtime file write.
+- Queue commit.
+- SendOrder.
+- Broker API.
+- Production execution bridge.
+- Recovery/rollback behavior for real writes.
+
+Next window start task:
+- Start with SELL Runtime Commit Real Executor Preview / Commit Boundary Review.
+
+Next window checklist:
+- Confirm kiwoom_auto master / origin/master equals 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc or newer.
+- Preserve protected dirty files.
+- Do not introduce real Runtime Write without explicit instruction.
+- Review runtime commit boundary and runtime file writer contracts.
+- Review queue commit boundary and transaction/recovery requirements.
+- Decide whether the next implementation is still preview-only or explicitly begins real commit work.

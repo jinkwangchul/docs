@@ -1,0 +1,37 @@
+MASTER_SPEC_READABLE_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE
+
+What changed:
+- The SELL Runtime Commit path now reaches the final execution plan layer.
+- It still does not perform a real commit.
+- The chain can validate, dry-run, approve, and plan Runtime Commit actions safely in memory.
+
+What was merged:
+- PR #10 added SELL Runtime Commit Preview.
+- PR #11 added SELL Runtime Commit Validator.
+- PR #12 added SELL Runtime Commit Dry-run Executor.
+- PR #13 added SELL Runtime Commit Approval Gate.
+- PR #14 added SELL Runtime Commit Execution Plan.
+
+Current state:
+- Latest kiwoom_auto master is 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc.
+- Latest full unittest result is 4641 OK, 1 skipped.
+- SELL Preview / Runtime Commit Pipeline progress is approximately 97%.
+
+Important boundaries:
+- Nothing writes Runtime files.
+- Nothing commits Queue records.
+- Nothing calls SendOrder.
+- Nothing calls a broker API.
+- Nothing creates a real OrderRequest.
+- Nothing mutates a real REAL_READY state.
+- Nothing executes a real Runtime Commit.
+
+Policy reminders:
+- All candidates must be READY for dry-run approval.
+- Partial approvals are invalid.
+- Partial execution plans are invalid.
+- Multiple candidates are preserved without priority selection.
+
+Next:
+- Begin with Runtime Commit real-execution boundary review.
+- Do not implement real Runtime Write without explicit instruction.
