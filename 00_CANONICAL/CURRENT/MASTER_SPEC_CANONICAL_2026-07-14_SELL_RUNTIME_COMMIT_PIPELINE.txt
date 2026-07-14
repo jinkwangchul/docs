@@ -333,3 +333,145 @@ Before any real commit implementation, verify:
 - whether approval token or user confirmation is required before real write
 
 No real Runtime Write should be introduced without an explicit new user instruction.
+
+14. BUY Budget Increase Policy Revision
+
+This section replaces older BUY increase descriptions that used fixed X2/X3 or user-array style wording. The project philosophy remains unchanged: BUY planning may define target values, but the final executable order is still constrained by budget, holdings, and execution safety checks.
+
+14.1 Initial Budget Setting Terms
+
+The initial setting terms are:
+
+- 최초 예산 설정
+  - 주수 설정
+  - 예산 설정
+
+The old first-setting terms "주수기준" and "금액기준" are deprecated.
+
+The term "금액 기준" remains valid only when it means the increase method described below.
+
+14.2 Increase Methods
+
+Supported increase methods are:
+
+- 회차 기준
+- 금액 기준
+
+The old fixed X2, X3, and user-array descriptions are deprecated.
+
+14.3 회차 기준 Contract
+
+회차 기준 supports two operators:
+
+- 합(+)
+- 곱(×)
+
+The operator and numeric value are entered directly by the operator. The UI must not restrict the value to fixed combo choices such as X2 or X3.
+
+Examples:
+
+- + 2
+- × 2
+- × 1.5
+- + 5
+
+Calculation:
+
+- 1회차 = 최초 예산 설정값
+- From 2회차:
+  - 합(+): current order target = previous round number + configured value
+  - 곱(×): current order target = previous round number × configured value
+
+Example, initial shares 2주 and 회차 기준 × 2:
+
+- 1회차: 2주
+- 2회차: 2주
+- 3회차: 4주
+- 4회차: 6주
+- 5회차: 8주
+
+Example, initial shares 2주 and 회차 기준 + 2:
+
+- 1회차: 2주
+- 2회차: 3주
+- 3회차: 4주
+- 4회차: 5주
+- 5회차: 6주
+
+14.4 금액 기준 Contract
+
+금액 기준 supports only 곱(×).
+
+The multiplier is entered directly by the operator.
+
+Examples:
+
+- × 1.2
+- × 1.5
+- × 2
+- × 3
+
+Calculation:
+
+- 1회차 = 최초 예산 설정값
+- From 2회차:
+  - current round budget target = previous round budget value × configured multiplier
+
+Example, initial budget 10000 and 금액 기준 × 2:
+
+- 1회차: 10000
+- 2회차: 20000
+- 3회차: 40000
+- 4회차: 80000
+- 5회차: 160000
+
+Older examples such as 100 -> 300 -> 900 -> 2700 are deprecated when they imply fixed X3 policy or conflict with the operator-entered multiplier contract.
+
+14.5 Supported Combinations
+
+주수 설정 supports:
+
+- 회차 기준(+)
+- 회차 기준(×)
+- 금액 기준(×)
+
+예산 설정 supports:
+
+- 회차 기준(+)
+- 회차 기준(×)
+- 금액 기준(×)
+
+The total supported combinations are six.
+
+14.6 예산 설정 Policy
+
+예산 설정 does not calculate a target share count directly.
+
+예산 설정 determines the maximum buy budget for each round. At actual order time, the system calculates the maximum integer quantity that can be bought at the current order price without exceeding the confirmed budget.
+
+No order may be created above the confirmed budget.
+
+14.7 Actual Order Contract
+
+The calculated value is a round target, not the final executable order.
+
+Immediately before the actual order is created, the final quantity must apply:
+
+- total budget
+- routine budget
+- per-symbol budget
+- maximum holding quantity
+- other order restrictions
+
+The final order quantity is the quantity that remains valid after these constraints are applied.
+
+14.8 UI Contract
+
+Increase values are entered directly by the operator.
+
+The UI contract is:
+
+- operator selection: + or ×
+- input value: direct operator input
+
+Fixed combo-only values are prohibited for this policy.

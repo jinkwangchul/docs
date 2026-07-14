@@ -35,3 +35,11 @@ Policy reminders:
 Next:
 - Begin with Runtime Commit real-execution boundary review.
 - Do not implement real Runtime Write without explicit instruction.
+
+BUY budget policy correction:
+- The old fixed X2/X3 style increase wording is no longer the official policy.
+- Initial setup is now described as "최초 예산 설정" with either "주수 설정" or "예산 설정".
+- Increase methods are now "회차 기준" and "금액 기준".
+- 회차 기준 supports direct operator input with + or ×.
+- 금액 기준 supports direct operator input with × only.
+- 예산 설정 means a maximum budget for the round; the actual order quantity is calculated later from the current order price and must stay within budget and other order limits.
