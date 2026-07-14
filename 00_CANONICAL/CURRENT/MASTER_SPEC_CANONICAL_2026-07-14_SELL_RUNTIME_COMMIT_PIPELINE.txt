@@ -1,4 +1,4 @@
-MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE
+﻿MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE
 
 Status:
 - Official Canonical for the SELL Runtime Commit preview-to-plan pipeline after PR #14.
@@ -39,13 +39,13 @@ SELL Execution Full Preview Orchestrator
 
 PR #10:
 - Title: feat: add SELL runtime commit preview
-- Merge commit: 1b3a1a6e2b9a2d0764f3950afef2fc9bb7165396
+- Merge commit: b0af8ff8048567a14c07d10f8e0eaa721fa5f2fa
 - Function: validates SELL_EXECUTION_FULL_PREVIEW results at the Runtime Commit preview boundary.
 - Master reflected: yes
 
 PR #11:
 - Title: feat: add SELL runtime commit validator
-- Merge commit: 8d6bc11be250cbb658da77efaf4ab148113f0240
+- Merge commit: 0a896105c4c5e4f25a7876a4c0c2141b11680ede
 - Function: validates Runtime Commit preview candidates before any commit-capable layer.
 - Master reflected: yes
 

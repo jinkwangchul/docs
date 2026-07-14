@@ -1,4 +1,4 @@
-# MASTER_SPEC AI Reference Edition Index (SELL Runtime Commit Pipeline + Workflow v2 Edition)
+﻿# MASTER_SPEC AI Reference Edition Index (SELL Runtime Commit Pipeline + Workflow v2 Edition)
 
 Reference Edition
 
@@ -15,11 +15,11 @@ Latest kiwoom_auto master: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
 
 ## Reference 구조
 
-이 디렉터리는 Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter Reference Edition을 유지하면서, 최신 SELL Preview Chain + Workflow v2 + Engine Ownership Canonical 위치를 함께 안내한다.
+이 디렉터리는 Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter Reference Edition을 유지하면서, 최신 SELL Runtime Commit Pipeline + Workflow v2 + Engine Ownership Canonical 위치를 함께 안내한다.
 공식 Source of Truth는 00_CANONICAL/CURRENT의 최신 Canonical이다.
 PART01~PART09는 2026-07-09 Canonical 기반의 Legacy Reference Edition이며, 최신 2026-07-13 Canonical 전체와 일치하는 분할본으로 간주하지 않는다.
-Workflow v2 및 SELL Preview 최신 상태는 최신 Canonical과 AGENT_WORKFLOW_REFERENCE를 직접 참조한다.
-2026-07-14 기준 SELL Execution Full Preview Orchestrator까지 master에 반영되었으며, 다음 작업은 SELL Integrated Preview Validation이다.
+Workflow v2 및 SELL Runtime Commit Pipeline 최신 상태는 최신 Canonical과 AGENT_WORKFLOW_REFERENCE를 직접 참조한다.
+2026-07-14 기준 SELL Runtime Commit Execution Plan까지 master에 반영되었으며, 다음 작업은 SELL Runtime Commit Real Executor Preview / Commit Boundary Review이다. 실제 Runtime Write는 사용자 명시 승인 전까지 금지한다.
 PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이며 PART01~PART09 재조립 대상이 아니다.
 
 원본 순서 보존 방식:
@@ -27,7 +27,7 @@ PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이�
 - PART01부터 PART09까지 Original Body Marker 사이의 본문을 순서대로 이어 붙이면 원본 Canonical 본문과 일치한다.
 - PART02_RUNTIME.md는 Runtime 상세 규격 우선 참조 위치이다.
 - PART06_EXECUTION_PREVIEW.md는 29.x Execution(Execution Preview Phase1/Phase2/Orchestrator) 상세 위치이다.
-- PART08_OPERATION_POLICY.md는 운영/AI 협업 정책(3모델 역할 재정의) 위치이다.
+- PART08_OPERATION_POLICY.md는 Legacy Reference이며, 현재 공식 역할 기준은 AGENT_WORKFLOW_REFERENCE.txt를 따른다.
 - PART01부터 PART05의 하위 SUBPART는 기존 SUBPART 체계를 유지하기 위한 AI 우선 참조 파일이다.
 - 원본 Canonical에 본문이 없는 예약 PART/SUBPART는 Original Body Marker 사이가 비어 있다.
 - 각 PART와 SUBPART의 header/footer는 Reference Edition 안내와 탐색 링크이며 원본 Canonical 본문이 아니다.
@@ -43,7 +43,7 @@ PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이�
 | PART05_RULE_APPROVAL.md | Reserved; no original body assigned | 638 bytes |
 | PART06_EXECUTION_PREVIEW.md | 29.x Execution: Execution Preview Phase1/Phase2/Orchestrator | 6792 bytes |
 | PART07_EXECUTION_CONTROLLER.md | Reserved; no original body assigned | 654 bytes |
-| PART08_OPERATION_POLICY.md | 운영/AI 협업 정책: 3모델 역할 재정의 | 1895 bytes |
+| PART08_OPERATION_POLICY.md | Legacy operation policy reference; current role policy is AGENT_WORKFLOW_REFERENCE.txt | 1895 bytes |
 | PART09_APPENDIX.md | Appendix: implementation commits, tests, protected files, prohibition lines | 3208 bytes |
 | PART02_06_RUNTIME_FILTER_ENGINE.md | Runtime Commit Architecture, Filter Engine, RSI Buy Filter | NEW |
 
@@ -82,7 +82,7 @@ PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이�
 - 02.20~02.28 Runtime Commit Boundary: PART02_05_RUNTIME.md
 - 02.29~02.30 Runtime Commit Architecture / Filter Engine: PART02_06_RUNTIME_FILTER_ENGINE.md
 - 29.x.1~29.x.8 Execution Preview Phase1/Phase2/Orchestrator: PART06_EXECUTION_PREVIEW.md
-- 운영/AI 협업 정책(3모델 역할): PART08_OPERATION_POLICY.md
+- 운영/AI 협업 정책: current role policy is AGENT_WORKFLOW_REFERENCE.txt; PART08_OPERATION_POLICY.md is Legacy Reference
 - Workflow v2 (Pull Request & Agent Operation Policy, Workflow Priority): AGENT_WORKFLOW_REFERENCE.txt section 17.1
 - SELL Runtime Commit Pipeline latest Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
 - SELL Preview 작업 재개 기준: 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-07-14.txt
@@ -111,11 +111,11 @@ PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이�
 
 ## Runtime Commit Core 위치 안내
 
-M6 Runtime Commit Core Completion(Contract / Persistence / Guard / Approval Token Store / Real Executor / Recovery Journal 구현 및 Real Executor 연동)은
-kiwoom_auto 프로젝트 master e5ef4bc에 구현 완료되었다.
+M6 Runtime Commit Core Completion(Contract / Persistence / Guard / Approval Token Store / Recovery Journal 및 과거 공통 Real Executor 기반 모듈)은
+kiwoom_auto 프로젝트 master e5ef4bc 기준으로 구현되었다.
 
-- 완료 범위: M6-11~M6-17 Runtime Commit Core 전체
-- Real Executor 연동 완료: Guard, Approval Token Store, Persistence, Recovery Journal
+- 완료 범위: 과거 M6-11~M6-17 공통 Runtime Commit Core 기반
+- 범위 제한: 현재 SELL 전용 Runtime Commit Real Executor 및 실제 Runtime Write 연결은 미완료
 - 구현 커밋: kiwoom_auto master e5ef4bc
 - 전체 unittest: 3492 tests OK
 - 보호 파일 변경 없음
@@ -139,9 +139,9 @@ kiwoom_auto 프로젝트 master e5ef4bc에 구현 완료되었다.
 RSI Buy Filter는 routines/지표추종매매/routine_macd_engine.py의 _evaluate_buy_rsi_filter()에 구현되어 있다(공식 설정 경로: buy.filters.rsi, pending UI 후보값은 실행 결과에 영향 없음).
 Filter 구현률은 MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt의 "현재 필터 구현률" 섹션을 참조한다.
 
-## SELL Preview Chain 위치 안내
+## SELL Runtime Commit Pipeline 위치 안내
 
-SELL Preview Chain은 kiwoom_auto master 6ea4a56d10517328ea24ea8f223d598be193588b 기준 다음 단계까지 완료되었다.
+SELL Runtime Commit Pipeline은 kiwoom_auto master 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc 기준 다음 단계까지 완료되었다.
 
 - SELL Method Preview
 - SELL Exit Policy Preview
@@ -153,16 +153,25 @@ SELL Preview Chain은 kiwoom_auto master 6ea4a56d10517328ea24ea8f223d598be193588
 - SELL Execution Contract Preview
 - SELL REAL_READY Adapter Preview
 - SELL Common Execution Preview Adapter
+- SELL Execution Readiness Preview
+- SELL Signal Gate Preview
+- SELL Execution Queue Preview
+- SELL Execution Full Preview Orchestrator
+- SELL Runtime Commit Preview
+- SELL Runtime Commit Validator
+- SELL Runtime Commit Dry-run Executor
+- SELL Runtime Commit Approval Gate
+- SELL Runtime Commit Execution Plan
 
-현재 SELL Preview preview-only 실행 체인은 Full Preview Orchestrator까지 완료되었으며, 다음 섹터는 SELL Integrated Preview Validation부터 시작한다.
+현재 SELL Runtime Commit Pipeline은 Execution Plan까지 완료되었으며, 다음 작업은 SELL Runtime Commit Real Executor Preview / Commit Boundary Review부터 시작한다.
 
-다음 순서:
+다음 기준:
 
-1. Execution Readiness Preview
-2. Signal Gate Preview
-3. Execution Queue Preview
-4. Execution Readiness Full Preview
-5. 통합 Preview 검증
+1. Runtime Commit Boundary Review
+2. Real Executor Preview 설계
+3. Runtime file writer contract 검토
+4. Queue commit boundary 검토
+5. 실제 Runtime Write는 사용자 명시 승인 전까지 금지
 
 ## 검증 기준
 

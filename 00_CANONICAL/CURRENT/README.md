@@ -1,4 +1,4 @@
-# CURRENT Directory Policy
+﻿# CURRENT Directory Policy
 
 - Official Source of Truth is the latest Canonical in `00_CANONICAL/CURRENT`, as guided by `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`.
 - Reference Index is a navigation and reference guide, not the Canonical itself.
