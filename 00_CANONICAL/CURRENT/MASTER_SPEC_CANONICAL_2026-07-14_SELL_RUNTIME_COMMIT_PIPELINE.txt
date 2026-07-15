@@ -291,7 +291,7 @@ progress notes in this file.
 11.1 Runtime Source of Truth
 
 - `routine_signals.json`: Signal source of truth.
-  - Writer Owner: routine signal writer/consumer boundary.
+  - Writer Owner: `routine_signal_queue.py`.
   - Responsibility: persist routine signal candidates before queue conversion.
 - `order_queue.json`: Order lifecycle source of truth.
   - Writer Owner: `execution_queue_writer.mutate_order_queue()`.
@@ -372,7 +372,7 @@ matching queue record. It does not write fills or positions.
 
 11.7 Preview Safety Line
 
-The following layers do not perform file writes, queue mutations, SendOrder
+In this Runtime / Execution pipeline, the following layers do not perform file writes, queue mutations, SendOrder
 calls, broker calls, or Runtime state changes:
 
 - Preview
