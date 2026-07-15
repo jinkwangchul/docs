@@ -1,275 +1,55 @@
 MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_COMMIT_BOUNDARY
 
-작성일: 2026-07-09
+Created: 2026-07-09
+Classification: Historical Runtime Commit Boundary design record
 
-원본 업데이트:
-- (사용자 제공 MASTER_SPEC 반영 범위 기반 신규 Canonical)
+1. Consolidation Status
 
-참고 기준 Canonical:
-- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
+This Canonical is preserved as the historical point where the project separated
+read-only execution preview from the real Runtime Commit boundary.
 
-요약
-본 문서는 Execution Preview Orchestrator 완료 이후, Real Runtime Commit 이전에 위치하는
-Runtime Commit Boundary 관련 신규 구조를 정의한 Canonical이다.
-기존 Execution Preview Orchestrator 흐름에 Runtime Commit Boundary, Runtime Commit Eligibility,
-Runtime Commit Contract, Runtime Commit Safety Gate, Runtime Commit Review를 추가한다.
-Preview Layer 추가 확장을 억제하고 실제 write 직전 Boundary로 구조를 단순화한다.
+The current source of truth is:
 
-==================================================
-02_Runtime_Data_Model
-==================================================
+- `MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt`
+  - Runtime Commit Preview
+  - Runtime Commit Validator
+  - Runtime Commit Dry-run Executor
+  - Runtime Commit Approval Gate
+  - Runtime Commit Execution Plan
+  - Runtime Living Contract
 
-02.20 Runtime Commit Boundary
+2. Preserved Boundary Contract
 
-목적
-- Execution Preview Orchestrator 이후, Real Runtime Commit 이전에 위치하는
-  런타임 커밋 적격성 검증, 계약 준비, 안전 게이트, 리뷰를 담당하는 경계 계층이다.
-- 실제 runtime write 직전 마지막 Preview/검증/승인 Boundary로 기능한다.
+The following contract remains valid and is now governed by the latest Runtime
+Canonical:
 
-위치 규칙
-- Execution Preview Orchestrator 이후
-- Real Runtime Commit 이전
-- Execution Commit Preview와 Execution Runtime Apply Preview 사이에 삽입하지 않는다.
-- Runtime Apply Preview는 중복 생성하지 않는다.
+- Runtime Commit Boundary is positioned after execution preview readiness and
+  before any real Runtime write.
+- Commit eligibility requires upstream READY state, preserved identity, and no
+  prior Runtime mutation.
+- Atomic apply, verification, and rollback planning belong to the commit
+  contract, not to an extra preview layer.
+- Runtime write is allowed only after the approved Commit Boundary.
+- Partial apply is prohibited.
+- Runtime Commit review is not a separate Preview layer.
 
-입력/출력
-- 입력: execution_preview_orchestrator_result, runtime_snapshot_candidate, commit_plan_candidate
-- 출력: commit_boundary_decision, commit_eligibility, contract_plan, safety_gate_result, review_result
+3. Historical-Only Content
 
-02.21 Runtime Commit Eligibility
+The following original content is historical and is not a current contract
+source:
 
-정의
-- Runtime Commit Boundary에 진입할 수 있는 자격 요건이다.
+- Milestone names.
+- Test counts.
+- Implementation commit references.
+- Next architecture candidates.
+- AI operation rules.
+- Git or document workflow instructions.
+- Repeated preview safety flag lists.
 
-요건
-- execution_orchestrator_decision == ORCHESTRATOR_READY
-- preview_safety_flags 전체 False
-- runtime_write == False (현재까지 write 없음)
-- previous_commit_success == True 또는 첫 커밋
-- no_pending_rollback == True
-- no_conflicting_commit_in_progress == True
+4. Safety Authority
 
-Eligibility 평가 결과
-- ELIGIBLE: 모든 요건 충족
-- NOT_ELIGIBLE: 하나 이상 요건 위반, 사유 포함
+Runtime safety, Preview safety, Writer ownership, Source of Truth, Queue
+mutation, SendOrder, Chejan, Fill, Position, Projection, Recovery, and
+Reconciliation contracts are consolidated in the latest Runtime Canonical.
 
-02.22 Runtime Commit Contract
-
-정의
-- Runtime Commit Boundary에서 실행될 커밋 계획의 계약 문서이다.
-- Atomic Apply Plan, Verification Plan, Rollback Plan으로 구성된다.
-
-구성 요소
-- Atomic Apply Plan: 단일 트랜잭션 단위의 적용 계획
-- Verification Plan: 적용 후 검증 계획
-- Rollback Plan: 롤백 계획
-
-정책
-- Atomic Apply Plan은 독립 Preview Layer가 아니라 Runtime Commit Contract 내부 구성이다.
-- Contract는 read-only 검증 후에만 실행 가능 상태로 전환된다.
-
-02.23 Atomic Apply Plan
-
-정의
-- 단일 트랜잭션으로 적용될 런타임 변경 계획이다.
-
-포함 항목
-- target_runtime_files: 적용 대상 파일 목록
-- changed_fields_candidate: 변경 필드 후보
-- apply_order: 적용 순서
-- atomic: True (전체 적용 또는 전체 롤백)
-
-제약
-- partial_apply 허용하지 않음
-- write는 Contract 승인 후 단일 계층에서만 수행
-
-02.24 Verification Plan
-
-정의
-- Atomic Apply 실행 후 결과 검증 계획이다.
-
-포함 항목
-- verification_targets: 검증 대상
-- verification_method: 검증 방법
-- pass_criteria: 통과 기준
-- failure_action: 실패 시 조치
-
-정책
-- 검증 실패 시 자동 Rollback으로 전환
-
-02.25 Rollback Plan
-
-정의
-- Atomic Apply 실행 전/후 문제 발생 시 롤백 계획이다.
-
-포함 항목
-- rollback_trigger: 롤백 트리거 조건
-- rollback_target: 롤백 대상
-- rollback_method: 롤백 방법
-- rollback_verification: 롤백 후 검증
-
-정책
-- Rollback은 Runtime Commit Boundary 계층에서만 계획한다.
-- 실제 Rollback 실행은 별도 승인 계층에서 수행한다.
-
-02.26 Runtime Commit Safety Gate
-
-정의
-- Runtime Commit Contract 실행 직전 안전성을 최종 검증하는 게이트이다.
-
-검증 항목
-- contract_integrity: Contract 무결성
-- atomic_apply_plan_validity: Atomic Apply Plan 유효성
-- verification_plan_completeness: Verification Plan 완전성
-- rollback_plan_readiness: Rollback Plan 준비 상태
-- preview_safety_flags: 모든 safety flags False
-- runtime_write_still_false: write 아직 없음
-
-게이트 결과
-- PASS: 모든 검증 통과, 다음 계층으로 진행 가능
-- FAIL: 검증 실패, 사유 포함, 실행 중단
-
-정책
-- Runtime Commit Dry-run은 독립 Layer가 아니라 Safety Gate / Review 내부 검증 성격으로 둔다.
-
-02.27 Runtime Commit Review
-
-정의
-- Runtime Commit Boundary 실행 결과를 검토하는 계층이다.
-
-포함 항목
-- review_target: 검토 대상 결과
-- review_criteria: 검토 기준
-- review_evidence: 검토 증빙
-- review_decision: 승인/반려/재검토
-
-정책
-- Runtime Commit Result Review는 별도 Preview Layer가 아니라 Runtime Commit Review로 단순화한다.
-- Review 결과는 다음 커밋 또는 아키텍처 단계의 입력으로 사용한다.
-
-02.28 Preview 안전선 (Runtime Commit Boundary)
-
-필수 safety flags
-- runtime_write=False
-- position_write=False
-- balance_write=False
-- gui_update_called=False
-- send_order_called=False
-- chejan_called=False
-- execution_commit_allowed=False
-- runtime_apply_allowed=False
-
-금지선
-- 실제 runtime write 금지
-- 실제 position/balance write 금지
-- 실제 Runtime Commit 수행 금지
-- 실제 Runtime Apply 수행 금지
-- GUI update 호출 금지
-- SendOrder 호출 금지
-- Chejan 호출 금지
-- rules.json write 금지
-- SQLite write 금지
-
-==================================================
-29.x Execution
-==================================================
-
-29.x.9 Execution Preview Orchestrator 이후 Runtime Commit Boundary 연결
-
-목적
-- Execution Preview Orchestrator 완료 후, 실제 런타임 커밋 직전에
-  런타임 커밋 적격성, 계약, 안전 게이트, 리뷰를 수행하는 경계 계층을 연결한다.
-
-연결 위치
-- Execution Preview Orchestrator (29.x.8) 이후
-- Real Runtime Commit 이전
-
-권장 실행 흐름
-Execution Preview Orchestrator (ORCHESTRATOR_READY)
-↓
-Runtime Commit Boundary 진입
-↓
-Runtime Commit Eligibility 평가
-↓
-ELIGIBLE 확인
-↓
-Runtime Commit Contract 생성
-  - Atomic Apply Plan
-  - Verification Plan
-  - Rollback Plan
-↓
-Runtime Commit Safety Gate 검증
-↓
-PASS 확인
-↓
-Real Runtime Commit (향후 구현)
-↓
-Runtime Commit Review
-↓
-다음 Architecture 단계 또는 Maintenance
-
-제약
-- Execution Commit Preview와 Execution Runtime Apply Preview 사이에 Runtime Commit Boundary를 삽입하지 않는다.
-- Runtime Apply Preview는 중복 생성하지 않는다.
-- Preview Layer 추가 확장을 억제하고, 실제 write 직전 Boundary로 구조를 단순화한다.
-
-29.x.10 Milestone
-
-M5 Runtime Commit Boundary Complete
-
-기존 Milestone 흐름
-- M1 Runtime Apply Preview/Gate Pipeline Complete
-- M2 Execution Preview Phase1 Complete
-- M3 Execution Preview Phase2 Complete
-- M4 Execution Preview Orchestrator Complete
-- M5 Runtime Commit Boundary Complete
-
-==================================================
-운영/AI 협업 정책
-==================================================
-
-운영 원칙
-- 모든 모델은 runtime/*.json write 금지, routines/*/rules.json write 금지, SQLite write 금지를 준수한다.
-- 모든 모델은 실제 Broker/Order Router/SendOrder/Chejan/GUI 연결 및 실제 Execution/Dispatch/Commit/Runtime Apply 실행을 금지한다.
-- 작업 범위와 반영 위치는 ChatGPT가 지정한 MASTER_SPEC 반영 범위를 기준으로 한다.
-
-문서 반영 책임
-- MASTER_SPEC, CHANGELOG, 작업재개요약, 참조 문서, 운영 문서의 반영 범위는 ChatGPT가 최종 결정한다.
-- 구현 모델(Codex, Kilo, 일반 코드 모델)은 구현, 테스트, 검증, Git 등을 수행하지만 MASTER_SPEC 반영 범위를 임의로 결정하지 않는다.
-
-==================================================
-부록: 구현 기준/참조
-==================================================
-
-기준 구현 커밋(참고)
-- Runtime Commit Boundary: 6886a01
-
-테스트 결과
-- Runtime Commit Boundary 단일 테스트: 14 tests OK
-- 최신 전체 unittest: 2858 tests OK
-
-보호 파일 변경 없음
-- runtime/order_queue.json
-- runtime/order_executions.json
-- runtime/order_locks.json
-- routines/*/rules.json
-
-금지선 명시
-- runtime/*.json 실제 write 없음
-- routines/*/rules.json 수정 없음
-- SQLite write 없음
-- Broker 연결 없음
-- Order Router 실제 연결 없음
-- SendOrder 호출 없음
-- Chejan 연결 없음
-- GUI update 없음
-- 실제 Runtime Commit 수행 없음
-- 실제 Runtime Apply 수행 없음
-
-다음 Architecture 후보(미구현)
-- Real Runtime Commit Architecture
-- Runtime Commit Executor Preview / Real Commit Gate 설계
-
-주의: 바로 실제 runtime write 구현으로 가지 않는다. 다음 단계도 먼저 Architecture 분석 후 진행한다.
-
-끝.
+End.

@@ -1,69 +1,44 @@
 MASTER_SPEC_CANONICAL_2026-07-11_RUNTIME_COMMIT_PRODUCTION_TRANSITION
 
-작성일: 2026-07-11
+Created: 2026-07-11
+Classification: Historical Runtime Commit production-transition record
 
-기준 Commit: e32ee1a3d29a4324166ebb789f95defa39bf46a8
+1. Consolidation Status
 
-전체 unittest: 3730 tests OK, 1 skipped
+This Canonical is preserved as historical context for the moment when the
+project reached the production Runtime transition boundary. It is not the
+current source of truth for Runtime Commit or dispatch contracts.
 
-1. 배경 및 개요
+Current contract authority:
 
-Preview 중심 Runtime Commit 단계가 완료되고, Production Runtime 진입 직전 단계에 도달하였다. 본 문서는 해당 전환점의 현행 상태를 공식 문서 체계에 반영한다.
+- `MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt`
 
-2. BUY 필터 완료 상태
+2. Preserved Contract Meaning
 
-- OCR/OSC: BUY Main Signal 유지
-- RSI BUY Filter 구현 완료
-- Moving Average BUY Filter 구현 완료
-- Price Compare BUY Filter 구현 완료
-- Bollinger BUY Filter 구현 완료
+The following meaning remains valid through the latest Runtime Canonical:
 
-3. BUY Execution Policy
+- Preview stages must not perform real Runtime writes.
+- Runtime Commit execution requires explicit approval and boundary validation.
+- Backup, verification, token, lock, and recovery evidence are part of the
+  Runtime Commit safety model.
+- Queue, SendOrder, Broker, and Chejan connections must not be opened by
+  preview-only stages.
 
-- 승인 경로: buy.execution.base, buy.execution.repeat
-- 실행 operation: set_execution_policy
-- 평가 완료 및 승인된 Rule만 실행
-- Legacy buy_method_*는 미사용
+3. Historical-Only Content
 
-4. 전체 Preview 실행 파이프라인
+The following original content is historical and is not a current contract
+source:
 
-- BUY Order Candidate Draft Preview
-- BUY Candidate Execution Preview Adapter
-- BUY Runtime Projection Preview
-- BUY Runtime Commit Preview Bridge
-- BUY Runtime Commit Gate Preview
-- BUY Runtime Commit Core Dry-run
-- BUY Runtime Commit Execution Readiness Preview
-- BUY Runtime Commit Approval Session/Decision Preview
-- BUY Runtime Commit Token Issue Preview
-- Runtime Commit Execution Context Builder
-- Approval Token Issue Adapter
-- Approval Token Validate / Real Executor Handoff Preview
-- Real Executor Handoff Finalizer
+- Point-in-time unittest count.
+- BUY filter completion status.
+- Production allowlist planning status.
+- Pilot-file planning.
+- Next-phase descriptions.
+- Repeated runtime safety lists.
 
-5. 실제 검증 범위
+4. Canonical Authority
 
-- tempfile runtime JSON before/after
-- Approval Token issue 및 validate, consume
-- lock acquire/release, transaction journal, recovery journal
-- backup, atomic write, verify
-- 프로젝트 runtime/routines 보호 파일 변경 없음
+Use the latest Runtime Canonical for current Runtime, Queue, SendOrder, Chejan,
+Fill, Position, Projection, Recovery, and Reconciliation contracts.
 
-6. Production Runtime 진입 전 미개방 상태 내용
-
-- 운영 Allowlist 설계
-- 단일 runtime 파일 Pilot 진행 예정
-- rollback/복구 실전 검증 예정
-- 다중 타겟 및 Order Queue 연결 준비
-
-7. 운영 금지선
-
-- 실제 runtime 경로 write 불가
-- Order Queue, SendOrder, Broker, Chejan 연결 금지
-
-8. 향후 단계
-
-- Production Runtime Allowlist 설계 및 Pilot 파일 운영
-- 구조 및 테스트 강화, rollback/verify/token/lock/journal 검증
-
-본 문서는 ProductionRuntime 전환점 현황 및 상세 운영 가이드의 Source of Truth로 활용한다.
+End.
