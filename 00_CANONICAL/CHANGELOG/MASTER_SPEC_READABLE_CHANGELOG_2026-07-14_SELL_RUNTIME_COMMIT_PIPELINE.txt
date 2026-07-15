@@ -43,3 +43,10 @@ BUY budget policy correction:
 - 회차 기준 supports direct operator input with + or ×.
 - 금액 기준 supports direct operator input with × only.
 - 예산 설정 means a maximum budget for the round; the actual order quantity is calculated later from the current order price and must stay within budget and other order limits.
+
+Operation Policy Gate update:
+- PR #44 moved the APPROVED -> EXECUTABLE / BLOCKED_POLICY queue update into the canonical queue writer.
+- The gate still keeps `execution_enabled=False`.
+- It no longer performs direct full Queue snapshot writes.
+- EXECUTABLE continues into the existing Execution Enable -> REAL_READY flow.
+- Full unittest passed in the project standard environment: 5161 OK, 1 skipped.

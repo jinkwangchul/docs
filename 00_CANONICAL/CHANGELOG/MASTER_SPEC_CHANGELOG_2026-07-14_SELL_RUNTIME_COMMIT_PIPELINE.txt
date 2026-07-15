@@ -73,3 +73,14 @@ Policy revision:
 - Clarified that 예산 설정 defines a maximum buy budget per round, not a direct target share count.
 - Clarified that actual order quantity is determined only after total budget, routine budget, per-symbol budget, maximum holding quantity, and other order restrictions are applied.
 - Deprecated old examples such as 100 -> 300 -> 900 -> 2700 when they imply fixed X2/X3 policy or conflict with the new direct-input multiplier contract.
+
+Operation Policy Gate canonical writer migration:
+- PR #44:
+  - feat: migrate operation policy gate to canonical writer
+  - Merge commit: b9f6045c76f32bbf472f098b6530be0af570683c
+  - `operation_policy_gate.apply_operation_policy_gate_for_order()` now owns the durable APPROVED -> EXECUTABLE / BLOCKED_POLICY transition through `execution_queue_writer.mutate_order_queue()`.
+  - Queue mutation rechecks the latest target record inside the canonical lock.
+  - `execution_enabled=False` remains unchanged after policy pass or policy block.
+  - Direct snapshot writer helpers were removed from `operation_policy_gate.py`.
+  - EXECUTABLE still proceeds through the existing Execution Enable -> REAL_READY flow.
+  - Full unittest in the project standard Python 3.11 32-bit PyQt5 environment: 5161 OK, 1 skipped.

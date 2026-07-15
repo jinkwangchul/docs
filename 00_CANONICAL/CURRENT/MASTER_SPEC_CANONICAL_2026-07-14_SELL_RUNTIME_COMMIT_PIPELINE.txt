@@ -374,6 +374,23 @@ progress notes in this file.
 - Builder, Adapter, Preview, Validator, and Dry-run layers must not mutate the
   queue.
 
+12.2.1 Operation Policy Gate Contract
+
+- Owner: `operation_policy_gate.apply_operation_policy_gate_for_order()`.
+- The Operation Policy Gate owns the durable `APPROVED` ->
+  `EXECUTABLE` / `BLOCKED_POLICY` transition.
+- The input state must be `APPROVED`.
+- Policy pass writes `status=EXECUTABLE`.
+- Policy block writes `status=BLOCKED_POLICY`.
+- `execution_enabled` remains `False` after this transition.
+- Queue mutation must use `execution_queue_writer.mutate_order_queue()`.
+- Direct snapshot writers are prohibited for this transition.
+- Same-result reapplication is a no-op.
+- Duplicate target identity, stale revision, and progressed lifecycle states
+  must not overwrite the queue.
+- After `EXECUTABLE`, the existing Execution Enable -> REAL_READY flow remains
+  unchanged.
+
 12.3 SendOrder Lifecycle
 
 Queue lifecycle before broker evidence:
