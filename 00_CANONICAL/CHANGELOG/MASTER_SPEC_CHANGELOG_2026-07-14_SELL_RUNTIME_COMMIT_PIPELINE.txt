@@ -65,3 +65,11 @@ Safety boundary unchanged:
 
 Next work:
 - SELL Runtime Commit Real Executor Preview / Commit Boundary Review.
+
+Policy revision:
+- Updated the Canonical BUY Budget Increase Policy to replace deprecated first-setting terms "주수기준" / "금액기준" with "최초 예산 설정" -> "주수 설정" / "예산 설정".
+- Replaced fixed X2/X3/user-array increase descriptions with operator-entered "회차 기준" and "금액 기준" contracts.
+- Added the six supported combinations for 주수 설정 / 예산 설정 with 회차 기준(+) / 회차 기준(×) / 금액 기준(×).
+- Clarified that 예산 설정 defines a maximum buy budget per round, not a direct target share count.
+- Clarified that actual order quantity is determined only after total budget, routine budget, per-symbol budget, maximum holding quantity, and other order restrictions are applied.
+- Deprecated old examples such as 100 -> 300 -> 900 -> 2700 when they imply fixed X2/X3 policy or conflict with the new direct-input multiplier contract.
