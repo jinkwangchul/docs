@@ -214,6 +214,22 @@ Reference Index 수정 시 과거 다음 작업, 과거 진행 상태, 과거 �
 
 - 변경 파일
 - 테스트 결과
+
+Completion Report Policy:
+
+- Completion reports are written from the project feature perspective, not from the code-change perspective.
+- A completion report must explain what project capability was implemented, why it was needed, and what behavior was added or changed.
+- A completion report must include:
+  - implementation purpose
+  - project feature or pipeline stage
+  - implemented behavior
+  - project-wide impact
+  - unaffected areas
+  - validation result
+- Function names, file names, Commit SHA, and test counts are supporting details. They must not appear before the core feature explanation.
+- A completion report that does not explain functional meaning and system role is a rule violation.
+- If the report is not project-feature-centered, AGENT_WORKFLOW_REFERENCE was not properly followed.
+
 - Commit SHA
 - PR 번호와 URL
 - PR / merge state
