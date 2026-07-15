@@ -282,13 +282,72 @@ The following are prohibited:
 - first-candidate-only processing
 - automatic priority selection
 
-11. Runtime Living Contract
+11. SELL Execution Full Preview Upstream Contract
+
+This section promotes the living upstream SELL Preview contract into this
+Runtime Canonical. It records only the contract that must remain true before
+Runtime Commit begins.
+
+11.1 Preview Flow
+
+SELL execution preview flows through these stages:
+
+SELL_REAL_READY_ADAPTER_PREVIEW
+-> SELL Common Execution Preview
+-> SELL Execution Readiness Preview
+-> SELL Signal Gate Preview
+-> SELL Execution Queue Preview
+-> SELL Execution Full Preview Orchestrator
+
+The Full Preview input is the ordered set of SELL preview stage results and
+candidate identities required to evaluate readiness without writing Runtime,
+Queue, or broker state.
+
+11.2 Stage Responsibilities
+
+- Execution Readiness confirms that the SELL candidate can enter execution
+  readiness review without changing durable state.
+- Signal Gate confirms that the candidate passes the SELL signal gate contract.
+- Queue Preview confirms that the candidate can form a preview-only
+  ORDER_QUEUED record contract.
+- Full Preview preserves the ordered stage results, aggregates status, and
+  stops on BLOCKED or INVALID without selecting candidates.
+
+11.3 MARKET Contract
+
+- `current_price` must not be injected automatically.
+- MARKET SELL is allowed only when an explicit MARKET contract is satisfied.
+- If the explicit MARKET contract is not satisfied, the preview status is
+  BLOCKED.
+
+11.4 PENDING / CANCEL Contract
+
+- Preview and Runtime contracts remain separated.
+- PENDING or CANCEL candidates must not be promoted into the normal SELL
+  execution path.
+- Actual cancel calls are prohibited in Preview.
+
+11.5 Multiple Candidate Contract
+
+- Preview must not automatically select a candidate.
+- Preview must not automatically remove a candidate.
+- All candidates and their input order must be preserved.
+- Candidate selection belongs outside the Preview chain.
+
+11.6 Preview MASTER_ENGINE Ownership
+
+- The SELL Preview Chain is owned by MASTER_ENGINE.
+- Routine layers provide preview inputs and results only.
+- This ownership does not change Runtime Commit ownership after the Preview
+  boundary.
+
+12. Runtime Living Contract
 
 This section records the current code contract for Runtime, Queue, SendOrder,
 Chejan, Fill, and Position. It supersedes older history-only Runtime Commit
 progress notes in this file.
 
-11.1 Runtime Source of Truth
+12.1 Runtime Source of Truth
 
 - `routine_signals.json`: Signal source of truth.
   - Writer Owner: `routine_signal_queue.py`.
@@ -304,7 +363,7 @@ progress notes in this file.
   - Writer Owner: `position_update_service.py`.
   - Responsibility: apply recorded fill deltas to position state.
 
-11.2 Queue Living Contract
+12.2 Queue Living Contract
 
 - Canonical writer: `execution_queue_writer.mutate_order_queue()`.
 - The canonical writer owns the queue lock, revision/CAS check, backup,
@@ -315,7 +374,7 @@ progress notes in this file.
 - Builder, Adapter, Preview, Validator, and Dry-run layers must not mutate the
   queue.
 
-11.3 SendOrder Lifecycle
+12.3 SendOrder Lifecycle
 
 Queue lifecycle before broker evidence:
 
@@ -332,7 +391,7 @@ ORDER_QUEUED
 - Broker acceptance, rejection, fills, and cancellation are confirmed only by
   the Chejan lifecycle.
 
-11.4 Chejan Contract
+12.4 Chejan Contract
 
 Current allowed lifecycle transitions:
 
@@ -350,7 +409,7 @@ Current allowed lifecycle transitions:
 Chejan recording appends event history and reduces broker lifecycle on the
 matching queue record. It does not write fills or positions.
 
-11.5 Fill Contract
+12.5 Fill Contract
 
 - Writer Owner: `execution_fill_recorder.py`.
 - Fill recording appends to `fills.json` only.
@@ -362,7 +421,7 @@ matching queue record. It does not write fills or positions.
 - Append uses file lock, backup, temp write, atomic replace, and post-write
   verification.
 
-11.6 Position Contract
+12.6 Position Contract
 
 - Writer Owner: `position_update_service.py`.
 - Position updates consume recorded fill records.
@@ -370,7 +429,7 @@ matching queue record. It does not write fills or positions.
 - Cumulative quantity delta is tracked separately per order identity.
 - Position updates do not mutate Queue or Chejan state.
 
-11.7 Preview Safety Line
+12.7 Preview Safety Line
 
 In this Runtime / Execution pipeline, the following layers do not perform file writes, queue mutations, SendOrder
 calls, broker calls, or Runtime state changes:
@@ -381,11 +440,11 @@ calls, broker calls, or Runtime state changes:
 - Validator
 - Dry-run
 
-12. BUY Budget Increase Policy Revision
+13. BUY Budget Increase Policy Revision
 
 This section replaces older BUY increase descriptions that used fixed X2/X3 or user-array style wording. The project philosophy remains unchanged: BUY planning may define target values, but the final executable order is still constrained by budget, holdings, and execution safety checks.
 
-12.1 Initial Budget Setting Terms
+13.1 Initial Budget Setting Terms
 
 The initial setting terms are:
 
@@ -397,7 +456,7 @@ The old first-setting terms "주수기준" and "금액기준" are deprecated.
 
 The term "금액 기준" remains valid only when it means the increase method described below.
 
-12.2 Increase Methods
+13.2 Increase Methods
 
 Supported increase methods are:
 
@@ -406,7 +465,7 @@ Supported increase methods are:
 
 The old fixed X2, X3, and user-array descriptions are deprecated.
 
-12.3 회차 기준 Contract
+13.3 회차 기준 Contract
 
 회차 기준 supports two operators:
 
@@ -445,7 +504,7 @@ Example, initial shares 2주 and 회차 기준 + 2:
 - 4회차: 5주
 - 5회차: 6주
 
-12.4 금액 기준 Contract
+13.4 금액 기준 Contract
 
 금액 기준 supports only 곱(×).
 
@@ -474,7 +533,7 @@ Example, initial budget 10000 and 금액 기준 × 2:
 
 Older examples such as 100 -> 300 -> 900 -> 2700 are deprecated when they imply fixed X3 policy or conflict with the operator-entered multiplier contract.
 
-12.5 Supported Combinations
+13.5 Supported Combinations
 
 주수 설정 supports:
 
@@ -490,7 +549,7 @@ Older examples such as 100 -> 300 -> 900 -> 2700 are deprecated when they imply 
 
 The total supported combinations are six.
 
-12.6 예산 설정 Policy
+13.6 예산 설정 Policy
 
 예산 설정 does not calculate a target share count directly.
 
@@ -498,7 +557,7 @@ The total supported combinations are six.
 
 No order may be created above the confirmed budget.
 
-12.7 Actual Order Contract
+13.7 Actual Order Contract
 
 The calculated value is a round target, not the final executable order.
 
@@ -512,7 +571,7 @@ Immediately before the actual order is created, the final quantity must apply:
 
 The final order quantity is the quantity that remains valid after these constraints are applied.
 
-12.8 UI Contract
+13.8 UI Contract
 
 Increase values are entered directly by the operator.
 
