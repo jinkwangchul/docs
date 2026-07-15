@@ -248,7 +248,19 @@ Codex 지시문에는 Codex가 수행할 작업만 작성한다.
 - 작업 범위, 수정 내용, 금지 범위, 검증, 완료 보고만 작성한다.
 - 검토 의견과 실행 지시는 분리한다.
 - 하나의 PR에 필요한 내용만 포함한다.
-## 12. Backtest Audit Log Architecture
+## 12. MASTER SPEC Maintenance Policy
+
+MASTER SPEC의 기본 원칙은 Living Contract 유지이다.
+
+- 새로운 기능은 해당 영역의 최신 Canonical에만 반영한다.
+- Contract Promotion이 완료되면 해당 Canonical이 그 영역의 유일한 Source of Truth가 된다.
+- 동일 계약을 다른 Canonical 문서에서 다시 정의하지 않는다.
+- 기존 Canonical은 Historical 역할을 유지하며 현재 계약을 다시 정의하지 않는다.
+- Historical 문서는 현재 계약의 Source of Truth가 될 수 없다.
+- Runtime Living Contract는 최신 Runtime Canonical만 기준으로 사용한다.
+- 대규모 Canonical 재작성은 Living Contract가 분산된 경우에만 수행한다.
+
+## 13. Backtest Audit Log Architecture
 
 별도 공식 문서 생성 전까지 임시 보존한다. 공식 Canonical이 생기면 AGENT에는 참조만 남긴다.
 
