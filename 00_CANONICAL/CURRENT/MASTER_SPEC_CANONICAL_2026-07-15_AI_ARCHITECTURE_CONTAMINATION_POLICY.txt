@@ -48,62 +48,51 @@ It includes:
 
 4. Minimum Structural Unit Policy
 
-A new layer, module, file, durable state, writer, Source of Truth, or production call graph branch is not justified by naming clarity, local testability, or future extensibility alone.
+New structure is the last resort.
 
-New structure requires at least one substantial production reason:
+AI must use an existing module, existing function, or orchestration of existing functions when the responsibility fits the current structure.
 
-- independent business responsibility
-- independent production caller
-- independent internal side effect
-- independent lock, transaction, or CAS boundary
-- independent lifecycle ownership
-- independent role isolation requirement
-- separate Source of Truth responsibility
+New structure is allowed only when all core conditions are true:
 
-The default decision is to keep work inside the existing layer.
+1. Existing structure cannot absorb the responsibility.
+2. The responsibility has an independent production caller, mutation boundary, Source of Truth, lifecycle owner, or side-effect boundary.
+3. The user explicitly approves the structural change scope and direction.
+4. The change does not conflict with Canonical contracts.
+
+Layer names do not justify structure. Preview, Approval, Validation, Recovery, Executor, Adapter, Orchestrator, Wrapper, and similar names are judged only by responsibility, production caller, mutation, Source of Truth, and lifecycle.
+
+Existing contracts are preserved. New structure cannot redefine current state, runtime, queue, writer, or lifecycle contracts.
 
 5. Integration Before Separation
 
-Before creating any new structure, AI must first prove that the responsibility cannot be absorbed into an existing layer or existing function.
+Before creating any new structure, AI must prove that the responsibility cannot be absorbed into an existing layer or existing function.
 
 The proof must stay minimal and focus on:
 
 - why existing layers or functions cannot contain the work
-- what independent responsibility or mutation/side-effect boundary exists
+- what independent responsibility, caller, mutation, Source of Truth, lifecycle, or side-effect boundary exists
 - why the change does not conflict with Canonical contracts
 - what exact scope and direction the user approved
 
 If this proof is missing, the new structure is prohibited.
 
-6. New Layer Approval Conditions
+6. Structural Audit Scope
 
-All core conditions must be satisfied before creating a new layer:
+Implementation First governs ordinary implementation work.
 
-1. Existing layer or existing function absorption is not possible.
-2. The responsibility is independent, or there is an independent mutation or side-effect boundary.
-3. The user explicitly approves the structural change scope and direction.
-4. The change does not conflict with Canonical contracts.
+Structural audit comes first only when a proposed change affects a layer, durable state, writer, Source of Truth, production call graph, lifecycle owner, or repeats an existing responsibility.
 
-If any condition is not satisfied, use an existing function, existing service, simple helper, or defer implementation.
+7. User Control
 
-7. Default Prohibited Layer Names
+AI must not change project structure without explicit user approval.
 
-The following names are prohibited by default unless the approval conditions are satisfied:
+When a structural problem is found, AI reports the investigation and options first.
 
-- Preview
-- Review
-- Readiness
-- Adapter
-- Inspector
-- Orchestrator
-- Validator
-- Approval Gate
-- Post Check
-- Wrapper
-- Entrypoint
-- Bridge
+Reporting a deletion candidate does not approve deletion.
 
-The names themselves are not permanently banned. They are prohibited when they are used without an independent production responsibility, caller, side effect, lifecycle, or Source of Truth boundary.
+Reporting an integration candidate does not approve integration.
+
+One PR handles only the single structural responsibility approved by the user.
 
 8. AI Self-Validation Bias Prevention
 
@@ -135,33 +124,23 @@ The following interpretation is forbidden:
 
 10. Forced Structural Audit Conditions
 
-New feature implementation must stop and structural audit must come first when any of the following core triggers occurs:
+New feature implementation stops for structural audit only when one of these core triggers occurs:
 
-- proposed new layer, durable state, writer, Source of Truth, or production call graph change
+- proposed new layer, durable state, writer, Source of Truth, production call graph, or lifecycle ownership change
 - repeated files or layers with the same responsibility
 - conflict with Canonical or existing document rules
 - user concern about structural complexity or reliability
 
-11. User Control
+11. Priority
 
-AI must not change project structure without explicit user approval.
+This policy has priority over general implementation guidance only when structural contamination risk is present.
 
-When a structural problem is found, AI reports the investigation and options first.
-
-Reporting a deletion candidate does not approve deletion.
-
-Reporting an integration candidate does not approve integration.
-
-One PR handles only the single structural responsibility approved by the user.
-
-12. Priority
-
-This policy has priority over general implementation guidance.
+Implementation First governs ordinary implementation work. Structural audit governs only when a proposed change affects a layer, durable state, writer, Source of Truth, production call graph, lifecycle owner, or repeats an existing responsibility.
 
 Conflict priority:
 
 1. explicit latest user decision
-2. AI Architecture Contamination Risk and Minimum Structural Unit Policy
+2. AI Architecture Contamination Risk and Minimum Structural Unit Policy when structural risk is present
 3. latest Canonical
 4. general rules in AGENT_WORKFLOW_REFERENCE
 5. existing implementation pattern in code
@@ -169,7 +148,7 @@ Conflict priority:
 
 AI general design preference, software textbook patterns, and local test convenience are not valid authority in this project.
 
-13. Scope
+12. Scope
 
 This document is a Canonical policy supplement.
 
