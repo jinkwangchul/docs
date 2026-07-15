@@ -9,20 +9,19 @@ This Canonical is preserved as historical context for the moment when the
 project reached the production Runtime transition boundary. It is not the
 current source of truth for Runtime Commit or dispatch contracts.
 
-Current contract authority:
+Canonical pointer:
 
 - `MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt`
 
-2. Preserved Contract Meaning
+2. Historical Contract Pointer
 
-The following meaning remains valid through the latest Runtime Canonical:
+This document no longer defines the active production-transition contract. The
+active contract is governed by the latest Runtime Canonical.
 
-- Preview stages must not perform real Runtime writes.
-- Runtime Commit execution requires explicit approval and boundary validation.
-- Backup, verification, token, lock, and recovery evidence are part of the
-  Runtime Commit safety model.
-- Queue, SendOrder, Broker, and Chejan connections must not be opened by
-  preview-only stages.
+The promoted contract covers preview write prohibition, explicit approval,
+boundary validation, backup, verification, token, lock, recovery evidence, and
+the prohibition on opening Queue, SendOrder, Broker, or Chejan connections from
+preview-only stages.
 
 3. Historical-Only Content
 

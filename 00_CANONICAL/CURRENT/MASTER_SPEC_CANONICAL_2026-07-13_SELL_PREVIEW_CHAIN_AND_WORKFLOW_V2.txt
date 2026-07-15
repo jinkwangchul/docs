@@ -34,19 +34,14 @@ It is historical evidence for:
 Detailed PR numbers, merge commits, test counts, progress percentages, and
 next-work lists are intentionally not repeated in this consolidated version.
 
-3. Preserved SELL Preview Contracts
+3. Historical Contract Pointer
 
-The following contracts remain valid, but their source of truth is now the
-latest Runtime Canonical:
+This document no longer defines the active SELL Preview contract. The active
+contract is governed by the latest Runtime Canonical.
 
-- MARKET SELL must not receive an automatic `current_price` substitution.
-- MARKET SELL remains BLOCKED unless an explicit MARKET contract is satisfied.
-- PENDING and CANCEL paths remain separate from the normal SELL execution path.
-- Actual cancel calls are prohibited in Preview.
-- Multiple SELL candidates must be preserved.
-- Preview must not automatically select, prioritize, or remove candidates.
-- Runtime write, Queue write, SendOrder, Broker API, REAL_READY mutation, and
-  OrderRequest creation are prohibited inside Preview.
+The promoted contract covers MARKET handling, PENDING/CANCEL separation,
+multiple-candidate preservation, no automatic candidate selection or removal,
+and preview-only safety boundaries.
 
 4. Non-Contract History
 

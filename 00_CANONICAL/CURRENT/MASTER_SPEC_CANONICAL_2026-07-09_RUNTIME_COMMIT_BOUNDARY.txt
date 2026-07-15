@@ -18,20 +18,14 @@ The current source of truth is:
   - Runtime Commit Execution Plan
   - Runtime Living Contract
 
-2. Preserved Boundary Contract
+2. Historical Contract Pointer
 
-The following contract remains valid and is now governed by the latest Runtime
-Canonical:
+This document no longer defines the active Runtime Commit Boundary contract.
+The active contract is governed by the latest Runtime Canonical.
 
-- Runtime Commit Boundary is positioned after execution preview readiness and
-  before any real Runtime write.
-- Commit eligibility requires upstream READY state, preserved identity, and no
-  prior Runtime mutation.
-- Atomic apply, verification, and rollback planning belong to the commit
-  contract, not to an extra preview layer.
-- Runtime write is allowed only after the approved Commit Boundary.
-- Partial apply is prohibited.
-- Runtime Commit review is not a separate Preview layer.
+The promoted contract covers boundary position, commit eligibility, identity
+preservation, atomic apply planning, verification, rollback planning, partial
+apply prohibition, and review ownership.
 
 3. Historical-Only Content
 

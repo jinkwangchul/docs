@@ -10,17 +10,14 @@ Core milestone. The living Runtime Commit contract is now consolidated in:
 
 - `MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt`
 
-2. Preserved Contract Meaning
+2. Historical Contract Pointer
 
-The following contract meaning remains valid through the latest Runtime
-Canonical:
+This document no longer defines the active Runtime Commit Core contract. The
+active contract is governed by the latest Runtime Canonical.
 
-- Runtime Commit requires an atomic apply plan, verification plan, and rollback
-  plan.
-- Runtime Commit must pass a guard before real execution.
-- Approval token validation protects commit integrity.
-- Recovery evidence must be available for failed or uncertain commit results.
-- Runtime Commit is separated from preview-only stages.
+The promoted contract covers atomic apply planning, verification planning,
+rollback planning, execution guard, approval token validation, recovery
+evidence, and separation from preview-only stages.
 
 3. Historical-Only Content
 
