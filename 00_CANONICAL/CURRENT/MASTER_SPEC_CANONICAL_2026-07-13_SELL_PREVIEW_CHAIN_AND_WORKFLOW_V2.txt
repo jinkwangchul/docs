@@ -1,229 +1,66 @@
 MASTER_SPEC_CANONICAL_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2
 
-작성일: 2026-07-13
-상태: Conversation Closing Final
+Created: 2026-07-13
+Classification: Historical SELL Preview Chain record
 
-기준 저장소:
-- kiwoom_auto master: 21ccf004551f26120b362d3fe8f9183de3129395
-- docs main: 8a840059f5a672da4fdb46d89840b279df3b5ea6
+1. Consolidation Status
 
-최신 kiwoom_auto Commit:
-- 21ccf00 Merge pull request #4 from jinkwangchul/feat/sell-common-execution-preview-adapter
+This Canonical is preserved as historical context for the early SELL Preview
+Chain. Its living contracts have been promoted into the latest Runtime
+Canonical:
 
-1. 문서 목적
+- `MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt`
+  - Section 11: SELL Execution Full Preview Upstream Contract
+  - Section 12: Runtime Living Contract
 
-본 문서는 이번 Conversation 전체 종료 시점의 최종 Canonical이다.
+Git workflow, agent role, document operation, and final reporting rules are no
+longer repeated here. The source of truth for those rules is:
 
-단순 이전 문서 이어붙이기가 아니라, kiwoom_auto master 21ccf004551f26120b362d3fe8f9183de3129395 기준으로 Workflow, Agent 역할, SELL Preview Chain, PR 기록, 남은 실행 경계를 다시 정리한다.
+- `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
 
-2. Git Workflow v2 공식 Workflow
+2. Preserved Historical Role
 
-kiwoom_auto 저장소는 Workflow v2를 공식 Git 운영 방식으로 사용한다.
+This document records the point where the SELL Preview Chain had reached the
+Common Execution Preview Adapter stage and still remained preview-only.
 
-공식 흐름:
-- master
-- Feature Branch
-- Commit
-- Push
-- Pull Request
-- Review
-- Merge
-- Branch Delete
-- master 최신화
+It is historical evidence for:
 
-운영 원칙:
-- master 직접 Commit 금지
-- master 직접 Push 금지
-- Feature 하나 = Branch 하나
-- Feature 하나 = Pull Request 하나
-- Merge 후 feature branch 삭제 확인
-- Merge 후 master와 origin/master 일치 확인
+- SELL preview-only development before Runtime Commit integration.
+- The separation between SELL preview stages and real Runtime/Queue/SendOrder
+  mutation.
+- The need to verify file existence, stage scope, and PR-based merge results
+  before treating an implementation as complete.
 
-docs 저장소는 Canonical 운영 저장소이며, 문서 갱신은 main 기준 Commit/Push로 운영한다.
+Detailed PR numbers, merge commits, test counts, progress percentages, and
+next-work lists are intentionally not repeated in this consolidated version.
 
-3. Agent 역할
+3. Historical Contract Pointer
 
-Codex:
-- 코드 조사
-- 영향 분석
-- 구현
-- 테스트
-- 리팩터링
-- Commit 직전 검증
+This document no longer defines the active SELL Preview contract. The active
+contract is governed by the latest Runtime Canonical.
 
-General Agent:
-General Agent는 AI의 추론, 사고, 구조 판단, 설계, 정책 결정이 필요하지 않은 입력과 출력이 명확한 기능적 작업만 수행한다.
+The promoted contract covers MARKET handling, PENDING/CANCEL separation,
+multiple-candidate preservation, no automatic candidate selection or removal,
+and preview-only safety boundaries.
 
-담당:
-- Git 상태 확인
-- HEAD / origin 동기화 확인
-- Branch 확인
-- Feature Branch 생성/삭제
-- Stage 확인
-- Commit
-- Push
-- Pull Request 생성
-- Pull Request 상태 확인
-- Merge 수행
-- master 최신화 확인
-- 파일 존재 확인
-- Test-Path
-- Get-Item
-- 체크리스트 기반 검증
-- 결과 보고
+4. Non-Contract History
 
-수행하지 않는 작업:
-- 설계
-- 정책 결정
-- 구조 판단
-- 영향 분석
-- 계약 설계
-- 코드 구현
-- Runtime 설계
-- Preview 설계
-- 구현 범위 결정
-- AI 추론이 필요한 작업
+The following items in the original document are historical only and are not
+current contract sources:
 
-High Reasoning:
-- 정책
-- 계약
-- 아키텍처
-- 프로젝트 방향
-- 대규모 구조 변경
-- 구현 범위 결정
+- Repository baseline SHA values.
+- Completed PR history.
+- Test counts.
+- Progress percentages.
+- Next-work sequencing.
+- Agent role descriptions.
+- Git workflow instructions.
+- Protected-file operation reminders.
 
-Git 작업은 Codex와 General Agent가 협업할 수 있으나, Codex는 프로젝트 정책 결정을 하지 않는다. 실행 계약과 아키텍처 경계 변경은 High Reasoning 검토 대상으로 본다.
+5. Canonical Authority
 
-4. SELL Preview Chain 최신 완료 상태
+For current SELL Preview, Runtime, Queue, SendOrder, Chejan, Fill, Position,
+Projection, Recovery, and Reconciliation contracts, use the latest Runtime
+Canonical listed in Section 1.
 
-SELL Preview Chain은 다음 단계까지 master에 반영 완료되었다.
-
-1. SELL Method Preview
-2. SELL Exit Policy Preview
-3. SELL Completion Policy Preview
-4. SELL Pending Policy Preview
-5. SELL Order Candidate Preview
-6. SELL Order Candidate Inspector
-7. SELL REAL_READY Authorization Preview
-8. SELL Execution Contract Preview
-9. SELL REAL_READY Adapter Preview
-10. SELL Common Execution Preview Adapter
-
-현재 SELL Preview 진행률:
-- 95%
-
-5. Merge 완료 PR 기록
-
-PR #1:
-- 제목: feat: add SELL REAL_READY authorization preview
-- 기능: SELL 후보 Inspector 결과를 실제 REAL_READY 생성 없이 Authorization Preview로 평가
-- Merge Commit: 685361cab8358e017c6a100ee8a5b074a1f8a13c
-- master 반영: 완료
-
-PR #2:
-- 제목: feat: add SELL execution contract preview
-- 기능: 승인된 METHOD / COMPLETION 후보를 SELL Execution Contract Preview로 정규화
-- Merge Commit: 379e133b9b83374785841136200db408f473e521
-- master 반영: 완료
-
-PR #3:
-- 제목: feat: add SELL REAL_READY adapter preview
-- 기능: SELL Execution Contract를 공통 REAL_READY 후보 형태로 얇게 변환하는 preview-only Adapter 추가
-- Merge Commit: 10884ce7a45278c86cd544958fa62cdc489dd5d6
-- master 반영: 완료
-
-PR #4:
-- 제목: feat: add SELL common execution preview adapter
-- 기능: SELL REAL_READY Adapter 후보를 공통 Execution Preview Pipeline에 연결하는 preview-only Adapter 추가
-- Merge Commit: 21ccf004551f26120b362d3fe8f9183de3129395
-- master 반영: 완료
-
-6. 이번 Conversation 특이사항
-
-SELL Common Execution Preview Adapter는 초기 구현 완료 보고와 실제 저장소 파일 존재 상태가 불일치했다.
-
-해당 불일치를 확인하기 위해 다음 조사를 수행했다.
-- Git history 조사
-- worktree 조사
-- reflog 조사
-- dangling object 조사
-- 파일시스템 검색
-
-조사 결과 실제 구현 파일과 복구 가능한 commit을 찾지 못했다.
-
-이후 동일 범위를 재구현하고 다음 검증을 완료했다.
-- 신규 adapter 테스트: 42 OK
-- SELL 테스트: 306 OK
-- Execution 테스트: 1623 OK
-- 전체 unittest: 4275 OK, 1 skipped
-
-최종적으로 PR #4로 병합 완료했다.
-
-이 사건은 Workflow v2의 "파일 실존 검증", "stage 범위 검증", "PR 기반 병합"이 필요한 사례로 기록한다.
-
-7. MARKET 정책
-
-MARKET 후보 정책:
-- price=None 유지
-- current_price 임의 대입 금지
-- 공통 Validator의 price > 0 계약과 충돌
-- 충돌 우회 금지
-- 현재 BLOCKED 유지
-
-MARKET 지원은 공통 Validator 계약을 별도 검토한 뒤 진행한다.
-
-8. PENDING 정책
-
-PENDING 정책:
-- Cancel Path 유지
-- 일반 SELL Order 경로와 분리
-- METHOD / COMPLETION 후보와 병합 금지
-- 실제 CancelOrder 호출 금지
-- Queue / Runtime / SendOrder 연결 금지
-
-9. 다중 후보 정책
-
-다중 후보 정책:
-- 우선순위 결정 금지
-- 자동 선택 금지
-- 후보 모두 유지
-- 후보별 독립 Preview 처리
-- 실행 대상 결정은 후속 승인/Guard/Queue 단계에서 별도 처리
-
-10. 안전 경계
-
-현재까지 다음 항목은 전부 금지 상태다.
-
-- Runtime Write 없음
-- Queue Write 없음
-- SendOrder 없음
-- Broker API 없음
-- 실제 REAL_READY 변경 없음
-- 실제 OrderRequest 생성 없음
-- Preview-only 유지
-
-11. 다음 섹터 시작점
-
-다음 섹터는 SELL Common Execution Preview Adapter 이후 공통 실행 준비 체인으로 넘어간다.
-
-다음 작업 순서:
-1. Execution Readiness Preview
-2. Signal Gate Preview
-3. Execution Queue Preview
-4. Execution Readiness Full Preview
-5. 통합 Preview 검증
-
-12. 보호 파일
-
-kiwoom_auto 보호 파일:
-- routines/지표추종매매/rules.json
-- stocks/*/state.json
-- runtime/*.json
-
-명시적 지시 없이는 수정, stage, commit, restore, reset, stash, delete하지 않는다.
-
-13. 최종 결론
-
-SELL 전용 Preview Chain은 공통 Execution Preview Adapter까지 완료되었다. 다음 단계는 실제 실행이 아니라 Execution Readiness / Signal Gate / Queue Preview를 순차적으로 붙여 preview-only 경계를 끝까지 검증하는 것이다.
-
-끝.
+End.

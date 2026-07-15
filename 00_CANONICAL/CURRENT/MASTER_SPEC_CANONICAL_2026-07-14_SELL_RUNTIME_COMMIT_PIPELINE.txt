@@ -282,63 +282,185 @@ The following are prohibited:
 - first-candidate-only processing
 - automatic priority selection
 
-11. Test Growth
+11. SELL Execution Full Preview Upstream Contract
 
-This conversation added the following focused test groups:
+This section promotes the living upstream SELL Preview contract into this
+Runtime Canonical. It records only the contract that must remain true before
+Runtime Commit begins.
 
-- SELL Runtime Commit Preview: 19 OK
-- SELL Runtime Commit Validator: 27 OK
-- SELL Runtime Commit Dry-run Executor: 33 OK
-- SELL Runtime Commit Approval Gate: 36 OK
-- SELL Runtime Commit Execution Plan: 38 OK
+11.1 Preview Flow
 
-Latest broad result:
-- Full unittest: 4641 OK, 1 skipped
+SELL execution preview flows through these stages:
 
-12. Current Progress
+SELL_REAL_READY_ADAPTER_PREVIEW
+-> SELL Common Execution Preview
+-> SELL Execution Readiness Preview
+-> SELL Signal Gate Preview
+-> SELL Execution Queue Preview
+-> SELL Execution Full Preview Orchestrator
 
-SELL Preview / Runtime Commit Pipeline progress:
-- Approximately 97%.
+The Full Preview input is the ordered set of SELL preview stage results and
+candidate identities required to evaluate readiness without writing Runtime,
+Queue, or broker state.
 
-Completed:
-- Preview-only SELL execution chain.
-- Integrated preview validation.
-- Runtime Commit Preview.
-- Runtime Commit Validator.
-- Runtime Commit Dry-run Executor.
-- Runtime Commit Approval Gate.
-- Runtime Commit Execution Plan.
+11.2 Stage Responsibilities
 
-Not completed:
-- Real Runtime Commit execution.
-- Runtime file writer connection.
-- Queue commit connection.
-- SendOrder connection.
-- Broker API connection.
-- Production execution approval beyond preview/plan layers.
+- Execution Readiness confirms that the SELL candidate can enter execution
+  readiness review without changing durable state.
+- Signal Gate confirms that the candidate passes the SELL signal gate contract.
+- Queue Preview confirms that the candidate can form a preview-only
+  ORDER_QUEUED record contract.
+- Full Preview preserves the ordered stage results, aggregates status, and
+  stops on BLOCKED or INVALID without selecting candidates.
 
-13. Next Start Point
+11.3 MARKET Contract
 
-The next window should start from:
+- `current_price` must not be injected automatically.
+- MARKET SELL is allowed only when an explicit MARKET contract is satisfied.
+- If the explicit MARKET contract is not satisfied, the preview status is
+  BLOCKED.
 
-SELL Runtime Commit Real Executor Preview / Commit Boundary Review
+11.4 PENDING / CANCEL Contract
 
-Before any real commit implementation, verify:
-- runtime commit boundary
-- runtime file writer contract
-- queue commit boundary
-- execution transaction boundary
-- rollback/recovery requirement
-- protected file and runtime state handling
-- whether approval token or user confirmation is required before real write
+- Preview and Runtime contracts remain separated.
+- PENDING or CANCEL candidates must not be promoted into the normal SELL
+  execution path.
+- Actual cancel calls are prohibited in Preview.
 
-No real Runtime Write should be introduced without an explicit new user instruction.
+11.5 Multiple Candidate Contract
 
-14. BUY Budget Increase Policy Revision
+- Preview must not automatically select a candidate.
+- Preview must not automatically remove a candidate.
+- All candidates and their input order must be preserved.
+- Candidate selection belongs outside the Preview chain.
+
+11.6 Preview MASTER_ENGINE Ownership
+
+- The SELL Preview Chain is owned by MASTER_ENGINE.
+- Routine layers provide preview inputs and results only.
+- This ownership does not change Runtime Commit ownership after the Preview
+  boundary.
+
+12. Runtime Living Contract
+
+This section records the current code contract for Runtime, Queue, SendOrder,
+Chejan, Fill, and Position. It supersedes older history-only Runtime Commit
+progress notes in this file.
+
+12.1 Runtime Source of Truth
+
+- `routine_signals.json`: Signal source of truth.
+  - Writer Owner: `routine_signal_queue.py`.
+  - Responsibility: persist routine signal candidates before queue conversion.
+- `order_queue.json`: Order lifecycle source of truth.
+  - Writer Owner: `execution_queue_writer.mutate_order_queue()`.
+  - Responsibility: preserve order lifecycle, dispatch claim, SendOrder call
+    lifecycle, Chejan lifecycle, and queue revision.
+- `fills.json`: Fill event ledger source of truth.
+  - Writer Owner: `execution_fill_recorder.py`.
+  - Responsibility: append reviewed fill events only.
+- `positions.json`: Position state source of truth.
+  - Writer Owner: `position_update_service.py`.
+  - Responsibility: apply recorded fill deltas to position state.
+
+12.2 Queue Living Contract
+
+- Canonical writer: `execution_queue_writer.mutate_order_queue()`.
+- The canonical writer owns the queue lock, revision/CAS check, backup,
+  temp write, atomic replace, and post-write verification.
+- Queue mutation must re-read the queue under lock before applying a mutation.
+- Dispatch, SendOrder lifecycle, and Chejan lifecycle state mutation must pass
+  through this boundary.
+- Builder, Adapter, Preview, Validator, and Dry-run layers must not mutate the
+  queue.
+
+12.3 SendOrder Lifecycle
+
+Queue lifecycle before broker evidence:
+
+ORDER_QUEUED
+-> DISPATCH_CLAIMED
+-> SEND_ATTEMPTED
+-> SEND_CALL_IN_PROGRESS
+-> SEND_CALL_ACCEPTED / SEND_CALL_REJECTED / SEND_UNCERTAIN
+
+- `send_order_called=True` is allowed only after the real callable boundary has
+  been entered.
+- `SEND_CALL_ACCEPTED` means the SendOrder callable result was accepted by the
+  local call contract. It is not broker acceptance.
+- Broker acceptance, rejection, fills, and cancellation are confirmed only by
+  the Chejan lifecycle.
+
+12.4 Chejan Contract
+
+Current allowed lifecycle transitions:
+
+- `SEND_CALL_ACCEPTED` or `SEND_UNCERTAIN`
+  -> `BROKER_ACCEPTED`
+- `SEND_CALL_ACCEPTED` or `SEND_UNCERTAIN`
+  -> `BROKER_REJECTED`
+- `SEND_CALL_ACCEPTED`, `SEND_UNCERTAIN`, `BROKER_ACCEPTED`,
+  `PARTIALLY_FILLED`, or `FILLED`
+  -> `PARTIALLY_FILLED` / `FILLED`
+- `SEND_CALL_ACCEPTED`, `SEND_UNCERTAIN`, `BROKER_ACCEPTED`, or
+  `PARTIALLY_FILLED`
+  -> `CANCELLED` / `PARTIAL_CANCELLED`
+
+Chejan recording appends event history and reduces broker lifecycle on the
+matching queue record. It does not write fills or positions.
+
+12.5 Fill Contract
+
+- Writer Owner: `execution_fill_recorder.py`.
+- Fill recording appends to `fills.json` only.
+- It does not mutate Queue or Position state.
+- Duplicate detection uses `execution_identity_source` plus
+  `execution_identity` when present.
+- FID 909 remains an execution identity source. Existing fallback duplicate
+  detection is kept only for records without explicit identity source/value.
+- Append uses file lock, backup, temp write, atomic replace, and post-write
+  verification.
+
+12.6 Position Contract
+
+- Writer Owner: `position_update_service.py`.
+- Position updates consume recorded fill records.
+- Idempotency scope is `position_id + broker + account_no + code`.
+- Cumulative quantity delta is tracked separately per order identity.
+- Position updates do not mutate Queue or Chejan state.
+
+12.7 Preview Safety Line
+
+In this Runtime / Execution pipeline, the following layers do not perform file writes, queue mutations, SendOrder
+calls, broker calls, or Runtime state changes:
+
+- Preview
+- Adapter
+- Builder
+- Validator
+- Dry-run
+
+12.8 Projection / Recovery / Reconciliation Contract
+
+- Projection is a Runtime reconstruction layer.
+- Projection reads Queue and Fill evidence to calculate Runtime state
+  candidates.
+- Projection must not write Runtime state or change any Source of Truth.
+- Recovery decides whether Runtime recovery is required and possible.
+- Recovery must not perform automatic normalization or write outside the
+  approved Commit Boundary.
+- Reconciliation checks Queue, Fill, and Position consistency.
+- Reconciliation detects mismatches and provides preview results only.
+- Projection, Recovery, and Reconciliation are Reader and Validator layers.
+- They must not call Canonical Writers.
+- They must not call SendOrder or broker APIs.
+- Runtime writes remain allowed only at the approved Commit Boundary.
+
+13. BUY Budget Increase Policy Revision
 
 This section replaces older BUY increase descriptions that used fixed X2/X3 or user-array style wording. The project philosophy remains unchanged: BUY planning may define target values, but the final executable order is still constrained by budget, holdings, and execution safety checks.
 
-14.1 Initial Budget Setting Terms
+13.1 Initial Budget Setting Terms
 
 The initial setting terms are:
 
@@ -350,7 +472,7 @@ The old first-setting terms "주수기준" and "금액기준" are deprecated.
 
 The term "금액 기준" remains valid only when it means the increase method described below.
 
-14.2 Increase Methods
+13.2 Increase Methods
 
 Supported increase methods are:
 
@@ -359,7 +481,7 @@ Supported increase methods are:
 
 The old fixed X2, X3, and user-array descriptions are deprecated.
 
-14.3 회차 기준 Contract
+13.3 회차 기준 Contract
 
 회차 기준 supports two operators:
 
@@ -398,7 +520,7 @@ Example, initial shares 2주 and 회차 기준 + 2:
 - 4회차: 5주
 - 5회차: 6주
 
-14.4 금액 기준 Contract
+13.4 금액 기준 Contract
 
 금액 기준 supports only 곱(×).
 
@@ -427,7 +549,7 @@ Example, initial budget 10000 and 금액 기준 × 2:
 
 Older examples such as 100 -> 300 -> 900 -> 2700 are deprecated when they imply fixed X3 policy or conflict with the operator-entered multiplier contract.
 
-14.5 Supported Combinations
+13.5 Supported Combinations
 
 주수 설정 supports:
 
@@ -443,7 +565,7 @@ Older examples such as 100 -> 300 -> 900 -> 2700 are deprecated when they imply 
 
 The total supported combinations are six.
 
-14.6 예산 설정 Policy
+13.6 예산 설정 Policy
 
 예산 설정 does not calculate a target share count directly.
 
@@ -451,7 +573,7 @@ The total supported combinations are six.
 
 No order may be created above the confirmed budget.
 
-14.7 Actual Order Contract
+13.7 Actual Order Contract
 
 The calculated value is a round target, not the final executable order.
 
@@ -465,7 +587,7 @@ Immediately before the actual order is created, the final quantity must apply:
 
 The final order quantity is the quantity that remains valid after these constraints are applied.
 
-14.8 UI Contract
+13.8 UI Contract
 
 Increase values are entered directly by the operator.
 
