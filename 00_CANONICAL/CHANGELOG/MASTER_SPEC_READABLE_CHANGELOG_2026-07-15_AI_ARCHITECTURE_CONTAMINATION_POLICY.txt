@@ -7,7 +7,10 @@ The project documentation now records a stronger rule against AI-created structu
 The new policy says that the largest structural risk is AI repeatedly splitting small implementation units into independent layers, then mistaking local modularity for whole-system correctness.
 
 Main additions:
-
+- Clarified priority: ordinary implementation follows Implementation First; structure audit comes first only when structure contamination risk appears.
+- Unified the maximum-risk definition as AI-generated architecture contamination during implementation.
+- Removed repeated long approval/checklist wording and kept only the core structural checks.
+- Changed layer guidance from name-based warnings to responsibility, caller, mutation, Source of Truth, and lifecycle criteria.
 - New AI architecture contamination policy in AGENT_WORKFLOW_REFERENCE.
 - New Canonical supplement for minimum structural unit rules.
 - Three absolute rules: AI cannot override existing document rules, cannot create a new layer when existing layers/functions can handle the work, and cannot change structure without explicit user-approved scope and direction.

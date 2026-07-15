@@ -79,7 +79,7 @@ Git(PR/Merge)
 
 4. 구현 없는 작업 금지
 
-다음 작업은 원칙적으로 금지한다.
+다음 작업은 금지한다.
 
 - 구현 없는 문서 작성
 - 구현 없는 보고서 작성
@@ -160,7 +160,7 @@ ChatGPT는 다음 행동을 하지 않는다.
 
 11. 구현 단위
 
-가능하면 기능 단위로 구현한다.
+기능 단위로 구현한다.
 
 작은 모듈 하나마다 조사, 문서, 보고를 반복하지 않는다.
 
@@ -176,32 +176,26 @@ Conversation 시작 시 ChatGPT는 본 규칙을 가장 먼저 확인한다.
 Layer Architecture Policy
 ==================================================
 
-1. 새로운 계층 생성은 최후의 수단이다.
+1. New structure is the last resort.
 
-2. 다음 조건을 모두 만족할 때만 신규 계층 생성을 허용한다.
+2. AI must use an existing module, existing function, or orchestration of existing functions when the responsibility fits the current structure.
 
-- 기존 계층으로 해결 불가능
-- 기존 Contract를 유지해야 함
-- 명확히 독립된 책임이 존재
-- 재사용 가치가 존재
-- 독립 테스트가 가능
+3. New structure is allowed only when all core conditions are true:
 
-3. 기존 기능을 새로운 파일에서 재구현하는 것을 금지한다.
+- existing structure cannot absorb the responsibility
+- the responsibility has an independent production caller, mutation boundary, Source of Truth, lifecycle owner, or side-effect boundary
+- the user explicitly approves the structural change scope and direction
+- the change does not conflict with Canonical contracts
 
-반드시 기존 모듈 재사용 또는 Orchestration 방식 중 하나를 사용한다.
+4. Layer names do not justify structure. Preview, Approval, Validation, Recovery, Executor, Adapter, Orchestrator, Wrapper, and similar names are judged only by responsibility, production caller, mutation, Source of Truth, and lifecycle.
 
-4. 신규 계층은 기존 Contract를 변경하지 않는다.
+5. Existing contracts are preserved. New structure cannot redefine current state, runtime, queue, writer, or lifecycle contracts.
 
-5. Preview, Approval, Validation, Recovery, Executor 각 계층은 단일 책임(Single Responsibility)을 유지한다.
+6. Runtime Boundary is not crossed before the final approved runtime boundary.
 
-6. Runtime Boundary는 최종 승인 전까지 절대 넘지 않는다.
+7. AI must not expand implementation scope or create structure because it considers the design cleaner.
 
-7. AI는 구현 범위를 이유 없이 확대하거나 불필요한 계층을 생성해서는 안 된다.
-
-8. 모든 신규 계층은 "왜 기존 계층으로 해결할 수 없는가"를 먼저 검증한 후에만 구현한다.
-
-9. 프로젝트의 유지보수성과 검증 가능성을 새 기능 추가보다 우선한다.
-
+8. Maintainability and verifiability have priority over adding a new feature through extra structure.
 ==================================================
 AI Architecture Contamination Risk and Minimum Structural Unit Policy
 ==================================================
@@ -226,107 +220,55 @@ Required final risk statement:
 
 If this risk appears, implementation must stop and the structure must be audited before new features continue.
 
-Minimum Structural Unit Principle
+Minimum Structural Unit Policy
 
-Structure must not be separated merely because a function is long, a name can be clarified, a test can be isolated, or a future extension is imaginable.
+New structure is the last resort.
 
-A new structural unit is permitted only when at least one substantial reason exists:
+AI must use an existing module, existing function, or orchestration of existing functions when the responsibility fits the current structure.
 
-- independent business responsibility
-- independent production caller
-- independent internal side effect
-- independent lock, transaction, or CAS boundary
-- independent lifecycle ownership
-- independent role isolation requirement
-- separate Source of Truth responsibility
+New structure is allowed only when all core conditions are true:
 
-The following alone do not justify a new layer, module, file, or wrapper:
-
-- dict creation or conversion
-- value forwarding
-- identical field validation
-- status string checking
-- result preservation
-- reviewing a preview result
-- checking readiness from a review result
-- calling one existing function
-- preparing for possible future expansion
-- creating a wrapper only to make tests easier
-
-The default decision is not separation. The default decision is to include the work inside the existing layer or existing function unless separation is proven necessary.
-
-Integration Before Separation Rule
-
-Before asking "Should this be separated?", AI must first prove:
-
-Can this be included in an existing layer?
-
-Any proposal for a new layer must explicitly explain:
-
-- why the existing layer cannot contain the responsibility
-- what concrete operational role would break if integrated
-- what real production risk the new structure blocks
-- what production caller invokes it separately
-- what independent side effect or lock boundary exists
-- expected maintenance cost
-- why removal or integration is not possible
-
-If this proof is not possible, the new layer is prohibited.
-
-New Layer Approval Conditions
-
-A new layer is allowed only when all of the following core conditions are met:
-
-1. Existing layer or existing function absorption is not possible.
-2. The responsibility is independent, or there is an independent mutation or side-effect boundary.
+1. Existing structure cannot absorb the responsibility.
+2. The responsibility has an independent production caller, mutation boundary, Source of Truth, lifecycle owner, or side-effect boundary.
 3. The user explicitly approves the structural change scope and direction.
 4. The change does not conflict with Canonical contracts.
 
-If any condition is not satisfied, use one of the following instead:
+Layer names do not justify structure. Preview, Approval, Validation, Recovery, Executor, Adapter, Orchestrator, Wrapper, and similar names are judged only by responsibility, production caller, mutation, Source of Truth, and lifecycle.
 
-- include the work in an existing function
-- absorb it into an existing service
-- implement a simple helper function
-- defer implementation
+Existing contracts are preserved. New structure cannot redefine current state, runtime, queue, writer, or lifecycle contracts.
 
-Default Prohibited Layer Names
+Integration Before Separation Rule
 
-The following names often indicate accidental over-layering and are prohibited by default unless the approval conditions above are satisfied:
+Before creating new structure, AI must prove that the responsibility cannot be absorbed into an existing layer or existing function.
 
-- Preview
-- Review
-- Readiness
-- Adapter
-- Inspector
-- Orchestrator
-- Validator
-- Approval Gate
-- Post Check
-- Wrapper
-- Entrypoint
-- Bridge
+The proof must stay minimal and focus on:
 
-These names are not banned in every case. They are banned when used without a proven independent responsibility, caller, side effect, lifecycle, or Source of Truth boundary.
+- why existing layers or functions cannot contain the work
+- what independent responsibility, caller, mutation, Source of Truth, lifecycle, or side-effect boundary exists
+- why the change does not conflict with Canonical contracts
+- what exact scope and direction the user approved
+
+If this proof is missing, the new structure is prohibited.
+
+Structural Audit Scope
+
+Implementation First governs ordinary implementation work.
+
+Structural audit comes first only when a proposed change affects a layer, durable state, writer, Source of Truth, production call graph, lifecycle owner, or repeats an existing responsibility.
 
 AI Self-Validation Bias Prevention
 
-AI must not treat its own previous design as sufficient proof that the design is correct.
+AI must not treat its own previous design as sufficient proof.
 
-When auditing structure, the governing question is not:
-
-Why is this layer needed?
-
-The governing question is:
+The structural audit question is:
 
 Has it been proven that this layer cannot be removed or absorbed into an existing layer?
 
-If not proven, the default action is integration, reduction, isolation, or deprecation candidate reporting. AI must not automatically choose retention.
+If not, the default result is integration, reduction, isolation, or deprecation candidate reporting.
 
 Test Interpretation Rule
 
 Unit test success does not prove production connectivity.
-
-Many Preview, Review, Readiness, or orchestration tests can hide real execution disconnection.
 
 Test success proves only the local function contract unless it also verifies:
 
@@ -340,22 +282,11 @@ The following interpretation is forbidden:
 
 전체 테스트 통과 = 실제 자동매매 운영 완성
 
-Structural Change Approval Procedure
-
-Any change to a layer, state, writer, Source of Truth, or production call graph must be reduced to the smallest necessary decision:
-
-1. Confirm the existing rule and Canonical contract.
-2. Confirm whether the existing layer or function can absorb the work.
-3. Receive explicit user approval for the change scope and direction.
-4. Implement only the approved minimum change.
-
-AI proposal alone is not enough to change structure.
-
 Forced Structural Audit Conditions
 
-If any of the following occurs, new feature implementation must stop and a structural audit must happen first:
+New feature implementation stops for structural audit only when one of these core triggers occurs:
 
-- proposed new layer, durable state, writer, Source of Truth, or production call graph change
+- proposed new layer, durable state, writer, Source of Truth, production call graph, or lifecycle ownership change
 - repeated files or layers with the same responsibility
 - conflict with Canonical or existing document rules
 - user concern about structural complexity or reliability
@@ -364,22 +295,22 @@ User Control Rule
 
 AI must not change project structure without explicit user approval.
 
-When a structural problem is found, AI must report the investigation result and options first.
+Reporting a deletion candidate does not approve deletion.
 
-Reporting a deletion candidate is not the same as approval to delete.
+Reporting an integration candidate does not approve integration.
 
-Reporting an integration candidate is not the same as approval to integrate.
-
-Only the single structural responsibility approved by the user may be handled in one PR.
+One PR handles only the single structural responsibility approved by the user.
 
 Document Priority
 
-This policy has priority over general implementation guidance.
+This policy has priority over general implementation guidance only when structural contamination risk is present.
+
+Implementation First governs ordinary implementation work. Structural audit governs only when a proposed change affects a layer, durable state, writer, Source of Truth, production call graph, lifecycle owner, or repeats an existing responsibility.
 
 Conflict priority:
 
 1. explicit latest user decision
-2. this AI Architecture Contamination Risk and Minimum Structural Unit Policy
+2. this AI Architecture Contamination Risk and Minimum Structural Unit Policy when structural risk is present
 3. latest Canonical
 4. general rules in AGENT_WORKFLOW_REFERENCE
 5. existing implementation pattern in code
@@ -387,33 +318,15 @@ Conflict priority:
 
 AI general design preference, software textbook patterns, and local test convenience are not valid authority in this project.
 
-Incident Record
-
-This policy records the recent structure audit incident:
-
-- Similar layer reviews were performed before, but the same risk accumulated again.
-- Existing validation over-weighted local modularity and unit-test success.
-- Production callers, real side effects, lock/CAS boundaries, and full call graph were not forced strongly enough.
-- AI self-validation bias was not blocked sufficiently.
-- Multiple Preview, Review, Readiness, and Orchestrator layers accumulated into isolated or duplicated structures.
-- The real operation pipeline became partially disconnected.
-- Therefore the previous validation method is considered incomplete and is replaced by this proof-based structural audit policy.
-
-Do not invent numbers or statistics without a verified analysis report.
-
 Prohibitions
 
 - Do not modify code repositories under this policy update.
 - Do not create implementation code.
 - Do not propose new architecture without proof.
-- Do not delete existing modules under this policy alone.
-- Do not mark existing layers deprecated without user approval.
+- Do not delete, move, deprecate, or integrate existing modules under this policy alone.
 - Do not rewrite the entire existing Canonical.
 - Do not delete old documents.
 - Do not modify protected dirty or untracked files.
-- Do not move documents without user approval.
-- Do not summarize existing errors in a way that makes AI look harmless.
-
 ==================================================
 Backtest Audit Log Architecture
 ==================================================
@@ -912,7 +825,7 @@ Codex 구현
 ↓
 Codex 검토
 ↓
-필요 시 Codex 재수정
+검토 결과 수정이 요구되면 Codex 재수정
 ↓
 Codex
 

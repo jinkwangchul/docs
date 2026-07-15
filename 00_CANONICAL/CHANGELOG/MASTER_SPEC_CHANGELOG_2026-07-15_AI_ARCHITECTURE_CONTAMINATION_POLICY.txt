@@ -11,7 +11,10 @@ Summary:
 - Existing dirty/untracked files were not modified, staged, moved, restored, reset, or stashed.
 
 Policy changes:
-- Defined the project maximum structural risk as AI-generated architecture contamination.
+- Clarified that Implementation First governs ordinary implementation, while structural audit only takes priority when structural contamination risk is present.
+- Consolidated duplicated AI risk wording around one final definition: the maximum project risk is AI-generated architecture contamination during implementation.
+- Reduced repeated new-layer and audit procedures to the core checks: existing-structure absorption impossible, independent responsibility or mutation/side-effect boundary, explicit user approval, and Canonical non-conflict.
+- Rephrased layer guidance around responsibility, production caller, mutation, Source of Truth, and lifecycle instead of layer names.- Defined the project maximum structural risk as AI-generated architecture contamination.
 - Added a final Korean risk statement for the project.
 - Added three absolute rules: AI cannot override existing document rules with its own reasoning; existing layers/functions must be used when possible; structural changes require explicit user approval of scope and direction.
 - Added the Minimum Structural Unit Principle.

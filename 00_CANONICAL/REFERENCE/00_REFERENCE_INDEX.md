@@ -1,4 +1,4 @@
-﻿# MASTER_SPEC AI Reference Edition Index (AI Architecture Contamination Policy Edition)
+# MASTER_SPEC AI Reference Edition Index (AI Architecture Contamination Policy Edition)
 
 Reference Edition
 
@@ -20,8 +20,8 @@ This docs-only policy update did not modify the kiwoom_auto repository.
 이 디렉터리는 Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter Reference Edition을 유지하면서, 최신 AI Architecture Contamination Policy Canonical 위치를 함께 안내한다.
 공식 Source of Truth는 00_CANONICAL/CURRENT의 최신 Canonical이다.
 PART01~PART09는 2026-07-09 Canonical 기반의 Legacy Reference Edition이며, 최신 2026-07-13 Canonical 전체와 일치하는 분할본으로 간주하지 않는다.
-Workflow v2, SELL Runtime Commit Pipeline, Layer Architecture Policy, Backtest Audit Log Architecture, AI Architecture Contamination Risk and Minimum Structural Unit Policy 최신 상태는 최신 Canonical과 AGENT_WORKFLOW_REFERENCE를 직접 참조한다.
-2026-07-15 기준 AI 구조 오염 방지 정책이 최상위 Reference 정책으로 보강되었다. 신규 계층, 상태, writer, Source of Truth, Production Call Graph 변경은 기존 계층 흡수 가능성 검증과 사용자 명시 승인 없이는 진행하지 않는다.
+Workflow v2, SELL Runtime Commit Pipeline, Layer Architecture Policy, Backtest Audit Log Architecture, AI Architecture Contamination Risk and Minimum Structural Unit Policy 최신 상태는 최신 Canonical과 AGENT_WORKFLOW_REFERENCE를 직접 참조한다. Implementation First와 구조 감사는 충돌하지 않으며, 일반 구현은 구현 우선이고 구조 오염 위험이 있을 때만 구조 감사가 우선한다.
+2026-07-15 기준 AI 구조 오염 방지 정책은 AI 구현 과정의 구조 오염을 프로젝트 최대 리스크로 정의한다. 신규 계층, 상태, writer, Source of Truth, Production Call Graph 변경은 기존 구조 흡수 불가와 사용자 명시 승인 없이는 진행하지 않는다.
 PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이며 PART01~PART09 재조립 대상이 아니다.
 
 원본 순서 보존 방식:
