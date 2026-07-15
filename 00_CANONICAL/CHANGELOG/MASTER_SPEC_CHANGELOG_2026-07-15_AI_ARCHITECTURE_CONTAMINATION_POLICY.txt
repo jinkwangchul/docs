@@ -1,0 +1,30 @@
+MASTER_SPEC_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY
+
+Baseline:
+- docs main / origin/main before this branch: 72fdc0a513c2e247a94cc6fac61bec3ade966e05
+
+Summary:
+- Added AI architecture contamination prevention policy to AGENT_WORKFLOW_REFERENCE.
+- Added a Canonical policy supplement for minimum structural unit rules.
+- Updated the Reference Index to point to the new Canonical and Changelog.
+- No code repository files were modified.
+- Existing dirty/untracked files were not modified, staged, moved, restored, reset, or stashed.
+
+Policy changes:
+- Defined the project maximum structural risk as AI-generated architecture contamination.
+- Added a final Korean risk statement for the project.
+- Added the Minimum Structural Unit Principle.
+- Added the Integration Before Separation rule.
+- Added New Layer Approval Conditions.
+- Added default-prohibited layer name guidance for Preview, Review, Readiness, Adapter, Orchestrator, Validator, Approval Gate, Post Check, Wrapper, Entrypoint, and Bridge.
+- Added AI self-validation bias prevention.
+- Added limits on interpreting unit-test success as production readiness.
+- Added forced structural audit conditions.
+- Added user control rules for deletion, integration, and structural change approval.
+
+Safety:
+- Code repositories were not modified.
+- No implementation code was generated.
+- Existing Canonical files were not rewritten.
+- Existing ChangeLog files were not modified.
+- Existing Work Resume files were not modified.

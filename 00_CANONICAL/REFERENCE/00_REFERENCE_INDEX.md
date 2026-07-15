@@ -1,25 +1,25 @@
-﻿# MASTER_SPEC AI Reference Edition Index (SELL Runtime Commit Pipeline + Workflow v2 Edition)
+﻿# MASTER_SPEC AI Reference Edition Index (AI Architecture Contamination Policy Edition)
 
 Reference Edition
 
 Reference Base Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
-Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
+Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt
 Latest Work Resume: WORK_RESUME_LATEST_2026-07-14.txt
-Latest Changelog: MASTER_SPEC_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
-Latest Readable Changelog: MASTER_SPEC_READABLE_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
-Latest kiwoom_auto master: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
+Latest Changelog: MASTER_SPEC_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt
+Latest Readable Changelog: MASTER_SPEC_READABLE_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt
+Latest kiwoom_auto master: not changed by this docs-only policy update
 
-생성일: 2026-07-13
+생성일: 2026-07-15
 
 주의: 본 문서는 AI 참조용 분할본이며 공식 원본은 CURRENT의 Canonical이다.
 
 ## Reference 구조
 
-이 디렉터리는 Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter Reference Edition을 유지하면서, 최신 SELL Runtime Commit Pipeline + Workflow v2 + Engine Ownership Canonical 위치를 함께 안내한다.
+이 디렉터리는 Runtime Commit Core + M7 Lifecycle Runtime Commit + RSI Buy Filter Reference Edition을 유지하면서, 최신 AI Architecture Contamination Policy Canonical 위치를 함께 안내한다.
 공식 Source of Truth는 00_CANONICAL/CURRENT의 최신 Canonical이다.
 PART01~PART09는 2026-07-09 Canonical 기반의 Legacy Reference Edition이며, 최신 2026-07-13 Canonical 전체와 일치하는 분할본으로 간주하지 않는다.
-Workflow v2 및 SELL Runtime Commit Pipeline 최신 상태는 최신 Canonical과 AGENT_WORKFLOW_REFERENCE를 직접 참조한다.
-2026-07-14 기준 SELL Runtime Commit Execution Plan까지 master에 반영되었으며, 다음 작업은 SELL Runtime Commit Real Executor Preview / Commit Boundary Review이다. 실제 Runtime Write는 사용자 명시 승인 전까지 금지한다.
+Workflow v2, SELL Runtime Commit Pipeline, Layer Architecture Policy, Backtest Audit Log Architecture, AI Architecture Contamination Risk and Minimum Structural Unit Policy 최신 상태는 최신 Canonical과 AGENT_WORKFLOW_REFERENCE를 직접 참조한다.
+2026-07-15 기준 AI 구조 오염 방지 정책이 최상위 Reference 정책으로 보강되었다. 신규 계층, 상태, writer, Source of Truth, Production Call Graph 변경은 기존 계층 흡수 가능성 검증과 사용자 명시 승인 없이는 진행하지 않는다.
 PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이며 PART01~PART09 재조립 대상이 아니다.
 
 원본 순서 보존 방식:
@@ -84,9 +84,12 @@ PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이�
 - 29.x.1~29.x.8 Execution Preview Phase1/Phase2/Orchestrator: PART06_EXECUTION_PREVIEW.md
 - 운영/AI 협업 정책: current role policy is AGENT_WORKFLOW_REFERENCE.txt; PART08_OPERATION_POLICY.md is Legacy Reference
 - Workflow v2 (Pull Request & Agent Operation Policy, Workflow Priority): AGENT_WORKFLOW_REFERENCE.txt section 17.1
-- SELL Runtime Commit Pipeline latest Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
+- AI Architecture Contamination Policy latest Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt
+- SELL Runtime Commit Pipeline Canonical: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
 - BUY Budget Increase Policy Revision: 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt section 14
 - SELL Preview 작업 재개 기준: 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-07-14.txt
+- AI Architecture Contamination Policy Changelog: 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt
+- AI Architecture Contamination Policy Readable Changelog: 00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt
 - SELL Runtime Commit Pipeline Changelog: 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
 - SELL Runtime Commit Pipeline Readable Changelog: 00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
 - 구현 커밋/테스트/보호 파일/금지선 부록: PART09_APPENDIX.md
@@ -104,11 +107,12 @@ PART02_06_RUNTIME_FILTER_ENGINE.md는 후속 Runtime/Filter 보조 Reference이�
 8. Runtime 상세 규격 확인 시 PART02_RUNTIME.md 또는 PART02 SUBPART
 9. Execution Preview 교차참조 확인 시 PART06_EXECUTION_PREVIEW.md
 10. 운영/AI 협업 정책 확인 시 PART08_OPERATION_POLICY.md
-11. SELL Runtime Commit Pipeline / Workflow v2 / Engine Ownership latest state -> 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
-12. 필요한 경우 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
-13. 10_UPDATE/MERGED
-14. 00_CANONICAL/CHANGELOG
-15. 20_ARCHIVE
+11. AI Architecture Contamination Risk and Minimum Structural Unit Policy latest state -> 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt
+12. SELL Runtime Commit Pipeline / Workflow v2 / Engine Ownership state -> 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE.txt
+13. 필요한 경우 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-10_M7_LIFECYCLE_RUNTIME_COMMIT_RSI_BUY_FILTER.txt
+14. 10_UPDATE/MERGED
+15. 00_CANONICAL/CHANGELOG
+16. 20_ARCHIVE
 
 ## Runtime Commit Core 위치 안내
 

@@ -1,0 +1,25 @@
+MASTER_SPEC_READABLE_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY
+
+What changed:
+
+The project documentation now records a stronger rule against AI-created structure contamination.
+
+The new policy says that the largest structural risk is AI repeatedly splitting small implementation units into independent layers, then mistaking local modularity for whole-system correctness.
+
+Main additions:
+
+- New AI architecture contamination policy in AGENT_WORKFLOW_REFERENCE.
+- New Canonical supplement for minimum structural unit rules.
+- Stronger rule that integration must be considered before separation.
+- Stronger approval conditions for new layers.
+- Clear warning that unit-test success does not prove production call graph completeness.
+- Forced structural audit triggers when new layers, writers, durable states, or Source of Truth boundaries are proposed.
+- User approval remains required before deletion, integration, or structural change.
+
+What did not change:
+
+- No code files were changed.
+- No runtime files were changed.
+- No queue, rules, or stocks files were changed.
+- Existing Canonical files were preserved.
+- Existing dirty/untracked files were preserved.

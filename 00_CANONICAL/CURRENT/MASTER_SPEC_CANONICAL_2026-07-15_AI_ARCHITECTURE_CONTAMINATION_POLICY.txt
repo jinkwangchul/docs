@@ -1,0 +1,189 @@
+MASTER_SPEC_CANONICAL_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY
+
+Status:
+- Official Canonical policy supplement for AI architecture contamination prevention.
+- This document records policy only.
+- It does not modify code, runtime files, queue files, rules files, stock state files, or existing Canonical files.
+- Older Canonical files are preserved and are not modified.
+
+Repository baseline:
+- docs main / origin/main before this branch: 72fdc0a513c2e247a94cc6fac61bec3ade966e05
+- docs update branch: docs/strengthen-ai-architecture-contamination-policy
+
+1. Purpose
+
+This Canonical supplement records a structural audit policy for preventing AI-generated architecture contamination.
+
+The recent whole-structure review confirmed that AI can repeatedly split small verification units into independent layers, then treat local modularity and high unit-test counts as proof of production architecture validity.
+
+This policy strengthens the project rules so that structure changes require proof, user approval, and production call graph awareness.
+
+2. Final Risk Statement
+
+이 프로젝트의 가장 큰 리스크는 AI 구현 과정에서 발생하는 구조 오염이며,
+특히 너무 작은 단위를 독립 구조로 반복 분리하고,
+국소적 합리성을 전체 구조의 합리성으로 오판하는 위험이다.
+
+This risk is not reduced to a simple implementation mistake.
+
+It includes:
+
+- excessive layer separation
+- Source of Truth dispersion
+- writer bypass
+- production call graph disconnection
+- repeated wrappers
+- duplicated validation
+- isolated modules without callers
+- contract drift
+- maintenance cost increase
+
+3. Minimum Structural Unit Policy
+
+A new layer, module, file, durable state, writer, Source of Truth, or production call graph branch is not justified by naming clarity, local testability, or future extensibility alone.
+
+New structure requires at least one substantial production reason:
+
+- independent business responsibility
+- independent production caller
+- independent internal side effect
+- independent lock, transaction, or CAS boundary
+- independent lifecycle ownership
+- independent role isolation requirement
+- separate Source of Truth responsibility
+
+The default decision is to keep work inside the existing layer.
+
+4. Integration Before Separation
+
+Before creating any new structure, AI must first prove that the responsibility cannot be absorbed into an existing layer or existing function.
+
+The required proof includes:
+
+- why existing layers cannot contain the work
+- what operational role would break if integrated
+- what real production risk the split blocks
+- what production caller needs independent invocation
+- what side effect, lock, transaction, or CAS boundary exists
+- expected maintenance cost
+- why removal or integration is not viable
+
+If this proof is missing, the new structure is prohibited.
+
+5. New Layer Approval Conditions
+
+All conditions must be satisfied before creating a new layer:
+
+1. Existing layer modification cannot solve the problem.
+2. The responsibility is clearly independent.
+3. A production caller exists, or a concrete approved connection plan exists.
+4. An independent side effect, lifecycle, or lock/CAS boundary exists.
+5. The responsibility does not duplicate an existing layer.
+6. The concrete risk of removing the layer is explained.
+7. Reliability or operational benefit exceeds maintenance cost.
+8. The layer does not conflict with Canonical contracts.
+9. The user explicitly approves the structural change.
+
+If any condition is not satisfied, use an existing function, existing service, simple helper, or defer implementation.
+
+6. Default Prohibited Layer Names
+
+The following names are prohibited by default unless the approval conditions are satisfied:
+
+- Preview
+- Review
+- Readiness
+- Adapter
+- Inspector
+- Orchestrator
+- Validator
+- Approval Gate
+- Post Check
+- Wrapper
+- Entrypoint
+- Bridge
+
+The names themselves are not permanently banned. They are prohibited when they are used without an independent production responsibility, caller, side effect, lifecycle, or Source of Truth boundary.
+
+7. AI Self-Validation Bias Prevention
+
+AI must not treat its own previous design as sufficient proof.
+
+The structural audit question is:
+
+Has it been proven that this layer cannot be removed or absorbed into an existing layer?
+
+If not, the default result is integration, reduction, isolation, or deprecation candidate reporting.
+
+8. Test Interpretation Limit
+
+Unit test success does not prove production connectivity.
+
+Many Preview, Review, Readiness, or Orchestrator tests can pass while the real production call graph remains disconnected.
+
+Test success proves only the local function contract unless it also verifies:
+
+- production call graph
+- writer and Source of Truth ownership
+- state transition path
+- runtime concurrency conditions
+- identity propagation across real steps
+
+The following interpretation is forbidden:
+
+전체 테스트 통과 = 실제 자동매매 운영 완성
+
+9. Forced Structural Audit Conditions
+
+New feature implementation must stop and structural audit must come first when any of the following occurs:
+
+- new layer or module creation
+- durable state addition or semantic change
+- writer addition or change
+- Source of Truth change
+- production call graph change
+- Canonical contract change
+- repeated accumulation of files with the same responsibility
+- increase of Preview, Review, Readiness, or Orchestrator layers
+- repeated extension of the same pipeline across multiple PRs
+- module increase without a production caller
+- contract conflict discovery
+- user concern about structural complexity or reliability
+- AI does not understand the whole structure
+
+10. User Control
+
+AI must not change project structure without explicit user approval.
+
+When a structural problem is found, AI reports the investigation and options first.
+
+Reporting a deletion candidate does not approve deletion.
+
+Reporting an integration candidate does not approve integration.
+
+One PR handles only the single structural responsibility approved by the user.
+
+11. Priority
+
+This policy has priority over general implementation guidance.
+
+Conflict priority:
+
+1. explicit latest user decision
+2. AI Architecture Contamination Risk and Minimum Structural Unit Policy
+3. latest Canonical
+4. general rules in AGENT_WORKFLOW_REFERENCE
+5. existing implementation pattern in code
+6. AI general design preference
+
+AI general design preference, software textbook patterns, and local test convenience are not valid authority in this project.
+
+12. Scope
+
+This document is a Canonical policy supplement.
+
+It does not create code requirements by itself.
+
+It does not authorize deletion, movement, deprecation, or integration of existing modules.
+
+Any concrete structural change still requires investigation, report, user approval, and a minimal implementation plan.
