@@ -440,6 +440,22 @@ calls, broker calls, or Runtime state changes:
 - Validator
 - Dry-run
 
+12.8 Projection / Recovery / Reconciliation Contract
+
+- Projection is a Runtime reconstruction layer.
+- Projection reads Queue and Fill evidence to calculate Runtime state
+  candidates.
+- Projection must not write Runtime state or change any Source of Truth.
+- Recovery decides whether Runtime recovery is required and possible.
+- Recovery must not perform automatic normalization or write outside the
+  approved Commit Boundary.
+- Reconciliation checks Queue, Fill, and Position consistency.
+- Reconciliation detects mismatches and provides preview results only.
+- Projection, Recovery, and Reconciliation are Reader and Validator layers.
+- They must not call Canonical Writers.
+- They must not call SendOrder or broker APIs.
+- Runtime writes remain allowed only at the approved Commit Boundary.
+
 13. BUY Budget Increase Policy Revision
 
 This section replaces older BUY increase descriptions that used fixed X2/X3 or user-array style wording. The project philosophy remains unchanged: BUY planning may define target values, but the final executable order is still constrained by budget, holdings, and execution safety checks.
