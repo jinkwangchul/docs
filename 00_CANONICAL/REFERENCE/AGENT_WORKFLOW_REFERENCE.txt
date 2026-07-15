@@ -223,96 +223,25 @@ Reference Index 수정 시 과거 다음 작업, 과거 진행 상태, 과거 �
 
 불필요한 장문 설명, 반복 설명, 요청 없는 선택지 제시는 하지 않는다.
 
-## 11. Backtest Audit Log Architecture
+## 11. Codex 작업 지시문 작성 규칙
 
-주의: 이 섹션은 현재 별도 공식 Canonical이 확인되지 않아 임시 보존한다. 별도 공식 문서가 생성되면 AGENT 문서에는 참조만 남긴다.
+Codex 지시문에는 Codex가 수행할 작업만 작성한다.
 
-목적:
+- ChatGPT의 검토 기준, 판단 과정, 배경설명을 섞지 않는다.
+- 기존 운영 규칙을 매 지시문마다 반복하지 않는다.
+- 작업 범위, 수정 내용, 금지 범위, 검증, 완료 보고만 작성한다.
+- 검토 의견과 실행 지시는 분리한다.
+- 하나의 PR에 필요한 내용만 포함한다.
+## 12. Backtest Audit Log Architecture
 
-- AI 분석
-- 전략 비교
-- Parameter 비교
-- Rule 회귀 분석
-- 자동 리포트 생성
-- 실거래 비교
-- Replay
-- 성능 분석
+별도 공식 문서 생성 전까지 임시 보존한다. 공식 Canonical이 생기면 AGENT에는 참조만 남긴다.
 
-Identity Contract:
+Backtest log는 사람이 읽는 텍스트 로그가 아니라 schema-first structured event ledger이다.
 
-- backtest_run_id
-- strategy_id
-- strategy_version
-- rules_hash
-- signal_id
-- candidate_id
-- execution_id
-- order_id
-- position_id
-- trade_id
-- snapshot_id
+필수 원칙:
 
-Event Contract:
-
-- BACKTEST_STARTED
-- SNAPSHOT_CREATED
-- SIGNAL_CREATED
-- FILTER_PASSED
-- FILTER_BLOCKED
-- CANDIDATE_CREATED
-- ORDER_APPROVED
-- ORDER_REJECTED
-- ORDER_SUBMITTED
-- ORDER_FILLED
-- PARTIAL_FILL
-- POSITION_OPENED
-- POSITION_UPDATED
-- POSITION_CLOSED
-- STOP_LOSS
-- TAKE_PROFIT
-- TIME_EXIT
-- RULE_BLOCKED
-- ERROR
-- BACKTEST_FINISHED
-
-Snapshot Contract:
-
-각 event는 가능한 경우 시장, 전략, budget, position, holding snapshot과 연결한다.
-
-Performance Contract:
-
-- realized pnl
-- unrealized pnl
-- mfe
-- mae
-- holding time
-- entry
-- exit
-- fee
-- slippage
-- win/loss
-- cumulative pnl
-- drawdown
-
-Replay Contract:
-
-Backtest 결과만으로 Signal -> Candidate -> Order -> Position -> Exit 흐름을 재현할 수 있어야 한다.
-
-AI Analysis Contract:
-
-AI가 승률, 손익비, Filter 기여도, Rule 기여도, Parameter 비교, 시간대별 성능, 종목별 성능, 장세별 성능, 실패 원인, Block 원인, 미체결 원인, 최적화 후보를 분석할 수 있어야 한다.
-
-Runtime Independence:
-
-Backtest Log 생성 실패가 전략 판단, Replay, Simulation 결과를 바꾸면 안 된다.
-
-Export Contract:
-
-JSON, CSV, Parquet export가 가능하도록 schema 중심으로 설계한다.
-
-금지:
-
-- 사람이 보기 편한 텍스트 로그 중심 설계
-- identity 없는 로그
-- event 간 연결 불가능한 로그
-- replay 불가능한 로그
+- stable identity linkage로 run, strategy, signal, candidate, order, position, trade, snapshot을 연결한다.
+- Signal -> Candidate -> Order -> Position -> Exit replay가 가능해야 한다.
+- performance 분석 필드는 pnl, mfe, mae, drawdown, fee, slippage, holding time을 포함한다.
+- Runtime 독립성을 유지한다. log 실패가 전략 판단, replay, simulation 결과를 바꾸면 안 된다.
+- text-log-first 설계, identity 없는 로그, event 연결 불가능한 로그, replay 불가능한 로그를 금지한다.

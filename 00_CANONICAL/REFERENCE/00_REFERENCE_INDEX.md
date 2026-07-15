@@ -7,9 +7,7 @@ Reference Edition
 - Latest Work Resume: WORK_RESUME_LATEST_2026-07-14.txt
 - Latest Changelog: MASTER_SPEC_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt
 - Latest Readable Changelog: MASTER_SPEC_READABLE_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt
-- Latest verified kiwoom_auto master: 80fa5b3510102e430f3992948ea0015eabcbf3da
 
-This docs-only policy update did not modify the kiwoom_auto repository.
 
 ## Source of Truth
 
