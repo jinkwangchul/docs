@@ -10,11 +10,13 @@ Main additions:
 
 - New AI architecture contamination policy in AGENT_WORKFLOW_REFERENCE.
 - New Canonical supplement for minimum structural unit rules.
+- Three absolute rules: AI cannot override existing document rules, cannot create a new layer when existing layers/functions can handle the work, and cannot change structure without explicit user-approved scope and direction.
 - Stronger rule that integration must be considered before separation.
-- Stronger approval conditions for new layers.
+- Simpler approval conditions for new layers, limited to the core structural checks.
 - Clear warning that unit-test success does not prove production call graph completeness.
-- Forced structural audit triggers when new layers, writers, durable states, or Source of Truth boundaries are proposed.
+- Reduced structural audit triggers so the policy does not become another complex procedure.
 - User approval remains required before deletion, integration, or structural change.
+- The policy is mandatory for AI-assisted implementation and structural judgment, but it does not automatically approve any specific file modification, deletion, movement, integration, or deprecation.
 
 What did not change:
 

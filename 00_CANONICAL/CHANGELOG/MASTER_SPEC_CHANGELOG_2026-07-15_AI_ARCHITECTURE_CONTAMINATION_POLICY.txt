@@ -13,14 +13,16 @@ Summary:
 Policy changes:
 - Defined the project maximum structural risk as AI-generated architecture contamination.
 - Added a final Korean risk statement for the project.
+- Added three absolute rules: AI cannot override existing document rules with its own reasoning; existing layers/functions must be used when possible; structural changes require explicit user approval of scope and direction.
 - Added the Minimum Structural Unit Principle.
 - Added the Integration Before Separation rule.
-- Added New Layer Approval Conditions.
+- Simplified New Layer Approval Conditions to four core checks: existing layer absorption impossible, independent responsibility or mutation/side-effect boundary, explicit user approval, and Canonical non-conflict.
 - Added default-prohibited layer name guidance for Preview, Review, Readiness, Adapter, Orchestrator, Validator, Approval Gate, Post Check, Wrapper, Entrypoint, and Bridge.
 - Added AI self-validation bias prevention.
 - Added limits on interpreting unit-test success as production readiness.
-- Added forced structural audit conditions.
+- Reduced forced structural audit triggers to core structure-risk cases.
 - Added user control rules for deletion, integration, and structural change approval.
+- Clarified that this policy is mandatory for AI-assisted implementation and structural judgment, but does not automatically approve modification, deletion, movement, integration, or deprecation of any specific file.
 
 Safety:
 - Code repositories were not modified.

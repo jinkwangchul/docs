@@ -212,6 +212,12 @@ This policy prevents project structure contamination caused by AI-generated over
 
 The largest risk in this project is not only simple AI mistakes. The largest risk is that AI repeatedly splits small work units into independent structures during implementation, then mistakes local modularity for whole-system structural validity.
 
+Absolute Rules
+
+1. AI cannot prioritize its own reasoning over existing document rules.
+2. If implementation is possible inside an existing layer or existing function, AI cannot create a new layer.
+3. A structural change is allowed only when the user explicitly approves the change scope and direction.
+
 Required final risk statement:
 
 이 프로젝트의 가장 큰 리스크는 AI 구현 과정에서 발생하는 구조 오염이며,
@@ -269,17 +275,12 @@ If this proof is not possible, the new layer is prohibited.
 
 New Layer Approval Conditions
 
-A new layer is allowed only after all of the following are verified:
+A new layer is allowed only when all of the following core conditions are met:
 
-1. Existing layer modification cannot solve the problem.
-2. The responsibility is clearly independent.
-3. A production caller exists, or a concrete approved connection plan exists.
-4. An independent side effect, lifecycle, or lock/CAS boundary exists.
-5. The responsibility does not duplicate an existing layer.
-6. The concrete risk of removing the layer is explained.
-7. Reliability or operational benefit exceeds maintenance cost.
-8. The layer does not conflict with Canonical contracts.
-9. The user explicitly approves the structural change.
+1. Existing layer or existing function absorption is not possible.
+2. The responsibility is independent, or there is an independent mutation or side-effect boundary.
+3. The user explicitly approves the structural change scope and direction.
+4. The change does not conflict with Canonical contracts.
 
 If any condition is not satisfied, use one of the following instead:
 
@@ -341,37 +342,23 @@ The following interpretation is forbidden:
 
 Structural Change Approval Procedure
 
-Any change to a layer, state, writer, Source of Truth, or production call graph must follow this procedure:
+Any change to a layer, state, writer, Source of Truth, or production call graph must be reduced to the smallest necessary decision:
 
-1. Investigate the existing structure.
-2. Confirm the Canonical contract.
-3. Check whether the existing layer can absorb the work.
-4. Analyze structural impact.
-5. Confirm production call graph impact.
-6. Confirm writer and Source of Truth impact.
-7. Receive user approval.
-8. Implement the minimum change.
-9. Verify structural integrity.
+1. Confirm the existing rule and Canonical contract.
+2. Confirm whether the existing layer or function can absorb the work.
+3. Receive explicit user approval for the change scope and direction.
+4. Implement only the approved minimum change.
 
 AI proposal alone is not enough to change structure.
 
 Forced Structural Audit Conditions
 
-If any of the following occurs, new feature implementation must stop and structural audit comes first:
+If any of the following occurs, new feature implementation must stop and a structural audit must happen first:
 
-- creation of a new layer or module
-- addition or semantic change of a durable state
-- addition or change of a writer
-- Source of Truth change
-- production call graph change
-- Canonical contract change
-- repeated accumulation of files with the same responsibility
-- increase of Preview, Review, Readiness, or Orchestrator layers
-- repeated extension of the same pipeline across multiple PRs
-- module increase without production caller
-- discovery of contract conflict
-- user raises structural complexity or reliability concerns
-- AI does not yet understand the full structure
+- proposed new layer, durable state, writer, Source of Truth, or production call graph change
+- repeated files or layers with the same responsibility
+- conflict with Canonical or existing document rules
+- user concern about structural complexity or reliability
 
 User Control Rule
 

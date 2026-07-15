@@ -18,7 +18,15 @@ The recent whole-structure review confirmed that AI can repeatedly split small v
 
 This policy strengthens the project rules so that structure changes require proof, user approval, and production call graph awareness.
 
-2. Final Risk Statement
+2. Absolute Rules
+
+1. AI cannot prioritize its own reasoning over existing document rules.
+2. If implementation is possible inside an existing layer or existing function, AI cannot create a new layer.
+3. A structural change is allowed only when the user explicitly approves the change scope and direction.
+
+The detailed criteria below are supporting judgment rules. They must not become a new complex procedure or checklist that slows implementation.
+
+3. Final Risk Statement
 
 이 프로젝트의 가장 큰 리스크는 AI 구현 과정에서 발생하는 구조 오염이며,
 특히 너무 작은 단위를 독립 구조로 반복 분리하고,
@@ -38,7 +46,7 @@ It includes:
 - contract drift
 - maintenance cost increase
 
-3. Minimum Structural Unit Policy
+4. Minimum Structural Unit Policy
 
 A new layer, module, file, durable state, writer, Source of Truth, or production call graph branch is not justified by naming clarity, local testability, or future extensibility alone.
 
@@ -54,39 +62,31 @@ New structure requires at least one substantial production reason:
 
 The default decision is to keep work inside the existing layer.
 
-4. Integration Before Separation
+5. Integration Before Separation
 
 Before creating any new structure, AI must first prove that the responsibility cannot be absorbed into an existing layer or existing function.
 
-The required proof includes:
+The proof must stay minimal and focus on:
 
-- why existing layers cannot contain the work
-- what operational role would break if integrated
-- what real production risk the split blocks
-- what production caller needs independent invocation
-- what side effect, lock, transaction, or CAS boundary exists
-- expected maintenance cost
-- why removal or integration is not viable
+- why existing layers or functions cannot contain the work
+- what independent responsibility or mutation/side-effect boundary exists
+- why the change does not conflict with Canonical contracts
+- what exact scope and direction the user approved
 
 If this proof is missing, the new structure is prohibited.
 
-5. New Layer Approval Conditions
+6. New Layer Approval Conditions
 
-All conditions must be satisfied before creating a new layer:
+All core conditions must be satisfied before creating a new layer:
 
-1. Existing layer modification cannot solve the problem.
-2. The responsibility is clearly independent.
-3. A production caller exists, or a concrete approved connection plan exists.
-4. An independent side effect, lifecycle, or lock/CAS boundary exists.
-5. The responsibility does not duplicate an existing layer.
-6. The concrete risk of removing the layer is explained.
-7. Reliability or operational benefit exceeds maintenance cost.
-8. The layer does not conflict with Canonical contracts.
-9. The user explicitly approves the structural change.
+1. Existing layer or existing function absorption is not possible.
+2. The responsibility is independent, or there is an independent mutation or side-effect boundary.
+3. The user explicitly approves the structural change scope and direction.
+4. The change does not conflict with Canonical contracts.
 
 If any condition is not satisfied, use an existing function, existing service, simple helper, or defer implementation.
 
-6. Default Prohibited Layer Names
+7. Default Prohibited Layer Names
 
 The following names are prohibited by default unless the approval conditions are satisfied:
 
@@ -105,7 +105,7 @@ The following names are prohibited by default unless the approval conditions are
 
 The names themselves are not permanently banned. They are prohibited when they are used without an independent production responsibility, caller, side effect, lifecycle, or Source of Truth boundary.
 
-7. AI Self-Validation Bias Prevention
+8. AI Self-Validation Bias Prevention
 
 AI must not treat its own previous design as sufficient proof.
 
@@ -115,7 +115,7 @@ Has it been proven that this layer cannot be removed or absorbed into an existin
 
 If not, the default result is integration, reduction, isolation, or deprecation candidate reporting.
 
-8. Test Interpretation Limit
+9. Test Interpretation Limit
 
 Unit test success does not prove production connectivity.
 
@@ -133,25 +133,16 @@ The following interpretation is forbidden:
 
 전체 테스트 통과 = 실제 자동매매 운영 완성
 
-9. Forced Structural Audit Conditions
+10. Forced Structural Audit Conditions
 
-New feature implementation must stop and structural audit must come first when any of the following occurs:
+New feature implementation must stop and structural audit must come first when any of the following core triggers occurs:
 
-- new layer or module creation
-- durable state addition or semantic change
-- writer addition or change
-- Source of Truth change
-- production call graph change
-- Canonical contract change
-- repeated accumulation of files with the same responsibility
-- increase of Preview, Review, Readiness, or Orchestrator layers
-- repeated extension of the same pipeline across multiple PRs
-- module increase without a production caller
-- contract conflict discovery
+- proposed new layer, durable state, writer, Source of Truth, or production call graph change
+- repeated files or layers with the same responsibility
+- conflict with Canonical or existing document rules
 - user concern about structural complexity or reliability
-- AI does not understand the whole structure
 
-10. User Control
+11. User Control
 
 AI must not change project structure without explicit user approval.
 
@@ -163,7 +154,7 @@ Reporting an integration candidate does not approve integration.
 
 One PR handles only the single structural responsibility approved by the user.
 
-11. Priority
+12. Priority
 
 This policy has priority over general implementation guidance.
 
@@ -178,11 +169,13 @@ Conflict priority:
 
 AI general design preference, software textbook patterns, and local test convenience are not valid authority in this project.
 
-12. Scope
+13. Scope
 
 This document is a Canonical policy supplement.
 
-It does not create code requirements by itself.
+This policy is mandatory for all AI-assisted implementation and structural judgment.
+
+However, this policy itself does not automatically approve modification, deletion, movement, integration, or deprecation of any specific file.
 
 It does not authorize deletion, movement, deprecation, or integration of existing modules.
 
