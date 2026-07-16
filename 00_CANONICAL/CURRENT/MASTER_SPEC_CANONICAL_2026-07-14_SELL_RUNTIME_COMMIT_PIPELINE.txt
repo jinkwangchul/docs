@@ -452,7 +452,7 @@ Consistent snapshots clear the broker-holding reconciliation state for the
 same account/code only. Mismatches are preserved as manual reconciliation
 evidence and do not modify internal Position state.
 
-Cancel/modify Chejan evidence is partially implemented. Manual cancel/modify
+Cancel/modify Chejan evidence is fully connected through the current production lifecycle. Manual cancel/modify
 requests can be created as separate `ORDER_QUEUED` records and sent through
 SendOrder type 3/4/5/6 with `original_order_no`. Chejan FID 904 is preserved
 as the canonical original order number, and broker Chejan evidence links the
