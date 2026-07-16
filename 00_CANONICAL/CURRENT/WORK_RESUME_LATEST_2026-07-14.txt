@@ -1,5 +1,47 @@
 ﻿WORK_RESUME_LATEST_2026-07-14
 
+Latest handoff update:
+- Big Feature Goal: automatic order execution method implementation.
+- Current feature branch: feat/connect-operation-policy-production-caller.
+- Current PR: #45, OPEN. No merge was performed for this handoff.
+- Local and remote feature branch HEAD observed: f3a9c3c1ad23c15dd2ca17bd06371c3cc2a764bd.
+- The earlier requested handoff baseline 81dc483db99d9b3fe69265be4fa56d20e66f9b29 is no longer the current feature branch HEAD.
+- Protected dirty/untracked runtime, stock, routine, and changelog files in the code repository were preserved.
+
+Completed production flow for the current Big Feature:
+- Routine Signal -> approval -> Operation Policy Gate.
+- Execution Enable -> REAL_READY -> ORDER_QUEUED.
+- Final Send Gate -> durable dispatch claim -> SendOrder callable boundary.
+- SEND_CALL_ACCEPTED / SEND_CALL_REJECTED / SEND_UNCERTAIN recording.
+- live Chejan -> Queue lifecycle -> Fill ledger -> Position update.
+- event identity based reconciliation retry for incomplete Fill or Position follow-up.
+- Kiwoom gubun=1 -> runtime/broker_holdings.json.
+- Broker holdings vs internal positions comparison with manual reconciliation evidence.
+
+Source of Truth:
+- runtime/order_queue.json: order execution and lifecycle.
+- runtime/fills.json: fill event ledger.
+- runtime/positions.json: internal Position based on Fill evidence.
+- runtime/broker_holdings.json: live Kiwoom broker holding snapshot.
+- Broker holdings do not automatically modify positions.json.
+
+Partially completed:
+- Unfilled order cancel/modify execution.
+- Separate ORDER_QUEUED cancel/modify requests are created.
+- Kiwoom SendOrder type 3/4/5/6 is connected and carries original_order_no.
+- Broker Chejan cancel/modify results are not yet fully applied back to the original order.
+
+Next window start point:
+- Continue the same PR #45 branch.
+- Do not create a new PR or merge before the Big Feature is complete.
+- Preserve protected dirty/untracked files.
+- Implement the remaining cancel/modify Chejan linkage:
+  - preserve Chejan FID 904 original order number as a canonical field;
+  - link cancel/modify request records to the original order by identity;
+  - apply cancel results to the original order as CANCELLED or PARTIAL_CANCELLED;
+  - apply modify results to original-order remaining quantity, price, and broker identity relationship;
+  - block cross-duplicate CANCEL/MODIFY requests for the same original_order_no.
+
 Status:
 - kiwoom_auto master and origin/master are synchronized at 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc.
 - This conversation completed the SELL Runtime Commit preview-to-plan pipeline through Execution Plan.

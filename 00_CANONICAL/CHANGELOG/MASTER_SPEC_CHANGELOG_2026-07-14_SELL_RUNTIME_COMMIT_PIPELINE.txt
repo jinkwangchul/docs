@@ -84,3 +84,32 @@ Operation Policy Gate canonical writer migration:
   - Direct snapshot writer helpers were removed from `operation_policy_gate.py`.
   - EXECUTABLE still proceeds through the existing Execution Enable -> REAL_READY flow.
   - Full unittest in the project standard Python 3.11 32-bit PyQt5 environment: 5161 OK, 1 skipped.
+
+Automatic order execution flow accumulation:
+- Recorded the current Big Feature flow for automatic order execution.
+- Completed production contracts now include:
+  - Routine Signal -> approval -> Operation Policy Gate.
+  - Execution Enable -> REAL_READY -> ORDER_QUEUED.
+  - Final Send Gate -> durable dispatch claim -> SendOrder callable boundary.
+  - SEND_CALL_ACCEPTED / SEND_CALL_REJECTED / SEND_UNCERTAIN result recording.
+  - live Chejan -> Queue lifecycle -> Fill ledger -> Position update.
+  - event identity based Chejan reconciliation retry for missing Fill or Position follow-up.
+  - Kiwoom gubun=1 -> runtime/broker_holdings.json.
+  - Broker holdings vs internal positions comparison with manual reconciliation evidence.
+- Source of Truth contracts clarified:
+  - runtime/order_queue.json: order execution and lifecycle.
+  - runtime/fills.json: fill event ledger.
+  - runtime/positions.json: internal Position calculated from Fill evidence.
+  - runtime/broker_holdings.json: live Kiwoom broker holding snapshot.
+  - Broker holdings never auto-correct positions.json.
+
+Unfilled cancel/modify partial completion:
+- Manual cancel/modify can create separate ORDER_QUEUED request records.
+- Kiwoom SendOrder type 3/4/5/6 is connected and carries original_order_no.
+- Broker Chejan result application back to the original order is not yet complete.
+- Remaining disconnects:
+  - Chejan FID 904 original order number canonical preservation.
+  - request record and original order identity linkage.
+  - original order CANCELLED / PARTIAL_CANCELLED confirmation from cancel Chejan.
+  - original order remaining quantity, price, and broker identity relationship from modify Chejan.
+  - cross-duplicate CANCEL/MODIFY blocking for the same original_order_no.

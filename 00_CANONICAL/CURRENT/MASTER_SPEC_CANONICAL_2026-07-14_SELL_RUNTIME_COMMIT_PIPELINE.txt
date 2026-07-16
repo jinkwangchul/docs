@@ -362,6 +362,13 @@ progress notes in this file.
 - `positions.json`: Position state source of truth.
   - Writer Owner: `position_update_service.py`.
   - Responsibility: apply recorded fill deltas to position state.
+- `broker_holdings.json`: Kiwoom broker holding snapshot source of truth.
+  - Writer Owner: `broker_holding_recorder.py`.
+  - Responsibility: preserve the latest live Kiwoom gubun=1 account/code
+    holding snapshot and its reconciliation evidence against internal
+    positions.
+  - Broker holdings do not automatically create, delete, or overwrite
+    `positions.json`.
 
 12.2 Queue Living Contract
 
@@ -410,7 +417,12 @@ ORDER_QUEUED
 
 12.4 Chejan Contract
 
-Current allowed lifecycle transitions:
+Kiwoom gubun=0 order and fill events are normalized, reviewed, and recorded
+through the Chejan lifecycle before Fill or Position follow-up work is
+performed. `SEND_CALL_ACCEPTED` is not broker acceptance; only Chejan evidence
+can confirm broker acceptance, rejection, fills, or cancellation.
+
+Current allowed lifecycle transitions for normal order/fill events:
 
 - `SEND_CALL_ACCEPTED` or `SEND_UNCERTAIN`
   -> `BROKER_ACCEPTED`
@@ -425,6 +437,26 @@ Current allowed lifecycle transitions:
 
 Chejan recording appends event history and reduces broker lifecycle on the
 matching queue record. It does not write fills or positions.
+
+When a Chejan event produces `PARTIAL_FILL` or `FULL_FILL`, Fill ledger
+recording and Position updates run only after the canonical Queue lifecycle
+record succeeds. Event identity is preserved so repeated live Chejan events do
+not duplicate Queue, Fill, or Position mutations. Missing downstream Fill or
+Position work is persisted as manual reconciliation state on the Queue record
+and may be retried by event identity without reapplying the already recorded
+Queue lifecycle.
+
+Kiwoom gubun=1 holding events are not Fill events. They update
+`broker_holdings.json` and are compared read-only against `positions.json`.
+Consistent snapshots clear the broker-holding reconciliation state for the
+same account/code only. Mismatches are preserved as manual reconciliation
+evidence and do not modify internal Position state.
+
+Cancel/modify Chejan evidence is partially implemented. Manual cancel/modify
+requests can be created as separate `ORDER_QUEUED` records and sent through
+SendOrder type 3/4/5/6 with `original_order_no`. Broker Chejan evidence still
+must become the source that links the request record to the original order and
+confirms original-order cancellation or modification.
 
 12.5 Fill Contract
 
@@ -445,6 +477,8 @@ matching queue record. It does not write fills or positions.
 - Idempotency scope is `position_id + broker + account_no + code`.
 - Cumulative quantity delta is tracked separately per order identity.
 - Position updates do not mutate Queue or Chejan state.
+- Broker holding snapshots are external evidence. They are compared with
+  internal positions but must not silently overwrite internal positions.
 
 12.7 Preview Safety Line
 
@@ -472,6 +506,42 @@ calls, broker calls, or Runtime state changes:
 - They must not call Canonical Writers.
 - They must not call SendOrder or broker APIs.
 - Runtime writes remain allowed only at the approved Commit Boundary.
+
+12.9 Current Production Completion Status
+
+Completed in the current Big Feature flow:
+
+- Routine Signal -> approval -> Operation Policy Gate.
+- Execution Enable -> REAL_READY -> ORDER_QUEUED.
+- Final Send Gate -> durable dispatch claim -> SendOrder callable boundary.
+- SendOrder result states:
+  `SEND_CALL_ACCEPTED`, `SEND_CALL_REJECTED`, `SEND_UNCERTAIN`.
+- Live Chejan -> Queue lifecycle -> Fill ledger -> Position update.
+- Event-identity based reconciliation retry for missing Fill or Position
+  follow-up work.
+- Kiwoom gubun=1 -> `broker_holdings.json`.
+- Broker holdings vs internal positions comparison with manual reconciliation
+  evidence.
+
+Partially completed:
+
+- Unfilled order cancel/modify execution.
+- Manual request creation reaches separate `ORDER_QUEUED` cancel/modify
+  records.
+- SendOrder type 3/4/5/6 is connected with `original_order_no`.
+- Broker Chejan result application back to the original order remains
+  incomplete.
+
+Remaining cancel/modify disconnects:
+
+- Preserve Chejan FID 904 original order number as a canonical field.
+- Link cancel/modify request records and original orders by identity.
+- Apply cancel results to the original order as `CANCELLED` or
+  `PARTIAL_CANCELLED`.
+- Apply modify results to original-order remaining quantity, price, and broker
+  identity relationship.
+- Block cross-duplicate CANCEL/MODIFY requests for the same
+  `original_order_no` until the original-order result is confirmed.
 
 13. BUY Budget Increase Policy Revision
 

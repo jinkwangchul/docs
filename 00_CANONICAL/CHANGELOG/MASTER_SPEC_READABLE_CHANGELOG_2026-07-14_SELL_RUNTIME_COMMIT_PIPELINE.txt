@@ -50,3 +50,23 @@ Operation Policy Gate update:
 - It no longer performs direct full Queue snapshot writes.
 - EXECUTABLE continues into the existing Execution Enable -> REAL_READY flow.
 - Full unittest passed in the project standard environment: 5161 OK, 1 skipped.
+
+Automatic order execution flow update:
+- The production flow now records the completed path from Routine Signal through approval, Operation Policy Gate, Execution Enable, REAL_READY, ORDER_QUEUED, Final Send Gate, dispatch claim, and SendOrder callable result recording.
+- SendOrder results are recorded as `SEND_CALL_ACCEPTED`, `SEND_CALL_REJECTED`, or `SEND_UNCERTAIN`.
+- Live Chejan order/fill events now feed the Queue lifecycle, Fill ledger, and Position update path.
+- Missing Fill or Position follow-up can be retried by Chejan event identity without duplicating completed work.
+- Kiwoom gubun=1 holding events are stored in `runtime/broker_holdings.json`.
+- Broker holdings are compared against internal positions for reconciliation, but they do not automatically modify `positions.json`.
+
+Current Source of Truth:
+- `runtime/order_queue.json`: order execution and lifecycle.
+- `runtime/fills.json`: fill ledger.
+- `runtime/positions.json`: internal Position based on Fill evidence.
+- `runtime/broker_holdings.json`: live Kiwoom broker holding snapshot.
+
+Unfilled cancel/modify status:
+- Cancel/modify can create separate ORDER_QUEUED request records.
+- SendOrder type 3/4/5/6 is connected with `original_order_no`.
+- The remaining work is applying actual Broker Chejan cancel/modify evidence back to the original order.
+- The next work starts with FID 904 original order number preservation, request/original identity linkage, original-order cancel confirmation, modify result relationship, and cross-duplicate CANCEL/MODIFY blocking for one original order number.
