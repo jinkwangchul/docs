@@ -1,0 +1,41 @@
+MASTER_SPEC_READABLE_CHANGELOG_2026-07-16_OPERATOR_RECONCILIATION_RECOVERY
+
+Operator manual Reconciliation / Recovery is now recorded as a completed Big
+Feature.
+
+What changed:
+- Operators can use the existing review-required GUI to see unresolved runtime
+  reconciliation evidence.
+- The view combines Queue reconciliation flags, Chejan event identity, Fill
+  state, Position state, and Broker Holdings vs internal Position mismatch
+  evidence.
+- Stored Chejan evidence can be retried safely by event identity when Fill or
+  Position follow-up was incomplete.
+- Retry uses the existing Fill recorder, Position update service, and Queue
+  reconciliation mutation.
+- Runtime evidence is reloaded after retry so the unresolved state is checked
+  from actual data.
+
+What did not change:
+- Broker Holdings still does not automatically modify positions.json.
+- SendOrder is not recalled.
+- Broker API is not called.
+- Orders are not automatically retried.
+- CANCEL/MODIFY is not automatically resent.
+- No new runtime Source of Truth or runtime writer was added.
+
+Verification:
+- Focused 3 OK.
+- Chejan + Fill recorder 132 OK.
+- GUI/Broker regression 84 OK.
+- Broker Holdings 25 OK.
+- Position update 50 OK.
+- Full unittest 5268 OK, 1 skipped.
+- git diff --check passed.
+- py_compile was blocked by the local Python Manager permission error, while
+  full unittest import and execution passed.
+
+Git:
+- Code branch: feat/operator-reconciliation-recovery.
+- Code commit: dec2efbaf4ad03baf0da00fa2b6fbbf346f818e7.
+- PR #46 is OPEN and was not merged.
