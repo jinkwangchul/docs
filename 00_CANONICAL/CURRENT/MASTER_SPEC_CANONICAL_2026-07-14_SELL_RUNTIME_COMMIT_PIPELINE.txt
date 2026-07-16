@@ -529,30 +529,21 @@ Completed in the current Big Feature flow:
 - Original order `CANCELLED` / `PARTIAL_CANCELLED` application.
 - MODIFY Chejan original-order remaining quantity, price, and broker identity
   relationship preservation.
+- CANCEL `ORDER_ACCEPTED` / `ORDER_OPEN` records request acceptance only and
+  leaves the original order unchanged until `ORDER_CANCELED`.
+- MODIFY request records preserve `original_order_effect_confirmed` evidence
+  after original-order effects are applied.
 - Cross-duplicate CANCEL/MODIFY blocking for the same `original_order_no`.
 - Additional request blocking while a `BROKER_ACCEPTED` cancel/modify request
   has not confirmed its original-order result.
-
-Partially completed:
-
-- Unfilled order cancel/modify execution.
-- Manual request creation reaches separate `ORDER_QUEUED` cancel/modify
-  records.
-- SendOrder type 3/4/5/6 is connected with `original_order_no`.
-- Broker Chejan result application back to the original order is connected for
-  the core cancel/modify evidence path, but the final request lifecycle details
-  below remain open.
-
-Remaining cancel/modify disconnects:
-
-- CANCEL `ORDER_ACCEPTED` / `ORDER_OPEN` must record request acceptance only
-  and keep the original order unchanged until `ORDER_CANCELED`.
-- MODIFY original-order effect confirmation must be preserved on the request
-  record.
-- Follow-up CANCEL/MODIFY must be allowed after MODIFY original-order effect
+- Follow-up CANCEL/MODIFY is allowed after MODIFY original-order effect
   confirmation.
-- Manual reconciliation state from other causes must remain preserved after
-  cancel/modify original-order effects.
+- Manual reconciliation state from causes other than the completed
+  cancel/modify Chejan effect is preserved.
+- The automatic order execution Big Feature is complete through the current
+  pre-dispatch, SendOrder, Chejan, Fill, Position, Broker holding, and
+  unfilled cancel/modify lifecycle boundaries. Do not split this completed
+  feature back into smaller follow-up tasks.
 
 13. BUY Budget Increase Policy Revision
 

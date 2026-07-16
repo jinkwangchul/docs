@@ -73,5 +73,9 @@ Unfilled cancel/modify status:
 - CANCEL Chejan can update the request record and original order in one canonical Queue mutation.
 - Original orders can be confirmed as `CANCELLED` or `PARTIAL_CANCELLED`.
 - MODIFY Chejan preserves the original-order remaining quantity, price, and broker identity relationship.
+- CANCEL acceptance Chejan records request acceptance only and leaves the original order unchanged until cancel completion.
+- MODIFY request records preserve `original_order_effect_confirmed` evidence after the original order is updated.
 - CANCEL/MODIFY requests block each other for the same `original_order_no`, and a `BROKER_ACCEPTED` request blocks additional requests until its original-order result is confirmed.
-- The remaining work is the final request lifecycle detail: CANCEL acceptance should not change the original order, MODIFY effect confirmation should be stored on the request, follow-up requests should be allowed after MODIFY confirmation, and unrelated manual reconciliation reasons must be preserved.
+- Follow-up CANCEL/MODIFY is allowed after MODIFY original-order effect confirmation.
+- Manual reconciliation state from other causes is preserved.
+- The automatic order execution Big Feature is complete through the current pre-dispatch, SendOrder, Chejan, Fill, Position, Broker holding, and unfilled cancel/modify lifecycle boundaries.

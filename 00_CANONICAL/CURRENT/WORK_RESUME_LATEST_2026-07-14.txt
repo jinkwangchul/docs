@@ -25,7 +25,9 @@ Source of Truth:
 - runtime/broker_holdings.json: live Kiwoom broker holding snapshot.
 - Broker holdings do not automatically modify positions.json.
 
-Partially completed:
+Completed Big Feature:
+- Automatic order execution method implementation is complete through the current pre-dispatch, SendOrder, Chejan, Fill, Position, Broker holding, and unfilled cancel/modify lifecycle boundaries.
+- Do not split this completed feature back into smaller follow-up tasks in the next window.
 - Unfilled order cancel/modify execution.
 - Separate ORDER_QUEUED cancel/modify requests are created.
 - Kiwoom SendOrder type 3/4/5/6 is connected and carries original_order_no.
@@ -35,17 +37,16 @@ Partially completed:
 - Original orders can be confirmed as CANCELLED or PARTIAL_CANCELLED.
 - MODIFY Chejan preserves the original-order remaining quantity, price, and broker identity relationship.
 - CANCEL/MODIFY requests block each other for the same original_order_no, including BROKER_ACCEPTED requests before original-order result confirmation.
-- Final request lifecycle details remain open.
+- CANCEL ORDER_ACCEPTED / ORDER_OPEN records request acceptance only and leaves the original order unchanged.
+- MODIFY request records preserve original_order_effect_confirmed evidence after original-order effects are applied.
+- Follow-up CANCEL/MODIFY is allowed after MODIFY original-order effect confirmation.
+- Manual reconciliation state from other causes is preserved.
 
 Next window start point:
-- Continue the same PR #45 branch.
-- Do not create a new PR or merge before the Big Feature is complete.
+- Do not continue by subdividing the completed automatic order execution method feature.
+- Select the next Big Feature only after a fresh structure audit.
 - Preserve protected dirty/untracked files.
-- Implement the remaining cancel/modify lifecycle details:
-  - CANCEL ORDER_ACCEPTED / ORDER_OPEN records request acceptance only and leaves the original order unchanged;
-  - MODIFY original-order effect confirmation is preserved on the request record;
-  - follow-up CANCEL/MODIFY is allowed after MODIFY original-order effect confirmation;
-  - manual reconciliation state from other causes remains preserved after cancel/modify original-order effects.
+- Candidate next Big Feature must be chosen from the actual remaining production gaps, not from individual files, helpers, or states.
 
 Status:
 - kiwoom_auto master and origin/master are synchronized at 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc.
