@@ -1,0 +1,49 @@
+MASTER_SPEC_CHANGELOG_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME
+
+Purpose:
+- Record completion of Startup Recovery / Session Resume as a new Canonical
+  update.
+- Preserve older Canonical and Changelog files as historical evidence.
+
+Big Feature:
+- Safe operator-controlled automatic trading resume after application or host
+  restart.
+
+Code baseline:
+- Base master: d7582d00c1114c441b923459b0763ebb0d902566.
+- Branch: feat/startup-recovery-session-resume.
+- Commit: f3f9ed1846509f23b00d078313c98f3ed121f300.
+- PR: #47, OPEN.
+- Merge was not performed.
+
+Implemented production behavior:
+- MainWindow assesses existing Queue, Fill, Position, Broker Holdings,
+  execution, lock, routine signal, stock state, and reconciliation evidence at
+  startup.
+- Recovery results distinguish RESUME_READY, REVIEW_REQUIRED,
+  BLOCKED_RECOVERY, and INVALID_RUNTIME.
+- The prior force-reset of per-symbol runtime state was removed so restart
+  evidence remains intact.
+- The operator sees the recovery result in the existing main GUI.
+- Existing operator reconciliation remains available for unresolved evidence.
+- Resume approval is bound to the exact runtime evidence snapshot.
+- Evidence changes revoke approval and require a new assessment.
+- Automatic trading, timer processing, Execution Enable, REAL_READY, Queue
+  commit, SendOrder, CANCEL, and MODIFY remain blocked before approval.
+
+Safety boundaries:
+- No new Source of Truth or Writer.
+- No automatic SendOrder or order retry.
+- No automatic CANCEL/MODIFY resend.
+- No automatic Queue completion, Fill creation, or Position correction.
+- Broker Holdings does not modify internal Position.
+- Missing runtime files are not initialized by Startup Recovery.
+- The assessment does not mutate runtime evidence.
+
+Verification:
+- Startup Recovery and operator reconciliation: 13 OK.
+- GUI production and execution regression: 86 OK.
+- Legacy multiprocessing comparison: 10/10 PASS.
+- Full unittest: 5280 OK, 1 skipped.
+- py_compile passed with Python 3.11 32-bit.
+- git diff --check passed.

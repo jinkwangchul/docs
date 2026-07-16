@@ -1,0 +1,56 @@
+WORK_RESUME_LATEST_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME
+
+Big Feature Goal:
+- Startup Recovery / Session Resume after application failure or restart.
+
+Code state:
+- Base master: d7582d00c1114c441b923459b0763ebb0d902566.
+- Branch: feat/startup-recovery-session-resume.
+- Commit: f3f9ed1846509f23b00d078313c98f3ed121f300.
+- PR #47: OPEN, merge not performed.
+- Protected dirty/untracked runtime, routine, changelog, stock state, and log
+  files remain outside the commit.
+
+Completed production flow:
+- MainWindow reads existing runtime evidence at startup.
+- Queue, Fill, Position, Broker Holdings, runtime executions and locks, routine
+  signals, stock state, and reconciliation evidence are assessed together.
+- The session is classified as RESUME_READY, REVIEW_REQUIRED,
+  BLOCKED_RECOVERY, or INVALID_RUNTIME.
+- The result is visible in the existing main GUI.
+- Existing reconciliation GUI and retry functions remain the operator path for
+  unresolved evidence.
+- The operator must explicitly approve resume.
+- Approval is bound to the current evidence snapshot and is revoked when the
+  evidence changes.
+- Automatic trading start, timer processing, execution progression, Queue
+  commit, SendOrder, CANCEL, and MODIFY are blocked before approval.
+
+Safety boundaries:
+- No new Source of Truth, Writer, lifecycle state owner, or runtime file.
+- No startup force-reset of prior runtime evidence.
+- No SendOrder recall or automatic order retry.
+- No automatic CANCEL/MODIFY resend.
+- No Broker Holdings overwrite of internal Position.
+- No automatic Queue completion, Fill creation, Position correction, or
+  runtime initialization.
+
+Verification:
+- Startup Recovery and operator reconciliation: 13 OK.
+- GUI production and execution regression: 86 OK.
+- Legacy multiprocessing comparison: 10/10 PASS.
+- Full unittest: 5280 OK, 1 skipped.
+- py_compile passed with Python 3.11 32-bit.
+- git diff --check passed.
+
+Completed Big Feature:
+- Startup Recovery / Session Resume is complete for the current canonical
+  runtime evidence and GUI production flow.
+- Do not split this completed feature back into file, helper, preview, or state
+  follow-up tasks.
+
+Next start point:
+- Review PR #47.
+- Do not merge without explicit user approval.
+- Select the next Big Feature only after PR #47 is merged and a fresh
+  Production structure audit identifies a user-facing gap.

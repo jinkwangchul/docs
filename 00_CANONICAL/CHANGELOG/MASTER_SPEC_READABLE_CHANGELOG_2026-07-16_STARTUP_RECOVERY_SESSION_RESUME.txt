@@ -1,0 +1,33 @@
+MASTER_SPEC_READABLE_CHANGELOG_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME
+
+Startup Recovery / Session Resume is complete.
+
+What operators can now do:
+- Restart the application without losing prior runtime evidence to a forced
+  startup reset.
+- See whether the previous session is ready, needs review, is blocked, or has
+  invalid runtime evidence.
+- Review unfinished orders, Fill/Position gaps, Broker Holdings mismatches,
+  active locks, uncertain sends, and reconciliation items.
+- Use the existing review workflow for unresolved evidence.
+- Explicitly approve the session before automatic trading resumes.
+
+How resume remains safe:
+- Approval is tied to the exact runtime evidence snapshot.
+- A later file change revokes approval.
+- Automatic trading and all order progression remain blocked before approval.
+- Startup Recovery does not resend orders, call SendOrder, repair Position,
+  initialize runtime files, or erase evidence.
+- Existing Source of Truth and Writer ownership remain unchanged.
+
+Verification:
+- Startup Recovery and reconciliation: 13 OK.
+- GUI production and execution regression: 86 OK.
+- Legacy multiprocessing: 10/10 PASS.
+- Full unittest: 5280 OK, 1 skipped.
+- py_compile and git diff --check passed.
+
+Git:
+- Code branch: feat/startup-recovery-session-resume.
+- Code commit: f3f9ed1846509f23b00d078313c98f3ed121f300.
+- PR #47 is OPEN and was not merged.

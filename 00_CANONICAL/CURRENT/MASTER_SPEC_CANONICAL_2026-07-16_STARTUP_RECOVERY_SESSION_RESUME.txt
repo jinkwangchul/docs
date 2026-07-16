@@ -1,0 +1,870 @@
+MASTER_SPEC_CANONICAL_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME
+
+Status:
+- Official Canonical for the Runtime / Queue / SendOrder / Chejan / Fill /
+  Position / Broker Holdings / Recovery living contract after Startup Recovery
+  / Session Resume completion.
+- This document carries forward the latest living runtime contract and records
+  the PR #47 implementation result without rewriting older Canonical evidence.
+- Older Canonical files are preserved and are not modified.
+
+Repository baseline:
+- kiwoom_auto base master / origin/master: d7582d00c1114c441b923459b0763ebb0d902566
+- kiwoom_auto feature branch: feat/startup-recovery-session-resume
+- kiwoom_auto feature commit: f3f9ed1846509f23b00d078313c98f3ed121f300
+- Code PR: #47, OPEN, merge not performed.
+
+Test baseline:
+- Startup Recovery and operator reconciliation tests: 13 OK
+- GUI production and execution regression: 86 OK
+- Legacy multiprocessing comparison: 10/10 PASS
+- Full unittest: 5280 OK, 1 skipped
+- git diff --check: passed
+- py_compile: passed with Python 3.11 32-bit.
+
+Historical baseline from the carried-forward Runtime Canonical:
+- SELL Runtime Commit Execution Plan tests: 38 OK
+- SELL Runtime Commit Approval Gate tests: 36 OK
+- SELL Runtime Commit Dry-run Executor tests: 33 OK
+- SELL Runtime Commit Validator tests: 27 OK
+- SELL Runtime Commit Preview tests: 19 OK
+- SELL Preview tests: 514 OK
+- Full unittest: 4641 OK, 1 skipped
+
+1. Purpose
+
+This Canonical carries forward the latest Runtime execution living contracts
+and records the completed Startup Recovery / Session Resume operation function.
+
+Older preview-only SELL Runtime Commit sections are preserved below as
+historical contract context. The current living runtime contract is defined in
+sections 11, 12, and 14.
+
+2. Completed Runtime Commit Pipeline
+
+The current SELL Runtime Commit chain is:
+
+SELL Execution Full Preview Orchestrator
+-> SELL Runtime Commit Preview
+-> SELL Runtime Commit Validator
+-> SELL Runtime Commit Dry-run Executor
+-> SELL Runtime Commit Approval Gate
+-> SELL Runtime Commit Execution Plan
+
+3. Implemented PRs
+
+PR #10:
+- Title: feat: add SELL runtime commit preview
+- Merge commit: b0af8ff8048567a14c07d10f8e0eaa721fa5f2fa
+- Function: validates SELL_EXECUTION_FULL_PREVIEW results at the Runtime Commit preview boundary.
+- Master reflected: yes
+
+PR #11:
+- Title: feat: add SELL runtime commit validator
+- Merge commit: 0a896105c4c5e4f25a7876a4c0c2141b11680ede
+- Function: validates Runtime Commit preview candidates before any commit-capable layer.
+- Master reflected: yes
+
+PR #12:
+- Title: feat: add SELL runtime commit dry-run executor
+- Merge commit: 75dbf4bcef426323302b12f07c4fc2a76802cb92
+- Function: creates dry-run commit actions and commit plans without performing a Runtime Commit.
+- Master reflected: yes
+
+PR #13:
+- Title: feat: add SELL runtime commit approval gate
+- Merge commit: 077db4fd563682aa350e19a88e827903527e715c
+- Function: grants final approval only when all dry-run commit actions are READY and internally consistent.
+- Master reflected: yes
+
+PR #14:
+- Title: feat: add SELL runtime commit execution plan
+- Merge commit: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
+- Function: creates the final RUNTIME_COMMIT execution plan from approved commit actions.
+- Master reflected: yes
+
+4. Ownership
+
+Ownership:
+- MASTER_ENGINE
+
+Domain:
+- Execution / Runtime Commit Preview
+- Execution / Runtime Commit Validator
+- Execution / Runtime Commit Dry Run Executor
+- Execution / Runtime Commit Approval Gate
+- Execution / Runtime Commit Execution Plan
+
+Routine dependency:
+- None
+
+5. Runtime Commit Preview Contract
+
+Module:
+- sell_runtime_commit_preview.py
+
+Input:
+- SELL_EXECUTION_FULL_PREVIEW
+
+Output:
+- preview_type = SELL_RUNTIME_COMMIT_PREVIEW
+- ownership = MASTER_ENGINE
+- domain = Execution / Runtime Commit Preview
+- routine_dependency = None
+
+Responsibility:
+- Validate the full SELL execution preview result at the Runtime Commit boundary.
+- Preserve candidate identity, source_signal_id, order_id, execution_request, request_hash, lock_id, summary, warnings, and reasons.
+- Keep commit_allowed aligned with preview-only readiness.
+
+Boundary:
+- No Runtime Commit.
+- No Runtime file write.
+- No Queue Commit.
+- No SendOrder.
+- No broker API.
+- No OrderRequest creation.
+- No REAL_READY mutation.
+
+6. Runtime Commit Validator Contract
+
+Module:
+- sell_runtime_commit_validator.py
+
+Input:
+- SELL_RUNTIME_COMMIT_PREVIEW
+
+Output:
+- validation_type = SELL_RUNTIME_COMMIT_VALIDATOR
+- commit_allowed = True | False
+- status = READY | BLOCKED | INVALID
+
+Responsibility:
+- Validate whether the Runtime Commit Preview can proceed to dry-run execution.
+- Reject identity gaps, safety flag violations, summary count mismatches, and partial candidate validity.
+- Preserve every candidate without priority selection.
+
+Boundary:
+- No Runtime Commit.
+- No Queue Commit.
+- No file write.
+- No external dispatch.
+
+7. Runtime Commit Dry-run Executor Contract
+
+Module:
+- sell_runtime_commit_dryrun_executor.py
+
+Input:
+- SELL_RUNTIME_COMMIT_VALIDATOR
+
+Output:
+- dryrun_type = SELL_RUNTIME_COMMIT_DRYRUN_EXECUTOR
+- dry_run = True
+- commit_allowed = True | False
+- commit_actions
+- blocked_commit_actions
+- validation_summary
+- execution_summary
+
+Responsibility:
+- Generate in-memory commit actions as if Runtime Commit would be performed later.
+- Require all candidates READY for overall READY.
+- Treat structural identity errors as INVALID.
+- Treat policy non-approval as BLOCKED.
+
+Boundary:
+- runtime_commit_executed = False
+- runtime_write = False
+- queue_write = False
+- queue_committed = False
+- send_order = False
+- broker_api_called = False
+
+8. Runtime Commit Approval Gate Contract
+
+Module:
+- sell_runtime_commit_approval_gate.py
+
+Input:
+- SELL_RUNTIME_COMMIT_DRYRUN_EXECUTOR
+
+Output:
+- approval_type = SELL_RUNTIME_COMMIT_APPROVAL_GATE
+- approval_granted = True | False
+- commit_allowed = True | False
+- approved_commit_actions
+- blocked_approval_actions
+
+Approval rule:
+- upstream status must be READY
+- upstream commit_allowed must be True
+- dry_run must be True
+- preview_only must be True
+- all commit_actions must be READY
+- blocked_commit_actions must be empty
+- dryrun_invalid_count must be 0
+- dryrun_blocked_count must be 0
+- dryrun_ready_count must equal len(commit_actions)
+
+Invalid rule:
+- READY dry-run with blocked_commit_actions is INVALID.
+- READY dry-run with blocked or invalid summary counts is INVALID.
+- ready_count mismatch is INVALID.
+- identity mismatch or missing fields are INVALID.
+
+Boundary:
+- No actual approval side effect.
+- No Runtime Commit.
+- No Queue Commit.
+- No SendOrder.
+
+9. Runtime Commit Execution Plan Contract
+
+Module:
+- sell_runtime_commit_execution_plan.py
+
+Input:
+- SELL_RUNTIME_COMMIT_APPROVAL_GATE
+
+Output:
+- plan_type = SELL_RUNTIME_COMMIT_EXECUTION_PLAN
+- plan_only = True
+- execution_plan_ready = True | False
+- commit_allowed = True | False
+- execution_actions
+- blocked_execution_actions
+- approval_snapshot
+
+Each execution action contains:
+- plan_action = RUNTIME_COMMIT
+- source_signal_id
+- order_id
+- candidate_id
+- queue_pending_id
+- execution_id
+- request_hash
+- lock_id
+- execution_request
+- order_queued_record_preview
+- source_approval_action
+
+Ready rule:
+- approval status must be READY
+- approval_granted must be True
+- commit_allowed must be True
+- approved_commit_actions must not be empty
+- blocked_approval_actions must be empty
+- all approved actions must be READY
+- all identities must match
+- summary counts must match
+- all safety flags must be False
+
+Invalid rule:
+- READY approval with empty approved_commit_actions is INVALID.
+- READY approval containing BLOCKED action is INVALID.
+- Any blocked_execution_actions make the whole plan INVALID.
+- If approved action count and execution_actions count differ, the plan is INVALID.
+- Partial execution plans are prohibited.
+
+10. Safety Boundary
+
+The following values must remain False in every layer:
+
+- execution_connected
+- runtime_write
+- queue_write
+- file_write
+- send_order
+- broker_api_called
+- queue_committed
+- actual_order_sent
+- order_request_created
+- real_ready_state_changed
+- runtime_commit_executed
+
+The following are prohibited:
+
+- actual Runtime Commit
+- Runtime file write
+- Queue write
+- Queue commit
+- SendOrder
+- broker API call
+- actual OrderRequest creation
+- actual REAL_READY mutation
+- partial candidate approval
+- partial execution planning
+- first-candidate-only processing
+- automatic priority selection
+
+11. SELL Execution Full Preview Upstream Contract
+
+This section promotes the living upstream SELL Preview contract into this
+Runtime Canonical. It records only the contract that must remain true before
+Runtime Commit begins.
+
+11.1 Preview Flow
+
+SELL execution preview flows through these stages:
+
+SELL_REAL_READY_ADAPTER_PREVIEW
+-> SELL Common Execution Preview
+-> SELL Execution Readiness Preview
+-> SELL Signal Gate Preview
+-> SELL Execution Queue Preview
+-> SELL Execution Full Preview Orchestrator
+
+The Full Preview input is the ordered set of SELL preview stage results and
+candidate identities required to evaluate readiness without writing Runtime,
+Queue, or broker state.
+
+11.2 Stage Responsibilities
+
+- Execution Readiness confirms that the SELL candidate can enter execution
+  readiness review without changing durable state.
+- Signal Gate confirms that the candidate passes the SELL signal gate contract.
+- Queue Preview confirms that the candidate can form a preview-only
+  ORDER_QUEUED record contract.
+- Full Preview preserves the ordered stage results, aggregates status, and
+  stops on BLOCKED or INVALID without selecting candidates.
+
+11.3 MARKET Contract
+
+- `current_price` must not be injected automatically.
+- MARKET SELL is allowed only when an explicit MARKET contract is satisfied.
+- If the explicit MARKET contract is not satisfied, the preview status is
+  BLOCKED.
+
+11.4 PENDING / CANCEL Contract
+
+- Preview and Runtime contracts remain separated.
+- PENDING or CANCEL candidates must not be promoted into the normal SELL
+  execution path.
+- Actual cancel calls are prohibited in Preview.
+
+11.5 Multiple Candidate Contract
+
+- Preview must not automatically select a candidate.
+- Preview must not automatically remove a candidate.
+- All candidates and their input order must be preserved.
+- Candidate selection belongs outside the Preview chain.
+
+11.6 Preview MASTER_ENGINE Ownership
+
+- The SELL Preview Chain is owned by MASTER_ENGINE.
+- Routine layers provide preview inputs and results only.
+- This ownership does not change Runtime Commit ownership after the Preview
+  boundary.
+
+12. Runtime Living Contract
+
+This section records the current code contract for Runtime, Queue, SendOrder,
+Chejan, Fill, and Position. It supersedes older history-only Runtime Commit
+progress notes in this file.
+
+12.1 Runtime Source of Truth
+
+- `routine_signals.json`: Signal source of truth.
+  - Writer Owner: `routine_signal_queue.py`.
+  - Responsibility: persist routine signal candidates before queue conversion.
+- `order_queue.json`: Order lifecycle source of truth.
+  - Writer Owner: `execution_queue_writer.mutate_order_queue()`.
+  - Responsibility: preserve order lifecycle, dispatch claim, SendOrder call
+    lifecycle, Chejan lifecycle, and queue revision.
+- `fills.json`: Fill event ledger source of truth.
+  - Writer Owner: `execution_fill_recorder.py`.
+  - Responsibility: append reviewed fill events only.
+- `positions.json`: Position state source of truth.
+  - Writer Owner: `position_update_service.py`.
+  - Responsibility: apply recorded fill deltas to position state.
+- `broker_holdings.json`: Kiwoom broker holding snapshot source of truth.
+  - Writer Owner: `broker_holding_recorder.py`.
+  - Responsibility: preserve the latest live Kiwoom gubun=1 account/code
+    holding snapshot and its reconciliation evidence against internal
+    positions.
+  - Broker holdings do not automatically create, delete, or overwrite
+    `positions.json`.
+
+12.2 Queue Living Contract
+
+- Canonical writer: `execution_queue_writer.mutate_order_queue()`.
+- The canonical writer owns the queue lock, revision/CAS check, backup,
+  temp write, atomic replace, and post-write verification.
+- Queue mutation must re-read the queue under lock before applying a mutation.
+- Dispatch, SendOrder lifecycle, and Chejan lifecycle state mutation must pass
+  through this boundary.
+- Builder, Adapter, Preview, Validator, and Dry-run layers must not mutate the
+  queue.
+
+12.2.1 Operation Policy Gate Contract
+
+- Owner: `operation_policy_gate.apply_operation_policy_gate_for_order()`.
+- The Operation Policy Gate owns the durable `APPROVED` ->
+  `EXECUTABLE` / `BLOCKED_POLICY` transition.
+- The input state must be `APPROVED`.
+- Policy pass writes `status=EXECUTABLE`.
+- Policy block writes `status=BLOCKED_POLICY`.
+- `execution_enabled` remains `False` after this transition.
+- Queue mutation must use `execution_queue_writer.mutate_order_queue()`.
+- Direct snapshot writers are prohibited for this transition.
+- Same-result reapplication is a no-op.
+- Duplicate target identity, stale revision, and progressed lifecycle states
+  must not overwrite the queue.
+- After `EXECUTABLE`, the existing Execution Enable -> REAL_READY flow remains
+  unchanged.
+
+12.3 SendOrder Lifecycle
+
+Queue lifecycle before broker evidence:
+
+ORDER_QUEUED
+-> DISPATCH_CLAIMED
+-> SEND_ATTEMPTED
+-> SEND_CALL_IN_PROGRESS
+-> SEND_CALL_ACCEPTED / SEND_CALL_REJECTED / SEND_UNCERTAIN
+
+- `send_order_called=True` is allowed only after the real callable boundary has
+  been entered.
+- `SEND_CALL_ACCEPTED` means the SendOrder callable result was accepted by the
+  local call contract. It is not broker acceptance.
+- Broker acceptance, rejection, fills, and cancellation are confirmed only by
+  the Chejan lifecycle.
+
+12.4 Chejan Contract
+
+Kiwoom gubun=0 order and fill events are normalized, reviewed, and recorded
+through the Chejan lifecycle before Fill or Position follow-up work is
+performed. `SEND_CALL_ACCEPTED` is not broker acceptance; only Chejan evidence
+can confirm broker acceptance, rejection, fills, or cancellation.
+
+Current allowed lifecycle transitions for normal order/fill events:
+
+- `SEND_CALL_ACCEPTED` or `SEND_UNCERTAIN`
+  -> `BROKER_ACCEPTED`
+- `SEND_CALL_ACCEPTED` or `SEND_UNCERTAIN`
+  -> `BROKER_REJECTED`
+- `SEND_CALL_ACCEPTED`, `SEND_UNCERTAIN`, `BROKER_ACCEPTED`,
+  `PARTIALLY_FILLED`, or `FILLED`
+  -> `PARTIALLY_FILLED` / `FILLED`
+- `SEND_CALL_ACCEPTED`, `SEND_UNCERTAIN`, `BROKER_ACCEPTED`, or
+  `PARTIALLY_FILLED`
+  -> `CANCELLED` / `PARTIAL_CANCELLED`
+
+Chejan recording appends event history and reduces broker lifecycle on the
+matching queue record. It does not write fills or positions.
+
+When a Chejan event produces `PARTIAL_FILL` or `FULL_FILL`, Fill ledger
+recording and Position updates run only after the canonical Queue lifecycle
+record succeeds. Event identity is preserved so repeated live Chejan events do
+not duplicate Queue, Fill, or Position mutations. Missing downstream Fill or
+Position work is persisted as manual reconciliation state on the Queue record
+and may be retried by event identity without reapplying the already recorded
+Queue lifecycle.
+
+Kiwoom gubun=1 holding events are not Fill events. They update
+`broker_holdings.json` and are compared read-only against `positions.json`.
+Consistent snapshots clear the broker-holding reconciliation state for the
+same account/code only. Mismatches are preserved as manual reconciliation
+evidence and do not modify internal Position state.
+
+Cancel/modify Chejan evidence is fully connected through the current production lifecycle. Manual cancel/modify
+requests can be created as separate `ORDER_QUEUED` records and sent through
+SendOrder type 3/4/5/6 with `original_order_no`. Chejan FID 904 is preserved
+as the canonical original order number, and broker Chejan evidence links the
+request record to the original order identity before applying original-order
+effects.
+
+12.5 Fill Contract
+
+- Writer Owner: `execution_fill_recorder.py`.
+- Fill recording appends to `fills.json` only.
+- It does not mutate Queue or Position state.
+- Duplicate detection uses `execution_identity_source` plus
+  `execution_identity` when present.
+- FID 909 remains an execution identity source. Existing fallback duplicate
+  detection is kept only for records without explicit identity source/value.
+- Append uses file lock, backup, temp write, atomic replace, and post-write
+  verification.
+
+12.6 Position Contract
+
+- Writer Owner: `position_update_service.py`.
+- Position updates consume recorded fill records.
+- Idempotency scope is `position_id + broker + account_no + code`.
+- Cumulative quantity delta is tracked separately per order identity.
+- Position updates do not mutate Queue or Chejan state.
+- Broker holding snapshots are external evidence. They are compared with
+  internal positions but must not silently overwrite internal positions.
+
+12.7 Preview Safety Line
+
+In this Runtime / Execution pipeline, the following layers do not perform file writes, queue mutations, SendOrder
+calls, broker calls, or Runtime state changes:
+
+- Preview
+- Adapter
+- Builder
+- Validator
+- Dry-run
+
+12.8 Projection / Recovery / Reconciliation Contract
+
+- Projection is a Runtime reconstruction layer.
+- Projection reads Queue and Fill evidence to calculate Runtime state
+  candidates.
+- Projection must not write Runtime state or change any Source of Truth.
+- Recovery decides whether Runtime recovery is required and possible.
+- Recovery must not perform automatic normalization or write outside the
+  approved Commit Boundary.
+- Reconciliation checks Queue, Fill, and Position consistency.
+- Reconciliation detects mismatches and provides preview results only.
+- Projection, Recovery, and Reconciliation are Reader and Validator layers.
+- They must not call Canonical Writers.
+- They must not call SendOrder or broker APIs.
+- Runtime writes remain allowed only at the approved Commit Boundary.
+
+12.9 Current Production Completion Status
+
+Completed in the current Big Feature flow:
+
+- Completion code baseline: `8e69ee02534751b545f51fa01c501890ff542ca5`.
+- Routine Signal -> approval -> Operation Policy Gate.
+- Execution Enable -> REAL_READY -> ORDER_QUEUED.
+- Final Send Gate -> durable dispatch claim -> SendOrder callable boundary.
+- SendOrder result states:
+  `SEND_CALL_ACCEPTED`, `SEND_CALL_REJECTED`, `SEND_UNCERTAIN`.
+- Live Chejan -> Queue lifecycle -> Fill ledger -> Position update.
+- Event-identity based reconciliation retry for missing Fill or Position
+  follow-up work.
+- Kiwoom gubun=1 -> `broker_holdings.json`.
+- Broker holdings vs internal positions comparison with manual reconciliation
+  evidence.
+- Chejan FID 904 `original_order_no` canonical preservation.
+- cancel/modify request and original order identity validation.
+- CANCEL Chejan request/original single canonical Queue mutation.
+- Original order `CANCELLED` / `PARTIAL_CANCELLED` application.
+- MODIFY Chejan original-order remaining quantity, price, and broker identity
+  relationship preservation.
+- CANCEL `ORDER_ACCEPTED` / `ORDER_OPEN` records request acceptance only and
+  leaves the original order unchanged until `ORDER_CANCELED`.
+- MODIFY request records preserve `original_order_effect_confirmed` evidence
+  after original-order effects are applied.
+- Cross-duplicate CANCEL/MODIFY blocking for the same `original_order_no`.
+- Additional request blocking while a `BROKER_ACCEPTED` cancel/modify request
+  has not confirmed its original-order result.
+- Follow-up CANCEL/MODIFY is allowed after MODIFY original-order effect
+  confirmation.
+- Manual reconciliation state from causes other than the completed
+  cancel/modify Chejan effect is preserved.
+- The automatic order execution Big Feature is complete through the current
+  pre-dispatch, SendOrder, Chejan, Fill, Position, Broker holding, and
+  unfilled cancel/modify lifecycle boundaries. Do not split this completed
+  feature back into smaller follow-up tasks.
+
+12.10 Operator Manual Reconciliation / Recovery Contract
+
+The operator manual Reconciliation / Recovery function is the production
+operator surface for unresolved runtime evidence. It does not create a new
+Source of Truth and does not replace the existing Queue, Fill, Position, or
+Broker Holdings writers.
+
+Production entry point:
+
+- Existing review-required GUI.
+- Runtime evidence integrated from existing Source of Truth files.
+- Operator-confirmed safe retry for incomplete Chejan follow-up work.
+
+Integrated evidence:
+
+- Queue `manual_reconciliation_required`.
+- Queue `chejan_reconciliation_items`.
+- Chejan event identity.
+- Fill ledger application state.
+- Position application state.
+- Broker Holdings vs internal Position mismatch evidence.
+
+Allowed operator action:
+
+- The operator may refresh and inspect unresolved reconciliation items.
+- Retryable Chejan follow-up items may be retried by stored Chejan event
+  identity.
+- Retry uses the existing Fill recorder, existing Position update service, and
+  existing Queue reconciliation mutation.
+- Retry processes only missing downstream steps.
+- Completed Fill and Position mutations remain idempotent and must not be
+  duplicated.
+- After retry, unresolved state is reevaluated from actual runtime evidence.
+
+Safety boundary:
+
+- No new runtime Source of Truth.
+- No new Queue, Fill, Position, or Broker Holdings writer.
+- Broker Holdings must not automatically modify `positions.json`.
+- No SendOrder recall.
+- No Broker API call.
+- No automatic order retry.
+- No automatic CANCEL/MODIFY resend.
+- No bypass of canonical Queue mutation.
+
+Completion baseline:
+
+- Code commit: `dec2efbaf4ad03baf0da00fa2b6fbbf346f818e7`.
+- Full unittest discover: 5268 OK, 1 skipped.
+- `git diff --check`: passed.
+- `py_compile` was not completed because of the local Python Manager
+  permission error; full unittest import and execution passed.
+
+13. BUY Budget Increase Policy Revision
+
+This section replaces older BUY increase descriptions that used fixed X2/X3 or user-array style wording. The project philosophy remains unchanged: BUY planning may define target values, but the final executable order is still constrained by budget, holdings, and execution safety checks.
+
+13.1 Initial Budget Setting Terms
+
+The initial setting terms are:
+
+- 최초 예산 설정
+  - 주수 설정
+  - 예산 설정
+
+The old first-setting terms "주수기준" and "금액기준" are deprecated.
+
+The term "금액 기준" remains valid only when it means the increase method described below.
+
+13.2 Increase Methods
+
+Supported increase methods are:
+
+- 회차 기준
+- 금액 기준
+
+The old fixed X2, X3, and user-array descriptions are deprecated.
+
+13.3 회차 기준 Contract
+
+회차 기준 supports two operators:
+
+- 합(+)
+- 곱(×)
+
+The operator and numeric value are entered directly by the operator. The UI must not restrict the value to fixed combo choices such as X2 or X3.
+
+Examples:
+
+- + 2
+- × 2
+- × 1.5
+- + 5
+
+Calculation:
+
+- 1회차 = 최초 예산 설정값
+- From 2회차:
+  - 합(+): current order target = previous round number + configured value
+  - 곱(×): current order target = previous round number × configured value
+
+Example, initial shares 2주 and 회차 기준 × 2:
+
+- 1회차: 2주
+- 2회차: 2주
+- 3회차: 4주
+- 4회차: 6주
+- 5회차: 8주
+
+Example, initial shares 2주 and 회차 기준 + 2:
+
+- 1회차: 2주
+- 2회차: 3주
+- 3회차: 4주
+- 4회차: 5주
+- 5회차: 6주
+
+13.4 금액 기준 Contract
+
+금액 기준 supports only 곱(×).
+
+The multiplier is entered directly by the operator.
+
+Examples:
+
+- × 1.2
+- × 1.5
+- × 2
+- × 3
+
+Calculation:
+
+- 1회차 = 최초 예산 설정값
+- From 2회차:
+  - current round budget target = previous round budget value × configured multiplier
+
+Example, initial budget 10000 and 금액 기준 × 2:
+
+- 1회차: 10000
+- 2회차: 20000
+- 3회차: 40000
+- 4회차: 80000
+- 5회차: 160000
+
+Older examples such as 100 -> 300 -> 900 -> 2700 are deprecated when they imply fixed X3 policy or conflict with the operator-entered multiplier contract.
+
+13.5 Supported Combinations
+
+주수 설정 supports:
+
+- 회차 기준(+)
+- 회차 기준(×)
+- 금액 기준(×)
+
+예산 설정 supports:
+
+- 회차 기준(+)
+- 회차 기준(×)
+- 금액 기준(×)
+
+The total supported combinations are six.
+
+13.6 예산 설정 Policy
+
+예산 설정 does not calculate a target share count directly.
+
+예산 설정 determines the maximum buy budget for each round. At actual order time, the system calculates the maximum integer quantity that can be bought at the current order price without exceeding the confirmed budget.
+
+No order may be created above the confirmed budget.
+
+13.7 Actual Order Contract
+
+The calculated value is a round target, not the final executable order.
+
+Immediately before the actual order is created, the final quantity must apply:
+
+- total budget
+- routine budget
+- per-symbol budget
+- maximum holding quantity
+- other order restrictions
+
+The final order quantity is the quantity that remains valid after these constraints are applied.
+
+13.8 UI Contract
+
+Increase values are entered directly by the operator.
+
+The UI contract is:
+
+- operator selection: + or ×
+- input value: direct operator input
+
+Fixed combo-only values are prohibited for this policy.
+
+14. Startup Recovery / Session Resume Living Contract
+
+14.1 Purpose
+
+Startup Recovery makes the existing automatic trading production flow safe
+after process termination, application failure, or host restart.
+
+The operator must be able to inspect prior runtime evidence, understand whether
+the session is safe to resume, and explicitly approve the new session before
+automatic trading can continue.
+
+14.2 Evidence Contract
+
+The assessment reads the existing canonical evidence:
+
+- `runtime/order_queue.json`: order execution and lifecycle.
+- `runtime/fills.json`: execution Fill ledger.
+- `runtime/positions.json`: internal Position derived from Fill evidence.
+- `runtime/broker_holdings.json`: Kiwoom-reported holding snapshots.
+- `runtime/order_executions.json`: committed execution evidence.
+- `runtime/order_locks.json`: active execution locks.
+- `runtime/routine_signals.json`: routine signal lifecycle.
+- `stocks/*/state.json`: per-symbol operating and review state.
+- Queue reconciliation fields and stored Chejan event identity.
+
+The assessment is read-only. It does not initialize, rewrite, normalize, or
+delete runtime evidence.
+
+14.3 Recovery Classification
+
+The production classification is:
+
+- `RESUME_READY`: no unfinished or contradictory evidence requires review.
+- `REVIEW_REQUIRED`: the operator must review unfinished Queue, Fill/Position,
+  Broker Holdings, Routine Signal, or reconciliation evidence.
+- `BLOCKED_RECOVERY`: uncertain dispatch, active lock, interrupted lifecycle,
+  or incomplete identity evidence prevents safe resume.
+- `INVALID_RUNTIME`: damaged JSON, duplicate identity, contradictory execution
+  identity, or invalid runtime structure prevents a reliable assessment.
+
+Runtime execution identity must remain consistent with the matching Queue order.
+Recorded Fill evidence must be traceable to an applied internal Position or be
+reported for operator review.
+
+14.4 Production Caller
+
+`MainWindow` runs the Startup Recovery assessment during production startup.
+The existing main GUI displays the current classification and exposes the
+operator resume action.
+
+Unresolved reconciliation evidence continues to use the existing
+review-required GUI and operator reconciliation functions. Startup Recovery
+does not replace reconciliation ownership.
+
+14.5 Resume Approval
+
+Automatic trading does not resume automatically.
+
+Operator approval is bound to the SHA-256 snapshot of all assessed runtime
+evidence. If any assessed file changes, the approval is revoked and a fresh
+assessment and confirmation are required.
+
+Before approval, the following production actions are blocked:
+
+- automatic trading start;
+- automatic timer processing;
+- Execution Enable and REAL_READY progression;
+- Queue commit;
+- SendOrder;
+- CANCEL and MODIFY execution.
+
+Read-only inspection, review, reconciliation, and emergency-stop behavior
+remain available.
+
+14.6 Evidence Preservation
+
+Program startup must not force-reset per-symbol runtime state or clear prior
+trading flags as a substitute for recovery.
+
+Startup Recovery does not:
+
+- recall SendOrder;
+- resend an order;
+- reissue CANCEL or MODIFY;
+- create Fill evidence;
+- modify Position from Broker Holdings;
+- force-complete Queue lifecycle;
+- release uncertain claims automatically;
+- initialize missing runtime files;
+- remove historical runtime evidence.
+
+14.7 Source of Truth and Ownership
+
+No new Source of Truth or Writer is introduced.
+
+The existing Queue, Fill, Position, Broker Holdings, Runtime execution, lock,
+Routine Signal, and stock-state owners retain their responsibilities. Startup
+Recovery only reads and compares their evidence and controls whether the new
+GUI session may enter production trading actions.
+
+14.8 Completion Baseline
+
+- Code branch: `feat/startup-recovery-session-resume`.
+- Code commit: `f3f9ed1846509f23b00d078313c98f3ed121f300`.
+- Code PR: #47, OPEN, merge not performed.
+- Startup Recovery and operator reconciliation: 13 OK.
+- GUI production and execution regression: 86 OK.
+- Legacy multiprocessing comparison: 10/10 PASS.
+- Full unittest: 5280 OK, 1 skipped.
+- `py_compile`: passed with Python 3.11 32-bit.
+- `git diff --check`: passed.
