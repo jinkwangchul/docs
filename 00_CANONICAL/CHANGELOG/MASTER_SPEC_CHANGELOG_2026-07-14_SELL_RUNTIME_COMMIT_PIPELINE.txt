@@ -104,6 +104,7 @@ Automatic order execution flow accumulation:
   - Broker holdings never auto-correct positions.json.
 
 Unfilled cancel/modify completion:
+- Completion commit: 8e69ee02534751b545f51fa01c501890ff542ca5.
 - Manual cancel/modify can create separate ORDER_QUEUED request records.
 - Kiwoom SendOrder type 3/4/5/6 is connected and carries original_order_no.
 - Chejan FID 904 original order number is preserved as canonical original_order_no.

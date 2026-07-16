@@ -66,6 +66,7 @@ Current Source of Truth:
 - `runtime/broker_holdings.json`: live Kiwoom broker holding snapshot.
 
 Unfilled cancel/modify status:
+- Completion commit: `8e69ee02534751b545f51fa01c501890ff542ca5`.
 - Cancel/modify can create separate ORDER_QUEUED request records.
 - SendOrder type 3/4/5/6 is connected with `original_order_no`.
 - FID 904 is preserved as canonical `original_order_no`.

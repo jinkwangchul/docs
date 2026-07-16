@@ -512,6 +512,7 @@ calls, broker calls, or Runtime state changes:
 
 Completed in the current Big Feature flow:
 
+- Completion code baseline: `8e69ee02534751b545f51fa01c501890ff542ca5`.
 - Routine Signal -> approval -> Operation Policy Gate.
 - Execution Enable -> REAL_READY -> ORDER_QUEUED.
 - Final Send Gate -> durable dispatch claim -> SendOrder callable boundary.
