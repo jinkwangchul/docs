@@ -119,3 +119,22 @@ Unfilled cancel/modify completion:
 - Follow-up CANCEL/MODIFY is allowed after MODIFY original-order effect confirmation.
 - Manual reconciliation state from causes other than the completed cancel/modify effect is preserved.
 - The automatic order execution Big Feature is complete through the current pre-dispatch, SendOrder, Chejan, Fill, Position, Broker holding, and unfilled cancel/modify lifecycle boundaries.
+
+Operator manual Reconciliation / Recovery completion:
+- Completion commit: dec2efbaf4ad03baf0da00fa2b6fbbf346f818e7.
+- The existing review-required GUI now exposes unresolved runtime reconciliation evidence for operator use.
+- Integrated evidence includes Queue manual_reconciliation_required, Queue chejan_reconciliation_items, Chejan event identity, Fill application state, Position application state, and Broker Holdings vs internal Position mismatch evidence.
+- Retryable Chejan follow-up items can be safely retried by stored Chejan event identity.
+- Retry uses the existing Fill recorder, Position update service, and Queue reconciliation mutation.
+- Completed Fill and Position work remains idempotent and is not duplicated.
+- Broker Holdings mismatch remains manual review evidence and does not auto-correct positions.json.
+- No new Source of Truth or Queue/Fill/Position/Broker Holdings writer was added.
+- No SendOrder recall, Broker API call, automatic order retry, or automatic CANCEL/MODIFY resend was added.
+- Focused operator reconciliation tests: 3 OK.
+- Chejan + Fill recorder regression: 132 OK.
+- GUI execution / Chejan / Broker holdings regression: 84 OK.
+- Broker holdings regression: 25 OK.
+- Position update regression: 50 OK.
+- Full unittest discover: 5268 OK, 1 skipped.
+- git diff --check passed.
+- py_compile was not completed because of the local Python Manager permission error; full unittest import and execution passed.

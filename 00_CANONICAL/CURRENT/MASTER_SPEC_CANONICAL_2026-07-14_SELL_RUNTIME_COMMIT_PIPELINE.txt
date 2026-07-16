@@ -546,6 +546,59 @@ Completed in the current Big Feature flow:
   unfilled cancel/modify lifecycle boundaries. Do not split this completed
   feature back into smaller follow-up tasks.
 
+12.10 Operator Manual Reconciliation / Recovery Contract
+
+The operator manual Reconciliation / Recovery function is the production
+operator surface for unresolved runtime evidence. It does not create a new
+Source of Truth and does not replace the existing Queue, Fill, Position, or
+Broker Holdings writers.
+
+Production entry point:
+
+- Existing review-required GUI.
+- Runtime evidence integrated from existing Source of Truth files.
+- Operator-confirmed safe retry for incomplete Chejan follow-up work.
+
+Integrated evidence:
+
+- Queue `manual_reconciliation_required`.
+- Queue `chejan_reconciliation_items`.
+- Chejan event identity.
+- Fill ledger application state.
+- Position application state.
+- Broker Holdings vs internal Position mismatch evidence.
+
+Allowed operator action:
+
+- The operator may refresh and inspect unresolved reconciliation items.
+- Retryable Chejan follow-up items may be retried by stored Chejan event
+  identity.
+- Retry uses the existing Fill recorder, existing Position update service, and
+  existing Queue reconciliation mutation.
+- Retry processes only missing downstream steps.
+- Completed Fill and Position mutations remain idempotent and must not be
+  duplicated.
+- After retry, unresolved state is reevaluated from actual runtime evidence.
+
+Safety boundary:
+
+- No new runtime Source of Truth.
+- No new Queue, Fill, Position, or Broker Holdings writer.
+- Broker Holdings must not automatically modify `positions.json`.
+- No SendOrder recall.
+- No Broker API call.
+- No automatic order retry.
+- No automatic CANCEL/MODIFY resend.
+- No bypass of canonical Queue mutation.
+
+Completion baseline:
+
+- Code commit: `dec2efbaf4ad03baf0da00fa2b6fbbf346f818e7`.
+- Full unittest discover: 5268 OK, 1 skipped.
+- `git diff --check`: passed.
+- `py_compile` was not completed because of the local Python Manager
+  permission error; full unittest import and execution passed.
+
 13. BUY Budget Increase Policy Revision
 
 This section replaces older BUY increase descriptions that used fixed X2/X3 or user-array style wording. The project philosophy remains unchanged: BUY planning may define target values, but the final executable order is still constrained by budget, holdings, and execution safety checks.
