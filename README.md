@@ -43,7 +43,8 @@ MASTER_SPEC는 `00_CANONICAL/CURRENT`의 최신 `MASTER_SPEC_CANONICAL_*.txt`를
 운영 원칙:
 
 - 기존 Canonical은 덮어쓰지 않는다.
-- 갱신 시 새 Canonical 파일을 생성한다.
+- Domain별 최신 Canonical을 Living Contract로 유지한다.
+- Historical 문서는 과거 설계 근거이며 현재 계약을 다시 정의하지 않는다.
 - 기존 내용을 임의 삭제하거나 축약하지 않는다.
 - 실제 구현된 내용만 Canonical에 반영한다.
 - CHANGELOG를 통해 변경 이력을 남긴다.
@@ -119,7 +120,7 @@ UPDATE 생성
 ↓
 역할과 Git 절차는 AGENT_WORKFLOW_REFERENCE Workflow v2를 따름
 ↓
-새 MASTER_SPEC Canonical 생성
+Domain별 최신 MASTER_SPEC Canonical 갱신
 ↓
 병합 완료 UPDATE는 MERGED 이동 후보
 ```
