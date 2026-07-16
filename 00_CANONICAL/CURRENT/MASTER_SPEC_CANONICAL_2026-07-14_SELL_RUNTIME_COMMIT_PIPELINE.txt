@@ -454,9 +454,10 @@ evidence and do not modify internal Position state.
 
 Cancel/modify Chejan evidence is partially implemented. Manual cancel/modify
 requests can be created as separate `ORDER_QUEUED` records and sent through
-SendOrder type 3/4/5/6 with `original_order_no`. Broker Chejan evidence still
-must become the source that links the request record to the original order and
-confirms original-order cancellation or modification.
+SendOrder type 3/4/5/6 with `original_order_no`. Chejan FID 904 is preserved
+as the canonical original order number, and broker Chejan evidence links the
+request record to the original order identity before applying original-order
+effects.
 
 12.5 Fill Contract
 
@@ -522,6 +523,15 @@ Completed in the current Big Feature flow:
 - Kiwoom gubun=1 -> `broker_holdings.json`.
 - Broker holdings vs internal positions comparison with manual reconciliation
   evidence.
+- Chejan FID 904 `original_order_no` canonical preservation.
+- cancel/modify request and original order identity validation.
+- CANCEL Chejan request/original single canonical Queue mutation.
+- Original order `CANCELLED` / `PARTIAL_CANCELLED` application.
+- MODIFY Chejan original-order remaining quantity, price, and broker identity
+  relationship preservation.
+- Cross-duplicate CANCEL/MODIFY blocking for the same `original_order_no`.
+- Additional request blocking while a `BROKER_ACCEPTED` cancel/modify request
+  has not confirmed its original-order result.
 
 Partially completed:
 
@@ -529,19 +539,20 @@ Partially completed:
 - Manual request creation reaches separate `ORDER_QUEUED` cancel/modify
   records.
 - SendOrder type 3/4/5/6 is connected with `original_order_no`.
-- Broker Chejan result application back to the original order remains
-  incomplete.
+- Broker Chejan result application back to the original order is connected for
+  the core cancel/modify evidence path, but the final request lifecycle details
+  below remain open.
 
 Remaining cancel/modify disconnects:
 
-- Preserve Chejan FID 904 original order number as a canonical field.
-- Link cancel/modify request records and original orders by identity.
-- Apply cancel results to the original order as `CANCELLED` or
-  `PARTIAL_CANCELLED`.
-- Apply modify results to original-order remaining quantity, price, and broker
-  identity relationship.
-- Block cross-duplicate CANCEL/MODIFY requests for the same
-  `original_order_no` until the original-order result is confirmed.
+- CANCEL `ORDER_ACCEPTED` / `ORDER_OPEN` must record request acceptance only
+  and keep the original order unchanged until `ORDER_CANCELED`.
+- MODIFY original-order effect confirmation must be preserved on the request
+  record.
+- Follow-up CANCEL/MODIFY must be allowed after MODIFY original-order effect
+  confirmation.
+- Manual reconciliation state from other causes must remain preserved after
+  cancel/modify original-order effects.
 
 13. BUY Budget Increase Policy Revision
 

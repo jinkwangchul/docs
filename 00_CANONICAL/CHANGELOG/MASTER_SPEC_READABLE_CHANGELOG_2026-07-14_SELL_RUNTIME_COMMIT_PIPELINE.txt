@@ -68,5 +68,10 @@ Current Source of Truth:
 Unfilled cancel/modify status:
 - Cancel/modify can create separate ORDER_QUEUED request records.
 - SendOrder type 3/4/5/6 is connected with `original_order_no`.
-- The remaining work is applying actual Broker Chejan cancel/modify evidence back to the original order.
-- The next work starts with FID 904 original order number preservation, request/original identity linkage, original-order cancel confirmation, modify result relationship, and cross-duplicate CANCEL/MODIFY blocking for one original order number.
+- FID 904 is preserved as canonical `original_order_no`.
+- cancel/modify request records and original orders are identity-checked before original-order effects are applied.
+- CANCEL Chejan can update the request record and original order in one canonical Queue mutation.
+- Original orders can be confirmed as `CANCELLED` or `PARTIAL_CANCELLED`.
+- MODIFY Chejan preserves the original-order remaining quantity, price, and broker identity relationship.
+- CANCEL/MODIFY requests block each other for the same `original_order_no`, and a `BROKER_ACCEPTED` request blocks additional requests until its original-order result is confirmed.
+- The remaining work is the final request lifecycle detail: CANCEL acceptance should not change the original order, MODIFY effect confirmation should be stored on the request, follow-up requests should be allowed after MODIFY confirmation, and unrelated manual reconciliation reasons must be preserved.

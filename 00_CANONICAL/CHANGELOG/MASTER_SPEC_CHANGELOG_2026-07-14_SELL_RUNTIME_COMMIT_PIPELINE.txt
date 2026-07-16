@@ -106,10 +106,16 @@ Automatic order execution flow accumulation:
 Unfilled cancel/modify partial completion:
 - Manual cancel/modify can create separate ORDER_QUEUED request records.
 - Kiwoom SendOrder type 3/4/5/6 is connected and carries original_order_no.
-- Broker Chejan result application back to the original order is not yet complete.
+- Chejan FID 904 original order number is preserved as canonical original_order_no.
+- cancel/modify request records and original orders are linked by validated identity.
+- CANCEL Chejan can update the request record and original order in one canonical Queue mutation.
+- Cancel result application sets the original order to CANCELLED or PARTIAL_CANCELLED.
+- MODIFY Chejan preserves the original-order remaining quantity, price, and broker identity relationship.
+- Active CANCEL/MODIFY requests block each other for the same original_order_no.
+- BROKER_ACCEPTED cancel/modify requests continue to block additional requests until the original-order result is confirmed.
+- Broker Chejan result application back to the original order is connected for the core cancel/modify evidence path, but final request lifecycle details remain partial.
 - Remaining disconnects:
-  - Chejan FID 904 original order number canonical preservation.
-  - request record and original order identity linkage.
-  - original order CANCELLED / PARTIAL_CANCELLED confirmation from cancel Chejan.
-  - original order remaining quantity, price, and broker identity relationship from modify Chejan.
-  - cross-duplicate CANCEL/MODIFY blocking for the same original_order_no.
+  - CANCEL ORDER_ACCEPTED / ORDER_OPEN should record request acceptance only and leave the original order unchanged.
+  - MODIFY original-order effect confirmation should be preserved on the request record.
+  - follow-up CANCEL/MODIFY should be allowed after MODIFY original-order effect confirmation.
+  - manual reconciliation state from other causes should remain preserved after cancel/modify original-order effects.

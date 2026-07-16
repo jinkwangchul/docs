@@ -29,18 +29,23 @@ Partially completed:
 - Unfilled order cancel/modify execution.
 - Separate ORDER_QUEUED cancel/modify requests are created.
 - Kiwoom SendOrder type 3/4/5/6 is connected and carries original_order_no.
-- Broker Chejan cancel/modify results are not yet fully applied back to the original order.
+- Chejan FID 904 original_order_no is preserved.
+- cancel/modify request records and original orders are identity-checked.
+- CANCEL Chejan can update the request record and original order in one canonical Queue mutation.
+- Original orders can be confirmed as CANCELLED or PARTIAL_CANCELLED.
+- MODIFY Chejan preserves the original-order remaining quantity, price, and broker identity relationship.
+- CANCEL/MODIFY requests block each other for the same original_order_no, including BROKER_ACCEPTED requests before original-order result confirmation.
+- Final request lifecycle details remain open.
 
 Next window start point:
 - Continue the same PR #45 branch.
 - Do not create a new PR or merge before the Big Feature is complete.
 - Preserve protected dirty/untracked files.
-- Implement the remaining cancel/modify Chejan linkage:
-  - preserve Chejan FID 904 original order number as a canonical field;
-  - link cancel/modify request records to the original order by identity;
-  - apply cancel results to the original order as CANCELLED or PARTIAL_CANCELLED;
-  - apply modify results to original-order remaining quantity, price, and broker identity relationship;
-  - block cross-duplicate CANCEL/MODIFY requests for the same original_order_no.
+- Implement the remaining cancel/modify lifecycle details:
+  - CANCEL ORDER_ACCEPTED / ORDER_OPEN records request acceptance only and leaves the original order unchanged;
+  - MODIFY original-order effect confirmation is preserved on the request record;
+  - follow-up CANCEL/MODIFY is allowed after MODIFY original-order effect confirmation;
+  - manual reconciliation state from other causes remains preserved after cancel/modify original-order effects.
 
 Status:
 - kiwoom_auto master and origin/master are synchronized at 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc.
