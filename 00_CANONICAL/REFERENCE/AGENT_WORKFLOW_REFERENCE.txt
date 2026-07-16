@@ -37,7 +37,98 @@ Conversation 시작 시 확인 질문:
 
 YES이면 진행한다. NO이면 사용자의 명시 요청이 없는 한 수행하지 않는다.
 
-## 3. 문서 작성 시점
+## 3. Big Feature Goal Policy
+
+프로젝트 작업 단위는 함수, 파일, 계층, 상태 전이가 아니라 사용자가 실제 사용할 수 있는 큰 기능이다.
+
+코드, 문서, 백업, Git은 Big Feature 완성을 위한 수단이며 독립 목표가 아니다.
+
+작업 시작 시 하나의 Big Feature Goal을 정하고, 해당 기능이 Production 흐름에서 완성될 때까지 목표를 변경하지 않는다.
+
+구조 조사, 코드 작성, 상태 처리, GUI 연결, 예외 처리, 테스트는 독립 작업이 아니라 Big Feature Goal 완성을 위한 내부 작업이다.
+
+Preview, Validator, Gate, Adapter, Wrapper, Executor 또는 개별 상태 전이를 독립적인 다음 작업으로 분리하지 않는다.
+
+신규 계층과 신규 파일은 기존 구조가 해당 책임을 수용할 수 없을 때만 허용한다.
+
+모든 코드 변경은 다음 질문에 답해야 한다.
+
+- 현재 Big Feature Goal의 어떤 사용자 기능을 완성하는가?
+- 실제 Production Call Graph의 어느 단절을 해결하는가?
+- 이 변경 없이 큰 기능을 완성할 수 없는가?
+
+테스트 통과, 파일 생성, 상태 하나 연결, 개별 계층 완성은 기능 완료가 아니다.
+
+완료 기준은 사용자가 해당 큰 기능을 실제 프로젝트 흐름에서 사용할 수 있는 상태인지 여부다.
+
+큰 기능이 완료되기 전에는 다음 기능 선정, 중간 Canonical 작성, 불필요한 PR / Merge 반복, 작업재개 문서 생성을 하지 않는다.
+
+구조 감사와 검증은 큰 기능 완성에 필요한 범위로 제한한다. 조사와 검증 자체를 별도 프로젝트로 확대하지 않는다.
+
+사소한 수정과 오류 보완은 같은 기능 작업 안에서 처리하며 별도 작업 단계로 분리하지 않는다.
+
+완료 보고는 개별 코드 변경이 아니라 Big Feature Goal의 완성도, 실제 사용 흐름, 남은 단절점과 안전 경계를 중심으로 작성한다.
+
+## 4. Shared Foundation Pre-Implementation Policy
+
+기본값은 "신규 공통 저층 작업 없음"이다. 현재 Big Feature는 기존 구조를 사용해 실제 Production 연결을 완성하는 방향으로 진행한다. 공통 저층 구축이나 공통화는 독립 작업 목표가 아니다.
+
+공통 저층 검토는 현재 Big Feature가 기존 구조만으로 완료되지 않고, 막힌 원인이 Source of Truth, Canonical Writer, Broker I/O, 공통 저장, 외부 이벤트 입력, 공유 Mutation Boundary 중 하나에 있을 때만 허용한다. 미래 재사용 가능성, 구조적 깔끔함, 예상 중복만으로 공통화를 시작하지 않는다.
+
+검토가 필요한 경우에도 기존 구조의 최소 수정을 우선한다. 현재 기능에 필요하지 않은 일반화, 인터페이스 확대, 추상화, 리팩터링을 금지한다.
+
+구현 전에 보고가 필요한 경우는 위 조건을 만족해 현재 기능이 실제로 막힌 때뿐이다. 보고는 막힌 공통 경계, 현재 기능이 막힌 이유, 최소 변경 범위만 간단히 제시한다. 같은 Big Feature에서 이미 승인된 범위는 다시 보고하거나 승인받지 않는다.
+
+공통 경계 수정이 끝나면 즉시 현재 Big Feature의 Production Caller 연결로 복귀한다. 공통 기반 구현만 완료한 상태로 작업을 종료하지 않는다.
+
+다음은 공통 저층 사전 보고 대상으로 보지 않는다: 기능 내부 helper, 작은 함수, GUI 버튼과 Dialog, BUY / SELL별 정책, 가격 / 호가 / 수량 결정, 테스트 fixture / mock, 단순 이름 변경, 기존 계약을 바꾸지 않는 입력 검증, 기존 계층을 사용하는 Production Caller 연결, 특정 기능에서만 쓰는 Preview / Gate / Adapter.
+
+정책 충돌 시 Source of Truth와 Mutation Boundary는 우회할 수 없다. 동시에 Source of Truth 보호를 이유로 필요하지 않은 공통 계층을 만들 수도 없다.
+
+Shared Foundation 보고를 이유로 별도 PR이나 Merge를 만들지 않는다. 작은 공통 경계 수정은 기존 Big Feature 작업에 누적한다.
+
+## 5. Big Feature Git Completion Policy
+
+PR과 Merge의 기본 단위는 개별 파일, 함수, 상태 전이, 작은 수정이 아니라 Big Feature Goal이다.
+
+Big Feature Goal이 완료되기 전에는 작은 단계가 끝났다는 이유로 PR 생성, Review, Merge, Branch 정리를 반복하지 않는다.
+
+Big Feature 구현 중에는 의미 있는 복구 지점이 필요할 때만 Commit한다. 중간 Commit은 작업 완료나 PR 생성 사유가 아니다.
+
+Push는 코드 유실 방지나 다른 환경 동기화가 필요할 때 수행할 수 있지만, Push 자체를 기능 완료로 판단하지 않는다.
+
+기본 Git 흐름:
+
+Big Feature Branch 생성 -> 기능 완성까지 연속 구현 -> 필요한 중간 Commit -> Big Feature Production 연결 검증 -> 전체 영향 검증 -> PR 1회 -> Review 1회 -> 사용자 승인 -> Merge 1회 -> 기본 Branch 동기화
+
+Big Feature 완료 전 별도 PR 허용 조건:
+
+- 실제 주문 또는 Broker API 안전 경계 변경
+- Source of Truth 또는 Canonical Writer 변경
+- 데이터 손실 위험이 있는 Migration
+- 긴급 장애 수정
+- 사용자가 별도 PR을 명시적으로 지시한 경우
+
+AI/Codex는 PR 또는 Merge를 제안하기 전에 다음을 확인한다.
+
+- 현재 Big Feature Goal이 무엇인가?
+- 해당 기능이 실제 Production Call Graph에서 완성됐는가?
+- 사용자에게 실제 사용 가능한 결과가 생겼는가?
+- 남은 단절점이 없는가?
+
+하나라도 충족하지 않으면 PR / Merge를 제안하지 않고 같은 Big Feature 구현을 계속한다.
+
+Conversation이나 작업 세션이 바뀌어도 최신 Big Feature Goal과 완료 조건을 먼저 확인한다. 개별 Commit이나 직전 수정 내용을 새로운 작업 목표로 오인하지 않는다.
+
+완료 보고 전 다음 문장을 확인한다.
+
+"지금 완료하려는 대상은 코드 변경인가, 실제 큰 기능인가?"
+
+코드 변경만 완료된 상태라면 Big Feature 완료 보고, PR, Merge 단계로 진행하지 않는다.
+
+기존 Git / PR / Merge 절차는 유지한다. Big Feature Goal이 진행 중인 경우에는 본 정책이 개별 변경 단위 Git 절차보다 우선한다.
+
+## 6. 문서 작성 시점
 
 문서는 구현 결과를 기록하는 용도이다.
 
@@ -57,7 +148,7 @@ YES이면 진행한다. NO이면 사용자의 명시 요청이 없는 한 수행
 
 Conversation 종료 문서는 한 번만 작성한다.
 
-## 4. 역할 분리
+## 7. 역할 분리
 
 ChatGPT 역할:
 
@@ -85,7 +176,7 @@ Codex 역할:
 
 일반 Agent 역할 규정은 운영 규칙에 포함하지 않는다.
 
-## 5. 작업 범위와 승인
+## 8. 작업 범위와 승인
 
 Codex는 사용자가 지정한 범위 안에서만 작업한다.
 
@@ -103,7 +194,7 @@ Codex는 사용자가 지정한 범위 안에서만 작업한다.
 
 보고는 삭제, 통합, 이동, deprecate 승인으로 간주하지 않는다.
 
-## 6. 구조 변경 통제
+## 9. 구조 변경 통제
 
 프로젝트의 최대 리스크는 AI 구현 과정에서 발생하는 구조 오염이다.
 
@@ -130,7 +221,7 @@ Layer 이름은 근거가 아니다. 책임, caller, mutation, Source of Truth, 
 
 - 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt
 
-## 7. Runtime 안전 금지선
+## 10. Runtime 안전 금지선
 
 명시 승인 전 금지:
 
@@ -148,7 +239,7 @@ Preview / Validation / Approval / Dry-run 계층은 실제 side effect를 만들
 
 실제 side effect가 허용된 작업은 사용자 지시의 commit boundary 안에서만 수행한다.
 
-## 8. Git / PR / Merge 절차
+## 11. Git / PR / Merge 절차
 
 Code repository 기본 절차:
 
@@ -186,7 +277,9 @@ Docs repository 기본 절차:
 - 보호 dirty 파일 stage
 - merge 전 추가 범위 수정
 
-## 9. GitHub 최종 검증
+Git / PR / Merge는 Big Feature Goal 완성을 위한 관리 수단이다. Preview, Validator, Gate, Adapter, Wrapper, Executor 또는 상태 하나를 완료했다는 이유만으로 불필요한 PR / Merge를 반복하지 않는다.
+
+## 12. GitHub 최종 검증
 
 최종 보고 전 GitHub 기본 브랜치 기준으로 확인한다.
 
@@ -206,7 +299,7 @@ Docs repository 기본 절차:
 
 Reference Index 수정 시 과거 다음 작업, 과거 진행 상태, 과거 역할 설명, 완료 상태, Legacy 안내가 최신 Canonical과 충돌하지 않는지 확인한다.
 
-## 10. 최종 보고 규칙
+## 13. 최종 보고 규칙
 
 최종 보고는 결과 중심으로 작성한다.
 
@@ -239,7 +332,7 @@ Completion Report Policy:
 
 불필요한 장문 설명, 반복 설명, 요청 없는 선택지 제시는 하지 않는다.
 
-## 11. Codex 작업 지시문 작성 규칙
+## 14. Codex 작업 지시문 작성 규칙
 
 Codex 지시문에는 Codex가 수행할 작업만 작성한다.
 
@@ -248,7 +341,7 @@ Codex 지시문에는 Codex가 수행할 작업만 작성한다.
 - 작업 범위, 수정 내용, 금지 범위, 검증, 완료 보고만 작성한다.
 - 검토 의견과 실행 지시는 분리한다.
 - 하나의 PR에 필요한 내용만 포함한다.
-## 12. MASTER SPEC Maintenance Policy
+## 15. MASTER SPEC Maintenance Policy
 
 MASTER SPEC의 기본 원칙은 Living Contract 유지이다.
 
@@ -260,7 +353,7 @@ MASTER SPEC의 기본 원칙은 Living Contract 유지이다.
 - Runtime Living Contract는 최신 Runtime Canonical만 기준으로 사용한다.
 - 대규모 Canonical 재작성은 Living Contract가 분산된 경우에만 수행한다.
 
-## 13. Backtest Audit Log Architecture
+## 16. Backtest Audit Log Architecture
 
 별도 공식 문서 생성 전까지 임시 보존한다. 공식 Canonical이 생기면 AGENT에는 참조만 남긴다.
 
