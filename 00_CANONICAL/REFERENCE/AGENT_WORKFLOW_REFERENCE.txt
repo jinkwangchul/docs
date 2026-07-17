@@ -150,6 +150,15 @@ Startup triggers:
 - Resuming after a Git baseline change
 - User asks to verify current baseline before work
 
+Session Startup Source Resolution Policy:
+
+Before reading project documents or source code, identify the active work environment.
+
+- ChatGPT with GitHub connector: use the GitHub docs repository and GitHub code repository as the remote backup and restoration baseline.
+- Local Codex / VSCode: use the local docs repository and local code repository as the working baseline.
+
+Use the source that matches the active environment. Do not mix GitHub connector state and local repository state unless the user explicitly asks for a comparison.
+
 Startup execution flow:
 
 1. Read the Latest Work Resume only for the previous completion state and next implementation target.
@@ -206,7 +215,84 @@ Freeze is complete only when the next AI can continue the same work from GitHub 
 
 Freeze must not record ideas, unapproved plans, or discussed UI proposals as Canonical.
 
-## 10. Local Git And GitHub
+## 10. Conversation Closing Standard Procedure
+
+Run this procedure only when the user explicitly says they are moving to the next conversation, opening a new window, closing the window, finishing, wrapping up, or equivalent.
+
+Step 1. Codex Closing Prompt
+
+Create a concrete closing prompt for Codex to finish the current work.
+
+The Codex Closing Prompt must include:
+
+1. Source of Truth document update:
+   - Latest Canonical when needed
+   - AGENT_WORKFLOW_REFERENCE when needed
+   - Reference documents when needed
+   - Work Resume when needed
+   - Changelog or other Canonical documents when needed
+2. Verification:
+   - Review changed content
+   - Run `git diff --check`
+   - Run any other required verification
+3. Git work:
+   - Commit
+   - Push
+   - Confirm latest GitHub state
+4. Final report:
+   - Updated Source of Truth document list
+   - Commit SHA
+   - Push result
+   - Verification result
+   - Next Session Startup Prompt
+
+The Codex Closing Prompt must end by creating the Next Session Startup Prompt so the next session can start implementation immediately.
+
+The final report should contain only the required result. Do not include unnecessary intermediate work logs.
+
+Step 2. Next Session Startup Prompt
+
+After the closing work is complete, create a concrete Next Session Startup Prompt for the next conversation.
+
+The prompt must include:
+
+1. Environment resolution:
+   - ChatGPT with GitHub connector
+   - Local Codex / VSCode
+2. Source of Truth selection:
+   - GitHub environment uses the GitHub repository.
+   - Local environment uses the local repository.
+   - Do not mix the two environments unless the user asks.
+3. Startup procedure:
+   - Do not use memory or the previous conversation as Source of Truth.
+   - Check `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`.
+   - Check `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`.
+   - Check the latest `MASTER_SPEC_CANONICAL`.
+   - Check the latest `WORK_RESUME`.
+   - Check required Reference documents only when the next task needs them.
+4. Repository state:
+   - Branch
+   - Commit
+   - Dirty or untracked state
+   - Recently completed work
+   - Current implementation location
+5. Next implementation task:
+   - Name one concrete implementation task to perform first in the next session.
+   - The task must be specific enough to implement immediately.
+   - Do not select a new feature or change scope without explicit user instruction.
+   - Do not write the next action as an abstract area such as "continue Execution Layer" or "continue order system"; name the concrete task identifier.
+
+Step 3. Handover Validation
+
+Before closing the conversation, verify:
+- The Next Session Startup Prompt alone is enough to resume work.
+- The next task is specific enough to implement immediately.
+- The prompt refers to the latest Source of Truth for the selected environment.
+- No confirmed decision is missing from the applicable Source of Truth document.
+- Required document updates are complete.
+- GitHub backup is complete when GitHub backup was required.
+
+## 11. Local Git And GitHub
 
 Git is used for:
 - Local version management
@@ -231,7 +317,7 @@ Rules:
 - Do not reset, restore, stash, clean, or delete protected dirty/untracked files unless the user explicitly asks.
 - Report branch, local SHA, remote SHA, ahead/behind, status, diff, and untracked files when doing baseline verification.
 
-## 11. Document Roles
+## 12. Document Roles
 
 Document hierarchy: AI operating rules -> AGENT_WORKFLOW_REFERENCE; technical contract -> Latest Canonical; recovery -> Latest Work Resume; change history -> Latest Changelog; navigation -> Reference Index; repository guide -> README; historical evidence -> 20_ARCHIVE.
 
@@ -253,7 +339,7 @@ Rules:
 - Changelog records what changed in a Canonical update.
 - Intermediate documents are forbidden unless user explicitly asks.
 
-## 12. Prompt Standard
+## 13. Prompt Standard
 
 Permanent operating rules are not repeated in every task prompt.
 
@@ -277,7 +363,7 @@ Prompt checklist:
 - Is the purpose one sentence?
 - Is the report format not excessive?
 
-## 13. Verification And Reporting
+## 14. Verification And Reporting
 
 No conclusion without evidence.
 
@@ -318,7 +404,7 @@ Report order for bug/feature work:
 
 Do not over-report file and function names before explaining actual user-facing behavior.
 
-## 14. Prohibited Defaults
+## 15. Prohibited Defaults
 
 Unless explicitly requested, do not:
 - Create new project concepts
@@ -335,7 +421,7 @@ Unless explicitly requested, do not:
 - Expand a bug task into architecture cleanup
 - Turn analysis into implementation
 
-## 15. Final Principle
+## 16. Final Principle
 
 The AI's job is to make the current real project work under the user's contracts.
 
