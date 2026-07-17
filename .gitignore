@@ -20,6 +20,8 @@ __pycache__/
 # Local Codex / agent workspace metadata
 .agents/
 .codex/
+20_ARCHIVE/CHAT_HISTORY/
+grep_result.json
 
 # Temporary docs review area
 90_TEMP/
@@ -39,4 +41,3 @@ MASTER_SPEC_v4.0/
 *.7z
 *.rar
 프로젝트폴더백업/
-
