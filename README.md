@@ -15,7 +15,7 @@ AI_SESSION_START_PROTOCOL.md.
 - MASTER_SPEC Canonical을 기준 문서로 관리한다.
 - CHANGELOG로 Canonical 변경 이력을 보존한다.
 - UPDATE 문서로 신규 변경 후보를 수집한다.
-- 운영 매뉴얼과 docs 운영 표준으로 ChatGPT / Codex / 일반 코드 모델 3모델 협업 절차를 고정한다.
+- 운영 매뉴얼과 docs 운영 표준으로 ChatGPT / Codex / 일반 코드 모델 3모델 작업 기준을 고정한다.
 - ARCHIVE와 REPORTS를 통해 과거 문서와 관리 보고서를 보존한다.
 
 ## 기본 구조
@@ -29,7 +29,7 @@ docs/
     OPEN_ISSUES/
   10_UPDATE/
     INBOX/
-    MERGED/
+    APPLIED/
     TEMPLATE/
   20_ARCHIVE/
   30_REPORTS/
@@ -51,7 +51,7 @@ MASTER_SPEC는 `00_CANONICAL/CURRENT`의 최신 `MASTER_SPEC_CANONICAL_*.txt`를
 
 ## AI Reference Edition
 
-최신 MASTER_SPEC Canonical은 크기가 커서 GitHub Web과 일부 AI Connector에서 전체 내용을 한 번에 읽기 어렵다. 이를 위해 `00_CANONICAL/REFERENCE`에 AI 참조용 분할본을 둔다.
+최신 MASTER_SPEC Canonical은 크기가 커서 일부 도구에서 전체 내용을 한 번에 읽기 어렵다. 이를 위해 `00_CANONICAL/REFERENCE`에 AI 참조용 분할본을 둔다.
 
 Reference Edition 원칙:
 
@@ -122,7 +122,7 @@ UPDATE 생성
 ↓
 Domain별 최신 MASTER_SPEC Canonical 갱신
 ↓
-병합 완료 UPDATE는 MERGED 이동 후보
+반영 완료 UPDATE는 APPLIED 이동 후보
 ```
 
 ## CHANGELOG 정책
@@ -133,7 +133,7 @@ CHANGELOG는 `00_CANONICAL/CHANGELOG`에 보관한다.
 
 - 기존 CHANGELOG를 수정하지 않는다.
 - 새 변경은 새 날짜 또는 새 주제 CHANGELOG로 작성한다.
-- 추가 섹션, 병합 위치, 테스트 현황, 금지선 유지 여부를 기록한다.
+- 추가 섹션, 반영 위치, 테스트 현황, 금지선 유지 여부를 기록한다.
 
 ## ARCHIVE 정책
 
@@ -142,7 +142,7 @@ CHANGELOG는 `00_CANONICAL/CHANGELOG`에 보관한다.
 정책:
 
 - 삭제보다 ARCHIVE 이동을 우선한다.
-- 중복 의심 파일도 해시 비교와 사용자 승인 전에는 삭제하지 않는다.
+- 중복 의심 파일도 해시 비교와 사용자 명시 허가 전에는 삭제하지 않는다.
 - 압축 원본은 Git 포함보다 로컬 보관 또는 별도 release/storage 사용을 권장한다.
 
 ## 새 대화 시작 시 참조 순서
@@ -158,11 +158,13 @@ CHANGELOG는 `00_CANONICAL/CHANGELOG`에 보관한다.
 9. `00_CANONICAL/CHANGELOG`
 10. `20_ARCHIVE`
 
-## GitHub 운영 원칙
+## Local Git 운영 원칙
 
-- GitHub 최신 docs 저장소를 문서 Source of Truth로 사용한다.
-- docs 저장소는 PR 의무 없음.
-- commit/push는 사용자 승인 후 수행한다.
-- commit/push 전 diff와 Stage 대상 확인은 필수이다.
+- 로컬 프로젝트 파일과 문서가 작업 기준이다.
+- 실제 실행되는 코드, Runtime 상태, 실행 결과를 기준으로 검증한다.
+- Git은 로컬 버전 복구, 이력 확인, diff 확인 용도로 사용한다.
+- GitHub는 개발 절차가 아니라 백업 저장소로만 사용한다.
+- commit은 사용자 명시 허가 후 수행한다.
+- commit 전 diff와 stage 대상 확인은 필수이다.
 - 백업 zip, TEMP, 로컬 캐시는 Git 포함을 피한다.
 - 문서 변경과 구현 코드 변경은 분리한다.

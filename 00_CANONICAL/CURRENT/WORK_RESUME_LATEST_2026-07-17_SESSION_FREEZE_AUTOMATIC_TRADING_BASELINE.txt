@@ -1,0 +1,56 @@
+WORK_RESUME_LATEST_2026-07-17_SESSION_FREEZE_AUTOMATIC_TRADING_BASELINE
+
+Session purpose:
+- Freeze the current local project and documentation baseline for the next
+  session.
+
+Project state:
+- Repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: 9df8b9957867d25ffc32cb623c4248e044ec7bd6
+- Push target: origin/feat/restore-auto-trade-setting-ui
+- Untracked runtime lock, backup, and stock log files were not included in the
+  project commit.
+
+Documentation state:
+- Repository: C:\Users\JIN KWANG CHUL\Documents\docs
+- Branch before documentation freeze commit: agent/project-prompt-standard
+- Latest Canonical:
+  MASTER_SPEC_CANONICAL_2026-07-17_SESSION_FREEZE_AUTOMATIC_TRADING_BASELINE.txt
+- Latest Changelog:
+  MASTER_SPEC_CHANGELOG_2026-07-17_SESSION_FREEZE_AUTOMATIC_TRADING_BASELINE.txt
+- Latest Work Resume:
+  WORK_RESUME_LATEST_2026-07-17_SESSION_FREEZE_AUTOMATIC_TRADING_BASELINE.txt
+
+Completed in this session:
+- Runtime file initialization connection and related tests were accumulated in
+  the local project state.
+- AutoTradeSettingWindow automatic execution path was connected far enough to
+  process executable candidates automatically.
+- Actual GUI timer validation confirmed SELL signals are consumed and correctly
+  blocked when holding_qty is 0.
+- Temporary BUY fixture validation confirmed BUY signal -> PENDING -> consumer
+  -> EXECUTABLE -> Execution Enable -> REAL_READY.
+- The current confirmed disconnect is REAL_READY -> execution_preview.
+- MainWindow structure was analyzed for the future control-window layout work.
+
+Current confirmed disconnect:
+- BUY temporary validation stops at process_executable_order_for_auto_trade
+  stage = execution_preview.
+- The caller receives blocked_reasons = [] at that stage, so the detailed
+  execution preview block reason is not exposed to the automatic caller.
+
+Next session start point:
+- Run AI_SESSION_START_PROTOCOL.
+- Confirm the project commit and docs commit from this freeze.
+- Resume from the confirmed disconnect:
+  REAL_READY -> preview_execution_for_real_ready_order -> execution_preview.
+- Do not start by redesigning the main window.
+- Do not treat the discussed main window layout as implemented or Canonical.
+
+Safety notes:
+- Actual Kiwoom SendOrder was not called.
+- Mock Kiwoom API was used for BUY execution-chain validation.
+- Real rules.json and real stock state were not modified for BUY validation.
+- Runtime files were not manually initialized with empty JSON.
+- Existing Source of Truth and Writer boundaries remain in force.

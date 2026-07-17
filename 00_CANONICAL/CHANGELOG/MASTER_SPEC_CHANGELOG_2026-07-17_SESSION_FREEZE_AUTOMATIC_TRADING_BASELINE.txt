@@ -1,0 +1,31 @@
+MASTER_SPEC_CHANGELOG_2026-07-17_SESSION_FREEZE_AUTOMATIC_TRADING_BASELINE
+
+Purpose:
+- Record the 2026-07-17 session-freeze baseline as a new Canonical update.
+- Preserve older Canonical and Changelog files as historical evidence.
+
+Code baseline:
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: 9df8b9957867d25ffc32cb623c4248e044ec7bd6
+- Push target: origin/feat/restore-auto-trade-setting-ui
+
+Confirmed changes in this Canonical:
+- The current automatic trading GUI timer path was validated from
+  AutoTradeSettingWindow through routine signal probing and consumer processing.
+- Actual local SELL signals for 003550 LG were processed and correctly blocked
+  as SELL_NO_HOLDING_CANDIDATE because holding_qty is 0.
+- A temporary BUY fixture with Mock Kiwoom API validated the automatic path
+  through BUY signal, PENDING, consumer, EXECUTABLE, Execution Enable, and
+  REAL_READY.
+- The current confirmed automatic execution disconnect is at
+  preview_execution_for_real_ready_order / execution_preview.
+- ORDER_QUEUED, Runtime Commit, Final Send Gate, dispatch claim,
+  execute_claimed_send_order, and Mock SendOrder were not reached in the BUY
+  fixture validation.
+- Actual Kiwoom SendOrder was not called.
+- MainWindow structure and connected/incomplete operations were analyzed.
+
+Not added as Canonical:
+- Main control window layout proposals.
+- Future UI implementation ideas.
+- Any unapproved Runtime, Queue, Execution, or SendOrder contract change.

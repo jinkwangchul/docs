@@ -1,0 +1,146 @@
+MASTER_SPEC_CANONICAL_2026-07-17_SESSION_FREEZE_AUTOMATIC_TRADING_BASELINE
+
+Status:
+- Official Canonical session-freeze baseline for the current local project state.
+- This document records only confirmed implementation and validation state from
+  the session ending on 2026-07-17.
+- UI layout proposals and future implementation ideas are not Canonical here.
+- Older Canonical files are preserved and are not modified.
+
+Repository baseline:
+- kiwoom_auto branch: feat/restore-auto-trade-setting-ui
+- kiwoom_auto commit: 9df8b9957867d25ffc32cb623c4248e044ec7bd6
+- Push target: origin/feat/restore-auto-trade-setting-ui
+
+1. Confirmed Automatic Trading Execution State
+
+The local code contains the current automatic trading execution chain through
+the GUI timer path:
+
+AutoTradeSettingWindow
+-> on_time_policy_timer_tick
+-> auto_trade_on_time_policy_timer_tick
+-> probe_selected_routine_once
+-> routine signal queue
+-> consume_pending_routine_signals_dry_run
+-> order_queue candidate creation
+-> auto_process_executable_orders_for_real_trade
+-> process_executable_order_for_auto_trade
+
+2. Confirmed SELL Validation Result
+
+With the actual local runtime state for 003550 LG:
+
+- status = RUNNING
+- trade_enabled = true
+- real_trade_enabled = true
+- signal_probe_only = false
+- review_required = false
+- holding_qty = 0
+
+The GUI timer path produced SELL signals and the consumer processed them.
+The order candidates were correctly blocked as SELL_NO_HOLDING_CANDIDATE.
+
+Confirmed boundary:
+- SELL without holding quantity does not proceed to EXECUTABLE dispatch.
+- No Kiwoom SendOrder was called.
+- No runtime execution or lock files were created by that blocked path.
+
+3. Confirmed BUY Validation Result
+
+Using a temporary fixture runtime and Mock Kiwoom API only, without modifying
+the real rules.json, real stock state, or real runtime files, the BUY path was
+validated as follows:
+
+AutoTradeSettingWindow actual GUI instance
+-> Mock Kiwoom connected
+-> RUNNING target stock
+-> on_time_policy_timer_tick
+-> auto_trade_on_time_policy_timer_tick
+-> probe_selected_routine_once
+-> BUY signal
+-> routine_signals.json PENDING
+-> consume_pending_routine_signals_dry_run
+-> EXECUTABLE order candidate
+-> Execution Enable
+-> REAL_READY
+-> execution_preview block
+
+Confirmed boundary:
+- BUY signal generation works.
+- PENDING signal creation works.
+- Consumer processing works.
+- EXECUTABLE order candidate creation works.
+- Execution Enable succeeds.
+- REAL_READY succeeds.
+- ORDER_QUEUED was not created in the fixture validation.
+- Runtime File Init and Runtime Commit were not entered.
+- Final Send Gate, dispatch claim, execute_claimed_send_order, and Mock
+  SendOrder were not entered.
+- Actual Kiwoom SendOrder was not called.
+
+4. Current Execution Disconnect
+
+The currently confirmed remaining disconnect is:
+
+REAL_READY
+-> preview_execution_for_real_ready_order
+-> execution_preview stage blocks
+
+The automatic processing result reports:
+
+- processed = false
+- stage = execution_preview
+- blocked_reasons = []
+
+This means the current block location is confirmed, but the return contract
+does not expose the detailed block reason to the caller.
+
+5. Main Control Window Analysis State
+
+The actual application entry point is:
+
+gui_main.py
+-> gui_windows.MainWindow
+
+Confirmed current MainWindow areas:
+
+- top system status area
+- budget summary area
+- registered routine table
+- running auto-trade stock table
+- bottom command buttons
+
+Confirmed connected operations:
+
+- Kiwoom login
+- account list and selected account
+- emergency stop and release
+- stock registration window
+- auto trade setting window
+- startup recovery resume
+- review-required management window
+- routine settings dialog from the main routine table
+
+Confirmed placeholder or incomplete operations:
+
+- initial reset button is not implemented
+- main log-view button is not implemented
+- full auto-trade stop button displays confirmation but is not connected to
+  full production stop execution
+
+The main control window layout proposal discussed in the session is not a
+Canonical implementation contract yet.
+
+6. Safety Boundaries
+
+The following boundaries remain confirmed:
+
+- No actual Kiwoom SendOrder was executed during validation.
+- Mock Kiwoom API was used for execution-chain validation.
+- Real rules.json was not modified for BUY validation.
+- Real stock state was not manually edited for BUY validation.
+- Runtime files were not manually initialized with empty JSON.
+- Existing Source of Truth and Writer boundaries remain in force.
+- UI layout proposals require explicit implementation approval before code
+  changes.

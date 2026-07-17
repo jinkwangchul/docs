@@ -20,7 +20,7 @@ Source of Truth: 최신 Canonical과 본 Reference
 1. 코드 구현
 2. 테스트
 3. 코드 검토
-4. Git / PR / Merge
+4. Local Git
 5. 문서 작업
 
 금지:
@@ -61,7 +61,7 @@ Preview, Validator, Gate, Adapter, Wrapper, Executor 또는 개별 상태 전이
 
 완료 기준은 사용자가 해당 큰 기능을 실제 프로젝트 흐름에서 사용할 수 있는 상태인지 여부다.
 
-큰 기능이 완료되기 전에는 다음 기능 선정, 중간 Canonical 작성, 불필요한 PR / Merge 반복, 작업재개 문서 생성을 하지 않는다.
+큰 기능이 완료되기 전에는 다음 기능 선정, 중간 Canonical 작성, 불필요한 기능 완성과 무관한 절차 반복, 작업재개 문서 생성을 하지 않는다.
 
 구조 감사와 검증은 큰 기능 완성에 필요한 범위로 제한한다. 조사와 검증 자체를 별도 프로젝트로 확대하지 않는다.
 
@@ -77,7 +77,7 @@ Preview, Validator, Gate, Adapter, Wrapper, Executor 또는 개별 상태 전이
 
 검토가 필요한 경우에도 기존 구조의 최소 수정을 우선한다. 현재 기능에 필요하지 않은 일반화, 인터페이스 확대, 추상화, 리팩터링을 금지한다.
 
-구현 전에 보고가 필요한 경우는 위 조건을 만족해 현재 기능이 실제로 막힌 때뿐이다. 보고는 막힌 공통 경계, 현재 기능이 막힌 이유, 최소 변경 범위만 간단히 제시한다. 같은 Big Feature에서 이미 승인된 범위는 다시 보고하거나 승인받지 않는다.
+구현 전에 보고가 필요한 경우는 위 조건을 만족해 현재 기능이 실제로 막힌 때뿐이다. 보고는 막힌 공통 경계, 현재 기능이 막힌 이유, 최소 변경 범위만 간단히 제시한다. 같은 Big Feature에서 이미 허가된 범위는 다시 보고하거나 허가받지 않는다.
 
 공통 경계 수정이 끝나면 즉시 현재 Big Feature의 Production Caller 연결로 복귀한다. 공통 기반 구현만 완료한 상태로 작업을 종료하지 않는다.
 
@@ -85,48 +85,38 @@ Preview, Validator, Gate, Adapter, Wrapper, Executor 또는 개별 상태 전이
 
 정책 충돌 시 Source of Truth와 Mutation Boundary는 우회할 수 없다. 동시에 Source of Truth 보호를 이유로 필요하지 않은 공통 계층을 만들 수도 없다.
 
-Shared Foundation 보고를 이유로 별도 PR이나 Merge를 만들지 않는다. 작은 공통 경계 수정은 기존 Big Feature 작업에 누적한다.
+Shared Foundation 보고를 이유로 별도 기능 완성과 무관한 절차를 만들지 않는다. 작은 공통 경계 수정은 기존 Big Feature 작업에 누적한다.
 
-## 5. Big Feature Git Completion Policy
+## 5. Big Feature Local Git Completion Policy
 
-PR과 Merge의 기본 단위는 개별 파일, 함수, 상태 전이, 작은 수정이 아니라 Big Feature Goal이다.
+Git은 Big Feature 완성을 위한 로컬 복구와 이력 관리 수단이다. 기능 완성과 무관한 절차는 현재 개발 단계의 기본 절차로 사용하지 않는다.
 
-Big Feature Goal이 완료되기 전에는 작은 단계가 끝났다는 이유로 PR 생성, Review, Merge, Branch 정리를 반복하지 않는다.
+Big Feature Goal이 완료되기 전에는 작은 단계가 끝났다는 이유로 Git 절차를 반복하지 않는다.
 
-Big Feature 구현 중에는 의미 있는 복구 지점이 필요할 때만 Commit한다. 중간 Commit은 작업 완료나 PR 생성 사유가 아니다.
+Big Feature 구현 중에는 의미 있는 복구 지점이 필요할 때만 commit한다. 중간 commit은 기능 완료 사유가 아니다.
 
-Push는 코드 유실 방지나 다른 환경 동기화가 필요할 때 수행할 수 있지만, Push 자체를 기능 완료로 판단하지 않는다.
+GitHub는 개발 절차가 아니라 백업 저장소로만 사용한다. 원격 백업이 필요한 경우에도 사용자 명시 허가 후 수행한다.
 
-기본 Git 흐름:
+기본 작업 흐름:
 
-Big Feature Branch 생성 -> 기능 완성까지 연속 구현 -> 필요한 중간 Commit -> Big Feature Production 연결 검증 -> 전체 영향 검증 -> PR 1회 -> Review 1회 -> 사용자 승인 -> Merge 1회 -> 기본 Branch 동기화
+문제 정의 -> 호출 경로 추적 -> 실제 중단 위치 확인 -> 최소 수정 -> 실행 검증 -> 필요한 경우 로컬 commit
 
-Big Feature 완료 전 별도 PR 허용 조건:
-
-- 실제 주문 또는 Broker API 안전 경계 변경
-- Source of Truth 또는 Canonical Writer 변경
-- 데이터 손실 위험이 있는 Migration
-- 긴급 장애 수정
-- 사용자가 별도 PR을 명시적으로 지시한 경우
-
-AI/Codex는 PR 또는 Merge를 제안하기 전에 다음을 확인한다.
+AI/Codex는 Git 작업을 제안하기 전에 다음을 확인한다.
 
 - 현재 Big Feature Goal이 무엇인가?
 - 해당 기능이 실제 Production Call Graph에서 완성됐는가?
 - 사용자에게 실제 사용 가능한 결과가 생겼는가?
 - 남은 단절점이 없는가?
 
-하나라도 충족하지 않으면 PR / Merge를 제안하지 않고 같은 Big Feature 구현을 계속한다.
+하나라도 충족하지 않으면 Git 절차로 작업을 종료하지 않고 같은 Big Feature 구현을 계속한다.
 
-Conversation이나 작업 세션이 바뀌어도 최신 Big Feature Goal과 완료 조건을 먼저 확인한다. 개별 Commit이나 직전 수정 내용을 새로운 작업 목표로 오인하지 않는다.
+Conversation이나 작업 세션이 바뀌어도 최신 Big Feature Goal과 완료 조건을 먼저 확인한다. 개별 commit이나 직전 수정 내용을 새로운 작업 목표로 오인하지 않는다.
 
 완료 보고 전 다음 문장을 확인한다.
 
 "지금 완료하려는 대상은 코드 변경인가, 실제 큰 기능인가?"
 
-코드 변경만 완료된 상태라면 Big Feature 완료 보고, PR, Merge 단계로 진행하지 않는다.
-
-기존 Git / PR / Merge 절차는 유지한다. Big Feature Goal이 진행 중인 경우에는 본 정책이 개별 변경 단위 Git 절차보다 우선한다.
+코드 변경만 완료된 상태라면 Big Feature 완료 보고나 Git 마감 단계로 진행하지 않는다.
 
 ## 6. 문서 작성 시점
 
@@ -144,7 +134,7 @@ Conversation이나 작업 세션이 바뀌어도 최신 Big Feature Goal과 완�
 
 1. 사용자가 명시적으로 문서 작업을 요청한 경우
 2. Conversation 종료 시 사용자가 마무리 / 다음 창 / 문서 작성 / 작업재개 문서 생성을 요청한 경우
-3. 대규모 아키텍처 변경으로 사용자가 문서 갱신을 승인한 경우
+3. 대규모 아키텍처 변경으로 사용자가 문서 갱신을 허가한 경우
 
 Conversation 종료 문서는 한 번만 작성한다.
 
@@ -156,11 +146,11 @@ ChatGPT 역할:
 - 구현 방향 결정
 - 작업 우선순위 결정
 - 계약 검토
-- 코드 리뷰
+- 코드 검토
 - 버그 원인 분석
 - 구현 범위 결정
 - Codex 작업 지시 작성
-- 최종 Merge 승인 판단
+- 최종 작업 범위 확인
 
 Codex 역할:
 
@@ -169,30 +159,30 @@ Codex 역할:
 - 테스트 작성
 - Git 작업
 - Commit
-- Push
-- PR
-- Merge
+- 사용자 명시 허가 시 백업 push
+- 로컬 Git 이력 확인
+- 실행 검증 결과 보고
 - ChatGPT가 결정한 구현 작업 수행
 
 일반 Agent 역할 규정은 운영 규칙에 포함하지 않는다.
 
-## 8. 작업 범위와 승인
+## 8. 작업 범위와 허가
 
 Codex는 사용자가 지정한 범위 안에서만 작업한다.
 
 금지:
 
-- 사용자 승인 없는 신규 계층 생성
-- 사용자 승인 없는 상태명 변경
-- 사용자 승인 없는 writer 변경
-- 사용자 승인 없는 Source of Truth 변경
-- 사용자 승인 없는 production call graph 변경
-- 사용자 승인 없는 lifecycle owner 변경
+- 사용자 명시 허가 없는 신규 계층 생성
+- 사용자 명시 허가 없는 상태명 변경
+- 사용자 명시 허가 없는 writer 변경
+- 사용자 명시 허가 없는 Source of Truth 변경
+- 사용자 명시 허가 없는 production call graph 변경
+- 사용자 명시 허가 없는 lifecycle owner 변경
 - 보호 dirty / untracked 파일 수정, stage, restore, reset, stash
 
 구조 문제가 발견되면 먼저 조사 결과와 선택지를 보고한다.
 
-보고는 삭제, 통합, 이동, deprecate 승인으로 간주하지 않는다.
+보고는 삭제, 통합, 이동, deprecate 허가으로 간주하지 않는다.
 
 ## 9. 구조 변경 통제
 
@@ -211,7 +201,7 @@ Codex는 사용자가 지정한 범위 안에서만 작업한다.
 1. 기존 구조가 책임을 흡수할 수 없다.
 2. 독립 production caller, mutation boundary, Source of Truth, lifecycle owner, side-effect boundary 중 하나가 존재한다.
 3. Canonical 계약과 충돌하지 않는다.
-4. 사용자가 구조 변경 범위와 방향을 명시적으로 승인했다.
+4. 사용자가 구조 변경 범위와 방향을 명시적으로 허가했다.
 
 Layer 이름은 근거가 아니다. 책임, caller, mutation, Source of Truth, lifecycle 기준으로 판단한다.
 
@@ -223,7 +213,7 @@ Layer 이름은 근거가 아니다. 책임, caller, mutation, Source of Truth, 
 
 ## 10. Runtime 안전 금지선
 
-명시 승인 전 금지:
+명시 허가 전 금지:
 
 - SendOrder 실제 호출
 - Kiwoom OpenAPI 호출
@@ -235,65 +225,65 @@ Layer 이름은 근거가 아니다. 책임, caller, mutation, Source of Truth, 
 - rollback / restore 실행
 - 보호 파일 수정
 
-Preview / Validation / Approval / Dry-run 계층은 실제 side effect를 만들 수 없다.
+Preview / Validation / Confirmation / Dry-run 계층은 실제 side effect를 만들 수 없다.
 
 실제 side effect가 허용된 작업은 사용자 지시의 commit boundary 안에서만 수행한다.
 
-## 11. Git / PR / Merge 절차
+## 11. Local Git 절차
+
+이 프로젝트는 단일 개발자 기준으로 운영한다. Git은 협업 도구가 아니라 로컬 버전 관리, 실패 시 파일 단위 복구, 작업 종료 전 최종 백업 commit, 대화 종료 직전 필요한 경우 원격 백업 Push 1회에만 사용한다. 원격 저장소는 백업 위치일 뿐 개발 절차에 참여하지 않는다.
+
+버그가 발생하면 원인 분석 -> 호출 경로 추적 -> 수정 파일 확인 -> 파일 단위 복구 -> 재수정 순서로 처리한다. 전체 프로젝트 초기화나 대규모 복구를 기본 전략으로 사용하지 않는다.
 
 Code repository 기본 절차:
 
-1. Branch 확인
-2. 구현
-3. 테스트
-4. 지정 파일만 stage
-5. commit
-6. push
-7. PR 생성
-8. review
-9. 사용자 승인 후 merge
-10. master 동기화
-11. origin/master 일치 확인
+1. 현재 파일 상태 확인
+2. 문제 정의
+3. 호출 경로 추적
+4. 실제 중단 위치 확인
+5. 최소 수정
+6. 실행 검증
+7. 지정 파일만 stage
+8. 필요한 경우 commit
+9. git status / git log / git diff 확인
 
 Docs repository 기본 절차:
 
-1. Branch 확인
+1. 문서 위치 확인
 2. 문서 수정
 3. diff 검토
 4. 지정 파일만 stage
-5. commit
-6. push
-7. main / origin 일치 확인
+5. 필요한 경우 commit
+6. git status / git log / git diff 확인
 
-Docs repository는 PR 의무가 아니다. docs PR / Review / Merge는 사용자가 요청하거나 대규모 또는 고위험 문서 변경일 때만 수행한다.
+GitHub는 개발 절차가 아니라 백업 저장소로만 사용한다. 기능 완성과 무관한 절차는 기본 작업 절차가 아니다.
 
 금지:
 
 - `git add .`
 - `git add -A`
-- 승인 없는 restore / reset / stash
+- 허가 없는 restore / reset / stash
 - 보호 dirty 파일 stage
-- merge 전 추가 범위 수정
+- 작업 범위를 벗어난 파일 수정
 
-Git / PR / Merge는 Big Feature Goal 완성을 위한 관리 수단이다. Preview, Validator, Gate, Adapter, Wrapper, Executor 또는 상태 하나를 완료했다는 이유만으로 불필요한 PR / Merge를 반복하지 않는다.
+Git 작업은 Big Feature Goal 완성을 위한 관리 수단이다. Preview, Validator, Gate, Adapter, Wrapper, Executor 또는 상태 하나를 완료했다는 이유만으로 Git 절차를 반복하지 않는다.
 
-## 12. GitHub 최종 검증
+## 12. Local 최종 검증
 
-최종 보고 전 GitHub 기본 브랜치 기준으로 확인한다.
+최종 보고 전 현재 로컬 작업 폴더 기준으로 확인한다.
 
 확인 대상:
 
-- master / main 최신 SHA
-- Merge Commit SHA
-- PR 상태
-- README
-- REFERENCE_INDEX
+- 실제 수정 파일
+- git status
+- git diff
 - 최신 Canonical
 - 최신 Work Resume
 - 최신 ChangeLog
-- 기본 브랜치가 최신 문서를 가리키는지
+- Runtime 상태와 실행 결과
+- 보호 dirty / untracked 유지 여부
 
-문서에 기록되는 Commit SHA와 Merge SHA는 GitHub의 실제 Merge Commit을 사용한다.
+문서나 보고서에 기록하는 commit SHA는 실제 로컬 Git 이력을 기준으로 사용한다.
 
 Reference Index 수정 시 과거 다음 작업, 과거 진행 상태, 과거 역할 설명, 완료 상태, Legacy 안내가 최신 Canonical과 충돌하지 않는지 확인한다.
 
@@ -322,8 +312,8 @@ Completion Report Policy:
 - If the report is not project-feature-centered, AGENT_WORKFLOW_REFERENCE was not properly followed.
 
 - Commit SHA
-- PR 번호와 URL
-- PR / merge state
+- Git commit 또는 작업 이력
+- Git 상태
 - 로컬/원격 HEAD
 - 보호 dirty / untracked 유지 여부
 - 금지선 미침범 여부
@@ -338,7 +328,7 @@ Codex 지시문에는 Codex가 수행할 작업만 작성한다.
 - 기존 운영 규칙을 매 지시문마다 반복하지 않는다.
 - 작업 범위, 수정 내용, 금지 범위, 검증, 완료 보고만 작성한다.
 - 검토 의견과 실행 지시는 분리한다.
-- 하나의 PR에 필요한 내용만 포함한다.
+- 하나의 작업에 필요한 내용만 포함한다.
 ## 15. MASTER SPEC Maintenance Policy
 
 MASTER SPEC의 기본 원칙은 Living Contract 유지이다.
