@@ -1,74 +1,55 @@
 # ARCHITECTURE_GLOSSARY
 
-문서 성격: 운영·해석 기준 Reference (MASTER_SPEC 아님)
+Document role: terminology reference only.
 
-생성일: 2026-07-12
+This file does not define AI operating procedure, startup order, Git workflow, document lifecycle, or project contracts.
 
-분류: 00_CANONICAL/REFERENCE
+If this glossary conflicts with the latest Canonical or `AGENT_WORKFLOW_REFERENCE.txt`, follow the latest Canonical for technical contracts and `AGENT_WORKFLOW_REFERENCE.txt` for AI operating rules.
 
-주의: 본 문서는 운영·해석 기준만 기록한다. 기존 구현이나 구조를 변경하지 않는다.
+Use `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md` only to locate this file when terminology clarification is needed.
 
-- Canonical 충돌 시 최신 Canonical을 우선한다.
-- 과거 Archive 문서와 충돌 시 이 Glossary 및 최신 Canonical을 우선한다.
+## Call Order Terms
 
-==================================================
-1. 공식 호출 순서
-==================================================
+Service:
+- Use-case entry point.
+- Receives input, selects the flow, and returns the result.
+- Does not directly assemble internal executor objects.
 
-Lifecycle Runtime Commit 공식 호출 순서:
+Builder:
+- Converts validated input into the request object required by an executor contract.
+- Does not run business flow or write data.
 
-Service
-→ Builder
-→ Adapter
-→ Runtime Commit Real Executor
+Adapter:
+- Converts builder output to the lower-level interface shape.
+- Does not create a new policy or request structure.
 
-정의:
+Runtime Commit Real Executor:
+- The single write owner that performs Runtime Commit after approval, guard, persistence, recovery, and verification contracts pass.
+- Production-callable implementation and production-connected implementation are separate facts.
 
-Service
-- 유스케이스 진입점
-- 입력 수신, 흐름 선택, 결과 반환 담당
-- 실행용 내부 객체를 직접 조립하지 않음
+## Preview, Review, Approval, Verification
 
-Builder
-- 검증된 입력을 Executor 계약에 필요한 요청 객체로 조립
-- 비즈니스 흐름이나 실제 write를 수행하지 않음
+Preview:
+- A no-side-effect calculation of expected result or execution candidate.
+- Mode or stage, not state.
 
-Adapter
-- Builder 결과를 하위 계층 인터페이스에 맞게 변환하고 호출
-- 독립적인 정책이나 요청 구조를 새로 만들지 않음
+Review:
+- Operator or upper-layer risk inspection of evidence and candidates.
 
-Runtime Commit Real Executor
-- 승인·Guard·Persistence·Recovery 계약을 통과한 Runtime Commit의
-  실제 수행 능력을 가진 단일 쓰기 소유자
-- 구현되어 있다는 사실과 Production 호출이 허용됐다는 사실은 별개
+Approval:
+- Explicit permission decision for a specific evidence, plan, or execution target.
+- Not the same as Review.
 
-==================================================
-2. Preview / Review / Approval / Verification
-==================================================
+Verification:
+- Check that input, contract, execution result, or persisted result is correct.
+- Not an operator approval decision.
 
-Preview
-- 실제 변경이나 외부 호출 없이 예상 결과와 실행 후보를 생성하는 처리 방식
-- State가 아니라 Mode 또는 Stage
+Validation:
+- Check that input and contract format are valid before passing to the next step.
 
-Review
-- 운영자나 상위 판단 계층이 후보와 위험을 검토하는 과정
+## State, Stage, Mode
 
-Approval
-- 특정 후보·계획·해시에 대해 실행을 허가한 결정 또는 상태
-- Review와 동일 의미가 아님
-
-Verification
-- 입력, 계약, 실행 결과 또는 저장 결과의 정합성을 검사하는 과정
-- 운영자 승인 판단이 아님
-
-Validation
-- 다음 계층으로 전달되기 전에 입력과 계약 형식이 유효한지 검사
-
-==================================================
-3. State / Stage / Mode 분리
-==================================================
-
-State 예:
+State examples:
 - READY
 - BLOCKED
 - INVALID
@@ -79,7 +60,7 @@ State 예:
 - ROLLED_BACK
 - REVIEW_REQUIRED
 
-Stage 예:
+Stage examples:
 - Build
 - Adapt
 - Validate
@@ -88,128 +69,79 @@ Stage 예:
 - Verify
 - Recover
 
-Mode 예:
+Mode examples:
 - Preview
 - Dry-run
 - Production
 
-PREVIEW를 READY, BLOCKED 같은 State와 같은 축으로 정의하지 않는다.
+Do not use `PREVIEW` as a state such as READY or BLOCKED.
 
-==================================================
-4. Contract / Plan / Boundary / Gate
-==================================================
+## Contract, Plan, Boundary, Gate
 
-Contract
-- 계층 간 전달 데이터와 불변조건의 공식 약속
+Contract:
+- Formal promise for data or behavior passed between layers.
 
-Plan
-- 실행 전에 생성된 구체적인 작업 순서와 대상 목록
+Plan:
+- Concrete sequence or list of work generated before execution.
 
-Boundary
-- 계층 또는 기능이 허용하는 책임과 접근 범위
+Boundary:
+- Responsibility and access limit of a layer or feature.
 
-Gate
-- 조건을 평가해 다음 단계 진입 허용 여부를 결정하는 지점
+Gate:
+- Decision point that allows or blocks entry to the next step.
 
-Policy
-- Gate와 Service가 판단할 때 사용하는 규칙
+Policy:
+- Rule used by a Gate or Service.
 
-Token
-- 특정 승인 대상과 범위를 결합한 검증 가능한 허가 증표
+Token:
+- Verifiable permission evidence bound to a specific target and scope.
 
-Candidate
-- 아직 최종 승인 또는 Commit되지 않은 변경·실행 후보
+Candidate:
+- Proposed change that is not yet approved or committed.
 
-Pending
-- Candidate가 승인 또는 거절 결정을 기다리는 상태
+Pending:
+- Candidate waiting for approval or rejection.
 
-==================================================
-5. Rollback / Recovery / Cleanup
-==================================================
+## Cleanup, Rollback, Recovery
 
-Cleanup
-- 실패 또는 종료 후 lock, temp resource 등을 정리
-- 이전 데이터 상태 복원이 아님
+Cleanup:
+- Release locks or temporary resources after failure or completion.
+- Not data rollback.
 
-Lock Release
-- Cleanup의 일부
-- Rollback과 동일하지 않음
+Lock Release:
+- A cleanup operation.
+- Not the same as rollback.
 
-Rollback
-- 이미 적용된 변경을 이전 검증 상태로 복원
+Rollback:
+- Restore an already-applied change to the previous verified state.
 
-Recovery
-- 장애 이후 시스템을 일관된 운영 상태로 되돌리는 전체 절차
-- Rollback, Journal, Verification을 포함할 수 있음
+Recovery:
+- Bring the system back to an operational state after interruption.
+- May include rollback, journal use, and verification.
 
-==================================================
-6. Runtime / Lifecycle / Execution
-==================================================
+## Runtime, Lifecycle, Execution
 
-Lifecycle
-- 종목 또는 운영 객체의 상태 전이 흐름
+Lifecycle:
+- State transition flow of an operating object such as an order or holding.
 
-Runtime
-- 프로그램 실행 중 유지·변경되는 운영 상태와 파일
+Runtime:
+- Operating state and files that are used or changed while the program runs.
 
-Execution
-- 승인된 신호나 계획을 주문·Commit 등 실제 수행 경로로 전달하는 처리
+Execution:
+- Flow that moves approved signal or plan toward order, commit, or production action.
 
-Lifecycle Runtime Commit
-- Lifecycle 상태 변경을 Runtime Source of Truth에 반영하는 Commit 흐름
+Lifecycle Runtime Commit:
+- Commit flow that records lifecycle state changes in Runtime Source of Truth.
 
-Execution Runtime Commit
-- Execution 결과 또는 실행 상태를 Runtime Source of Truth에 반영하는 Commit 흐름
+Execution Runtime Commit:
+- Commit flow that records execution result or execution state in Runtime Source of Truth.
 
-둘 다 Runtime Commit 기반 구조를 재사용할 수 있지만
-업무 입력과 대상 Runtime 파일은 구분한다.
+## Usage Notes
 
-==================================================
-7. 용어 사용 금지·주의
-==================================================
-
-- Preview Executor라는 신규 용어를 임의 생성하지 않는다.
-- Real Executor를 실제 Production 연결 완료 의미로 해석하지 않는다.
-- Review와 Approval을 동의어로 쓰지 않는다.
-- Validation과 Verification을 동의어로 쓰지 않는다.
-- Rollback과 Lock Release를 같은 작업으로 쓰지 않는다.
-- Stage와 State를 같은 표에 혼합할 경우 열을 분리한다.
-- 기존 코드 심볼명은 Glossary 정리를 이유로 변경하지 않는다.
-
-==================================================
-8. 기존 문서 처리
-==================================================
-
-수정하지 않을 대상:
-
-- 00_CANONICAL/CURRENT 기존 Canonical
-- 20_ARCHIVE 전체
-- 10_UPDATE/MERGED 과거 문서
-- 기존 CHANGELOG
-- kiwoom_auto 전체
-
-과거 문서에 다른 호출 순서가 있어도 삭제·수정하지 않고
-최신 공식 기준이 무엇인지만 Glossary에 명시한다.
-
-==================================================
-9. 참조 연결
-==================================================
-
-본 Glossary는 다음 문서에서 세션 우선 참조 문서로 연결된다.
-
-- 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
-- 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
-
-권장 참조 순서:
-
-1. README
-2. AI_PROJECT_OPERATION_MANUAL_RELEASE
-3. AI_SESSION_START_PROTOCOL
-4. AGENT_WORKFLOW_REFERENCE
-5. ARCHITECTURE_GLOSSARY
-6. 00_REFERENCE_INDEX
-7. 작업 관련 PART/SUBPART
-
-==================================================
-(End of ARCHITECTURE_GLOSSARY)
-=================================================
+- Do not invent terms such as Preview Executor without user approval.
+- Do not interpret Real Executor as proof of completed Production connection.
+- Do not use Review and Approval interchangeably.
+- Do not use Validation and Verification interchangeably.
+- Do not use Rollback and Lock Release interchangeably.
+- Do not mix Stage and State in the same field.
+- Do not change existing code names only because the glossary uses cleaner terminology.

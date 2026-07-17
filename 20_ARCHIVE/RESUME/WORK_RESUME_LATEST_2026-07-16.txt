@@ -6,7 +6,7 @@ Latest handoff update:
 - Current code branch: feat/operator-reconciliation-recovery.
 - Code commit: dec2efbaf4ad03baf0da00fa2b6fbbf346f818e7.
 - Base master: 3d4b2bab676e21bb54c3eaca5916960b30c8a28e.
-- Code PR: #46, OPEN, merge not performed.
+- Code baseline: #46, baseline pending, remote backup not performed.
 - Protected dirty/untracked runtime, stock, routine, changelog, and log files in
   the code repository were preserved.
 
@@ -54,9 +54,9 @@ Completed Big Feature:
   next window.
 
 Next window start point:
-- Review PR #46.
-- Do not merge without explicit user approval.
-- After merge, update docs only if the merged code SHA or PR result needs to be
+- Verify change set 46.
+- Do not update the baseline without explicit user approval.
+- After baseline update, update docs only if the baseline code SHA or change result needs to be
   recorded.
 - Select the next Big Feature only after a fresh structure audit.
 - Candidate next Big Feature must be chosen from actual remaining production

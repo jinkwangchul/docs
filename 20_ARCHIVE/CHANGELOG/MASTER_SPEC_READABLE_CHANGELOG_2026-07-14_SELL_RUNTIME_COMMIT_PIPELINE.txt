@@ -1,4 +1,4 @@
-﻿MASTER_SPEC_READABLE_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE
+MASTER_SPEC_READABLE_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE
 
 What changed:
 - The SELL Runtime Commit path now reaches the final execution plan layer.
@@ -6,11 +6,11 @@ What changed:
 - The chain can validate, dry-run, approve, and plan Runtime Commit actions safely in memory.
 
 What was merged:
-- PR #10 added SELL Runtime Commit Preview.
-- PR #11 added SELL Runtime Commit Validator.
-- PR #12 added SELL Runtime Commit Dry-run Executor.
-- PR #13 added SELL Runtime Commit Approval Gate.
-- PR #14 added SELL Runtime Commit Execution Plan.
+- change set 10 added SELL Runtime Commit Preview.
+- change set 11 added SELL Runtime Commit Validator.
+- change set 12 added SELL Runtime Commit Dry-run Executor.
+- change set 13 added SELL Runtime Commit Approval Gate.
+- change set 14 added SELL Runtime Commit Execution Plan.
 
 Current state:
 - Latest kiwoom_auto master is 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc.
@@ -45,7 +45,7 @@ BUY budget policy correction:
 - 예산 설정 means a maximum budget for the round; the actual order quantity is calculated later from the current order price and must stay within budget and other order limits.
 
 Operation Policy Gate update:
-- PR #44 moved the APPROVED -> EXECUTABLE / BLOCKED_POLICY queue update into the canonical queue writer.
+- change set 44 moved the APPROVED -> EXECUTABLE / BLOCKED_POLICY queue update into the canonical queue writer.
 - The gate still keeps `execution_enabled=False`.
 - It no longer performs direct full Queue snapshot writes.
 - EXECUTABLE continues into the existing Execution Enable -> REAL_READY flow.

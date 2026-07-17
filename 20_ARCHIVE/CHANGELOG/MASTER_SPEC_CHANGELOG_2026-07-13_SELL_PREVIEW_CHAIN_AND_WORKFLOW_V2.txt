@@ -9,13 +9,13 @@ MASTER_SPEC_CHANGELOG_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2
 1. 운영 정책
 
 - Git Workflow v2 공식화
-- master → Feature Branch → Commit → Push → Pull Request → Review → Merge → Branch Delete → master 최신화 흐름 확정
+- master → Feature Branch → Commit → Push → change set → Review → Merge → Branch Delete → master 최신화 흐름 확정
 - master 직접 Commit / Push 금지
 
 2. Agent 역할
 
 Codex:
-- 구현, 테스트, Commit, Push, PR, Merge
+- 구현, 테스트, Commit, Push
 
 General Agent:
 - 구조검토, 설계검토, 구현범위결정, Git관리, 결과검증
@@ -40,38 +40,38 @@ High Reasoning:
 진행률:
 - SELL Preview 95%
 
-4. PR 기록
+4. 기준점 기록
 
-PR #1:
+change set 1:
 - 기능: SELL REAL_READY Authorization Preview
-- Merge Commit: 685361cab8358e017c6a100ee8a5b074a1f8a13c
+- Baseline Commit: 685361cab8358e017c6a100ee8a5b074a1f8a13c
 - master 반영: 완료
 
-PR #2:
+change set 2:
 - 기능: SELL Execution Contract Preview
-- Merge Commit: 379e133b9b83374785841136200db408f473e521
+- Baseline Commit: 379e133b9b83374785841136200db408f473e521
 - master 반영: 완료
 
-PR #3:
+change set 3:
 - 기능: SELL REAL_READY Adapter Preview
-- Merge Commit: 10884ce7a45278c86cd544958fa62cdc489dd5d6
+- Baseline Commit: 10884ce7a45278c86cd544958fa62cdc489dd5d6
 - master 반영: 완료
 
-PR #4:
+change set 4:
 - 기능: SELL Common Execution Preview Adapter
-- Merge Commit: 21ccf004551f26120b362d3fe8f9183de3129395
+- Baseline Commit: 21ccf004551f26120b362d3fe8f9183de3129395
 - master 반영: 완료
 
-5. PR #4 특이사항
+5. change set 4 특이사항
 
 - 초기 구현 완료 보고와 실제 저장소 파일 존재 상태가 불일치
 - Git/worktree/reflog/dangling object/filesystem 조사 수행
 - 복구 가능한 대상 파일 미발견
-- 재구현 후 테스트 통과 및 PR #4 병합 완료
+- 재구현 후 테스트 통과 및 change set 4 기준점 반영 완료
 
 6. 검증 기록
 
-PR #4 재구현 검증:
+change set 4 재구현 검증:
 - Adapter tests: 42 OK
 - SELL tests: 306 OK
 - Execution tests: 1623 OK

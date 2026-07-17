@@ -9,7 +9,7 @@ MASTER_SPEC_READABLE_CHANGELOG_2026-07-13_SELL_PREVIEW_CHAIN_AND_WORKFLOW_V2
 
 21ccf004551f26120b362d3fe8f9183de3129395
 
-이 commit은 PR #4 병합 결과이며, SELL Common Execution Preview Adapter가 master에 반영된 상태다.
+이 commit은 change set 4 기준점 반영 결과이며, SELL Common Execution Preview Adapter가 master에 반영된 상태다.
 
 운영 방식도 확정됐다.
 
@@ -19,7 +19,7 @@ master
 → Feature Branch
 → Commit
 → Push
-→ Pull Request
+→ change set
 → Review
 → Merge
 → Branch Delete
@@ -27,7 +27,7 @@ master
 
 Agent 역할도 최종 정리했다.
 
-Codex는 구현, 테스트, Commit, Push, PR, Merge를 맡는다.
+Codex는 구현, 테스트, Commit, Push를 맡는다.
 
 General Agent는 구조검토, 설계검토, 구현범위결정, Git관리, 결과검증을 맡는다.
 
@@ -48,23 +48,23 @@ SELL Method Preview
 
 현재 SELL Preview 진행률은 95%로 본다.
 
-이번 섹터에서 병합된 Pull Request는 네 개다.
+이번 섹터에서 반영된 change set는 네 개다.
 
-PR #1은 SELL REAL_READY Authorization Preview를 추가했다.
-Merge Commit은 685361cab8358e017c6a100ee8a5b074a1f8a13c이다.
+change set 1은 SELL REAL_READY Authorization Preview를 추가했다.
+Baseline Commit은 685361cab8358e017c6a100ee8a5b074a1f8a13c이다.
 
-PR #2는 SELL Execution Contract Preview를 추가했다.
-Merge Commit은 379e133b9b83374785841136200db408f473e521이다.
+change set 2는 SELL Execution Contract Preview를 추가했다.
+Baseline Commit은 379e133b9b83374785841136200db408f473e521이다.
 
-PR #3은 SELL REAL_READY Adapter Preview를 추가했다.
-Merge Commit은 10884ce7a45278c86cd544958fa62cdc489dd5d6이다.
+change set 3은 SELL REAL_READY Adapter Preview를 추가했다.
+Baseline Commit은 10884ce7a45278c86cd544958fa62cdc489dd5d6이다.
 
-PR #4는 SELL Common Execution Preview Adapter를 추가했다.
-Merge Commit은 21ccf004551f26120b362d3fe8f9183de3129395이다.
+change set 4는 SELL Common Execution Preview Adapter를 추가했다.
+Baseline Commit은 21ccf004551f26120b362d3fe8f9183de3129395이다.
 
 이번 Conversation에는 중요한 운영 사례가 있었다.
 
-SELL Common Execution Preview Adapter는 처음에 구현 완료로 보고됐지만 실제 저장소에는 파일이 없었다. 그래서 Git history, worktree, reflog, dangling object, 파일시스템까지 조사했다. 복구 가능한 파일이나 commit은 찾지 못했고, 동일 범위를 재구현했다. 재구현 후 신규 테스트 42개, SELL 테스트 306개, Execution 테스트 1623개, 전체 unittest 4275개가 통과했고 PR #4로 병합했다.
+SELL Common Execution Preview Adapter는 처음에 구현 완료로 보고됐지만 실제 저장소에는 파일이 없었다. 그래서 Git history, worktree, reflog, dangling object, 파일시스템까지 조사했다. 복구 가능한 파일이나 commit은 찾지 못했고, 동일 범위를 재구현했다. 재구현 후 신규 테스트 42개, SELL 테스트 306개, Execution 테스트 1623개, 전체 unittest 4275개가 통과했고 change set 4로 기준점에 반영했다.
 
 이 사례는 Workflow v2에서 파일 실존 검증과 stage/commit 범위 검증이 왜 필요한지를 보여준다.
 

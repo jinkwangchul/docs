@@ -142,7 +142,7 @@ Real side effects must go through the existing canonical writer, service, or com
 
 ## 8. Session Startup Policy
 
-At the start of a new session, confirm only what is needed to resume safely.
+At the start of a new session, resume implementation from the latest Work Resume. Startup is not document review.
 
 Startup triggers:
 - New conversation
@@ -150,23 +150,27 @@ Startup triggers:
 - Resuming after a Git baseline change
 - User asks to verify current baseline before work
 
-Startup order:
+Startup execution flow:
 
-1. Read this `AGENT_WORKFLOW_REFERENCE`
-2. Read `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`
-3. Identify Latest Official Canonical
-4. Identify Latest Work Resume
-5. Confirm Git baseline for the repository involved in the task
-6. Read README only if repository layout or document role is unclear
-7. Read only the Canonical sections and source files required by the current task
+1. Read the Latest Work Resume only for the previous completion state and next implementation target.
+2. Confirm the current Git Baseline (branch and commit). Report to the user only if it differs from the expected baseline.
+3. If the next implementation scope is clear from the Work Resume, start implementation immediately.
+
+Reference rules:
+
+4. Refer to the corresponding Latest Canonical section only when needed during implementation.
+5. Use Reference Index only to locate a required document.
+6. Re-read this file only when operating rules changed, a new operating rule must be applied, or the user asks.
 
 Forbidden:
 - Broad structure audit without need
-- Re-reading historical documents by default
+- Re-reading AGENT, Reference Index, full Canonical, historical documents, or broad project structure by default
+- Adding startup checks inferred from general development or Git practices
 - Treating old Work Resume next steps as current user instruction
 - Starting implementation before the fixed problem and allowed scope are known
 
 Reference Index is only an index. It is not an operating policy document.
+Follow only the operating procedures defined by this project. Documents support implementation; they must not become a repeated startup gate when the Latest Work Resume already provides the next implementation point.
 
 ## 9. Conversation Shutdown / Project Freeze Policy
 
@@ -269,7 +273,7 @@ Default prompt length should stay small:
 Prompt checklist:
 - Is this directly related to the current task?
 - Does it avoid repeating this operating rule file?
-- Does it avoid unrelated Git, test, document, or PR instructions?
+- Does it avoid unrelated Git, test, document, or collaboration workflow instructions?
 - Is the purpose one sentence?
 - Is the report format not excessive?
 

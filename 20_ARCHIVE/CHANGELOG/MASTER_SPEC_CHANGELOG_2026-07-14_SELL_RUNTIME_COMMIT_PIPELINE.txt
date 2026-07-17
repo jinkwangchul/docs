@@ -1,39 +1,39 @@
-﻿MASTER_SPEC_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE
+MASTER_SPEC_CHANGELOG_2026-07-14_SELL_RUNTIME_COMMIT_PIPELINE
 
 Baseline:
 - kiwoom_auto master / origin/master: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
 
 Summary:
 - Recorded completion of the SELL Runtime Commit preview-to-plan pipeline.
-- Added PR #10 through PR #14 history.
+- Added change set 10 through change set 14 history.
 - Added contracts for Runtime Commit Preview, Validator, Dry-run Executor, Approval Gate, and Execution Plan.
 - Preserved the preview-only and plan-only safety boundaries.
 
-Merged PR history:
+Baseline history:
 
-PR #10:
+change set 10:
 - feat: add SELL runtime commit preview
-- Merge commit: b0af8ff8048567a14c07d10f8e0eaa721fa5f2fa
+- Baseline commit: b0af8ff8048567a14c07d10f8e0eaa721fa5f2fa
 - Added SELL_RUNTIME_COMMIT_PREVIEW.
 
-PR #11:
+change set 11:
 - feat: add SELL runtime commit validator
-- Merge commit: 0a896105c4c5e4f25a7876a4c0c2141b11680ede
+- Baseline commit: 0a896105c4c5e4f25a7876a4c0c2141b11680ede
 - Added SELL_RUNTIME_COMMIT_VALIDATOR.
 
-PR #12:
+change set 12:
 - feat: add SELL runtime commit dry-run executor
-- Merge commit: 75dbf4bcef426323302b12f07c4fc2a76802cb92
+- Baseline commit: 75dbf4bcef426323302b12f07c4fc2a76802cb92
 - Added SELL_RUNTIME_COMMIT_DRYRUN_EXECUTOR.
 
-PR #13:
+change set 13:
 - feat: add SELL runtime commit approval gate
-- Merge commit: 077db4fd563682aa350e19a88e827903527e715c
+- Baseline commit: 077db4fd563682aa350e19a88e827903527e715c
 - Added SELL_RUNTIME_COMMIT_APPROVAL_GATE.
 
-PR #14:
+change set 14:
 - feat: add SELL runtime commit execution plan
-- Merge commit: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
+- Baseline commit: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
 - Added SELL_RUNTIME_COMMIT_EXECUTION_PLAN.
 
 Technical changes reflected:
@@ -75,9 +75,9 @@ Policy revision:
 - Deprecated old examples such as 100 -> 300 -> 900 -> 2700 when they imply fixed X2/X3 policy or conflict with the new direct-input multiplier contract.
 
 Operation Policy Gate canonical writer migration:
-- PR #44:
+- change set 44:
   - feat: migrate operation policy gate to canonical writer
-  - Merge commit: b9f6045c76f32bbf472f098b6530be0af570683c
+  - Baseline commit: b9f6045c76f32bbf472f098b6530be0af570683c
   - `operation_policy_gate.apply_operation_policy_gate_for_order()` now owns the durable APPROVED -> EXECUTABLE / BLOCKED_POLICY transition through `execution_queue_writer.mutate_order_queue()`.
   - Queue mutation rechecks the latest target record inside the canonical lock.
   - `execution_enabled=False` remains unchanged after policy pass or policy block.

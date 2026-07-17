@@ -1,148 +1,92 @@
 # Docs Repository
 
-This repository is the official documentation source of truth
-for the Kiwoom Auto Trading Project.
+This repository stores documentation for the Kiwoom Auto Trading Project.
 
-Every AI session follows
-`00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`.
+AI operating rules are defined only in:
 
-이 저장소는 `kiwoom_auto` 프로젝트의 문서 Source of Truth를 장기 운영하기 위한 docs 전용 저장소이다.
+```text
+00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+```
 
-이 저장소는 구현 코드 저장소가 아니다. Python 코드, runtime, rules.json, 실제 주문 실행 파일은 이 저장소에서 수정하지 않는다.
+README is a repository guide. It does not define AI operating procedure.
 
-## 목적
+## Repository Purpose
 
-- MASTER_SPEC Canonical을 기준 문서로 관리한다.
-- CHANGELOG로 Canonical 변경 이력을 보존한다.
-- UPDATE 문서로 신규 변경 후보를 수집한다.
-- `AGENT_WORKFLOW_REFERENCE`를 AI 운영규정의 유일 기준으로 둔다.
-- ARCHIVE와 REPORTS를 통해 과거 문서와 관리 보고서를 보존한다.
+- Keep the latest project technical contracts in `00_CANONICAL/CURRENT`.
+- Keep Canonical change history in `00_CANONICAL/CHANGELOG`.
+- Keep document navigation in `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`.
+- Keep old evidence and historical documents in `20_ARCHIVE`.
+- Keep management reports in `30_REPORTS`.
 
-## 기본 구조
+This repository is not the code repository. Do not edit Python code, runtime files, rules files, or live trading data here.
+
+## Core Structure
 
 ```text
 docs/
   00_CANONICAL/
     CURRENT/
     CHANGELOG/
+    REFERENCE/
     TRACE/
     OPEN_ISSUES/
   10_UPDATE/
     INBOX/
-    APPLIED/
+    MERGED/
     TEMPLATE/
   20_ARCHIVE/
+    REFERENCE_EDITION/
   30_REPORTS/
   90_TEMP/
 ```
 
-## MASTER_SPEC 운영 방식
+## Document Roles
 
-MASTER_SPEC는 `00_CANONICAL/CURRENT`의 최신 `MASTER_SPEC_CANONICAL_*.txt`를 기준으로 한다.
+- `AGENT_WORKFLOW_REFERENCE.txt`: single AI operating rule source.
+- `00_REFERENCE_INDEX.md`: index to latest documents.
+- Latest Canonical: project technical contract.
+- Latest Work Resume: recovery and next-session context.
+- Latest Changelog: Canonical change history.
+- `ARCHITECTURE_GLOSSARY.md`: terminology reference.
+- `20_ARCHIVE`: historical evidence only.
 
-운영 원칙:
+## Canonical Rules
 
-- 기존 Canonical은 덮어쓰지 않는다.
-- Domain별 최신 Canonical을 Living Contract로 유지한다.
-- Historical 문서는 과거 설계 근거이며 현재 계약을 다시 정의하지 않는다.
-- 기존 내용을 임의 삭제하거나 축약하지 않는다.
-- 실제 구현된 내용만 Canonical에 반영한다.
-- CHANGELOG를 통해 변경 이력을 남긴다.
+- Do not overwrite existing Canonical files.
+- Create a new Canonical only for confirmed implementation or confirmed policy.
+- Keep old Canonical files as historical evidence.
+- Keep only the latest Canonical in `00_CANONICAL/CURRENT`.
+- Latest Canonical is the technical contract unless superseded by newer user instruction or actual runtime evidence.
 
-## AI Reference Edition
+## Changelog Rules
 
-최신 MASTER_SPEC Canonical은 크기가 커서 일부 도구에서 전체 내용을 한 번에 읽기 어렵다. 이를 위해 `00_CANONICAL/REFERENCE`에 AI 참조용 분할본을 둔다.
+- Do not overwrite existing Changelog files.
+- Create a new Changelog only when a new Canonical is created or a confirmed Canonical contract changes.
+- Record what changed, where it was reflected, and what evidence verifies it.
 
-Reference Edition 원칙:
+## Work Resume Rules
 
-- 공식 원본은 `00_CANONICAL/CURRENT`의 최신 Canonical이다.
-- Reference Edition은 AI 참조 편의를 위한 분할본이다.
-- SUBPART는 AI가 우선 참조하는 작은 단위 분할본이다.
-- 기존 PART01~PART05는 Legacy large part / Full part로 유지한다.
-- Reference Edition은 원문을 요약하거나 생략하지 않는다.
-- Reference Edition은 원본 순서를 유지한다.
+- Work Resume records recovery state, current baseline, next start point, and unresolved blockers.
+- Startup uses the latest Work Resume to resume implementation quickly.
+- Keep only the latest Work Resume in `00_CANONICAL/CURRENT`.
+- Old Work Resume files are historical evidence only.
 
-새 AI 세션에서는 AGENT_WORKFLOW_REFERENCE를 기준으로 필요한 문서만 참조한다.
+## Archive Rules
 
-```text
-00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
-↓
-00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
-↓
-Latest Official Canonical / Latest Work Resume
-↓
-현재 작업에 필요한 소스와 Runtime 증거
-```
+- Prefer archive preservation over deletion.
+- Do not delete old evidence unless the user explicitly approves deletion and preserved evidence is confirmed.
+- Historical and archived files do not redefine current contracts.
 
-## CURRENT 사용법
+## Reference Rules
 
-`00_CANONICAL/CURRENT`는 현재 프로젝트를 바로 재개하는 데 필요한 최신 기준 문서만 두는 영역이다.
+- Use `00_REFERENCE_INDEX.md` only to locate required documents.
+- Legacy PART files are archived in `20_ARCHIVE/REFERENCE_EDITION` as historical reference evidence.
+- If a Reference file conflicts with the latest Canonical or `AGENT_WORKFLOW_REFERENCE.txt`, the latest Canonical or AGENT file wins according to its role.
 
-CURRENT 기준:
+## Git And Remote Backup
 
-- 최신 MASTER_SPEC Canonical
-- 최신 작업재개요약
-- 최신 운영 기준 문서
-- Canonical 사용 안내
+Local Git is used for local version history and recovery.
 
-오래된 CURRENT 문서는 삭제하지 않고 ARCHIVE 이동 후보로 분류한다.
+GitHub is used as remote backup and restoration baseline after user-approved push.
 
-## UPDATE 사용법
-
-신규 변경 후보는 `10_UPDATE/INBOX`에 둔다.
-
-권장 파일명:
-
-```text
-UPDATE_YYYYMMDD_주제.txt
-```
-
-운영 흐름:
-
-```text
-UPDATE 생성
-↓
-10_UPDATE/INBOX 저장
-↓
-사용자 지시에 따라 지정된 문서 작업 에이전트가 Canonical 갱신
-↓
-역할과 Git 절차는 AGENT_WORKFLOW_REFERENCE Workflow v2를 따름
-↓
-Domain별 최신 MASTER_SPEC Canonical 갱신
-↓
-반영 완료 UPDATE는 APPLIED 이동 후보
-```
-
-## CHANGELOG 정책
-
-CHANGELOG는 `00_CANONICAL/CHANGELOG`에 보관한다.
-
-정책:
-
-- 기존 CHANGELOG를 수정하지 않는다.
-- 새 변경은 새 날짜 또는 새 주제 CHANGELOG로 작성한다.
-- 추가 섹션, 반영 위치, 테스트 현황, 금지선 유지 여부를 기록한다.
-
-## ARCHIVE 정책
-
-`20_ARCHIVE`는 기존 문서를 보존하는 장기 보관 영역이다.
-
-정책:
-
-- 삭제보다 ARCHIVE 이동을 우선한다.
-- 중복 의심 파일도 해시 비교와 사용자 명시 허가 전에는 삭제하지 않는다.
-- 압축 원본은 Git 포함보다 로컬 보관 또는 별도 release/storage 사용을 권장한다.
-
-## 새 대화 시작 시 참조 순서
-
-1. `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
-2. `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`
-3. Latest Official Canonical
-4. Latest Work Resume
-5. 현재 작업에 필요한 파일과 Runtime 증거
-
-## Local Git 운영 원칙
-
-Local Git 운영 원칙은 `AGENT_WORKFLOW_REFERENCE`를 따른다.
-
-이 README는 저장소 안내 문서이며 AI 운영규정을 정의하지 않는다.
+Follow `AGENT_WORKFLOW_REFERENCE.txt` for all Git and baseline rules.

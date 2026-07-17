@@ -11,8 +11,8 @@ Big Feature:
 Code baseline:
 - Branch: feat/operator-reconciliation-recovery.
 - Commit: dec2efbaf4ad03baf0da00fa2b6fbbf346f818e7.
-- PR: #46.
-- PR state: OPEN.
+- Change set: #46.
+- Baseline state: OPEN.
 - Mergeable: true.
 - Merge was not performed.
 

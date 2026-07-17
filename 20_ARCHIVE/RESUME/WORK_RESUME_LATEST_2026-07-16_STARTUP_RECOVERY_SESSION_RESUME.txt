@@ -7,7 +7,7 @@ Code state:
 - Base master: d7582d00c1114c441b923459b0763ebb0d902566.
 - Branch: feat/startup-recovery-session-resume.
 - Commit: f3f9ed1846509f23b00d078313c98f3ed121f300.
-- PR #47: OPEN, merge not performed.
+- change set 47: baseline pending, remote backup not performed.
 - Protected dirty/untracked runtime, routine, changelog, stock state, and log
   files remain outside the commit.
 
@@ -50,7 +50,7 @@ Completed Big Feature:
   follow-up tasks.
 
 Next start point:
-- Review PR #47.
-- Do not merge without explicit user approval.
-- Select the next Big Feature only after PR #47 is merged and a fresh
+- Verify change set 47.
+- Do not update the baseline without explicit user approval.
+- Select the next Big Feature only after change set 47 is merged and a fresh
   Production structure audit identifies a user-facing gap.

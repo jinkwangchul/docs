@@ -28,10 +28,10 @@ It is historical evidence for:
 - SELL preview-only development before Runtime Commit integration.
 - The separation between SELL preview stages and real Runtime/Queue/SendOrder
   mutation.
-- The need to verify file existence, stage scope, and PR-based merge results
+- The need to verify file existence, stage scope, and Git baseline reflection results
   before treating an implementation as complete.
 
-Detailed PR numbers, merge commits, test counts, progress percentages, and
+Detailed change-set numbers, baseline commits, test counts, progress percentages, and
 next-work lists are intentionally not repeated in this consolidated version.
 
 3. Historical Contract Pointer
@@ -49,7 +49,7 @@ The following items in the original document are historical only and are not
 current contract sources:
 
 - Repository baseline SHA values.
-- Completed PR history.
+- Completed baseline history.
 - Test counts.
 - Progress percentages.
 - Next-work sequencing.

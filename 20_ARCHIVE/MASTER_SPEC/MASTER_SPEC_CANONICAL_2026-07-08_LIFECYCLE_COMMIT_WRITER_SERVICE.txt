@@ -126,6 +126,6 @@ MASTER_SPEC CANONICAL — Lifecycle Commit Writer Service
 - Backup/Recovery 절차 및 Runbook
 - 모니터링 및 경보 체계
 
-참고: 이 파일은 기존 Canonical을 수정하지 않고 새 Canonical 파일로 추가되었습니다. 실제 MASTER_SPEC에 반영하려면 별도의 검토/PR 프로세스를 거치기 바랍니다.
+참고: 이 파일은 기존 Canonical을 수정하지 않고 새 Canonical 파일로 추가되었습니다. 실제 MASTER_SPEC에 반영하려면 별도의 검토/change set 프로세스를 거치기 바랍니다.
 
 끝.

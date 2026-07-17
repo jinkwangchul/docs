@@ -22,31 +22,20 @@ This Reference Index is an index. It is not an AI operating policy document.
 ## Current Policy References
 
 - Agent workflow and operation rules: `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
-- AI Architecture Contamination Policy: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt`
-- AI Architecture Contamination Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt`
-- AI Architecture Contamination Readable Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt`
-- Runtime / Startup Recovery Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME.txt`
+- AI Architecture Contamination Policy: `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt`
+- AI Architecture Contamination Changelog: `20_ARCHIVE/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt`
+- AI Architecture Contamination Readable Changelog: `20_ARCHIVE/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt`
+- Runtime / Startup Recovery Canonical: `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME.txt`
 - Current session-freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-17_SESSION_FREEZE_AUTOMATIC_TRADING_BASELINE.txt`
-- SELL Preview, Runtime / Queue / SendOrder / Chejan / Fill / Position, Projection / Recovery / Reconciliation / Startup Recovery Living Contracts: sections 11, 12, and 14 of `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME.txt`
+- SELL Preview, Runtime / Queue / SendOrder / Chejan / Fill / Position, Projection / Recovery / Reconciliation / Startup Recovery Living Contracts: sections 11, 12, and 14 of `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME.txt`
 - Latest Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-07-17_SESSION_FREEZE_AUTOMATIC_TRADING_BASELINE.txt`
 - Architecture glossary: `00_CANONICAL/REFERENCE/ARCHITECTURE_GLOSSARY.md`
 
-## Reference Edition Files
+## Legacy Reference Edition
 
-PART01부터 PART09까지는 2026-07-09 Reference Base Canonical 기반 Legacy Reference Edition이다.
+PART01부터 PART09까지의 2026-07-09 Reference Base Canonical 기반 Legacy Reference Edition은 `20_ARCHIVE/REFERENCE_EDITION`에 보관한다.
 
-- `PART01_SYSTEM_FOUNDATION.md`
-- `PART02_RUNTIME.md`
-- `PART02_06_RUNTIME_FILTER_ENGINE.md`
-- `PART03_GUI.md`
-- `PART04_ROUTINE.md`
-- `PART05_RULE_APPROVAL.md`
-- `PART06_EXECUTION_PREVIEW.md`
-- `PART07_RUNTIME_COMMIT.md`
-- `PART08_OPERATION_POLICY.md`
-- `PART09_APPENDIX.md`
-
-Legacy PART 파일은 최신 Canonical과 충돌하면 최신 Canonical을 우선한다.
+Legacy PART 파일은 현재 Reference 기준 문서가 아니다. 최신 Canonical과 충돌하면 최신 Canonical을 우선한다.
 
 ## Operational Rules
 

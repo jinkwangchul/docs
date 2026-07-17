@@ -38,4 +38,4 @@ Verification:
 Git:
 - Code branch: feat/operator-reconciliation-recovery.
 - Code commit: dec2efbaf4ad03baf0da00fa2b6fbbf346f818e7.
-- PR #46 is OPEN and was not merged.
+- change set 46 is pending and not reflected in the baseline.

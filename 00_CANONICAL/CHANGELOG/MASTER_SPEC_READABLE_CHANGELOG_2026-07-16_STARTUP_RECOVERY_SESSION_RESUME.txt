@@ -9,7 +9,7 @@ What operators can now do:
   invalid runtime evidence.
 - Review unfinished orders, Fill/Position gaps, Broker Holdings mismatches,
   active locks, uncertain sends, and reconciliation items.
-- Use the existing review workflow for unresolved evidence.
+- Use the existing reconciliation workflow for unresolved evidence.
 - Explicitly approve the session before automatic trading resumes.
 
 How resume remains safe:
@@ -30,4 +30,4 @@ Verification:
 Git:
 - Code branch: feat/startup-recovery-session-resume.
 - Code commit: f3f9ed1846509f23b00d078313c98f3ed121f300.
-- PR #47 is OPEN and was not merged.
+- change set 47 is pending and not reflected in the baseline.

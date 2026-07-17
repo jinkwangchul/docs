@@ -41,7 +41,7 @@ Current confirmed disconnect:
   execution preview block reason is not exposed to the automatic caller.
 
 Next session start point:
-- Run AI_SESSION_START_PROTOCOL.
+- Follow `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt` Session Startup Policy.
 - Confirm the project commit and docs commit from this freeze.
 - Resume from the confirmed disconnect:
   REAL_READY -> preview_execution_for_real_ready_order -> execution_preview.

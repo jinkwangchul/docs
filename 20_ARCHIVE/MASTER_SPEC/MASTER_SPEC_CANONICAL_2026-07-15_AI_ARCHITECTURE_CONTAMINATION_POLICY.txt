@@ -92,7 +92,7 @@ Reporting a deletion candidate does not approve deletion.
 
 Reporting an integration candidate does not approve integration.
 
-One PR handles only the single structural responsibility approved by the user.
+One baseline change handles only the single structural responsibility approved by the user.
 
 8. AI Self-Validation Bias Prevention
 

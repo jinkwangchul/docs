@@ -1,26 +1,29 @@
-MASTER_SPEC_CANONICAL_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME
+MASTER_SPEC_CANONICAL_2026-07-16_OPERATOR_RECONCILIATION_RECOVERY
 
 Status:
 - Official Canonical for the Runtime / Queue / SendOrder / Chejan / Fill /
-  Position / Broker Holdings / Recovery living contract after Startup Recovery
-  / Session Resume completion.
+  Position / Broker Holdings / Operator Reconciliation living contract after
+  operator manual Reconciliation / Recovery completion.
 - This document carries forward the latest living runtime contract and records
-  the PR #47 implementation result without rewriting older Canonical evidence.
+  the change set 46 implementation result without rewriting older Canonical evidence.
 - Older Canonical files are preserved and are not modified.
 
 Repository baseline:
-- kiwoom_auto base master / origin/master: d7582d00c1114c441b923459b0763ebb0d902566
-- kiwoom_auto feature branch: feat/startup-recovery-session-resume
-- kiwoom_auto feature commit: f3f9ed1846509f23b00d078313c98f3ed121f300
-- Code PR: #47, OPEN, merge not performed.
+- kiwoom_auto base master / origin/master: 3d4b2bab676e21bb54c3eaca5916960b30c8a28e
+- kiwoom_auto feature branch: feat/operator-reconciliation-recovery
+- kiwoom_auto feature commit: dec2efbaf4ad03baf0da00fa2b6fbbf346f818e7
+- Code baseline: #46, baseline pending, remote backup not performed.
 
 Test baseline:
-- Startup Recovery and operator reconciliation tests: 13 OK
-- GUI production and execution regression: 86 OK
-- Legacy multiprocessing comparison: 10/10 PASS
-- Full unittest: 5280 OK, 1 skipped
+- Operator reconciliation focused tests: 3 OK
+- Chejan + Fill recorder regression: 132 OK
+- GUI execution / Chejan / Broker holdings regression: 84 OK
+- Broker Holdings regression: 25 OK
+- Position update regression: 50 OK
+- Full unittest: 5268 OK, 1 skipped
 - git diff --check: passed
-- py_compile: passed with Python 3.11 32-bit.
+- py_compile: not completed because of the local Python Manager permission error;
+  full unittest import and execution passed.
 
 Historical baseline from the carried-forward Runtime Canonical:
 - SELL Runtime Commit Execution Plan tests: 38 OK
@@ -33,12 +36,9 @@ Historical baseline from the carried-forward Runtime Canonical:
 
 1. Purpose
 
-This Canonical carries forward the latest Runtime execution living contracts
-and records the completed Startup Recovery / Session Resume operation function.
+This Canonical carries forward the latest Runtime execution living contracts and records the completed operator manual Reconciliation / Recovery operation function.
 
-Older preview-only SELL Runtime Commit sections are preserved below as
-historical contract context. The current living runtime contract is defined in
-sections 11, 12, and 14.
+Older preview-only SELL Runtime Commit sections are preserved below as historical contract context. The current living runtime contract is defined in sections 11 and 12, including the operator reconciliation contract in section 12.10.
 
 2. Completed Runtime Commit Pipeline
 
@@ -53,33 +53,33 @@ SELL Execution Full Preview Orchestrator
 
 3. Implemented PRs
 
-PR #10:
+change set 10:
 - Title: feat: add SELL runtime commit preview
-- Merge commit: b0af8ff8048567a14c07d10f8e0eaa721fa5f2fa
+- Baseline commit: b0af8ff8048567a14c07d10f8e0eaa721fa5f2fa
 - Function: validates SELL_EXECUTION_FULL_PREVIEW results at the Runtime Commit preview boundary.
 - Master reflected: yes
 
-PR #11:
+change set 11:
 - Title: feat: add SELL runtime commit validator
-- Merge commit: 0a896105c4c5e4f25a7876a4c0c2141b11680ede
+- Baseline commit: 0a896105c4c5e4f25a7876a4c0c2141b11680ede
 - Function: validates Runtime Commit preview candidates before any commit-capable layer.
 - Master reflected: yes
 
-PR #12:
+change set 12:
 - Title: feat: add SELL runtime commit dry-run executor
-- Merge commit: 75dbf4bcef426323302b12f07c4fc2a76802cb92
+- Baseline commit: 75dbf4bcef426323302b12f07c4fc2a76802cb92
 - Function: creates dry-run commit actions and commit plans without performing a Runtime Commit.
 - Master reflected: yes
 
-PR #13:
+change set 13:
 - Title: feat: add SELL runtime commit approval gate
-- Merge commit: 077db4fd563682aa350e19a88e827903527e715c
+- Baseline commit: 077db4fd563682aa350e19a88e827903527e715c
 - Function: grants final approval only when all dry-run commit actions are READY and internally consistent.
 - Master reflected: yes
 
-PR #14:
+change set 14:
 - Title: feat: add SELL runtime commit execution plan
-- Merge commit: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
+- Baseline commit: 16a1c6b06fe139ac6ef0aa4ef071cf93464227dc
 - Function: creates the final RUNTIME_COMMIT execution plan from approved commit actions.
 - Master reflected: yes
 
@@ -756,115 +756,3 @@ The UI contract is:
 - input value: direct operator input
 
 Fixed combo-only values are prohibited for this policy.
-
-14. Startup Recovery / Session Resume Living Contract
-
-14.1 Purpose
-
-Startup Recovery makes the existing automatic trading production flow safe
-after process termination, application failure, or host restart.
-
-The operator must be able to inspect prior runtime evidence, understand whether
-the session is safe to resume, and explicitly approve the new session before
-automatic trading can continue.
-
-14.2 Evidence Contract
-
-The assessment reads the existing canonical evidence:
-
-- `runtime/order_queue.json`: order execution and lifecycle.
-- `runtime/fills.json`: execution Fill ledger.
-- `runtime/positions.json`: internal Position derived from Fill evidence.
-- `runtime/broker_holdings.json`: Kiwoom-reported holding snapshots.
-- `runtime/order_executions.json`: committed execution evidence.
-- `runtime/order_locks.json`: active execution locks.
-- `runtime/routine_signals.json`: routine signal lifecycle.
-- `stocks/*/state.json`: per-symbol operating and review state.
-- Queue reconciliation fields and stored Chejan event identity.
-
-The assessment is read-only. It does not initialize, rewrite, normalize, or
-delete runtime evidence.
-
-14.3 Recovery Classification
-
-The production classification is:
-
-- `RESUME_READY`: no unfinished or contradictory evidence requires review.
-- `REVIEW_REQUIRED`: the operator must review unfinished Queue, Fill/Position,
-  Broker Holdings, Routine Signal, or reconciliation evidence.
-- `BLOCKED_RECOVERY`: uncertain dispatch, active lock, interrupted lifecycle,
-  or incomplete identity evidence prevents safe resume.
-- `INVALID_RUNTIME`: damaged JSON, duplicate identity, contradictory execution
-  identity, or invalid runtime structure prevents a reliable assessment.
-
-Runtime execution identity must remain consistent with the matching Queue order.
-Recorded Fill evidence must be traceable to an applied internal Position or be
-reported for operator review.
-
-14.4 Production Caller
-
-`MainWindow` runs the Startup Recovery assessment during production startup.
-The existing main GUI displays the current classification and exposes the
-operator resume action.
-
-Unresolved reconciliation evidence continues to use the existing
-review-required GUI and operator reconciliation functions. Startup Recovery
-does not replace reconciliation ownership.
-
-14.5 Resume Approval
-
-Automatic trading does not resume automatically.
-
-Operator approval is bound to the SHA-256 snapshot of all assessed runtime
-evidence. If any assessed file changes, the approval is revoked and a fresh
-assessment and confirmation are required.
-
-Before approval, the following production actions are blocked:
-
-- automatic trading start;
-- automatic timer processing;
-- Execution Enable and REAL_READY progression;
-- Queue commit;
-- SendOrder;
-- CANCEL and MODIFY execution.
-
-Read-only inspection, review, reconciliation, and emergency-stop behavior
-remain available.
-
-14.6 Evidence Preservation
-
-Program startup must not force-reset per-symbol runtime state or clear prior
-trading flags as a substitute for recovery.
-
-Startup Recovery does not:
-
-- recall SendOrder;
-- resend an order;
-- reissue CANCEL or MODIFY;
-- create Fill evidence;
-- modify Position from Broker Holdings;
-- force-complete Queue lifecycle;
-- release uncertain claims automatically;
-- initialize missing runtime files;
-- remove historical runtime evidence.
-
-14.7 Source of Truth and Ownership
-
-No new Source of Truth or Writer is introduced.
-
-The existing Queue, Fill, Position, Broker Holdings, Runtime execution, lock,
-Routine Signal, and stock-state owners retain their responsibilities. Startup
-Recovery only reads and compares their evidence and controls whether the new
-GUI session may enter production trading actions.
-
-14.8 Completion Baseline
-
-- Code branch: `feat/startup-recovery-session-resume`.
-- Code commit: `f3f9ed1846509f23b00d078313c98f3ed121f300`.
-- Code PR: #47, OPEN, merge not performed.
-- Startup Recovery and operator reconciliation: 13 OK.
-- GUI production and execution regression: 86 OK.
-- Legacy multiprocessing comparison: 10/10 PASS.
-- Full unittest: 5280 OK, 1 skipped.
-- `py_compile`: passed with Python 3.11 32-bit.
-- `git diff --check`: passed.

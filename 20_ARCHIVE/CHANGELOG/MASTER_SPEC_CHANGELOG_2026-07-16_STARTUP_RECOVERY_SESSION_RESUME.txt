@@ -13,7 +13,7 @@ Code baseline:
 - Base master: d7582d00c1114c441b923459b0763ebb0d902566.
 - Branch: feat/startup-recovery-session-resume.
 - Commit: f3f9ed1846509f23b00d078313c98f3ed121f300.
-- PR: #47, OPEN.
+- Change set: #47, OPEN.
 - Merge was not performed.
 
 Implemented production behavior:
