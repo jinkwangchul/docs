@@ -1,0 +1,39 @@
+MASTER_SPEC_CHANGELOG_2026-07-17_CURRENT_STATE_RESYNC
+
+Purpose:
+- Record Canonical Current State Resync.
+- Replace stale current progress records with current GitHub baseline state.
+
+Baseline recorded:
+- docs/main: 09ffe28afdc5570e7f2b878c314da9b2f1fa33d7
+- kiwoom_auto/master: 4eaefa77e06e0fc31990b2ba1a25eaa2ec4c87c6
+
+Changed current Source of Truth:
+- New Current State Canonical created.
+- New Work Resume created.
+- Previous session-freeze Canonical moved to archive.
+- Previous session-freeze Work Resume moved to archive.
+- Previous session-freeze Changelog moved to archive.
+- Previous readable Startup Recovery changelog moved to archive because it
+  contained stale pending change-set wording.
+- Reference Index updated to point to the Current State Resync files.
+
+Stale information removed from current contract:
+- feature branch baseline as current implementation baseline
+- stale local feature commit as current implementation baseline
+- historical OPEN/CLOSED change-set status
+- completed work recorded as next work
+- local-only validation progress not present on current master
+
+Current state recorded:
+- current master automatic timer path
+- current consumer guard condition
+- current manual execution chain through SendOrder callable boundary
+- current Chejan / Fill / Position / Broker Holdings contracts
+- current Startup Recovery and operator reconciliation contracts
+- current earliest production gap for the next implementation session
+
+Code and runtime impact:
+- No code file was modified.
+- No runtime file was modified.
+- No production data was changed.

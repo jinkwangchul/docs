@@ -1,0 +1,68 @@
+WORK_RESUME_LATEST_2026-07-17_CURRENT_STATE_RESYNC
+
+Purpose:
+- Current recovery point after Canonical Current State Resync.
+- Use this file to start the next implementation session from the current
+  GitHub baseline, not from stale branch or historical change-set state.
+
+Baseline:
+- docs/main HEAD: 09ffe28afdc5570e7f2b878c314da9b2f1fa33d7
+- kiwoom_auto/master HEAD: 4eaefa77e06e0fc31990b2ba1a25eaa2ec4c87c6
+
+Current Source of Truth:
+- Latest Canonical:
+  MASTER_SPEC_CANONICAL_2026-07-17_CURRENT_STATE_RESYNC.txt
+- Latest Work Resume:
+  WORK_RESUME_LATEST_2026-07-17_CURRENT_STATE_RESYNC.txt
+- Latest Changelog:
+  MASTER_SPEC_CHANGELOG_2026-07-17_CURRENT_STATE_RESYNC.txt
+
+Current completed baseline on master:
+- Startup Recovery / Session Resume is included in master.
+- Operator reconciliation / recovery is included in master.
+- Cancel/modify Chejan lifecycle linking is included in master.
+- AutoTradeSettingWindow confirmed control restoration is included in master.
+- buy_signal_expr_line baseline is restored to A and B and C and D.
+- Manual execution path exists through ORDER_QUEUED, Final Send Gate,
+  dispatch claim, and execute_claimed_send_order.
+
+Current implementation position:
+- The GUI timer evaluates routines and can create routine signal evidence.
+- The consumer can create order_queue candidates and apply approval and
+  Operation Policy.
+- The current master timer calls the consumer only when
+  auto_trade_signal_probe_only_active(window) is true.
+- Normal real automatic trading state has signal_probe_only=false.
+
+Current confirmed production gap:
+- Normal real automatic trading signals do not enter the consumer from the
+  timer path on current master.
+
+Next implementation start point:
+- File: gui_auto_trade_timer.py
+- Function: auto_trade_on_time_policy_timer_tick
+- Task: change the consumer entry condition so normal real automatic trading
+  state can enter consume_pending_routine_signals_dry_run while preserving the
+  separate signal_probe_only semantics.
+
+Required validation after implementation:
+- status=RUNNING, trade_enabled=true, real_trade_enabled=true,
+  signal_probe_only=false enters the consumer.
+- signal_probe_only=true still follows the probe-only path safely.
+- review_required=true blocks real automatic progression.
+- Startup Recovery not approved blocks automatic progression.
+- Emergency stop blocks automatic progression.
+- PENDING signal -> consumer -> order_queue candidate is verified.
+- No real Kiwoom SendOrder is called without explicit approval.
+
+Do not start next session by:
+- using stale feature branch baseline state
+- reopening completed change-set status
+- redesigning MainWindow
+- rewriting Canonical structure
+- treating local-only unmerged work as current master contract
+
+Safety notes:
+- Code and runtime were not modified by this Resync.
+- Historical documents were preserved in archive.
+- The next implementation must use current master code as the baseline.
