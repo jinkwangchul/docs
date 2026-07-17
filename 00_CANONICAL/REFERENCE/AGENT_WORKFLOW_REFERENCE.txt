@@ -164,12 +164,13 @@ Startup execution flow:
 1. Read the Latest Work Resume only for the previous completion state and next implementation target.
 2. Confirm the current Git Baseline (branch and commit). Report to the user only if it differs from the expected baseline.
 3. If the next implementation scope is clear from the Work Resume, start implementation immediately.
+4. If no explicit next implementation task exists in the Source of Truth, identify the earliest user-visible production gap in the current baseline, declare it as the next Big Feature implementation target, briefly report the rationale, and immediately begin implementation.
 
 Reference rules:
 
-4. Refer to the corresponding Latest Canonical section only when needed during implementation.
-5. Use Reference Index only to locate a required document.
-6. Re-read this file only when operating rules changed, a new operating rule must be applied, or the user asks.
+5. Refer to the corresponding Latest Canonical section only when needed during implementation.
+6. Use Reference Index only to locate a required document.
+7. Re-read this file only when operating rules changed, a new operating rule must be applied, or the user asks.
 
 Forbidden:
 - Broad structure audit without need
@@ -279,6 +280,7 @@ The prompt must include:
 5. Next implementation task:
    - Name one concrete implementation task to perform first in the next session.
    - The task must be specific enough to implement immediately.
+   - If no explicit next implementation task exists in Source of Truth, use the earliest user-visible production gap in the current baseline as the next Big Feature implementation target.
    - Do not select a new feature or change scope without explicit user instruction.
    - Do not write the next action as an abstract area such as "continue Execution Layer" or "continue order system"; name the concrete task identifier.
 
