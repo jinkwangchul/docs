@@ -12,10 +12,12 @@ Reference Edition
 ## Source of Truth
 
 1. Latest user instruction
-2. Latest file in `00_CANONICAL/CURRENT`
-3. `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
-4. This Reference Index
+2. `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt` for AI operating rules
+3. Latest file in `00_CANONICAL/CURRENT` for project technical contracts
+4. Actual local code, Runtime files, logs, and execution evidence for implementation state
 5. Legacy PART files only when the latest Canonical does not supersede them
+
+This Reference Index is an index. It is not an AI operating policy document.
 
 ## Current Policy References
 
@@ -48,12 +50,9 @@ Legacy PART 파일은 최신 Canonical과 충돌하면 최신 Canonical을 우�
 
 ## Operational Rules
 
-Implementation First와 구조 감사는 충돌하지 않는다.
+AI operating rules are defined only in `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`.
 
-- 일반 구현: Implementation First 우선
-- 구조 오염 위험: AI Architecture Contamination Policy 우선
-
-구조 오염 위험은 신규 계층, 상태, writer, Source of Truth, production call graph, lifecycle owner 변경 또는 기존 책임 반복이 있을 때 발생한다.
+This index may point to policy evidence such as Canonical files, but it does not create or override operating rules.
 
 ## Validation Rule
 

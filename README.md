@@ -3,8 +3,8 @@
 This repository is the official documentation source of truth
 for the Kiwoom Auto Trading Project.
 
-Every implementation session begins with
-AI_SESSION_START_PROTOCOL.md.
+Every AI session follows
+`00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`.
 
 이 저장소는 `kiwoom_auto` 프로젝트의 문서 Source of Truth를 장기 운영하기 위한 docs 전용 저장소이다.
 
@@ -15,7 +15,7 @@ AI_SESSION_START_PROTOCOL.md.
 - MASTER_SPEC Canonical을 기준 문서로 관리한다.
 - CHANGELOG로 Canonical 변경 이력을 보존한다.
 - UPDATE 문서로 신규 변경 후보를 수집한다.
-- 운영 매뉴얼과 docs 운영 표준으로 ChatGPT / Codex / 일반 코드 모델 3모델 작업 기준을 고정한다.
+- `AGENT_WORKFLOW_REFERENCE`를 AI 운영규정의 유일 기준으로 둔다.
 - ARCHIVE와 REPORTS를 통해 과거 문서와 관리 보고서를 보존한다.
 
 ## 기본 구조
@@ -62,28 +62,16 @@ Reference Edition 원칙:
 - Reference Edition은 원문을 요약하거나 생략하지 않는다.
 - Reference Edition은 원본 순서를 유지한다.
 
-새 AI 세션에서는 다음 순서로 참조한다.
+새 AI 세션에서는 AGENT_WORKFLOW_REFERENCE를 기준으로 필요한 문서만 참조한다.
 
 ```text
-README.md
-↓
-AI_PROJECT_OPERATION_MANUAL_RELEASE_v1.2.md
-↓
-AI_SESSION_START_PROTOCOL.md
+00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
 ↓
 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
 ↓
-필요한 SUBPART
+Latest Official Canonical / Latest Work Resume
 ↓
-필요한 경우 Legacy PART
-↓
-필요한 경우 00_CANONICAL/CURRENT 최신 Canonical
-↓
-UPDATE/INBOX
-↓
-CHANGELOG
-↓
-ARCHIVE
+현재 작업에 필요한 소스와 Runtime 증거
 ```
 
 ## CURRENT 사용법
@@ -147,24 +135,14 @@ CHANGELOG는 `00_CANONICAL/CHANGELOG`에 보관한다.
 
 ## 새 대화 시작 시 참조 순서
 
-1. `README.md`
-2. `AI_PROJECT_OPERATION_MANUAL_RELEASE_v1.2.md`
-3. `AI_SESSION_START_PROTOCOL.md`
-4. `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`
-5. 필요한 SUBPART
-6. 필요한 경우 Legacy PART
-7. 필요한 경우 `00_CANONICAL/CURRENT` 최신 Canonical
-8. `10_UPDATE/INBOX`
-9. `00_CANONICAL/CHANGELOG`
-10. `20_ARCHIVE`
+1. `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
+2. `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`
+3. Latest Official Canonical
+4. Latest Work Resume
+5. 현재 작업에 필요한 파일과 Runtime 증거
 
 ## Local Git 운영 원칙
 
-- 로컬 프로젝트 파일과 문서가 작업 기준이다.
-- 실제 실행되는 코드, Runtime 상태, 실행 결과를 기준으로 검증한다.
-- Git은 로컬 버전 복구, 이력 확인, diff 확인 용도로 사용한다.
-- GitHub는 개발 절차가 아니라 백업 저장소로만 사용한다.
-- commit은 사용자 명시 허가 후 수행한다.
-- commit 전 diff와 stage 대상 확인은 필수이다.
-- 백업 zip, TEMP, 로컬 캐시는 Git 포함을 피한다.
-- 문서 변경과 구현 코드 변경은 분리한다.
+Local Git 운영 원칙은 `AGENT_WORKFLOW_REFERENCE`를 따른다.
+
+이 README는 저장소 안내 문서이며 AI 운영규정을 정의하지 않는다.

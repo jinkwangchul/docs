@@ -1,356 +1,344 @@
 # AGENT_WORKFLOW_REFERENCE
 
-문서 성격: AI/Codex 운영 규정
-Source of Truth: 최신 Canonical과 본 Reference
+Document role:
+- This file is the single Source of Truth for AI operating rules.
+- All AI agents working on this project must follow this file before README, session protocols, older operation manuals, Work Resume notes, or historical Canonical text.
+- Other documents provide project contracts, indexes, evidence, or recovery context. They do not define AI operating procedure unless this file explicitly delegates that role.
 
-## 1. 최상위 해석 규칙
+## 1. Authority And Interpretation
 
-1. 사용자의 최신 명시 지시가 최우선이다.
-2. AI는 기존 Canonical, Reference, 코드 계약보다 자신의 추론을 우선할 수 없다.
-3. 일반 구현은 Implementation First를 따른다.
-4. 구조 오염 위험이 있을 때만 구조 감사가 구현보다 앞선다.
-5. 구조 오염 위험은 신규 계층, durable state, writer, Source of Truth, production call graph, lifecycle owner 변경 또는 기존 책임 반복이 있을 때 발생한다.
+Priority order:
 
-## 2. Implementation First Policy
+1. Latest explicit user instruction
+2. `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
+3. Latest Official Canonical for technical project contracts
+4. Latest Work Resume for recovery context
+5. Actual local code, Runtime files, logs, and execution evidence
+6. Reference Index as a document index only
+7. Historical and archived files only as evidence
 
-프로젝트의 기본 목표는 구현 진척이다.
+Rules:
+- Latest explicit user instruction always overrides this file.
+- The user owns project concepts, rules, policies, states, terms, UI contracts, data contracts, and structure contracts.
+- AI has no authority to create, change, replace, expand, shrink, reinterpret, or delete project contracts without explicit user approval.
+- AI reasoning is only a tool for finding evidence. It is not implementation authority.
+- If implementation and contract conflict, fix the implementation. Do not rewrite the contract to fit AI interpretation.
+- User-unapproved contract change is project contamination.
 
-우선순위:
+## 2. Work Purpose
 
-1. 코드 구현
-2. 테스트
-3. 코드 검토
-4. Local Git
-5. 문서 작업
+The project goal is working automatic trading software, not document growth, structure growth, or Git activity.
 
-금지:
+Every task starts with one fixed problem statement or Big Feature Goal.
 
-- 구현보다 긴 조사
-- 이미 확인한 구조의 반복 조사
-- 구현 중 MASTER_SPEC / WORK_RESUME / CHANGELOG 작성 제안
-- 같은 내용 반복 설명
-- 요청 없는 범위 확대
+Default work flow:
 
-Conversation 시작 시 확인 질문:
+1. Define the actual problem
+2. Trace the real call path
+3. Confirm the actual stop point
+4. Make the smallest necessary change
+5. Verify through execution, tests, Runtime evidence, or logs
+6. Report only the result and remaining real stop points
 
-이번 작업이 실제 코드 구현 또는 사용자가 명시한 필수 운영 작업을 증가시키는가?
+Do not change the problem during the task. New findings are reported separately unless the user explicitly expands scope.
 
-YES이면 진행한다. NO이면 사용자의 명시 요청이 없는 한 수행하지 않는다.
+## 3. Implementation First
 
-## 3. Big Feature Goal Policy
+Implementation First means actual user-facing project behavior has priority over process work.
 
-프로젝트 작업 단위는 함수, 파일, 계층, 상태 전이가 아니라 사용자가 실제 사용할 수 있는 큰 기능이다.
+Default priority:
 
-코드, 문서, 백업, Git은 Big Feature 완성을 위한 수단이며 독립 목표가 아니다.
+1. Real problem resolution
+2. Cause confirmation
+3. Minimal implementation
+4. Verification
+5. Local version management
+6. Documentation only when requested or at Project Freeze
 
-작업 시작 시 하나의 Big Feature Goal을 정하고, 해당 기능이 Production 흐름에서 완성될 때까지 목표를 변경하지 않는다.
+Forbidden during implementation unless explicitly requested:
+- Long repeated structure audits
+- Middle-of-work Canonical, Changelog, or Work Resume creation
+- Expanding the task into future design
+- Treating tests, files, helper functions, or state names as completed user features
+- Ending at an internal pipeline stage when the requested user flow remains disconnected
 
-구조 조사, 코드 작성, 상태 처리, GUI 연결, 예외 처리, 테스트는 독립 작업이 아니라 Big Feature Goal 완성을 위한 내부 작업이다.
+## 4. Big Feature Goal
 
-Preview, Validator, Gate, Adapter, Wrapper, Executor 또는 개별 상태 전이를 독립적인 다음 작업으로 분리하지 않는다.
+Work unit is a user-usable feature, not a function, file, helper, adapter, preview, validator, gate, wrapper, executor, or state transition.
 
-신규 계층과 신규 파일은 기존 구조가 해당 책임을 수용할 수 없을 때만 허용한다.
+A Big Feature is complete only when the user can use it in the actual production flow or when the exact remaining stop point is proven.
 
-모든 코드 변경은 다음 질문에 답해야 한다.
+During a Big Feature:
+- Do not repeatedly split work into smaller featurelets.
+- Do not declare completion because one internal layer or test passes.
+- Do not select the next feature before the current one reaches a usable state or a proven blocker.
+- Small fixes discovered inside the same feature stay inside the same feature.
 
-- 현재 Big Feature Goal의 어떤 사용자 기능을 완성하는가?
-- 실제 Production Call Graph의 어느 단절을 해결하는가?
-- 이 변경 없이 큰 기능을 완성할 수 없는가?
+Completion report must explain the user-visible capability, actual flow, safety boundary, validation result, and remaining stop point if any.
 
-테스트 통과, 파일 생성, 상태 하나 연결, 개별 계층 완성은 기능 완료가 아니다.
+## 5. Change Scope Rule
 
-완료 기준은 사용자가 해당 큰 기능을 실제 프로젝트 흐름에서 사용할 수 있는 상태인지 여부다.
+AI does not perform work outside the current task scope.
 
-큰 기능이 완료되기 전에는 다음 기능 선정, 중간 Canonical 작성, 불필요한 기능 완성과 무관한 절차 반복, 작업재개 문서 생성을 하지 않는다.
+Without explicit user approval, do not perform:
+- Refactoring
+- Optimization
+- Naming changes
+- Structure changes
+- Contract changes
+- Test changes
+- Documentation changes
+- Git work
+- Extra feature additions
 
-구조 감사와 검증은 큰 기능 완성에 필요한 범위로 제한한다. 조사와 검증 자체를 별도 프로젝트로 확대하지 않는다.
+If an improvement is discovered, report it as:
 
-사소한 수정과 오류 보완은 같은 기능 작업 안에서 처리하며 별도 작업 단계로 분리하지 않는다.
+```text
+Additional improvement candidate
+- Target:
+- Reason:
+- Expected impact:
+- Recommended separate task:
+```
 
-완료 보고는 개별 코드 변경이 아니라 Big Feature Goal의 완성도, 실제 사용 흐름, 남은 단절점과 안전 경계를 중심으로 작성한다.
+Do not include it in the current work.
 
-## 4. Shared Foundation Pre-Implementation Policy
+## 6. Shared Foundation And Architecture Contamination
 
-기본값은 "신규 공통 저층 작업 없음"이다. 현재 Big Feature는 기존 구조를 사용해 실제 Production 연결을 완성하는 방향으로 진행한다. 공통 저층 구축이나 공통화는 독립 작업 목표가 아니다.
+Default: no new shared foundation work.
 
-공통 저층 검토는 현재 Big Feature가 기존 구조만으로 완료되지 않고, 막힌 원인이 Source of Truth, Canonical Writer, Broker I/O, 공통 저장, 외부 이벤트 입력, 공유 Mutation Boundary 중 하나에 있을 때만 허용한다. 미래 재사용 가능성, 구조적 깔끔함, 예상 중복만으로 공통화를 시작하지 않는다.
+Shared foundation review is allowed only when all are true:
+- The current Big Feature cannot be completed with existing structure.
+- The blocker is Source of Truth, Canonical Writer, Broker I/O, common storage, external event input, or shared Mutation Boundary.
+- Solving it is necessary to avoid bypassing a safety boundary.
+- The change can be made with minimal modification to existing structure.
 
-검토가 필요한 경우에도 기존 구조의 최소 수정을 우선한다. 현재 기능에 필요하지 않은 일반화, 인터페이스 확대, 추상화, 리팩터링을 금지한다.
+Do not create new layers, writers, policies, previews, gates, adapters, services, wrappers, or executors for convenience, reuse speculation, cleanliness, or future extensibility.
 
-구현 전에 보고가 필요한 경우는 위 조건을 만족해 현재 기능이 실제로 막힌 때뿐이다. 보고는 막힌 공통 경계, 현재 기능이 막힌 이유, 최소 변경 범위만 간단히 제시한다. 같은 Big Feature에서 이미 허가된 범위는 다시 보고하거나 허가받지 않는다.
+Architecture contamination includes:
+- AI-created concepts not approved by the user
+- Repeated wrappers around existing responsibility
+- Writer or Source of Truth dispersion
+- Production call graph changes without contract authority
+- Lifecycle owner changes without approval
+- Treating unit-test count as production validity
 
-공통 경계 수정이 끝나면 즉시 현재 Big Feature의 Production Caller 연결로 복귀한다. 공통 기반 구현만 완료한 상태로 작업을 종료하지 않는다.
+When structural risk is present, report the blocker and minimal option before implementation.
 
-다음은 공통 저층 사전 보고 대상으로 보지 않는다: 기능 내부 helper, 작은 함수, GUI 버튼과 Dialog, BUY / SELL별 정책, 가격 / 호가 / 수량 결정, 테스트 fixture / mock, 단순 이름 변경, 기존 계약을 바꾸지 않는 입력 검증, 기존 계층을 사용하는 Production Caller 연결, 특정 기능에서만 쓰는 Preview / Gate / Adapter.
+## 7. Source Of Truth And Runtime Safety
+
+Project technical contracts live in the latest Official Canonical. AI operating rules live only in this file.
 
-정책 충돌 시 Source of Truth와 Mutation Boundary는 우회할 수 없다. 동시에 Source of Truth 보호를 이유로 필요하지 않은 공통 계층을 만들 수도 없다.
+Runtime safety rules:
+- Do not write Runtime files unless the user requested a task that requires it and an existing writer/commit boundary is used.
+- Do not directly mutate Queue, Fill, Position, Broker Holdings, locks, state, or rules files unless explicitly authorized.
+- Do not create fake Runtime evidence.
+- Do not manually create empty JSON to bypass initialization.
+- Do not call Kiwoom SendOrder, Broker API, or real order APIs without explicit user approval.
+- Do not treat preview, validation, dry-run, or dialog display as commit.
+- Do not change Source of Truth or Writer ownership without user approval.
 
-Shared Foundation 보고를 이유로 별도 기능 완성과 무관한 절차를 만들지 않는다. 작은 공통 경계 수정은 기존 Big Feature 작업에 누적한다.
+Real side effects must go through the existing canonical writer, service, or commit boundary.
 
-## 5. Big Feature Local Git Completion Policy
+## 8. Session Startup Policy
 
-Git은 Big Feature 완성을 위한 로컬 복구와 이력 관리 수단이다. 기능 완성과 무관한 절차는 현재 개발 단계의 기본 절차로 사용하지 않는다.
+At the start of a new session, confirm only what is needed to resume safely.
 
-Big Feature Goal이 완료되기 전에는 작은 단계가 끝났다는 이유로 Git 절차를 반복하지 않는다.
+Startup triggers:
+- New conversation
+- Continuing previous work
+- Resuming after a Git baseline change
+- User asks to verify current baseline before work
+
+Startup order:
 
-Big Feature 구현 중에는 의미 있는 복구 지점이 필요할 때만 commit한다. 중간 commit은 기능 완료 사유가 아니다.
+1. Read this `AGENT_WORKFLOW_REFERENCE`
+2. Read `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`
+3. Identify Latest Official Canonical
+4. Identify Latest Work Resume
+5. Confirm Git baseline for the repository involved in the task
+6. Read README only if repository layout or document role is unclear
+7. Read only the Canonical sections and source files required by the current task
 
-GitHub는 개발 절차가 아니라 백업 저장소로만 사용한다. 원격 백업이 필요한 경우에도 사용자 명시 허가 후 수행한다.
+Forbidden:
+- Broad structure audit without need
+- Re-reading historical documents by default
+- Treating old Work Resume next steps as current user instruction
+- Starting implementation before the fixed problem and allowed scope are known
+
+Reference Index is only an index. It is not an operating policy document.
 
-기본 작업 흐름:
+## 9. Conversation Shutdown / Project Freeze Policy
+
+Conversation Shutdown is Project Freeze, not casual summarization.
+
+Shutdown triggers:
+- User says the work is ending
+- User says to move to the next conversation or next window
+- User says "마감", "작업 종료", "오늘은 여기까지", "Freeze", or equivalent
+- User asks to create a next-session baseline
 
-문제 정의 -> 호출 경로 추적 -> 실제 중단 위치 확인 -> 최소 수정 -> 실행 검증 -> 필요한 경우 로컬 commit
+Project Freeze is allowed even though Implementation First normally places documentation after implementation. Freeze work is operational baseline creation, not feature documentation.
 
-AI/Codex는 Git 작업을 제안하기 전에 다음을 확인한다.
-
-- 현재 Big Feature Goal이 무엇인가?
-- 해당 기능이 실제 Production Call Graph에서 완성됐는가?
-- 사용자에게 실제 사용 가능한 결과가 생겼는가?
-- 남은 단절점이 없는가?
-
-하나라도 충족하지 않으면 Git 절차로 작업을 종료하지 않고 같은 Big Feature 구현을 계속한다.
-
-Conversation이나 작업 세션이 바뀌어도 최신 Big Feature Goal과 완료 조건을 먼저 확인한다. 개별 commit이나 직전 수정 내용을 새로운 작업 목표로 오인하지 않는다.
-
-완료 보고 전 다음 문장을 확인한다.
-
-"지금 완료하려는 대상은 코드 변경인가, 실제 큰 기능인가?"
-
-코드 변경만 완료된 상태라면 Big Feature 완료 보고나 Git 마감 단계로 진행하지 않는다.
-
-## 6. 문서 작성 시점
-
-문서는 구현 결과를 기록하는 용도이다.
-
-구현 진행 중에는 다음 문서를 생성하거나 갱신하지 않는다.
-
-- MASTER_SPEC
-- WORK_RESUME
-- CHANGELOG
-- 작업재개 문서
-- 기타 프로젝트 관리 문서
-
-예외:
-
-1. 사용자가 명시적으로 문서 작업을 요청한 경우
-2. Conversation 종료 시 사용자가 마무리 / 다음 창 / 문서 작성 / 작업재개 문서 생성을 요청한 경우
-3. 대규모 아키텍처 변경으로 사용자가 문서 갱신을 허가한 경우
-
-Conversation 종료 문서는 한 번만 작성한다.
-
-## 7. 역할 분리
-
-ChatGPT 역할:
-
-- 프로젝트 아키텍처 설계
-- 구현 방향 결정
-- 작업 우선순위 결정
-- 계약 검토
-- 코드 검토
-- 버그 원인 분석
-- 구현 범위 결정
-- Codex 작업 지시 작성
-- 최종 작업 범위 확인
-
-Codex 역할:
-
-- 코드 구현
-- 리팩터링
-- 테스트 작성
-- Git 작업
-- Commit
-- 사용자 명시 허가 시 백업 push
-- 로컬 Git 이력 확인
-- 실행 검증 결과 보고
-- ChatGPT가 결정한 구현 작업 수행
-
-일반 Agent 역할 규정은 운영 규칙에 포함하지 않는다.
-
-## 8. 작업 범위와 허가
-
-Codex는 사용자가 지정한 범위 안에서만 작업한다.
-
-금지:
-
-- 사용자 명시 허가 없는 신규 계층 생성
-- 사용자 명시 허가 없는 상태명 변경
-- 사용자 명시 허가 없는 writer 변경
-- 사용자 명시 허가 없는 Source of Truth 변경
-- 사용자 명시 허가 없는 production call graph 변경
-- 사용자 명시 허가 없는 lifecycle owner 변경
-- 보호 dirty / untracked 파일 수정, stage, restore, reset, stash
-
-구조 문제가 발견되면 먼저 조사 결과와 선택지를 보고한다.
-
-보고는 삭제, 통합, 이동, deprecate 허가으로 간주하지 않는다.
-
-## 9. 구조 변경 통제
-
-프로젝트의 최대 리스크는 AI 구현 과정에서 발생하는 구조 오염이다.
-
-구조 오염의 핵심 위험:
-
-- 너무 작은 단위를 독립 구조로 반복 분리
-- 국소적 합리성을 전체 구조의 합리성으로 오판
-- 기존 책임과 중복되는 wrapper / adapter / preview / validator 생성
-- production caller 없는 계층 증가
-- writer / Source of Truth 분산
-
-신규 구조는 아래 조건을 모두 만족할 때만 허용된다.
-
-1. 기존 구조가 책임을 흡수할 수 없다.
-2. 독립 production caller, mutation boundary, Source of Truth, lifecycle owner, side-effect boundary 중 하나가 존재한다.
-3. Canonical 계약과 충돌하지 않는다.
-4. 사용자가 구조 변경 범위와 방향을 명시적으로 허가했다.
-
-Layer 이름은 근거가 아니다. 책임, caller, mutation, Source of Truth, lifecycle 기준으로 판단한다.
-
-테스트 통과는 production 연결 증거가 아니다. production call graph, writer ownership, state transition, runtime concurrency, identity propagation을 확인해야 한다.
-
-구조 정책의 상세 Source of Truth:
-
-- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt
-
-## 10. Runtime 안전 금지선
-
-명시 허가 전 금지:
-
-- SendOrder 실제 호출
-- Kiwoom OpenAPI 호출
-- Broker API 호출
-- 실제 OrderRequest 생성
-- Queue 상태 변경
-- Runtime 파일 write
-- REAL_READY 상태 변경
-- rollback / restore 실행
-- 보호 파일 수정
-
-Preview / Validation / Confirmation / Dry-run 계층은 실제 side effect를 만들 수 없다.
-
-실제 side effect가 허용된 작업은 사용자 지시의 commit boundary 안에서만 수행한다.
-
-## 11. Local Git 절차
-
-이 프로젝트는 단일 개발자 기준으로 운영한다. Git은 협업 도구가 아니라 로컬 버전 관리, 실패 시 파일 단위 복구, 작업 종료 전 최종 백업 commit, 대화 종료 직전 필요한 경우 원격 백업 Push 1회에만 사용한다. 원격 저장소는 백업 위치일 뿐 개발 절차에 참여하지 않는다.
-
-버그가 발생하면 원인 분석 -> 호출 경로 추적 -> 수정 파일 확인 -> 파일 단위 복구 -> 재수정 순서로 처리한다. 전체 프로젝트 초기화나 대규모 복구를 기본 전략으로 사용하지 않는다.
-
-Code repository 기본 절차:
-
-1. 현재 파일 상태 확인
-2. 문제 정의
-3. 호출 경로 추적
-4. 실제 중단 위치 확인
-5. 최소 수정
-6. 실행 검증
-7. 지정 파일만 stage
-8. 필요한 경우 commit
-9. git status / git log / git diff 확인
-
-Docs repository 기본 절차:
-
-1. 문서 위치 확인
-2. 문서 수정
-3. diff 검토
-4. 지정 파일만 stage
-5. 필요한 경우 commit
-6. git status / git log / git diff 확인
-
-GitHub는 개발 절차가 아니라 백업 저장소로만 사용한다. 기능 완성과 무관한 절차는 기본 작업 절차가 아니다.
-
-금지:
-
-- `git add .`
-- `git add -A`
-- 허가 없는 restore / reset / stash
-- 보호 dirty 파일 stage
-- 작업 범위를 벗어난 파일 수정
-
-Git 작업은 Big Feature Goal 완성을 위한 관리 수단이다. Preview, Validator, Gate, Adapter, Wrapper, Executor 또는 상태 하나를 완료했다는 이유만으로 Git 절차를 반복하지 않는다.
-
-## 12. Local 최종 검증
-
-최종 보고 전 현재 로컬 작업 폴더 기준으로 확인한다.
-
-확인 대상:
-
-- 실제 수정 파일
-- git status
-- git diff
-- 최신 Canonical
-- 최신 Work Resume
-- 최신 ChangeLog
-- Runtime 상태와 실행 결과
-- 보호 dirty / untracked 유지 여부
-
-문서나 보고서에 기록하는 commit SHA는 실제 로컬 Git 이력을 기준으로 사용한다.
-
-Reference Index 수정 시 과거 다음 작업, 과거 진행 상태, 과거 역할 설명, 완료 상태, Legacy 안내가 최신 Canonical과 충돌하지 않는지 확인한다.
-
-## 13. 최종 보고 규칙
-
-최종 보고는 결과 중심으로 작성한다.
-
-포함:
-
-- 변경 파일
-- 테스트 결과
-
-Completion Report Policy:
-
-- Completion reports are written from the project feature perspective, not from the code-change perspective.
-- A completion report must explain what project capability was implemented, why it was needed, and what behavior was added or changed.
-- A completion report must include:
-  - implementation purpose
-  - project feature or pipeline stage
-  - implemented behavior
-  - project-wide impact
-  - unaffected areas
-  - validation result
-- Function names, file names, Commit SHA, and test counts are supporting details. They must not appear before the core feature explanation.
-- A completion report that does not explain functional meaning and system role is a rule violation.
-- If the report is not project-feature-centered, AGENT_WORKFLOW_REFERENCE was not properly followed.
-
-- Commit SHA
-- Git commit 또는 작업 이력
-- Git 상태
-- 로컬/원격 HEAD
-- 보호 dirty / untracked 유지 여부
-- 금지선 미침범 여부
-
-불필요한 장문 설명, 반복 설명, 요청 없는 선택지 제시는 하지 않는다.
-
-## 14. Codex 작업 지시문 작성 규칙
-
-Codex 지시문에는 Codex가 수행할 작업만 작성한다.
-
-- ChatGPT의 검토 기준, 판단 과정, 배경설명을 섞지 않는다.
-- 기존 운영 규칙을 매 지시문마다 반복하지 않는다.
-- 작업 범위, 수정 내용, 금지 범위, 검증, 완료 보고만 작성한다.
-- 검토 의견과 실행 지시는 분리한다.
-- 하나의 작업에 필요한 내용만 포함한다.
-## 15. MASTER SPEC Maintenance Policy
-
-MASTER SPEC의 기본 원칙은 Living Contract 유지이다.
-
-- 새로운 기능은 해당 영역의 최신 Canonical에만 반영한다.
-- Contract Promotion이 완료되면 해당 Canonical이 그 영역의 유일한 Source of Truth가 된다.
-- 동일 계약을 다른 Canonical 문서에서 다시 정의하지 않는다.
-- 기존 Canonical은 Historical 역할을 유지하며 현재 계약을 다시 정의하지 않는다.
-- Historical 문서는 현재 계약의 Source of Truth가 될 수 없다.
-- Runtime Living Contract는 최신 Runtime Canonical만 기준으로 사용한다.
-- 대규모 Canonical 재작성은 Living Contract가 분산된 경우에만 수행한다.
-
-## 16. Backtest Audit Log Architecture
-
-별도 공식 문서 생성 전까지 임시 보존한다. 공식 Canonical이 생기면 AGENT에는 참조만 남긴다.
-
-Backtest log는 사람이 읽는 텍스트 로그가 아니라 schema-first structured event ledger이다.
-
-필수 원칙:
-
-- stable identity linkage로 run, strategy, signal, candidate, order, position, trade, snapshot을 연결한다.
-- Signal -> Candidate -> Order -> Position -> Exit replay가 가능해야 한다.
-- performance 분석 필드는 pnl, mfe, mae, drawdown, fee, slippage, holding time을 포함한다.
-- Runtime 독립성을 유지한다. log 실패가 전략 판단, replay, simulation 결과를 바꾸면 안 된다.
-- text-log-first 설계, identity 없는 로그, event 연결 불가능한 로그, replay 불가능한 로그를 금지한다.
+Freeze includes, when requested or needed:
+- Project state check
+- Git status check
+- Commit of completed project work
+- Push to GitHub as backup and next-session recovery baseline
+- New Latest Official Canonical for confirmed project contracts only
+- New Latest Work Resume for recovery state
+- New Latest Changelog for Canonical changes
+- Reference Index update when latest document pointers change
+- Final verification that local and remote baselines match
+
+Big Feature Freeze must record:
+- Current Big Feature Goal
+- Current Big Feature progress
+- Completion criteria
+- Current blocker or next start point
+- Why the next Big Feature must not be selected yet, if the current one is not complete
+
+Freeze is complete only when the next AI can continue the same work from GitHub and the recorded documents without reading the previous conversation.
+
+Freeze must not record ideas, unapproved plans, or discussed UI proposals as Canonical.
+
+## 10. Local Git And GitHub
+
+Git is used for:
+- Local version management
+- Diff and history inspection
+- File-level recovery after mistakes
+- Final backup commit at stable points
+
+GitHub is used for:
+- Remote backup
+- AI state restoration
+- Project baseline verification
+- Remote baseline verification after push
+- Next-session recovery reference after the local baseline is pushed
+- Collaboration history only when the user explicitly needs it
+
+GitHub is not a development procedure and not a reason to add collaboration workflow.
+
+Rules:
+- Do not run Git operations unless requested or necessary for an approved Freeze/Git task.
+- Do not use `git add .` or `git add -A`.
+- Stage only specified files.
+- Do not reset, restore, stash, clean, or delete protected dirty/untracked files unless the user explicitly asks.
+- Report branch, local SHA, remote SHA, ahead/behind, status, diff, and untracked files when doing baseline verification.
+
+## 11. Document Roles
+
+Document hierarchy: AI operating rules -> AGENT_WORKFLOW_REFERENCE; technical contract -> Latest Canonical; recovery -> Latest Work Resume; change history -> Latest Changelog; navigation -> Reference Index; repository guide -> README; historical evidence -> 20_ARCHIVE.
+
+Document roles:
+
+- `AGENT_WORKFLOW_REFERENCE`: single AI operating rule source
+- `00_REFERENCE_INDEX.md`: index to latest documents
+- Canonical: project technical contract
+- Work Resume: recovery and next-session context
+- Changelog: Canonical change history
+- README: repository guide
+- Historical / Archive: evidence only
+
+Rules:
+- Do not modify old Canonical, old Changelog, or old Work Resume.
+- New confirmed contract goes into a new Canonical.
+- Canonical only records confirmed implementation or confirmed policy.
+- Work Resume records recovery state, current baseline, next start point, and unresolved blockers.
+- Changelog records what changed in a Canonical update.
+- Intermediate documents are forbidden unless user explicitly asks.
+
+## 12. Prompt Standard
+
+Permanent operating rules are not repeated in every task prompt.
+
+Task prompt should contain only:
+
+1. Purpose
+2. Target scope
+3. Additional restrictions unique to this task
+4. Verification
+5. Report format
+
+Default prompt length should stay small:
+- Analysis: about 10-20 lines when possible
+- Implementation: about 20-40 lines when possible
+- Git or document task: about 10-20 lines when possible
+
+Prompt checklist:
+- Is this directly related to the current task?
+- Does it avoid repeating this operating rule file?
+- Does it avoid unrelated Git, test, document, or PR instructions?
+- Is the purpose one sentence?
+- Is the report format not excessive?
+
+## 13. Verification And Reporting
+
+No conclusion without evidence.
+
+Valid evidence:
+- Code path
+- Runtime value
+- state file
+- Queue file
+- Log
+- Test result
+- GUI execution result
+- Git status or diff for Git tasks
+
+Every change or conclusion must distinguish evidence from inference.
+
+Examples of evidence:
+- Test result
+- `py_compile` result
+- `git status`
+- Commit hash
+- Runtime file content
+- Log line
+- Queue or state record
+
+If evidence is missing, report "not confirmed".
+
+Report order for bug/feature work:
+
+1. Problem definition
+2. Call chain
+3. Actual stop point
+4. Cause
+5. Evidence
+6. Change location
+7. Change summary
+8. Verification result
+9. Remaining issue
+
+Do not over-report file and function names before explaining actual user-facing behavior.
+
+## 14. Prohibited Defaults
+
+Unless explicitly requested, do not:
+- Create new project concepts
+- Create new statuses
+- Create new UI contracts
+- Create new Source of Truth
+- Create new writer or mutation boundary
+- Add hidden Runtime writes
+- Connect real SendOrder
+- Use Broker API
+- Generate new Canonical, Changelog, or Work Resume during implementation
+- Perform Git work
+- Modify unrelated files
+- Expand a bug task into architecture cleanup
+- Turn analysis into implementation
+
+## 15. Final Principle
+
+The AI's job is to make the current real project work under the user's contracts.
+
+When in doubt:
+
+1. Preserve the contract
+2. Trace the real execution path
+3. Fix only the proven blocker
+4. Verify with real evidence
+5. Report the next real blocker
