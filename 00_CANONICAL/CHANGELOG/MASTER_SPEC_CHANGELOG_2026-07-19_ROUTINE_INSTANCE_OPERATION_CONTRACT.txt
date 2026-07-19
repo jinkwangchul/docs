@@ -1,0 +1,42 @@
+MASTER_SPEC_CHANGELOG_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT
+
+Purpose:
+- Record the confirmed Routine Type / Routine Instance operating contract.
+- Keep implementation-specific fields and unverified algorithms out of the
+  Canonical until their actual implementation contracts are examined.
+
+Baseline Canonical:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-17_CURRENT_STATE_RESYNC.txt
+
+New documents:
+- MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt
+- MASTER_SPEC_CANONICAL_READABLE_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt
+- MASTER_SPEC_CHANGELOG_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt
+
+Contract added:
+- Routine Type is the parent category and template.
+- Routine Instance is the actual settings, operation, and stock-assignment
+  unit.
+- Stock monitoring and child aggregation use actual Routine Instance
+  membership; parent aggregation combines child results.
+- The routine tree keeps its existing hierarchy and checkbox model, with the
+  confirmed collapsed, expanded, and parent-name hover aggregate behavior.
+- Parent Early Close and Immediate Liquidation commands apply only to checked
+  child instances and reuse existing backend policy.
+- Early Close retains its existing policy meaning.
+- Immediate Liquidation remains a one-time request whose REQUESTED state is not
+  order or liquidation completion.
+- Real-trading completion display must reuse authoritative existing order and
+  Chejan evidence.
+
+Not defined in this update:
+- speculative storage fields or JSON schemas
+- a new completion algorithm
+- a new close, carry-over, or liquidation policy
+- Queue, Final Send Gate, SendOrder, or Chejan structural changes
+
+Code and runtime impact:
+- No code file was modified by this documentation task.
+- No runtime file was modified.
+- No production data was changed.

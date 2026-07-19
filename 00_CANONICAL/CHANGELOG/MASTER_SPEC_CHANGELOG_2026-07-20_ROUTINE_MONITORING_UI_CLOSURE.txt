@@ -1,0 +1,52 @@
+MASTER_SPEC_CHANGELOG_2026-07-20_ROUTINE_MONITORING_UI_CLOSURE
+
+Purpose:
+- Record the completed routine monitoring UI baseline and its safety boundaries.
+- Preserve previous Canonical files and add a new Canonical snapshot.
+
+Baseline Canonical:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt
+
+New documents:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-20_ROUTINE_MONITORING_UI_CLOSURE.txt
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_READABLE_2026-07-20_ROUTINE_MONITORING_UI_CLOSURE.txt
+- 00_CANONICAL/CHANGELOG/
+  MASTER_SPEC_CHANGELOG_2026-07-20_ROUTINE_MONITORING_UI_CLOSURE.txt
+- 00_CANONICAL/CURRENT/
+  WORK_RESUME_LATEST_2026-07-20_ROUTINE_MONITORING_UI_CLOSURE.txt
+
+Contract recorded:
+- Routine Type and Routine Instance identity separation remains the basis for
+  stock assignment, aggregation, and parent operation targeting.
+- Routine monitoring tree keeps parent/child hierarchy and checkbox contracts.
+- Child Routine Instance rows show operation information in one line.
+- Child status stamp no longer contains its internal circular icon.
+- Profit/loss LED before the instance name remains as the row signal indicator.
+- Child settings entry uses context menu "설정변경"; child double-click is
+  reserved for inline name editing.
+- Parent operation commands target checked child instances with assigned stocks.
+- Empty-target operation menu items are disabled in the GUI.
+- Early Close and Immediate Liquidation reuse OperationCommandService.
+- Immediate Liquidation REQUESTED is not order execution or liquidation
+  completion.
+
+Not changed:
+- Queue
+- Final Send Gate
+- SendOrder
+- Chejan
+- Broker API
+- runtime order files
+- operation command backend contract
+- completion algorithm
+
+Code baseline:
+- kiwoom_auto commit:
+  df671dc7215cb87a090301ae7d26bd5fc5362c6e
+
+Runtime impact:
+- No runtime data contract is changed by this document update.
+- This documentation task does not modify production runtime JSON or order data.

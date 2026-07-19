@@ -1,0 +1,39 @@
+WORK_RESUME_LATEST_2026-07-20_ROUTINE_MONITORING_UI_CLOSURE
+
+Current baseline:
+- kiwoom_auto branch at code closure:
+  feat/restore-auto-trade-setting-ui
+- kiwoom_auto latest pushed commit:
+  df671dc7215cb87a090301ae7d26bd5fc5362c6e
+- docs branch at document closure:
+  agent/project-prompt-standard
+
+Completed in the current baseline:
+- OperationCommandService exists and is reused by routine operation UI callers.
+- apply_selected_early_close uses OperationCommandService.
+- Routine monitoring UI has parent/child Routine Type/Routine Instance display
+  separation.
+- Routine Instance rows show status, counts, buy limit, consumed amount, and
+  profit in one line.
+- Profit/loss LED is displayed before child instance names.
+- Status stamp text no longer includes an internal circular icon.
+- Parent and child context menus expose 조기마감 and 즉시청산 through existing
+  backend paths.
+- Child context menu includes 설정변경 for existing instance settings.
+- Empty-target operation menu items are disabled.
+- Queue, Final Send Gate, SendOrder, Chejan, and actual order execution remain
+  outside this completed UI baseline.
+
+Protected state:
+- Existing runtime, stock data, routine instance JSON/rules, order queue, and
+  broker/Chejan data must remain protected unless a future task explicitly
+  targets them.
+- Do not infer completion from balances alone.
+- Data inconsistency must remain a review-management target.
+
+Recommended next start:
+- Before connecting real execution completion display, inspect the authoritative
+  order/Chejan result path and define the exact evidence contract for 매매완료
+  and 일부완료.
+- Do not add new Queue, SendOrder, or Chejan behavior from the monitoring UI
+  without a separate implementation contract.

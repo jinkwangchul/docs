@@ -1,0 +1,61 @@
+MASTER_SPEC_CANONICAL_READABLE_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT
+
+Purpose
+
+This document is the readable companion to Section 11 of
+MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.
+It summarizes the confirmed operating model without fixing speculative
+implementation details.
+
+1. Routine structure
+
+- A Routine Type is the parent category and shared template.
+- A Routine Instance is the actual registered routine used for settings,
+  operation, and stock assignment.
+- Stocks belong to an actual Routine Instance. The parent category receives
+  only the combined view of its children.
+
+2. Routine tree
+
+- Keep the existing parent/child tree and checkboxes.
+- Show the parent name slightly larger than child names.
+- Show the parent aggregate as:
+
+  Registered(value) | Running(value) | Stopped(value) | Error(value)
+
+- Show the aggregate while collapsed.
+- Hide it while expanded, except while the pointer is over the parent-name
+  text.
+
+3. Parent operations
+
+- The parent context menu contains Early Close and Immediate Liquidation.
+- Only checked child Routine Instances are targets.
+- Unchecked instances are not changed.
+- These actions reuse the existing backend and Operation Command Service.
+
+4. Policy meaning
+
+- Early Close follows the existing automatic-trading close policy and is not
+  the same as immediate market-order liquidation.
+- Immediate Liquidation is a one-time request. REQUESTED means only that the
+  request was recorded; it does not mean order or liquidation completion.
+- Existing market time, close timing, market order, carry-over, and unfilled
+  order policies remain authoritative.
+
+5. Monitoring and results
+
+- Stock monitoring shows the assigned Routine Instance rather than the parent
+  Routine Type.
+- Child aggregates use stocks assigned to that instance. Parent aggregates
+  combine the child values.
+- Trading Complete and Partially Complete are displayed only from authoritative
+  existing order-result and Chejan evidence. No new completion algorithm is
+  defined here.
+- Data inconsistency continues to enter the existing review-management flow.
+
+6. Safety
+
+- GUI code does not duplicate business logic.
+- This document does not change Queue, Final Send Gate, SendOrder, Chejan,
+  runtime, or production code.
