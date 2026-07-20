@@ -8,6 +8,9 @@ Current authoritative AI operating rules are defined only in:
 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
 ```
 
+The current Conversation Closing Standard Procedure is also defined only in
+`00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`.
+
 ## Current Role
 
 - This file no longer creates independent AI operating rules.

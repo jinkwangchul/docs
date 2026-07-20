@@ -321,3 +321,23 @@ CHANGELOG는 다음 경우 생성한다.
 - rules.json 수정
 - Git 작업
 - 압축파일 생성
+
+## 12. Conversation Closing Document Handling
+
+The current authoritative Conversation Closing Standard Procedure is defined in:
+
+```text
+00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+```
+
+Docs folder handling rule:
+
+- Do not create temporary, preliminary, draft, or intermediate Next Session
+  Startup Prompt files during closing.
+- Create the Next Session Startup Prompt only after close-out commit, push,
+  Canonical, Work Resume, Changelog, and Git status verification are complete.
+- If a startup prompt must be stored as a document, store only the final prompt
+  based on the final Git and Canonical state.
+- Do not overwrite existing Canonical, Changelog, or Work Resume files when
+  recording closing results. Use a new dated file when a document update is
+  required.

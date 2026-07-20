@@ -25,7 +25,33 @@ Rules:
 - If implementation and contract conflict, fix the implementation. Do not rewrite the contract to fit AI interpretation.
 - User-unapproved contract change is project contamination.
 
-## 2. Work Purpose
+## 2. Project Identity
+
+Automatic Trading Project:
+
+- Local Repository:
+  `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`
+- GitHub Repository:
+  `https://github.com/jinkwangchul/kiwoom_auto`
+- Default Remote:
+  `origin`
+
+Documentation Repository:
+
+- Local Repository:
+  `C:\Users\JIN KWANG CHUL\Documents\docs`
+- GitHub Repository:
+  `https://github.com/jinkwangchul/docs`
+- Default Remote:
+  `origin`
+
+Repository verification rule:
+- At new-session startup, run `git remote -v` for each repository that will be used.
+- Verify that the remote URL matches the corresponding Project Identity GitHub Repository.
+- Do not start project work if the local repository remote does not match Project Identity.
+- Report the mismatch and wait for user instruction instead of guessing or switching repositories.
+
+## 3. Work Purpose
 
 The project goal is working automatic trading software, not document growth, structure growth, or Git activity.
 
@@ -42,7 +68,7 @@ Default work flow:
 
 Do not change the problem during the task. New findings are reported separately unless the user explicitly expands scope.
 
-## 3. Implementation First
+## 4. Implementation First
 
 Implementation First means actual user-facing project behavior has priority over process work.
 
@@ -62,7 +88,7 @@ Forbidden during implementation unless explicitly requested:
 - Treating tests, files, helper functions, or state names as completed user features
 - Ending at an internal pipeline stage when the requested user flow remains disconnected
 
-## 4. Big Feature Goal
+## 5. Big Feature Goal
 
 Work unit is a user-usable feature, not a function, file, helper, adapter, preview, validator, gate, wrapper, executor, or state transition.
 
@@ -76,7 +102,7 @@ During a Big Feature:
 
 Completion report must explain the user-visible capability, actual flow, safety boundary, validation result, and remaining stop point if any.
 
-## 5. Change Scope Rule
+## 6. Change Scope Rule
 
 AI does not perform work outside the current task scope.
 
@@ -103,7 +129,7 @@ Additional improvement candidate
 
 Do not include it in the current work.
 
-## 6. Shared Foundation And Architecture Contamination
+## 7. Shared Foundation And Architecture Contamination
 
 Default: no new shared foundation work.
 
@@ -125,7 +151,7 @@ Architecture contamination includes:
 
 When structural risk is present, report the blocker and minimal option before implementation.
 
-## 7. Source Of Truth And Runtime Safety
+## 8. Source Of Truth And Runtime Safety
 
 Project technical contracts live in the latest Official Canonical. AI operating rules live only in this file.
 
@@ -140,7 +166,7 @@ Runtime safety rules:
 
 Real side effects must go through the existing canonical writer, service, or commit boundary.
 
-## 8. Session Startup Policy
+## 9. Session Startup Policy
 
 At the start of a new session, resume implementation from the latest Work Resume. Startup is not document review.
 
@@ -182,7 +208,7 @@ Forbidden:
 Reference Index is only an index. It is not an operating policy document.
 Follow only the operating procedures defined by this project. Documents support implementation; they must not become a repeated startup gate when the Latest Work Resume already provides the next implementation point.
 
-## 9. Conversation Shutdown / Project Freeze Policy
+## 10. Conversation Shutdown / Project Freeze Policy
 
 Conversation Shutdown is Project Freeze, not casual summarization.
 
@@ -216,85 +242,99 @@ Freeze is complete only when the next AI can continue the same work from GitHub 
 
 Freeze must not record ideas, unapproved plans, or discussed UI proposals as Canonical.
 
-## 10. Conversation Closing Standard Procedure
+## 11. Conversation Closing Standard Procedure
 
 Run this procedure only when the user explicitly says they are moving to the next conversation, opening a new window, closing the window, finishing, wrapping up, or equivalent.
 
-Step 1. Codex Closing Prompt
+Step 1. Implementation Work Ends
 
-Create a concrete closing prompt for Codex to finish the current work.
+Confirm that the implementation work itself has ended.
 
-The Codex Closing Prompt must include:
+This means:
+- Code implementation is complete.
+- Required tests and verification are complete.
+- The completed work scope and excluded scope are known.
 
-1. Source of Truth document update:
-   - Latest Canonical when needed
-   - AGENT_WORKFLOW_REFERENCE when needed
-   - Reference documents when needed
-   - Work Resume when needed
-   - Changelog or other Canonical documents when needed
-2. Verification:
-   - Review changed content
-   - Run `git diff --check`
-   - Run any other required verification
-3. Git work:
-   - Commit
-   - Push
-   - Confirm latest GitHub state
-4. Final report:
-   - Updated Source of Truth document list
-   - Commit SHA
-   - Push result
-   - Verification result
-   - Next Session Startup Prompt
+Do not create a Next Session Startup Prompt at this step.
 
-The Codex Closing Prompt must end by creating the Next Session Startup Prompt so the next session can start implementation immediately.
+Step 2. Run The Codex Work Closing Prompt
 
-The final report should contain only the required result. Do not include unnecessary intermediate work logs.
+Run the user-approved Codex closing prompt.
 
-Step 2. Next Session Startup Prompt
+This step performs the defined close-out work, including as applicable:
+- Git status inspection
+- Commit
+- Push
+- Canonical update
+- Changelog update
+- Work Resume update
+- Other close-out work defined by the operation manuals
 
-After the closing work is complete, create a concrete Next Session Startup Prompt for the next conversation.
+Do not create a Next Session Startup Prompt during this step.
 
-The prompt must include:
+Step 3. Codex Completion Report
 
-1. Environment resolution:
-   - ChatGPT with GitHub connector
-   - Local Codex / VSCode
-2. Source of Truth selection:
-   - GitHub environment uses the GitHub repository.
-   - Local environment uses the local repository.
-   - Do not mix the two environments unless the user asks.
-3. Startup procedure:
-   - Do not use memory or the previous conversation as Source of Truth.
-   - Check `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`.
-   - Check `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`.
-   - Check the latest `MASTER_SPEC_CANONICAL`.
-   - Check the latest `WORK_RESUME`.
-   - Check required Reference documents only when the next task needs them.
-4. Repository state:
-   - Branch
-   - Commit
-   - Dirty or untracked state
-   - Recently completed work
-   - Current implementation location
-5. Next implementation task:
-   - Name one concrete implementation task to perform first in the next session.
-   - The task must be specific enough to implement immediately.
-   - If no explicit next implementation task exists in Source of Truth, use the earliest user-visible production gap in the current baseline as this session's implementation target.
-   - Do not add a new feature or scope outside what can be reasonably derived from Source of Truth.
-   - Do not write the next action as an abstract area such as "continue Execution Layer" or "continue order system"; name the concrete task identifier.
+Codex reports the close-out result.
 
-Step 3. Handover Validation
+The report must include:
+- Commit SHA
+- Push result
+- Updated documents
+- Git status
+- Any protected dirty/untracked files that intentionally remain
 
-Before closing the conversation, verify:
-- The Next Session Startup Prompt alone is enough to resume work.
-- The next task is specific enough to implement immediately.
-- The prompt refers to the latest Source of Truth for the selected environment.
-- No confirmed decision is missing from the applicable Source of Truth document.
-- Required document updates are complete.
-- GitHub backup is complete when GitHub backup was required.
+Do not create a Next Session Startup Prompt in the completion report unless Steps 2 through 4 have already completed.
 
-## 11. Local Git And GitHub
+Step 4. Result Verification
+
+Verify the close-out result before declaring Conversation Closing complete.
+
+Required checks:
+- Commit SHA
+- Branch
+- Push success or exact push failure reason
+- Git status
+- Canonical creation or update status
+- Work Resume creation or update status
+- Changelog creation or update status
+- Protected dirty/untracked files remain protected
+
+Conversation Closing is complete only after these checks pass or an unresolved blocker is explicitly reported.
+
+Step 5. Create The Next Session Startup Prompt
+
+Create the Next Session Startup Prompt only after Steps 2 through 4 are complete.
+
+Never create it before close-out commit, push, Canonical, Work Resume, Changelog, and Git status verification are complete.
+
+The prompt must be based on the final:
+- Commit
+- Branch
+- Canonical
+- Work Resume
+- Changelog
+- Git status
+
+The Next Session Startup Prompt must be written exactly once.
+
+Forbidden:
+- Temporary Next Session Startup Prompt
+- Preliminary Next Session Startup Prompt
+- Draft Next Session Startup Prompt
+- Intermediate Next Session Startup Prompt
+- Multiple competing startup prompts
+
+The final prompt must include:
+- Environment resolution
+- Source of Truth selection
+- `git remote -v` verification against Project Identity before work starts
+- Latest repository branch and commit
+- Dirty or untracked state to preserve
+- Recently completed work
+- Current implementation location
+- The first concrete next implementation task, if one is defined by the Source of Truth
+
+## 12. Local Git And GitHub
 
 Git is used for:
 - Local version management
