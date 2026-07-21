@@ -1,0 +1,63 @@
+MASTER_SPEC_CHANGELOG_2026-07-21_MAIN_MONITORING_METRIC_LAYOUT_CLOSURE
+
+Purpose:
+- Record the confirmed UI layout contract for auto-trade setting stock metrics
+  and main routine monitoring stock metrics.
+- Preserve previous Canonical files and add a new Canonical snapshot.
+
+Baseline Canonical:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-20_ROUTINE_MONITORING_UI_CLOSURE.txt
+
+New documents:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-21_MAIN_MONITORING_METRIC_LAYOUT_CLOSURE.txt
+- 00_CANONICAL/CURRENT/
+  WORK_RESUME_LATEST_2026-07-21_MAIN_MONITORING_METRIC_LAYOUT_CLOSURE.txt
+- 00_CANONICAL/CHANGELOG/
+  MASTER_SPEC_CHANGELOG_2026-07-21_MAIN_MONITORING_METRIC_LAYOUT_CLOSURE.txt
+
+Contract recorded:
+- Data does not determine metric layout. Approved fixed rectangles determine
+  where data is rendered.
+- Auto-trade setting stock table metric cells use header-owned labels and
+  title-free cell values.
+- Main monitoring stock rows keep labels inside the row because the main tree
+  has no metric headers.
+- Main stock metric slots are fixed:
+  holding 232 px, price 226 px, profit/loss 232 px, unfilled order 120 px,
+  buy limit 146 px, consumed amount 214 px.
+- Main stock metric separators use 5 px gaps and a fixed 9 px separator glyph
+  width.
+- Main metric internal component rectangles are fixed for label, parentheses,
+  left value, slash, right value, and closing parenthesis.
+- Buy-limit display, hit-test, and editor value rectangles are aligned.
+- Buy-limit editing hides only the current value while keeping label and
+  parentheses visible.
+- Consumed amount is displayed only when a valid stock buy limit is configured.
+- Consumed amount and its preceding separator are hidden when the stock buy
+  limit is unconfigured.
+- Main routine monitoring tree reserves the vertical scrollbar AlwaysOn and
+  does not use a horizontal scrollbar.
+- Main window default size is 2137 x 720 for the confirmed layout.
+
+Not changed:
+- Runtime
+- Queue
+- OperationCommandService
+- SendOrder
+- Chejan
+- Broker API
+- stock config/state storage contract
+- automatic trading execution contract
+- auto-trade setting column order
+- metric calculation semantics
+
+Code baseline:
+- kiwoom_auto commit:
+  6cd76282ad17031efee4b36a1b06e92989c56ea3
+
+Runtime impact:
+- No Runtime data contract is changed by this document update.
+- This documentation task does not stage or commit protected runtime, stock, or
+  routine instance data.

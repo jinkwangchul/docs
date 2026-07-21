@@ -1,0 +1,81 @@
+WORK_RESUME_LATEST_2026-07-21_MAIN_MONITORING_METRIC_LAYOUT_CLOSURE
+
+Current baseline:
+- kiwoom_auto branch at code closure:
+  feat/restore-auto-trade-setting-ui
+- kiwoom_auto latest pushed commit:
+  6cd76282ad17031efee4b36a1b06e92989c56ea3
+- docs branch at document closure:
+  agent/project-prompt-standard
+
+Completed in the current baseline:
+- Auto-trade setting stock table metric cells use the confirmed title-free value
+  format under the existing headers.
+- Auto-trade setting selection rendering keeps custom metric values visible when
+  rows are selected.
+- Main routine monitoring stock rows keep metric labels because the main tree
+  has no metric headers.
+- Main routine monitoring stock rows use a fixed UI layout contract for
+  holding, price, profit/loss, unfilled order, buy limit, and consumed amount.
+- Main metric external text slots, separators, and internal component
+  rectangles are fixed and do not move when actual data length changes.
+- Main buy-limit display rectangle, double-click hit-test rectangle, and inline
+  editor value rectangle are aligned.
+- During buy-limit editing, the existing buy-limit value is hidden while the
+  label and parentheses remain visible.
+- Stock buy-limit editing remains stock-specific and does not call the routine
+  instance buy-limit path.
+- Consumed amount is displayed only when the stock buy limit is configured.
+- For unconfigured buy-limit rows, the consumed metric and its preceding
+  separator are hidden.
+- Main routine monitoring tree keeps vertical scrollbar AlwaysOn.
+- Main routine monitoring tree does not use a horizontal scrollbar.
+- Main window default size is fixed at 2137 x 720 so the consumed metric is
+  visible in the approved layout.
+
+Verification:
+- py_compile passed for:
+  gui_windows.py
+  gui_main_table_loader.py
+  tests/test_gui_main_routine_monitoring.py
+- Focused tests passed in the 32-bit Python/PyQt environment:
+  test_main_stock_limit_hit_rect_uses_display_layout_rect
+  test_stock_buy_limit_editor_rect_uses_limit_value_display_slot
+  test_main_stock_limit_edit_hides_only_limit_value_slot
+  test_main_stock_metric_texts_omits_consumed_when_limit_unconfigured
+  test_main_stock_metric_texts_includes_consumed_when_limit_configured
+- git diff --check passed with line-ending warnings only.
+- GUI window execution confirmed:
+  width 2137
+  height 720
+  vertical scrollbar visible
+  horizontal scrollbar not visible
+  consumed amount visible for a configured buy-limit row
+  consumed amount hidden for unconfigured buy-limit rows
+
+Protected dirty/untracked state in kiwoom_auto:
+- PROJECT_CHANGELOG.txt remains unstaged.
+- routine_instances JSON/rules changes remain unstaged.
+- stocks config/state changes remain unstaged.
+- reports/blocked_actions untracked file remains unstaged.
+- routine_instances/934db6ce-0514-465d-86a5-43515bd66bbb/ remains untracked.
+
+Protected dirty state in docs:
+- Existing unrelated modified files were not staged:
+  00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+  00_CANONICAL/TRACE/MASTER_SPEC_DEDUP_REPORT_2026-07-03.txt
+  10_UPDATE/MERGED/UPDATE_20260708_LIFECYCLE_COMMIT_WRITER_SERVICE.txt
+  master spec dedup output duplicate file under the non-ASCII output folder
+
+Remaining actual issues:
+- No additional UI redesign is approved in this Freeze.
+- Runtime, Queue, SendOrder, Chejan, order completion, and broker evidence
+  contracts remain outside this layout closure.
+- Existing protected runtime/config/state dirty data must be preserved unless a
+  future task explicitly targets it.
+
+Next concrete start point:
+- If continuing UI work, start from the confirmed main monitoring metric layout
+  contract and only change a specific user-approved display issue.
+- If moving back to trading execution state work, inspect the authoritative
+  order/Chejan result path before defining or displaying execution completion.

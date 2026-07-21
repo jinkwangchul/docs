@@ -1,0 +1,115 @@
+MASTER_SPEC_CANONICAL_2026-07-21_MAIN_MONITORING_METRIC_LAYOUT_CLOSURE
+
+Status:
+- This document records the confirmed UI layout contract completed on
+  2026-07-21 for the auto-trade setting stock table and the main routine
+  monitoring stock rows.
+- Existing Canonical files are preserved. This file is a new Canonical
+  snapshot.
+- This update records UI layout, rendering, and editing contracts only. It does
+  not redefine Runtime, Queue, OperationCommandService, SendOrder, Chejan,
+  broker execution, stock state, or config storage contracts.
+
+Baseline:
+- docs repository branch at creation time: agent/project-prompt-standard
+- docs repository pre-update HEAD: 8f9d936e05aa07d3d1602d367c8ea71d610f032c
+- kiwoom_auto repository branch at code commit:
+  feat/restore-auto-trade-setting-ui
+- kiwoom_auto code commit:
+  6cd76282ad17031efee4b36a1b06e92989c56ea3
+
+1. Shared UI Layout Principle
+
+- UI data must not decide the metric layout.
+- The approved layout decides the fixed rectangles that data is drawn into.
+- Maximum display strings are used only to verify and approve layout capacity.
+- After approval, the resulting widths and rectangles become the UI layout
+  contract.
+- Runtime values, shorter display strings, or later refreshes must not move the
+  next metric start point, separator, value slot, or editor slot.
+
+2. Auto-Trade Setting Stock Table Contract
+
+- The auto-trade setting stock table keeps column headers for metric names.
+- Cells for holding, price, profit/loss, and unfilled order display values only.
+- Cell-internal metric labels such as holding, price, profit/loss, and unfilled
+  order are not repeated inside those cells.
+- Metric display uses fixed value slots inside the existing table columns.
+- Selection rendering must paint the Qt selection background first and then the
+  custom metric text, avoiding white text on a white background.
+- Existing column order and confirmed column widths are preserved.
+- The stock table keeps the vertical scrollbar area reserved with Qt default
+  vertical scrollbar AlwaysOn behavior.
+
+3. Main Routine Monitoring Stock Row Metric Contract
+
+- Main stock rows have no header for metric names, so metric labels are kept in
+  the row text.
+- The main metric order is:
+  holding, price, profit/loss, unfilled order, buy limit, consumed amount.
+- The main metric layout is a fixed external slot and separator contract.
+- Confirmed metric text slot widths:
+  holding: 232 px
+  price: 226 px
+  profit/loss: 232 px
+  unfilled order: 120 px
+  buy limit: 146 px
+  consumed amount: 214 px
+- External separator gap is 5 px on both sides.
+- Separator glyph width is fixed at 9 px.
+- Text slot rectangles and separator rectangles are independent fixed
+  rectangles. Actual text width does not resize those rectangles.
+- Metric labels, parentheses, left value, slash, right value, and closing
+  parenthesis are rendered through fixed internal component rectangles.
+- Actual values are drawn inside the approved rectangles only.
+- Debug guide lines and temporary preview maximum strings are not part of the
+  production display.
+
+4. Main Buy Limit Display And Editing Contract
+
+- The displayed buy-limit rectangle and double-click hit-test rectangle must be
+  the same logical rectangle.
+- The displayed buy-limit value rectangle and inline editor rectangle must be
+  the same logical value slot.
+- During inline editing, only the existing buy-limit value is hidden.
+- The buy-limit label and parentheses remain visible during editing.
+- Existing editor geometry, backend save path, and stock-specific buy-limit
+  storage contract are preserved.
+- Buy-limit editing must not write the routine instance buy limit when editing a
+  stock row.
+
+5. Consumed Amount Conditional Display Contract
+
+- If a stock buy limit is configured and valid, the consumed amount metric is
+  displayed.
+- If a stock buy limit is not configured, the entire consumed amount metric is
+  hidden.
+- Hiding consumed amount includes the consumed metric label, parentheses, left
+  value, slash, right value, closing parenthesis, and the separator before the
+  consumed metric.
+- The consumed metric slot contract remains available and is used again when a
+  valid buy limit is configured.
+- No fallback consumed amount string is forced for unconfigured buy-limit rows.
+
+6. Main Window Scrollbar And Width Contract
+
+- The main routine monitoring tree reserves the vertical scrollbar with Qt
+  default vertical scrollbar AlwaysOn behavior.
+- The horizontal scrollbar is not used for the main routine monitoring tree.
+- The main window default width is set to show the consumed amount metric in the
+  confirmed layout without requiring a horizontal scrollbar.
+- Confirmed main window default size:
+  width 2137 px, height 720 px.
+- The width was selected to show the full consumed metric while leaving minimal
+  practical right-side space before the vertical scrollbar.
+- The main window height, font, metric slots, separators, upper panels, lower
+  buttons, Runtime, Queue, and backend operation paths are not changed by this
+  contract.
+
+7. Safety Boundary
+
+- These UI contracts do not create, delete, or reinterpret Runtime data.
+- These UI contracts do not change Queue, SendOrder, Broker API, Chejan,
+  fills, positions, or operation command execution.
+- GUI rendering and hit-test corrections must remain within the existing
+  backend and storage contracts.
