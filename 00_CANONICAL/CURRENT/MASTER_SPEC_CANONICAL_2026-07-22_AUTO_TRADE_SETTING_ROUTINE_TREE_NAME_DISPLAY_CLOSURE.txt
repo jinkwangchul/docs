@@ -1,0 +1,97 @@
+MASTER_SPEC_CANONICAL_2026-07-22_AUTO_TRADE_SETTING_ROUTINE_TREE_NAME_DISPLAY_CLOSURE
+
+Status:
+- This document records the confirmed closure contract for the auto-trade
+  setting window routine tree name display.
+- Existing Canonical files are preserved. This file is a new Canonical
+  snapshot for the completed UI contract.
+- This update does not change Runtime, Queue, SendOrder, Chejan, broker
+  execution, stock state/config storage, routine instance storage, or trading
+  calculation contracts.
+
+Baseline:
+- kiwoom_auto branch at closure: feat/restore-auto-trade-setting-ui
+- kiwoom_auto pushed closure commit:
+  b8ac809f2230e02fe88e0a08813ca8859ff6fbb6
+- docs branch at creation time: agent/project-prompt-standard
+- docs repository pre-update HEAD:
+  160d6b99a869b90ea720e6ea89ba1a0d34704a8a
+
+Confirmed Auto-Trade Setting Window Role
+
+- The auto-trade setting window is the strategy management workspace.
+- It is responsible for routine definition review, routine instance management,
+  stock composition, and historical/performance-oriented strategy inspection.
+- The main monitoring window remains the current operation and immediate
+  control surface.
+
+Routine Tree Structure Contract
+
+- The left routine tree is a two-level structure:
+  - parent row: Routine Definition
+  - child row: Routine Instance
+- Stock rows are not inserted into the left routine tree.
+- Parent definition selection is view-oriented:
+  - show all child instances' stocks
+  - do not implicitly select the first child instance
+  - keep instance_id empty for the selected parent row metadata
+- Child instance selection is target-oriented:
+  - show only stocks assigned to that instance
+  - keep the selected instance_id in row metadata
+
+Routine Tree Name Display Contract
+
+- Parent and child routine tree names use the same display rule.
+- The display rule is:
+  - 1 to 7 characters: show the original name unchanged
+  - 8 or more characters: show the first 6 characters plus U+2026 ellipsis
+- Examples:
+  - 지표추종매매 -> 지표추종매매
+  - 지표추종매매B -> 지표추종매매B
+  - 지표추종매매BC -> 지표추종매매…
+  - 1234567 -> 1234567
+  - 12345678 -> 123456…
+  - ABCDEFGHI -> ABCDEF…
+- The fixed name QLabel width is calculated from the actual applied font
+  metrics. The width must fit both:
+  - seven full-width display characters
+  - six display characters plus ellipsis
+- The width calculation uses the maximum of horizontalAdvance and boundingRect
+  width for the approved sample strings, plus internal safety padding.
+
+Routine Tree Selection And Visual Contract
+
+- The routine tree keeps centered name text inside the fixed name cell.
+- The routine tree keeps the status columns unchanged:
+  - 종목
+  - 실행
+  - 정지
+  - 검토
+- The profit/performance signal light is a meaningful status signal, not a
+  decorative tree marker.
+- The signal light uses the existing red/yellow/green visual language and must
+  not be removed, hidden, weakened, or replaced by another symbol without a new
+  approved contract.
+- The name QLabel background is transparent.
+- The selected row background must continue through the name area without a
+  separate white or boxed background interrupting selection visibility.
+
+Preserved Boundaries
+
+- Runtime files are not part of this UI contract.
+- Stock state/config files are not part of this UI contract.
+- Routine instance JSON/rules files are not part of this UI contract.
+- Trading calculations are not changed.
+- The main monitoring window metric layout contract is not changed.
+- The routine-instance operation contract is not changed.
+
+Verification Evidence
+
+- Focused unittest passed:
+  - python -m unittest tests.test_auto_trade_setting_routine_tree
+  - Ran 14 tests
+  - OK
+- py_compile passed for:
+  - gui_auto_trade_setting_window.py
+  - tests/test_auto_trade_setting_routine_tree.py
+- git diff --check passed with line-ending warnings only.

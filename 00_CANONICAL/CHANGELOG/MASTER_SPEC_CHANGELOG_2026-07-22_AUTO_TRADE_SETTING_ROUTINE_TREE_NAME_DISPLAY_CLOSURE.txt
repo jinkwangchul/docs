@@ -1,0 +1,58 @@
+MASTER_SPEC_CHANGELOG_2026-07-22_AUTO_TRADE_SETTING_ROUTINE_TREE_NAME_DISPLAY_CLOSURE
+
+Purpose:
+- Record the confirmed auto-trade setting routine tree name display closure.
+- Preserve previous Canonical files and add a new Canonical snapshot.
+
+Baseline Canonical:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-22_MAIN_MONITORING_STRATEGY_WORKSPACE_ARCHITECTURE.txt
+
+New documents:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-22_AUTO_TRADE_SETTING_ROUTINE_TREE_NAME_DISPLAY_CLOSURE.txt
+- 00_CANONICAL/CURRENT/
+  WORK_RESUME_LATEST_2026-07-22_AUTO_TRADE_SETTING_ROUTINE_TREE_NAME_DISPLAY_CLOSURE.txt
+- 00_CANONICAL/CHANGELOG/
+  MASTER_SPEC_CHANGELOG_2026-07-22_AUTO_TRADE_SETTING_ROUTINE_TREE_NAME_DISPLAY_CLOSURE.txt
+
+Contract added or confirmed:
+- The auto-trade setting routine tree is a Routine Definition -> Routine
+  Instance tree.
+- Parent selection remains parent-scoped and does not infer the first child
+  instance.
+- Child selection remains instance-scoped.
+- Routine tree name display rule changed to:
+  - 1 to 7 characters: original name
+  - 8 or more characters: first 6 characters plus ellipsis
+- Parent and child rows use the same name display rule.
+- Name QLabel fixed width must be calculated from actual font metrics and must
+  fit the approved 7-character and 6-character-plus-ellipsis samples.
+- Name QLabel background is transparent and does not interrupt selected row
+  background.
+- The red/yellow/green signal light remains meaningful and is not removed,
+  hidden, weakened, or replaced.
+- Status columns remain unchanged:
+  - 종목
+  - 실행
+  - 정지
+  - 검토
+
+Not changed:
+- Runtime
+- Queue
+- SendOrder
+- Chejan
+- Broker API
+- stock config/state storage
+- routine instance JSON/rules storage
+- trading calculation semantics
+- main monitoring metric layout contract
+- routine-instance operation contract
+
+Verification recorded:
+- Focused unittest:
+  - tests.test_auto_trade_setting_routine_tree
+  - 14 tests OK
+- py_compile passed for modified code/test files.
+- git diff --check passed with line-ending warnings only.
