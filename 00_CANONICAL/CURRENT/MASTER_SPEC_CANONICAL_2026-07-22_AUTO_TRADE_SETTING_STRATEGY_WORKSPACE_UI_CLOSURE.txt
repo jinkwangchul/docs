@@ -1,0 +1,137 @@
+MASTER_SPEC_CANONICAL_2026-07-22_AUTO_TRADE_SETTING_STRATEGY_WORKSPACE_UI_CLOSURE
+
+Status:
+- This document supplements the earlier routine-tree name-display closure and
+  records the full confirmed implementation scope included in kiwoom_auto commit
+  b8ac809f2230e02fe88e0a08813ca8859ff6fbb6.
+- The earlier name-display closure document remains valid for the detailed name
+  cell contract. This document is the latest broader UI closure baseline.
+- This update does not change Runtime, Queue, SendOrder, Chejan, broker
+  execution, stock state/config storage, routine instance storage, or trading
+  calculation contracts.
+
+Baseline:
+- kiwoom_auto branch at closure: feat/restore-auto-trade-setting-ui
+- kiwoom_auto pushed closure commit:
+  b8ac809f2230e02fe88e0a08813ca8859ff6fbb6
+- docs branch at supplemental closure: agent/project-prompt-standard
+- previous docs closure commit:
+  7f9b588a1ff9878fbd55d69b3e5b5cf7cdb25974
+
+Auto-Trade Setting Window Role
+
+- The auto-trade setting window is the strategy workspace.
+- It manages routine definitions, routine instances, stock composition, and
+  strategy-oriented review surfaces.
+- The main monitoring window remains the current-operation and immediate-control
+  surface.
+
+Strategy Workspace Layout Contract
+
+- The auto-trade setting window uses a left/right workspace layout.
+- The left area is the routine navigation tree.
+- The right area contains:
+  - Selection Summary
+  - Stock List
+- The left/right area is hosted by a splitter so the workspace can be adjusted
+  without changing Runtime or storage contracts.
+
+Routine Definition -> Routine Instance Tree
+
+- The left routine tree is a two-level structure:
+  - parent row: Routine Definition
+  - child row: Routine Instance
+- Stock rows are not inserted into the left routine tree.
+- The former table-like multi-column routine list is not the active contract for
+  this workspace.
+- The routine tree keeps row metadata:
+  - row_kind
+  - definition_id
+  - instance_id
+  - instance_dir where applicable
+
+Selection Scope Contract
+
+- Parent definition selection is view-scoped:
+  - show all stocks assigned to all child instances under that definition
+  - keep instance_id empty
+  - do not infer or select the first child instance
+- Child instance selection is target-scoped:
+  - show only stocks assigned to the selected instance
+  - keep the selected instance_id in metadata
+- Compatibility helpers must not convert a parent selection into a child
+  routine directory.
+- Operations requiring a single routine instance must use an actual instance
+  selection or an explicitly assigned stock instance scope.
+
+Selection Summary Contract
+
+- The right-side Selection Summary reflects the current selection scope.
+- Parent selection shows the routine definition and aggregate current counts for
+  its child instances.
+- Child selection shows the routine definition, instance name, current counts,
+  and default-operation state where applicable.
+- Historical performance metrics are not implemented by this closure.
+
+Stock List Scope Contract
+
+- Parent selection shows all child-instance stocks for the selected definition.
+- Child selection shows only stocks assigned to the selected instance.
+- The stock list is a selection result surface; it does not create stock rows in
+  the left routine tree.
+
+Routine Tree Current Count Contract
+
+- The tree displays current operational counts using the same source and meaning
+  as the existing monitoring path:
+  - 종목
+  - 실행
+  - 정지
+  - 검토
+- The tree does not introduce a separate current-state cache or alternate
+  counting semantics.
+
+Default-Operation Contract
+
+- Default-operation state is preserved as an instance-scoped concept.
+- Parent rows do not represent a default-operation target.
+- The current closure does not make the left routine tree default-operation
+  stamp buttons part of the visible final tree contract.
+- Default-operation helper paths and tests remain scoped to preserving selection
+  and status consistency, not to changing storage format.
+
+Routine Tree Visual Contract
+
+- Parent rows are Routine Definitions and child rows are Routine Instances.
+- Parent and child names use the shared name display rule:
+  - 1 to 7 characters: show original name
+  - 8 or more characters: show first 6 characters plus U+2026 ellipsis
+- Name QLabel fixed width is calculated from the actual applied font metrics and
+  must fit both seven characters and six characters plus ellipsis with internal
+  safety padding.
+- Name QLabel background is transparent.
+- The selected row background must remain continuous through the name area.
+- The red/yellow/green signal light is a meaningful past-performance signal and
+  must not be removed, hidden, weakened, or replaced without a new approved
+  contract.
+- Status columns remain unchanged in this closure.
+
+Preserved Boundaries
+
+- Runtime files are not part of this UI closure.
+- Stock state/config files are not part of this UI closure.
+- Routine instance JSON/rules files are not part of this UI closure.
+- Trading calculations are not changed.
+- Broker API, SendOrder, Queue, Chejan, and fill handling are not changed.
+- Main monitoring metric layout contracts are not changed by this closure.
+
+Verification Evidence
+
+- Focused unittest passed:
+  - python -m unittest tests.test_auto_trade_setting_routine_tree
+  - Ran 14 tests
+  - OK
+- py_compile passed for:
+  - gui_auto_trade_setting_window.py
+  - tests/test_auto_trade_setting_routine_tree.py
+- git diff --check passed with line-ending warnings only.

@@ -1,0 +1,106 @@
+WORK_RESUME_LATEST_2026-07-22_AUTO_TRADE_SETTING_STRATEGY_WORKSPACE_UI_CLOSURE
+
+Current baseline:
+- kiwoom_auto branch:
+  feat/restore-auto-trade-setting-ui
+- kiwoom_auto latest pushed commit:
+  b8ac809f2230e02fe88e0a08813ca8859ff6fbb6
+- docs branch:
+  agent/project-prompt-standard
+- This resume supersedes the narrower name-display closure resume as the latest
+  work resume for the actual code commit scope.
+
+Why this supplemental closure exists:
+- The pushed code commit includes the full auto-trade setting strategy workspace
+  routine-tree implementation, not only the final name display polish.
+- The previous closure documents accurately recorded the name display contract
+  but were too narrow for the complete code commit scope.
+- No code reset, revert, amend, or force-push was performed.
+
+Completed in the code closure:
+- Auto-trade setting window changed to a left/right strategy workspace.
+- Left side is a Routine Definition -> Routine Instance tree.
+- Right side includes Selection Summary and Stock List.
+- Stock rows are excluded from the left routine tree.
+- Parent definition selection is view-scoped and keeps instance_id empty.
+- Child instance selection is instance-scoped and keeps the selected
+  instance_id.
+- Parent selection shows all child-instance stocks.
+- Child selection shows only the selected instance's stocks.
+- Selection metadata helpers were separated around row metadata, definition id,
+  instance id, and instance directory.
+- Parent selection does not return the first child instance directory.
+- Runtime state lookup for order context uses explicit selected instance scope
+  where available and blocks ambiguous parent-only mutation scope.
+- Parent collapse/expand state is preserved.
+- Current count labels use the existing operational source:
+  - 종목
+  - 실행
+  - 정지
+  - 검토
+- The Selection Summary reflects the selected parent or child scope.
+- Default-operation state remains instance-scoped and does not make a parent a
+  mutation target.
+- The visible left tree does not retain default-operation stamp buttons as a
+  final tree display feature.
+- Routine tree name display contract changed to:
+  - 1 to 7 characters: original name
+  - 8 or more characters: first 6 characters plus ellipsis
+- Parent and child name QLabel fixed widths were recalculated from the actual
+  applied font metrics.
+- Name QLabel white/boxed background was removed.
+- Name QLabel background is transparent so the selected row background remains
+  continuous through the name area.
+- The red/yellow/green signal light remains a meaningful past-performance signal
+  and is not removed or replaced.
+
+Code files committed:
+- gui_auto_trade_setting_window.py
+- tests/test_auto_trade_setting_routine_tree.py
+
+Verification:
+- Focused tests:
+  - python -m unittest tests.test_auto_trade_setting_routine_tree
+  - Ran 14 tests
+  - OK
+- py_compile:
+  - gui_auto_trade_setting_window.py
+  - tests/test_auto_trade_setting_routine_tree.py
+  - passed
+- git diff --check:
+  - passed with line-ending warnings only
+- Display contract verified:
+  - 지표추종매매 -> 지표추종매매
+  - 지표추종매매B -> 지표추종매매B
+  - 지표추종매매BC -> 지표추종매매…
+  - 1234567 -> 1234567
+  - 12345678 -> 123456…
+  - ABCDEFGHI -> ABCDEF…
+- QLabel background verified:
+  - transparent background
+  - no white boxed name cell
+  - selected row background remains visually continuous
+
+Protected dirty/untracked state in kiwoom_auto:
+- Existing unrelated modified files remain unstaged, including project changelog,
+  runtime/routine instance files, stock config/state files, and unrelated
+  gui_auto_trade_table_loader.py changes.
+- Existing untracked reports and routine instance folders remain untracked.
+
+Protected dirty/untracked state in docs:
+- Existing unrelated modified files remain unstaged:
+  - 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+  - 00_CANONICAL/TRACE/MASTER_SPEC_DEDUP_REPORT_2026-07-03.txt
+  - 10_UPDATE/MERGED/UPDATE_20260708_LIFECYCLE_COMMIT_WRITER_SERVICE.txt
+  - master spec dedup output duplicate under the non-ASCII output folder
+- Existing untracked main-monitoring strategy workspace architecture documents
+  remain protected unless explicitly handled later.
+
+Remaining actual issues:
+- None identified for the confirmed auto-trade setting strategy workspace UI
+  closure.
+
+Next concrete start point:
+- Do not create a next-session startup prompt in this closure.
+- If continuing this area later, start from the confirmed strategy workspace
+  tree contracts and change only a specific user-approved UI issue.

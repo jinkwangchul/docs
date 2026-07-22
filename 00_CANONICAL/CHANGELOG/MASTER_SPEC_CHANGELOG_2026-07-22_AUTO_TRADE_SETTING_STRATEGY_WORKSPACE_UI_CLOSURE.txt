@@ -1,0 +1,80 @@
+MASTER_SPEC_CHANGELOG_2026-07-22_AUTO_TRADE_SETTING_STRATEGY_WORKSPACE_UI_CLOSURE
+
+Purpose:
+- Supplement the prior name-display closure with the complete UI scope included
+  in kiwoom_auto commit b8ac809f2230e02fe88e0a08813ca8859ff6fbb6.
+- Keep existing Canonical files and add a broader closure snapshot rather than
+  rewriting history.
+
+Baseline:
+- Previous narrow closure:
+  MASTER_SPEC_CANONICAL_2026-07-22_AUTO_TRADE_SETTING_ROUTINE_TREE_NAME_DISPLAY_CLOSURE.txt
+- Code commit:
+  b8ac809f2230e02fe88e0a08813ca8859ff6fbb6
+- Prior docs commit:
+  7f9b588a1ff9878fbd55d69b3e5b5cf7cdb25974
+
+New documents:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-22_AUTO_TRADE_SETTING_STRATEGY_WORKSPACE_UI_CLOSURE.txt
+- 00_CANONICAL/CURRENT/
+  WORK_RESUME_LATEST_2026-07-22_AUTO_TRADE_SETTING_STRATEGY_WORKSPACE_UI_CLOSURE.txt
+- 00_CANONICAL/CHANGELOG/
+  MASTER_SPEC_CHANGELOG_2026-07-22_AUTO_TRADE_SETTING_STRATEGY_WORKSPACE_UI_CLOSURE.txt
+
+Contracts added or clarified:
+- The auto-trade setting window uses a strategy workspace layout with:
+  - left Routine Definition -> Routine Instance tree
+  - right Selection Summary
+  - right Stock List
+- The tree is a two-level routine structure, not a stock-node tree.
+- Parent definition selection is view-scoped:
+  - all child-instance stocks are shown
+  - instance_id stays empty
+  - no first-child instance inference
+- Child instance selection is instance-scoped:
+  - only the child instance stocks are shown
+  - selected instance_id is retained
+- Selection Summary mirrors parent or child selection scope.
+- Current count labels remain:
+  - 종목
+  - 실행
+  - 정지
+  - 검토
+- Counts use the existing current-operation source and do not create a new cache
+  or alternate semantics.
+- Default-operation remains instance-scoped and is not assigned to parent rows.
+- The final visible tree does not treat default-operation stamp buttons as a
+  required left-tree display feature.
+- The routine tree name display rule remains the new confirmed rule:
+  - 1 to 7 characters: original name
+  - 8 or more characters: first 6 characters plus ellipsis
+- Name QLabel background is transparent and selected row background remains
+  continuous.
+- The red/yellow/green signal light remains meaningful as a past-performance
+  signal and is not removed, hidden, weakened, or replaced.
+
+Not changed:
+- Runtime
+- Queue
+- SendOrder
+- Chejan
+- Broker API
+- stock config/state storage
+- routine instance JSON/rules storage
+- trading calculation semantics
+- main monitoring metric layout contract
+
+Verification recorded:
+- Focused unittest:
+  - tests.test_auto_trade_setting_routine_tree
+  - 14 tests OK
+- py_compile passed for modified code/test files.
+- git diff --check passed with line-ending warnings only.
+
+Rationale:
+- The earlier docs commit described the final name display polish but did not
+  fully describe the larger strategy workspace UI scope present in the pushed
+  code commit.
+- This changelog closes that documentation gap without changing the existing
+  pushed code commit.
