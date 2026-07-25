@@ -96,14 +96,19 @@ Policy:
 Operation Mode Change Gate:
 - The single-stock Backend decision point for `CONTINUOUS` and `SCHEDULED`
   transitions. Multi-stock operation-mode changes are unsupported.
+- A valid Runtime ATS selection is a preceding hard block. ATS trading time and
+  holdings do not reopen operation-mode change eligibility. ATS is cleared only
+  by its existing Runtime lifecycle.
 - Its time inputs come from the effective per-stock schedule with the global
   scheduled-operation policy as fallback; missing or invalid policy is
   fail-closed.
-- It decides the time boundary before Runtime ATS clearing and mode persistence.
-  GUI callers only present its reason and must not duplicate the calculation.
+- After the ATS gate passes, it decides the time boundary before mode
+  persistence. GUI callers only present its result and must not duplicate the
+  calculation.
 - Boundary tests cover before, equal, and after the effective end time, strict
-  Source of Truth resolution, ATS-clear failure, and rejection of non-single
-  GUI selection before the Backend call.
+  Source of Truth resolution, active ATS rejection independent of trading time
+  or holdings, lifecycle reset recovery, and rejection of non-single GUI
+  selection before the Backend call.
 
 Token:
 - Verifiable permission evidence bound to a specific target and scope.

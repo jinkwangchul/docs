@@ -320,12 +320,13 @@ The following are not current Source of Truth:
 - After reset, the ATS Settings UI starts with all ATS selections cleared for
   that stock. The stock continues as ordinary manual operation.
 - A per-stock ATS selection is subordinate to `CONTINUOUS` manual operation.
-  Changing that stock to `SCHEDULED` or any other operation mode immediately
-  clears `manual_ats_selection`. Changing it back to `CONTINUOUS` starts
-  ordinary manual operation and must not restore the previous ATS selection.
-  The operator must explicitly select ATS sessions again, whether acting on
-  one stock or multiple selected stocks. Environment ATS time definitions
-  remain unchanged.
+  While a valid Runtime `manual_ats_selection` is active, operation-mode
+  changes are blocked. Operation-mode change must not clear that selection or
+  use ATS trading time or holdings as a condition that reopens the change.
+  ATS selection may be cleared only by its existing Runtime lifecycle. After
+  lifecycle reset leaves the stock in ordinary `CONTINUOUS` manual operation,
+  the existing manual/scheduled operation-mode change boundary applies.
+  Environment ATS time definitions remain unchanged.
 - `manual_operation.use_extra_session_1..3` is not an ATS auto-application
   policy. Legacy values must not make a stock ATS-enabled or order-eligible.
 - `MANUAL_ATS_LIQUIDATION` is a one-shot command. Its execution boundary must
@@ -349,19 +350,19 @@ The following are not current Source of Truth:
   `scheduled_operation` schedule is the fallback. Missing, incomplete,
   unparsable, or internally invalid schedule policy is fail-closed.
 - Holdings, pending buy quantity, pending sell quantity, order existence,
-  current trade status, ATS selection, and the displayed ATS state are not
-  eligibility inputs for this general operation-mode change boundary.
-  Existing higher-level REVIEW_REQUIRED, TROUBLE, and Recovery protections
-  remain authoritative.
+  current trade status, and the displayed ATS trading-time state are not
+  eligibility inputs for the time boundary. A valid Runtime ATS selection is
+  a preceding hard block. Existing higher-level REVIEW_REQUIRED, TROUBLE, and
+  Recovery protections remain authoritative.
 - Manual plus ATS is not a third operation mode. It remains `CONTINUOUS` with a
-  subordinate Runtime ATS selection and is evaluated as manual operation during
-  the regular session.
-- For either direction of an actual mode change, the order is:
-  resolve and validate the effective scheduled end time, verify that the
-  boundary has not been reached, clear the stock's Runtime
-  `manual_ats_selection`, verify the clear, and only then persist and read back
-  the requested operation mode. Any failure leaves the operation mode
-  unchanged. Returning to `CONTINUOUS` must not restore a prior ATS selection.
+  subordinate Runtime ATS selection, but it is not eligible for an
+  operation-mode change while that selection is active. ATS trading-session
+  entry does not reopen eligibility.
+- For either direction of an actual mode change, the order is: reject an active
+  Runtime ATS selection, resolve and validate the effective scheduled end time,
+  verify that the boundary has not been reached, and only then persist and read
+  back the requested operation mode. Holdings are never consulted. Any failure
+  leaves the operation mode and ATS Runtime state unchanged.
 - Manual and scheduled operation-mode changes are single-stock operations.
   Multi-stock selection is unsupported and must be rejected before the Backend
   decision or save path is called. There is no partial success, per-stock
