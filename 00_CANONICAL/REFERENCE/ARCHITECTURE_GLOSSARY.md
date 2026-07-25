@@ -99,16 +99,18 @@ Operation Mode Change Gate:
 - A valid Runtime ATS selection is a preceding hard block. ATS trading time and
   holdings do not reopen operation-mode change eligibility. ATS is cleared only
   by its existing Runtime lifecycle.
-- Its time inputs come from the effective per-stock schedule with the global
-  scheduled-operation policy as fallback; missing or invalid policy is
-  fail-closed.
-- After the ATS gate passes, it decides the time boundary before mode
-  persistence. GUI callers only present its result and must not duplicate the
-  calculation.
-- Boundary tests cover before, equal, and after the effective end time, strict
-  Source of Truth resolution, active ATS rejection independent of trading time
-  or holdings, lifecycle reset recovery, and rejection of non-single GUI
-  selection before the Backend call.
+- After the ATS gate passes, it reads authoritative Runtime and canonical
+  unresolved-order evidence. Active trading, order/fill, close, or liquidation
+  progress blocks the change; monitoring/waiting, stopped, and explicit
+  completion states are eligible. The scheduled-operation end time alone does
+  not block a change, and holding quantity alone does not block it.
+- Applicable schedule inputs still come from the effective per-stock schedule
+  with the global scheduled-operation policy as fallback; missing or invalid
+  policy remains fail-closed when a scheduled configuration must be persisted.
+- Tests cover idle and completed states after the effective end time, active
+  trading/order/close/liquidation rejection, strict Source of Truth resolution,
+  active ATS rejection, lifecycle reset recovery, and rejection of non-single
+  GUI selection before the Backend call.
 
 Token:
 - Verifiable permission evidence bound to a specific target and scope.

@@ -341,28 +341,30 @@ The following are not current Source of Truth:
 11.4.3 Manual and Scheduled Operation Mode Change Boundary
 
 - `CONTINUOUS` manual operation and `SCHEDULED` time operation may be changed
-  in either direction only while the current time is earlier than the effective
-  scheduled-operation end time. Equality belongs to the blocked side:
-  `current_time < scheduled_end_time` is allowed and
-  `current_time >= scheduled_end_time` is blocked.
-- The effective end time uses the existing Production schedule Source of Truth:
+  in either direction when the selected stock's authoritative Runtime evidence
+  shows that no trade, order/fill, close, or liquidation process is active.
+  The scheduled-operation end time is not a standalone block condition.
+- The effective schedule still uses the existing Production schedule Source of Truth:
   a valid per-stock schedule takes precedence and the valid global
   `scheduled_operation` schedule is the fallback. Missing, incomplete,
-  unparsable, or internally invalid schedule policy is fail-closed.
-- Holdings, pending buy quantity, pending sell quantity, order existence,
-  current trade status, and the displayed ATS trading-time state are not
-  eligibility inputs for the time boundary. A valid Runtime ATS selection is
-  a preceding hard block. Existing higher-level REVIEW_REQUIRED, TROUBLE, and
-  Recovery protections remain authoritative.
+  unparsable, or internally invalid schedule policy is fail-closed when a
+  `SCHEDULED` configuration must be persisted.
+- Runtime states that are monitoring/waiting, stopped/non-operating, or
+  explicitly complete (`AUTO_CLOSED`, `EARLY_CLOSED`, `LIQUIDATED`) remain
+  eligible even at or after the scheduled-operation end time.
+- Active trading states, canonical unresolved-order evidence, and active
+  auto-close, early-close, forced-close, or liquidation states block the
+  change. Holding quantity alone is not a block condition. Missing or
+  unreadable Runtime state is fail-closed.
 - Manual plus ATS is not a third operation mode. It remains `CONTINUOUS` with a
   subordinate Runtime ATS selection, but it is not eligible for an
   operation-mode change while that selection is active. ATS trading-session
   entry does not reopen eligibility.
 - For either direction of an actual mode change, the order is: reject an active
-  Runtime ATS selection, resolve and validate the effective scheduled end time,
-  verify that the boundary has not been reached, and only then persist and read
-  back the requested operation mode. Holdings are never consulted. Any failure
-  leaves the operation mode and ATS Runtime state unchanged.
+  Runtime ATS selection, read and validate Runtime state, reject active
+  trade/order/close/liquidation evidence, resolve and validate the applicable
+  schedule, and only then persist and read back the requested operation mode.
+  Any failure leaves the operation mode and ATS Runtime state unchanged.
 - Manual and scheduled operation-mode changes are single-stock operations.
   Multi-stock selection is unsupported and must be rejected before the Backend
   decision or save path is called. There is no partial success, per-stock
