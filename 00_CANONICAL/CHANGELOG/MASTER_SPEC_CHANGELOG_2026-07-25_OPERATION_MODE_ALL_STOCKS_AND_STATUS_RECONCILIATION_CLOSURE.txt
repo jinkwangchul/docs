@@ -1,0 +1,57 @@
+MASTER_SPEC_CHANGELOG_2026-07-25_OPERATION_MODE_ALL_STOCKS_AND_STATUS_RECONCILIATION_CLOSURE
+
+Purpose:
+- Close the confirmed operation-mode GUI target and Runtime status
+  reconciliation work at kiwoom_auto commit
+  7a54618f67011170fe2b181c2dbc872e2f133508.
+- Add one supplemental Canonical that preserves the existing Routine Instance
+  Operation Contract and records only the confirmed closure delta.
+
+Canonical created:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-25_OPERATION_MODE_ALL_STOCKS_AND_STATUS_RECONCILIATION_CLOSURE.txt
+
+Contracts added or clarified:
+- An operation-mode change targets exactly one selected stock.
+- The all-stocks view intentionally has no selected Routine context.
+- Routine name is optional logging/display context and is not an execution
+  prerequisite.
+- Multi-selection remains blocked before the Backend.
+- Success is silent; failure uses one generic modal warning.
+- Whole-stock status reconciliation discovers stocks from the central
+  `stocks/` repository.
+- Safe time-policy status normalization runs before Startup Recovery
+  evaluation.
+- Recovery continues to gate Signal Probe, execution, Queue dispatch,
+  SendOrder, and broker calls.
+- Operation-mode and unregister decisions retain their Runtime protections and
+  receive normalized state rather than feature-local stale-status exceptions.
+
+Confirmed code closure:
+- 4a4e842b83c769e20bcc4002151b72129f14c5d7
+  - restored central-stock status reconciliation
+- 510b0799d5f0e16e0716d4e61902bc5ce1fc6d0c
+  - separated safe status reconciliation from the Startup Recovery gate
+- 7a54618f67011170fe2b181c2dbc872e2f133508
+  - removed the legacy Routine-name execution prerequisite in all-stocks view
+
+Verification recorded:
+- tests.test_auto_trade_operation_mode_e2e: 21 tests OK
+- tests.test_auto_trade_setting_routine_tree: 60 tests OK
+- tests.test_operation_command_service: 63 tests OK
+- Total: 144 tests OK
+- py_compile passed for the modified code and focused test.
+- GUI imports passed.
+- git diff --check passed.
+
+Not changed by the final all-stocks fix:
+- Backend operation-mode decision
+- ATS gate
+- Runtime active-state gate
+- config save/read-back contract
+- Queue, Dispatch Claim, SendOrder, Chejan, or Broker API
+- multi-stock operation-mode support
+
+Readable changelog:
+- Not created. This is a narrow technical closure whose user-facing result is
+  fully represented by the Canonical and this changelog.

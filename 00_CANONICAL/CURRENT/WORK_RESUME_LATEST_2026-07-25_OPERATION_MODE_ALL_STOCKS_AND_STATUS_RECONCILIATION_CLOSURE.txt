@@ -1,0 +1,80 @@
+WORK_RESUME_LATEST_2026-07-25_OPERATION_MODE_ALL_STOCKS_AND_STATUS_RECONCILIATION_CLOSURE
+
+Current baseline:
+- kiwoom_auto branch: feat/restore-auto-trade-setting-ui
+- kiwoom_auto pushed HEAD:
+  7a54618f67011170fe2b181c2dbc872e2f133508
+- docs branch: agent/project-prompt-standard
+- docs baseline before this closure:
+  8e42f77848d26752559e9337c789c967ba1340d9
+
+Completed:
+- Central whole-stock status reconciliation uses the current `stocks/`
+  repository.
+- Safe time-policy status normalization runs before Startup Recovery
+  evaluation.
+- Startup Recovery still blocks Signal Probe, execution, Queue dispatch,
+  SendOrder, and broker calls until approved.
+- Operation-mode changes use authoritative Runtime active-state evidence.
+- Active ATS, trading, unresolved-order, close, and liquidation evidence
+  remains blocked.
+- Monitoring, waiting, stopped, and explicit completion states remain eligible
+  subject to the existing save policy.
+- Operation-mode changes remain exactly-one-stock operations.
+- The all-stocks view may change the selected stock's operation mode even
+  though no Routine row is selected.
+- Routine name is retained only as optional changelog/display context.
+- Successful operation-mode changes are silent.
+- Failed operation-mode changes show one generic modal warning and preserve
+  internal Backend result codes.
+
+Final code change:
+- gui_auto_trade_status_ops.py
+  - removed the legacy non-empty Routine-name execution guard
+  - retained exactly-one-stock validation
+  - added all-stocks / selected-stock changelog context fallback
+- tests/test_auto_trade_operation_mode_e2e.py
+  - added all-stocks single-selection success coverage
+  - added no-selection rejection coverage
+
+Verification:
+- tests.test_auto_trade_operation_mode_e2e: 21 OK
+- tests.test_auto_trade_setting_routine_tree: 60 OK
+- tests.test_operation_command_service: 63 OK
+- Total: 144 OK
+- py_compile: passed
+- GUI import: passed
+- git diff --check: passed
+
+Protected working state:
+- The kiwoom_auto repository contains pre-existing modified Runtime, config,
+  routine-instance, policy, and project changelog files plus an untracked
+  blocked-action report. They were not modified, staged, or committed by this
+  closure.
+- The docs repository contains pre-existing protected modifications and
+  untracked main-monitoring architecture documents. They are not part of this
+  closure and must remain unstaged.
+
+Next concrete start point:
+- Reproduce the all-stocks operation-column double-click in the actual Windows
+  Production GUI at pushed code commit
+  7a54618f67011170fe2b181c2dbc872e2f133508.
+- Confirm that one selected stock reaches the unchanged Backend decision and
+  that no Routine-selection error appears.
+- If the Backend rejects the request, inspect the returned Runtime policy result
+  without weakening the ATS, active-trading, close, liquidation, or recovery
+  gates.
+
+Required references:
+- 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-25_OPERATION_MODE_ALL_STOCKS_AND_STATUS_RECONCILIATION_CLOSURE.txt
+- 00_CANONICAL/CHANGELOG/
+  MASTER_SPEC_CHANGELOG_2026-07-25_OPERATION_MODE_ALL_STOCKS_AND_STATUS_RECONCILIATION_CLOSURE.txt
+
+Do not:
+- add a Routine-selection prerequisite back to all-stocks operation-mode change
+- add multi-stock operation-mode mutation
+- bypass Backend Runtime or ATS protections
+- modify Runtime files manually to make a test pass
+- stage or clean protected dirty/untracked files

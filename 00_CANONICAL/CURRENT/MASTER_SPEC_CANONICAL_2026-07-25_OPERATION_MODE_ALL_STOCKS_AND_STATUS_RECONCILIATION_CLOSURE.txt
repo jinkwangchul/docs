@@ -1,0 +1,107 @@
+MASTER_SPEC_CANONICAL_2026-07-25_OPERATION_MODE_ALL_STOCKS_AND_STATUS_RECONCILIATION_CLOSURE
+
+Status:
+- This is the latest supplemental Canonical for the confirmed operation-mode
+  GUI target and Runtime status reconciliation closure.
+- It extends, without rewriting, the operation contracts in
+  MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt.
+- Only confirmed implementation at the pushed code baseline is recorded.
+
+Baseline:
+- docs repository branch: agent/project-prompt-standard
+- docs repository baseline before this closure:
+  8e42f77848d26752559e9337c789c967ba1340d9
+- kiwoom_auto repository branch: feat/restore-auto-trade-setting-ui
+- kiwoom_auto pushed closure HEAD:
+  7a54618f67011170fe2b181c2dbc872e2f133508
+
+1. Preserved Operation Mode Gate
+
+- `CONTINUOUS` and `SCHEDULED` changes remain exactly-one-stock operations.
+- A valid Runtime ATS selection remains a hard block.
+- Active trading, unresolved-order, close, and liquidation evidence remains
+  blocked.
+- Monitoring, waiting, stopped, and explicit completion states remain eligible
+  subject to the existing persistence policy.
+- The scheduled-operation end time and holding quantity are not standalone
+  block conditions.
+- Backend decision codes, config persistence, and read-back contracts are
+  unchanged by this closure.
+
+2. Operation Mode GUI Target Contract
+
+- The mutation target is the one stock selected in the Registered Stock Status
+  table.
+- The stock path stored in the selected row's `Qt.UserRole`, together with its
+  code and name, is sufficient target identity.
+- The all-stocks view intentionally clears the Routine Definition / Routine
+  Instance selection. A Routine name is optional display or changelog context
+  and is not an execution prerequisite.
+- The same exactly-one-stock requirement applies in parent, instance, and
+  all-stocks view scopes.
+- No scope may infer the first row, silently select a stock, or turn the command
+  into a multi-stock operation.
+- Double-click entry remains limited to the Operation column.
+
+3. Operation Mode Result Presentation
+
+- A successful change produces no popup, Toast, or status-bar success message.
+- A failed Backend result produces exactly one modal warning:
+  `선택한 종목을 변경할 수 없습니다.`
+- Backend result codes and policy details remain available to logs, tests, and
+  internal decision flow only.
+- Selection-count errors remain separate from Backend failure presentation.
+
+4. Runtime Status Reconciliation Source
+
+- Whole-stock status reconciliation discovers current targets from the central
+  `stocks/` repository.
+- The removed legacy `routines/<routine>/<stock>/config.json` layout is not a
+  current discovery source.
+- Periodic reconciliation and startup reconciliation use the same central-stock
+  discovery contract.
+- A stale post-session `RUNNING` status unsupported by current policy evidence
+  is normalized before downstream operation-mode and unregister decisions
+  consume it.
+- Operation-mode and unregister gates do not add local stale-`RUNNING`
+  exceptions.
+
+5. Startup Ordering and Safety Boundary
+
+- Time-policy status reconciliation is a state-normalization step only.
+- It may read config/state evidence, calculate current policy status, persist a
+  normalized `state.json`, and verify read-back.
+- It must not create an order, Queue record, Signal Probe, execution candidate,
+  Dispatch Claim, SendOrder call, broker call, or Runtime identity change.
+- Startup performs safe status normalization after minimum Runtime loading and
+  before Startup Recovery evaluation.
+- Recovery approval remains required before Signal Probe, execution, Queue
+  dispatch, SendOrder, and broker calls.
+- Recovery failure does not suppress safe status normalization.
+- Missing or malformed Runtime remains fail-closed and must not be fabricated or
+  manually rewritten.
+
+6. Confirmed Implementation Evidence
+
+- 4a4e842b83c769e20bcc4002151b72129f14c5d7
+  - central-stock status reconciliation
+- 510b0799d5f0e16e0716d4e61902bc5ce1fc6d0c
+  - safe status reconciliation before Startup Recovery evaluation
+- 7a54618f67011170fe2b181c2dbc872e2f133508
+  - all-stocks operation-mode change without a Routine-name prerequisite
+
+Verification:
+- tests.test_auto_trade_operation_mode_e2e: 21 OK
+- tests.test_auto_trade_setting_routine_tree: 60 OK
+- tests.test_operation_command_service: 63 OK
+- Total: 144 OK
+- py_compile: passed
+- GUI import: passed
+- git diff --check: passed
+
+Not changed:
+- ATS lifecycle
+- Runtime active-state decision semantics
+- multi-stock operation-mode support
+- Queue, Dispatch Claim, SendOrder, Chejan, or Broker API contracts
+- Runtime files or persistent stock data as part of the final all-stocks fix
