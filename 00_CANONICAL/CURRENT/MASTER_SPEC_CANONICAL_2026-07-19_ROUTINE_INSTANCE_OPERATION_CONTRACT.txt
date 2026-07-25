@@ -211,12 +211,15 @@ The following are not current Source of Truth:
 - While the parent is expanded, the aggregate is hidden by default and is
   shown temporarily only when the pointer is over the displayed parent-name
   text.
-- The Registered Stock Status toolbar places its production entry buttons in
-  this fixed order: `전체종목`, `조기마감`, `강제종료`. `전체종목` uses the same
-  button geometry and visual contract as the two existing buttons.
-- `전체종목` is a view-only production entry point that selects the union of
-  stocks registered under every current Routine Type and Routine Instance. It
-  does not invoke or reuse the Early Close or Forced Stop command backends.
+- The Registered Stock Status toolbar displays its entries in this fixed
+  order: `전체 | 조기마감 강제종료`. The all-scope entry is a clickable `전체`
+  badge using the same component and visual contract as the Routine Performance
+  `전체` badge. `|` is a non-interactive separator between view scope and
+  operation commands.
+- The `전체` badge retains the existing view-only production entry point that
+  selects the union of stocks registered under every current Routine Type and
+  Routine Instance. This UI-form change does not alter its aggregation contract
+  and does not invoke or reuse the Early Close or Forced Stop command backends.
 - In the all-stocks view, the status summary begins with `전체` and uses
   `전체 그룹(N) 루틴(N) 종목(N) 실행(N) 정지(N) 검토(N)`. A parent or instance
   name is not shown because no single parent or instance owns that view scope.
