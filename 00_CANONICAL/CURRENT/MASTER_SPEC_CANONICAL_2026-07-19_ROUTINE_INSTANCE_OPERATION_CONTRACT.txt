@@ -362,11 +362,11 @@ The following are not current Source of Truth:
   `manual_ats_selection`, verify the clear, and only then persist and read back
   the requested operation mode. Any failure leaves the operation mode
   unchanged. Returning to `CONTINUOUS` must not restore a prior ATS selection.
-- Individual and multi-stock callers use the same per-stock Backend decision
-  and save path. The existing multi-stock contract remains per-stock result
-  reporting: an allowed stock may succeed while a blocked stock remains
-  unchanged, and each result must be reported without creating an ATS/mode
-  mismatch.
+- Manual and scheduled operation-mode changes are single-stock operations.
+  Multi-stock selection is unsupported and must be rejected before the Backend
+  decision or save path is called. There is no partial success, per-stock
+  iteration, or batch operation-mode change contract. A request has one result:
+  the selected stock changes successfully, or it remains unchanged on failure.
 
 11.5 Result presentation
 
