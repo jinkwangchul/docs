@@ -93,6 +93,18 @@ Gate:
 Policy:
 - Rule used by a Gate or Service.
 
+Operation Mode Change Gate:
+- The Backend decision point shared by individual and multi-stock callers for
+  `CONTINUOUS` and `SCHEDULED` transitions.
+- Its time inputs come from the effective per-stock schedule with the global
+  scheduled-operation policy as fallback; missing or invalid policy is
+  fail-closed.
+- It decides the time boundary before Runtime ATS clearing and mode persistence.
+  GUI callers only present its reason and must not duplicate the calculation.
+- Boundary tests cover before, equal, and after the effective end time, strict
+  Source of Truth resolution, ATS-clear failure, and the existing per-stock
+  multi-selection result contract.
+
 Token:
 - Verifiable permission evidence bound to a specific target and scope.
 

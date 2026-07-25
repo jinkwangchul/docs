@@ -337,6 +337,37 @@ The following are not current Source of Truth:
   Claim, Final Send Gate, SendOrder, Chejan, and broker evidence contracts are
   unchanged.
 
+11.4.3 Manual and Scheduled Operation Mode Change Boundary
+
+- `CONTINUOUS` manual operation and `SCHEDULED` time operation may be changed
+  in either direction only while the current time is earlier than the effective
+  scheduled-operation end time. Equality belongs to the blocked side:
+  `current_time < scheduled_end_time` is allowed and
+  `current_time >= scheduled_end_time` is blocked.
+- The effective end time uses the existing Production schedule Source of Truth:
+  a valid per-stock schedule takes precedence and the valid global
+  `scheduled_operation` schedule is the fallback. Missing, incomplete,
+  unparsable, or internally invalid schedule policy is fail-closed.
+- Holdings, pending buy quantity, pending sell quantity, order existence,
+  current trade status, ATS selection, and the displayed ATS state are not
+  eligibility inputs for this general operation-mode change boundary.
+  Existing higher-level REVIEW_REQUIRED, TROUBLE, and Recovery protections
+  remain authoritative.
+- Manual plus ATS is not a third operation mode. It remains `CONTINUOUS` with a
+  subordinate Runtime ATS selection and is evaluated as manual operation during
+  the regular session.
+- For either direction of an actual mode change, the order is:
+  resolve and validate the effective scheduled end time, verify that the
+  boundary has not been reached, clear the stock's Runtime
+  `manual_ats_selection`, verify the clear, and only then persist and read back
+  the requested operation mode. Any failure leaves the operation mode
+  unchanged. Returning to `CONTINUOUS` must not restore a prior ATS selection.
+- Individual and multi-stock callers use the same per-stock Backend decision
+  and save path. The existing multi-stock contract remains per-stock result
+  reporting: an allowed stock may succeed while a blocked stock remains
+  unchanged, and each result must be reported without creating an ATS/mode
+  mismatch.
+
 11.5 Result presentation
 
 - When authoritative real-trading results become available, each affected
