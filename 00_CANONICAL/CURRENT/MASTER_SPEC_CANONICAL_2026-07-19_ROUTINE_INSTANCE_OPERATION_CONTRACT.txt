@@ -319,6 +319,13 @@ The following are not current Source of Truth:
   change the stock's `CONTINUOUS` manual-operation mode.
 - After reset, the ATS Settings UI starts with all ATS selections cleared for
   that stock. The stock continues as ordinary manual operation.
+- A per-stock ATS selection is subordinate to `CONTINUOUS` manual operation.
+  Changing that stock to `SCHEDULED` or any other operation mode immediately
+  clears `manual_ats_selection`. Changing it back to `CONTINUOUS` starts
+  ordinary manual operation and must not restore the previous ATS selection.
+  The operator must explicitly select ATS sessions again, whether acting on
+  one stock or multiple selected stocks. Environment ATS time definitions
+  remain unchanged.
 - `manual_operation.use_extra_session_1..3` is not an ATS auto-application
   policy. Legacy values must not make a stock ATS-enabled or order-eligible.
 - `MANUAL_ATS_LIQUIDATION` is a one-shot command. Its execution boundary must
