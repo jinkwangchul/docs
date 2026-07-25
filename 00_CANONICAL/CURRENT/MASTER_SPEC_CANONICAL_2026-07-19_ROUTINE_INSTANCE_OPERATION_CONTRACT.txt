@@ -234,6 +234,48 @@ The following are not current Source of Truth:
   change. A REQUESTED result records acceptance of the request only and does
   not mean that an order was queued, submitted, accepted, filled, or completed.
 
+11.4.1 Individual Liquidation and Early Close One-shot Override Contract
+
+- Environment settings define persistent default policy for automatic close,
+  early close, and liquidation. A context menu may read those defaults to mark
+  the initially selected method or time, but that indication is read-only.
+- Individual Liquidation (`개별청산`) is an operator-initiated, one-shot
+  liquidation procedure for the selected stock. Its method (`시장가`,
+  `현재가`, or `이월`) and `minutes_before_regular_close` value apply only to
+  that invocation.
+- Context-menu Early Close (`조기마감`) is also an operator-initiated, one-shot
+  command. Its selected method and related execution options apply only to that
+  invocation. Automatic Close (`자동마감`) remains the separate automatic
+  procedure entered according to persistent settings and time policy.
+- A context-menu selection is a command override. It must not modify
+  `operation_policy.json`, the environment-setting `liquidation`,
+  `early_close`, or `auto_close` defaults, or any other persistent default
+  policy.
+- The interpretation that an Individual Liquidation context-menu selection is
+  saved as a per-stock persistent setting is retired. The interpretation that
+  an Early Close context-menu selection changes an environment-setting default
+  is also retired.
+- The selected override travels with the invocation through the existing
+  command or request boundary. Existing `OperationCommandRequest` fields are
+  `target_scope`, `target_id`, `command`, `source`, `occurred_at`, and
+  `command_id`. Early Close uses `command=EARLY_CLOSE`; its existing
+  compatibility payload uses `EarlyCloseCompatibility.method` and
+  `EarlyCloseCompatibility.policy`.
+- Existing option names such as `method` and
+  `minutes_before_regular_close` retain their current meanings when carried by
+  the applicable execution request. This contract does not invent a duplicate
+  command schema or Source of Truth.
+- `IMMEDIATE_LIQUIDATION` is the existing Immediate Liquidation (`즉시청산`)
+  command and must not be renamed or repurposed as Individual Liquidation.
+- Opening a new context menu starts a new command choice. If an explicit
+  in-progress, unconfirmed command edit state exists, that state may be shown;
+  otherwise the menu shows the current environment-setting defaults. A value
+  used by a completed one-shot command is never promoted to a default.
+- An accepted command records the selected override as part of that command or
+  request evidence. It does not authorize a write to persistent default-policy
+  files. Existing Queue, Final Send Gate, SendOrder, Chejan, and broker
+  evidence boundaries remain unchanged.
+
 11.5 Result presentation
 
 - When authoritative real-trading results become available, each affected
