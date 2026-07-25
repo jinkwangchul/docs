@@ -301,6 +301,35 @@ The following are not current Source of Truth:
   files. Existing Queue, Final Send Gate, SendOrder, Chejan, and broker
   evidence boundaries remain unchanged.
 
+11.4.2 Manual ATS Session-scoped Selection Contract
+
+- `operation_policy.extra_sessions` is the persistent Source of Truth only for
+  each ATS session's display name, start time, and end time. It does not apply
+  an ATS session automatically to any stock.
+- A manual-operation stock receives ATS applicability only when the operator
+  selects one or more ATS sessions for that individual stock or a multi-stock
+  selection in the ATS Settings UI.
+- The per-stock ATS selection is Runtime state scoped to both the current
+  trading date and the current program execution session. It is not a
+  persistent stock setting and must not be restored from
+  `config.json/manual_ats_sessions`.
+- Program startup clears prior per-stock ATS selections. A new trading date,
+  market-session end, or recovery classified as a new market session also
+  invalidates and clears those selections. Clearing ATS selection must not
+  change the stock's `CONTINUOUS` manual-operation mode.
+- After reset, the ATS Settings UI starts with all ATS selections cleared for
+  that stock. The stock continues as ordinary manual operation.
+- `manual_operation.use_extra_session_1..3` is not an ATS auto-application
+  policy. Legacy values must not make a stock ATS-enabled or order-eligible.
+- `MANUAL_ATS_LIQUIDATION` is a one-shot command. Its execution boundary must
+  verify both the stock's valid current Runtime ATS selection and the matching
+  `operation_policy.extra_sessions` time definition. A selection from another
+  trading date or program execution session is fail-closed.
+- The accepted command evidence carries the selected ATS session keys,
+  trading date, and program execution session identifier. Queue, Dispatch
+  Claim, Final Send Gate, SendOrder, Chejan, and broker evidence contracts are
+  unchanged.
+
 11.5 Result presentation
 
 - When authoritative real-trading results become available, each affected
