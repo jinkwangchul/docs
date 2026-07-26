@@ -1,0 +1,155 @@
+MASTER_SPEC_CANONICAL_2026-07-27_CLOSE_LIQUIDATION_TRANSITION_CONTRACT
+
+Status:
+- This is the latest supplemental Canonical for the confirmed Close Policy and
+  Liquidation Policy transition contract.
+- It extends the existing automatic-trading policy reuse and one-shot override
+  contracts without rewriting older Canonical files.
+- This document confirms policy only. It does not claim that the transition
+  checks, pending-order cancellation, or execution flow are implemented.
+
+Related contract location:
+- `MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT`
+  - `11.4 Existing automatic-trading policy reuse`
+  - `11.4.1 Individual Liquidation and Early Close One-shot Override Contract`
+
+1. Policy Option Boundary
+
+Close Policy (`마감정책`) consists of:
+- `루틴마감`
+- `이월`
+- `시장가`
+- `현재가`
+- `손/익절`
+
+Liquidation Policy (`청산정책`) consists of:
+- `이월`
+- `시장가`
+- `현재가`
+
+`현재가` and `시장가` are order methods.
+
+`손/익절` is a Close Policy behavior. It is not a Liquidation Policy option.
+
+The project does not have a separate limit-price (`지정가`) feature.
+`현재가` means that the order uses the current price observed when the
+applicable function is activated.
+
+2. Pending-order Cancellation Boundary
+
+The following transitions require the applicable pending orders to be
+cancelled under the existing order, Queue, SendOrder, and Chejan evidence
+contracts:
+
+Close Policy:
+- `시장가`
+- `현재가`
+- `손/익절`
+
+Liquidation Policy:
+- `시장가`
+- `현재가`
+
+Exceptions:
+- `루틴마감`
+- `이월`
+
+This section confirms only which policy choices require pending-order
+cancellation. It does not define a new cancellation implementation, Queue
+format, Writer, completion shortcut, or Source of Truth.
+
+3. Close Policy Transition Matrix
+
+From `루틴마감`:
+- transition to `이월`: allowed
+- transition to `시장가`: allowed
+- transition to `현재가`: allowed
+- transition to `손/익절`: allowed
+
+From `이월`:
+- transition to `시장가`: allowed
+- transition to `현재가`: allowed
+- transition to `손/익절`: allowed
+- transition to `루틴마감`: conditionally allowed
+
+The transition from `이월` to `루틴마감` is allowed only when all of the
+following are true:
+- no close behavior defined by the Routine has started
+- no actual order has been created
+- no actual buy has occurred
+- no actual sell has occurred
+
+If any one of these conditions is not satisfied, transition from `이월` to
+`루틴마감` is forbidden.
+
+From `현재가`:
+- transition to `시장가`: allowed
+- transition to `손/익절`: allowed
+- transition to `루틴마감`: forbidden
+- transition to `이월`: forbidden
+
+From `손/익절`:
+- transition to `현재가`: allowed
+- transition to `시장가`: allowed
+- transition to `루틴마감`: forbidden
+- transition to `이월`: forbidden
+
+From `시장가`:
+- transition to `현재가`: forbidden
+- transition to `손/익절`: forbidden
+- transition to `루틴마감`: forbidden
+- transition to `이월`: forbidden
+
+Therefore:
+- `현재가` and `손/익절` allow transition in both directions.
+- `현재가` may transition to `시장가`; `시장가` may not transition back to
+  `현재가`.
+- `손/익절` may transition to `시장가`; `시장가` may not transition back to
+  `손/익절`.
+
+4. Execution-progress Principle
+
+Transition eligibility is determined by actual execution progress, not only by
+the policy option name.
+
+After pending-order cancellation has started, the operation must not move
+backward to `루틴마감` or `이월`, because those behaviors depend on the
+pre-cancellation execution state.
+
+This contract does not authorize cancellation completion to be inferred from a
+SendOrder return value. Existing Chejan and broker-evidence boundaries remain
+authoritative.
+
+5. Automatic Close And Early Close
+
+The same Transition Contract applies when an Automatic Close (`자동마감`)
+operation is changed to an Early Close (`조기마감`) operation.
+
+Automatic Close and Early Close remain distinct entry purposes under the
+existing contracts. Applying the same transition rules does not merge their
+names, persistent settings, command identity, or invocation behavior.
+
+6. Scope And Non-implementation Boundary
+
+Confirmed in this Canonical:
+- Close Policy option boundary
+- Liquidation Policy option boundary
+- distinction between order methods and Close Policy behavior
+- pending-order cancellation requirement by option
+- allowed, forbidden, and conditional transitions
+- actual execution progress as the transition decision basis
+- the same transition rules for Automatic Close to Early Close
+
+Not implemented or changed by this Canonical:
+- Production code
+- Runtime files or Runtime state
+- tests
+- Queue or Writer formats
+- pending-order cancellation execution
+- Dispatch Claim, SendOrder, Chejan, or Broker API behavior
+- transition decision functions
+- GUI controls or display
+- persistent environment-setting values
+- Source of Truth ownership
+
+No implementation completion is claimed by this document.
