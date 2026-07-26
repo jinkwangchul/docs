@@ -1,0 +1,50 @@
+MASTER_SPEC_CHANGELOG_2026-07-26_MAIN_MONITORING_BADGE_AND_BUDGET_CONCEPT_FREEZE
+
+Purpose:
+- Close the confirmed main monitoring badge work at kiwoom_auto commit
+  `21e01eb`.
+- Record only the confirmed budget terminology boundary without claiming
+  implementation.
+
+Canonical created:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-26_MAIN_MONITORING_BADGE_AND_BUDGET_CONCEPT_FREEZE.txt
+
+Work Resume created:
+- 00_CANONICAL/CURRENT/
+  WORK_RESUME_LATEST_2026-07-26_MAIN_MONITORING_BADGE_AND_BUDGET_CONCEPT_FREEZE.txt
+
+Confirmed monitoring changes:
+- Removed parent, instance, and stock row checkboxes.
+- Replaced legacy monitoring tabs with:
+  `유효 / 그룹 / 루틴 / 종목 / 보유 / 가격 / 수익 / 미결 / 한도`.
+- Kept `유효` independent and hierarchy badges mutually exclusive.
+- Added flat valid-stock presentation for `유효 + 종목`.
+- Disabled metric badges at group level.
+- Changed the monitoring display term from `손익` to `수익`.
+- Kept separators non-interactive and retained current state colors.
+
+Budget concepts recorded:
+- 전체예산 설정
+- 종목 최초예산
+- 예산방식: 금액 / 주수
+- additional-buy and active-buy current purchase budget
+- 운영금액 / 완충금액 / 한도금액
+
+Explicitly not added:
+- budget implementation
+- unconfirmed formulas
+- hierarchical budget allocation
+- 사용예산 / 잔여예산
+- persistence, Runtime, Queue, or Broker changes
+
+Verification recorded:
+- 44 focused tests OK
+- staged clean-snapshot GUI import passed
+- staged clean-snapshot py_compile passed
+- staged clean-snapshot Windows Qt render passed
+- git diff --check passed
+
+Readable changelog:
+- Not created. The user requested a new Canonical, Work Resume, and Changelog
+  only.

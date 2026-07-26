@@ -1,0 +1,98 @@
+MASTER_SPEC_CANONICAL_2026-07-26_MAIN_MONITORING_BADGE_AND_BUDGET_CONCEPT_FREEZE
+
+Status:
+- This is the latest supplemental Canonical for the confirmed main monitoring
+  badge UI closure and the confirmed budget terminology boundary.
+- It extends the latest operation and monitoring contracts without rewriting
+  older Canonical files.
+- Monitoring statements record implemented behavior at the pushed code
+  baseline. Budget statements record confirmed concepts only and do not claim
+  implementation.
+
+Baseline:
+- docs repository branch: agent/project-prompt-standard
+- docs repository baseline before this closure:
+  3f461336b4fdf8b7464b969e4fca7a14bc6933b2
+- kiwoom_auto repository branch: feat/restore-auto-trade-setting-ui
+- kiwoom_auto pushed closure HEAD:
+  21e01eb
+
+1. Main Monitoring Tree Presentation
+
+- Parent Routine Definition, Routine Instance, and stock rows do not display
+  checkboxes.
+- Existing expansion arrows, status indicators, hierarchy alignment, names,
+  and monitoring values remain part of the tree presentation.
+- The monitoring UI change does not alter the tree data structure, persisted
+  data structure, Runtime, Queue, or Broker API.
+
+2. Main Monitoring Badge Set
+
+- The left badge order is:
+  `유효 / 그룹 / 루틴 / 종목 / 보유 / 가격 / 수익 / 미결 / 한도`.
+- Legacy `전체` and `운용` vertical tabs are not displayed.
+- A `과거` badge is not part of this monitoring contract.
+- `유효` is an independent toggle.
+- `그룹`, `루틴`, and `종목` are mutually exclusive hierarchy selections.
+- `보유`, `가격`, `수익`, `미결`, and `한도` are monitoring metric controls.
+- The user-facing profit term in this monitoring surface is `수익`; internal
+  data fields, calculations, storage formats, and APIs are unchanged.
+
+3. Badge Interaction Contract
+
+- `유효 + 종목` displays only valid stock rows as a flat presentation.
+- In that combination, parent and instance rows are hidden without creating a
+  second data model or changing the underlying hierarchy.
+- Selecting `그룹` disables `보유`, `가격`, `수익`, `미결`, and `한도`.
+- Selecting `루틴` or `종목` enables the supported metric controls.
+- Separators after `유효` and after `종목` are non-interactive visual group
+  boundaries. They cannot receive click or focus behavior.
+- Selected badges retain the existing green active presentation.
+- Enabled but unselected badges use the current dark-gray text presentation.
+- Disabled badges retain the existing light-gray presentation.
+- Further badge color refinement is not part of this freeze.
+
+4. Budget Concept Boundary
+
+The following concepts are confirmed for later budget design:
+
+- `전체예산 설정`
+- `종목 최초예산`
+- `예산방식`: `금액` or `주수`
+- `현재 구매예산`: the purchase budget determined during additional buying
+  or active buying by the applicable amount basis or round basis
+- `운영금액`, `완충금액`, and `한도금액` within total-budget operation
+
+These terms establish a vocabulary boundary only. This closure does not define
+or implement:
+
+- an unconfirmed calculation formula
+- hierarchical budget allocation
+- `사용예산` or `잔여예산`
+- new persistence fields, Runtime state, Queue behavior, or Broker behavior
+
+5. Confirmed Implementation Evidence
+
+- kiwoom_auto commit `21e01eb`
+  - removed monitoring-tree checkboxes
+  - replaced the legacy vertical tabs with the confirmed badge set
+  - implemented hierarchy and metric badge state behavior
+  - implemented `유효 + 종목` flat valid-stock presentation
+  - changed the monitoring display term from `손익` to `수익`
+  - preserved non-interactive separators and the current badge state colors
+
+Verification:
+- `tests.test_gui_main_routine_monitoring`
+- `tests.test_gui_main_routine_selection`
+- Total focused tests: 44 OK
+- staged clean-snapshot GUI import: passed
+- staged clean-snapshot py_compile: passed
+- staged clean-snapshot Windows Qt render: passed
+- git diff --check: passed
+
+Not changed:
+- tree or storage structures
+- Runtime files or Runtime contracts
+- Queue, Dispatch Claim, SendOrder, or Broker API
+- profit calculations or internal field names
+- budget implementation or budget calculation policy

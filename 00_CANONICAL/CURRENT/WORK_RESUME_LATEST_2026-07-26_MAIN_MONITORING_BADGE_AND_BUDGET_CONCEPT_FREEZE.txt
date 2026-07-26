@@ -1,0 +1,70 @@
+WORK_RESUME_LATEST_2026-07-26_MAIN_MONITORING_BADGE_AND_BUDGET_CONCEPT_FREEZE
+
+Current baseline:
+- kiwoom_auto branch: feat/restore-auto-trade-setting-ui
+- kiwoom_auto pushed HEAD: 21e01eb
+- docs branch: agent/project-prompt-standard
+- docs baseline before this closure:
+  3f461336b4fdf8b7464b969e4fca7a14bc6933b2
+
+Completed:
+- Parent, instance, and stock checkboxes were removed from the main monitoring
+  tree.
+- The left control area now uses the confirmed badges:
+  `유효 / 그룹 / 루틴 / 종목 / 보유 / 가격 / 수익 / 미결 / 한도`.
+- Legacy `전체` and `운용` tabs are absent, and no `과거` badge was added.
+- `유효` remains independent.
+- `그룹`, `루틴`, and `종목` remain mutually exclusive.
+- `유효 + 종목` presents valid stocks without parent or instance rows.
+- Group selection disables the metric badges.
+- Monitoring display terminology uses `수익` without changing internal profit
+  calculations or data contracts.
+- The two separators remain non-interactive visual boundaries.
+- Current dark-gray idle badge text is frozen without further refinement.
+
+Documentation-only budget boundary:
+- Confirmed terms are `전체예산 설정`, `종목 최초예산`, `예산방식(금액/주수)`,
+  `현재 구매예산`, `운영금액`, `완충금액`, and `한도금액`.
+- No budget formula, hierarchy allocation, `사용예산`, or `잔여예산` contract
+  was introduced.
+- No budget implementation was performed.
+
+Verification:
+- tests.test_gui_main_routine_monitoring
+- tests.test_gui_main_routine_selection
+- Total focused tests: 44 OK
+- staged clean-snapshot GUI import: passed
+- staged clean-snapshot py_compile: passed
+- staged clean-snapshot Windows Qt render: passed
+- git diff --check: passed
+
+Protected working state:
+- The kiwoom_auto repository retains pre-existing modified and untracked
+  Runtime, stock config/state, operation policy, Startup Runtime, other GUI,
+  and test files.
+- Unstaged Startup Runtime hunks in `gui_windows.py` remain protected.
+- Unstaged price-display test hunks in
+  `tests/test_gui_main_routine_monitoring.py` remain protected.
+- The docs repository retains its pre-existing modified and untracked files.
+- None of those protected files are part of this closure.
+
+Next concrete start point:
+- No next feature implementation is authorized by this freeze.
+- Resume from the latest explicit user instruction.
+- Treat the budget terms in the latest Canonical as concept boundaries only
+  until an explicit implementation and calculation contract is approved.
+
+Required references:
+- 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-26_MAIN_MONITORING_BADGE_AND_BUDGET_CONCEPT_FREEZE.txt
+- 00_CANONICAL/CHANGELOG/
+  MASTER_SPEC_CHANGELOG_2026-07-26_MAIN_MONITORING_BADGE_AND_BUDGET_CONCEPT_FREEZE.txt
+
+Do not:
+- restore monitoring-tree checkboxes
+- restore the legacy `전체` or `운용` monitoring tabs
+- add a `과거` monitoring badge without a new explicit contract
+- change Runtime, Queue, Broker, or storage contracts from this UI closure
+- infer or implement an unconfirmed budget formula
+- stage or clean protected dirty/untracked files
