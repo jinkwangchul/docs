@@ -1,0 +1,43 @@
+MASTER_SPEC_CHANGELOG_2026-07-28_RECOVERY_FAIL_CLOSED_STATE_PRESERVATION_FREEZE
+
+Purpose:
+- Freeze the implemented Production Recovery fail-closed state-preservation
+  contract at kiwoom_auto commit
+  `358262b941921357c51111968c4869390fa1f0cf`.
+
+Canonical created:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-28_RECOVERY_FAIL_CLOSED_STATE_PRESERVATION_FREEZE.txt
+
+Work Resume created:
+- 00_CANONICAL/CURRENT/
+  WORK_RESUME_LATEST_2026-07-28_RECOVERY_FAIL_CLOSED_STATE_PRESERVATION_FREEZE.txt
+
+Confirmed contract changes:
+- Global Recovery context prerequisites no longer persist a stock-level
+  REVIEW_REQUIRED transition.
+- Early close, immediate liquidation, individual liquidation, and automatic
+  close remain fail-closed without state mutation.
+- Expected prerequisites use the existing Toast path without warning
+  diagnostics.
+- Unknown reasons, Registry errors, and Gate exceptions retain diagnostics.
+- Immediate liquidation remains a one-shot REQUESTED command with no
+  persistent-mode, Queue, SendOrder, or Chejan contract expansion.
+
+Verification recorded:
+- 264 focused tests passed in a staged clean snapshot.
+- 32-bit Python 3.11 / PyQt5 GUI imports passed.
+- py_compile passed.
+- git diff --cached --check passed.
+- Code local and remote SHA matched after push.
+- Code ahead/behind was 0/0 after push.
+
+Explicitly not changed:
+- Runtime data
+- stock configuration or state data
+- operation policy data
+- Recovery admission policy
+- REVIEW_REQUIRED resolution policy
+- Queue, SendOrder, Chejan, or Broker execution contracts
+- protected dirty or untracked files
+- any next-session feature scope

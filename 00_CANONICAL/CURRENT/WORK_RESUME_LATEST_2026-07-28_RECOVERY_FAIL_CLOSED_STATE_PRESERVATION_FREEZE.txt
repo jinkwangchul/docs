@@ -1,0 +1,118 @@
+WORK_RESUME_LATEST_2026-07-28_RECOVERY_FAIL_CLOSED_STATE_PRESERVATION_FREEZE
+
+Current baseline:
+- kiwoom_auto branch: feat/restore-auto-trade-setting-ui
+- kiwoom_auto pushed commit:
+  358262b941921357c51111968c4869390fa1f0cf
+- docs branch: agent/project-prompt-standard
+- docs baseline before this closure:
+  3eb2cd0d0ae6f796863b92953e784cf388fc2c6c
+- docs Freeze commit: the commit containing this Work Resume; verify its exact
+  SHA from Git because a commit cannot embed its own content-derived SHA.
+
+Completed:
+- Removed the incorrect transition that persisted a missing global Recovery
+  context as stock-level REVIEW_REQUIRED.
+- Kept early close, immediate liquidation, individual liquidation, and
+  time-policy automatic close fail-closed without mutating stock state.
+- Expected prerequisites such as no login, no selected account, Recovery not
+  started, and Recovery in progress now use the existing operator Toast path
+  without console warning diagnostics.
+- Unknown reasons, Registry failures, and Recovery Gate exceptions retain
+  investigative diagnostics.
+- Preserved the immediate-liquidation one-shot REQUESTED command boundary,
+  idempotency, persistent-mode invariance, and Queue/SendOrder/Chejan
+  non-creation boundary.
+
+User-visible final behavior:
+- A predictable Recovery prerequisite block explains the blocked operation
+  through the existing Toast path.
+- A predictable global prerequisite block does not move an individual stock
+  into Review Management.
+- Blocked operations leave their previous stock and operation state intact.
+
+Recovery fail-closed safety boundary:
+- Recovery admission is still required.
+- A blocked request cannot mutate Runtime, create an OperationCommand, enqueue
+  execution, or enter SendOrder/Chejan.
+- Unexpected internal Recovery failures remain diagnosable.
+- Stock-specific official review evidence can still use the existing
+  REVIEW_REQUIRED writer and resolution lifecycle.
+
+Verification:
+- Staged clean snapshot: verified independently from protected working files.
+- Focused test modules: 12.
+- Total focused tests: 264 OK.
+- 32-bit Python 3.11 / PyQt5 GUI import: passed.
+- py_compile for committed production modules: passed.
+- git diff --cached --check: passed.
+- Code local and origin SHA after push:
+  358262b941921357c51111968c4869390fa1f0cf
+- Code ahead/behind after push: 0/0.
+
+Protected kiwoom_auto working state:
+- Modified project/support files:
+  PROJECT_CHANGELOG.txt
+  gui_operation_environment_settings_dialog.py
+  gui_schedule_window.py
+  operation_policy.json
+- Modified operational data remains unstaged:
+  routine_instances/*/instance.json
+  routine_instances/*/rules.json
+  runtime/order_queue.json
+  runtime/routine_signals.json
+  stocks/*/config.json
+  stocks/*/state.json
+- Modified tests remain unstaged:
+  tests/test_auto_trade_setting_routine_tree.py
+  tests/test_gui_execution_preview_button.py
+  tests/test_gui_main_routine_monitoring.py
+- Untracked operational artifacts remain protected:
+  artifacts/
+  reports/blocked_actions/
+  runtime/archive/
+  runtime/broker_holdings.json
+  runtime/fills.json
+  runtime/order_executions.json
+  runtime/order_locks.json
+  runtime/positions.json
+- Untracked source and tests remain protected:
+  startup_runtime_residue_disposal_service.py
+  tests/test_auto_close_runtime_policy_snapshot.py
+  tests/test_auto_trade_global_operation_button.py
+  tests/test_gui_main_stock_context_menu.py
+  tests/test_gui_toast.py
+  tests/test_kiwoom_recovery_snapshot_adapter.py
+  tests/test_routine_signal_probe_all_stocks.py
+  tests/test_startup_runtime_initializer.py
+  tests/test_startup_runtime_residue_disposal_service.py
+  tests/test_transition_evidence_reader.py
+  tests/test_transition_production_guard.py
+
+Protected docs working state:
+- Modified files remain unstaged:
+  00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+  00_CANONICAL/TRACE/MASTER_SPEC_DEDUP_REPORT_2026-07-03.txt
+  10_UPDATE/MERGED/UPDATE_20260708_LIFECYCLE_COMMIT_WRITER_SERVICE.txt
+  the existing Korean-path duplicate MASTER_SPEC_DEDUP_REPORT_2026-07-03.txt
+- Existing untracked 2026-07-22 strategy-workspace Canonical and Changelog
+  remain protected and are not part of this Freeze.
+
+Next concrete start point:
+- No subsequent implementation item is authorized by this Freeze.
+- Resume from the latest explicit user instruction.
+- Do not create a new feature from discussion history or unapproved ideas.
+
+Required references:
+- 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-28_RECOVERY_FAIL_CLOSED_STATE_PRESERVATION_FREEZE.txt
+- 00_CANONICAL/CHANGELOG/
+  MASTER_SPEC_CHANGELOG_2026-07-28_RECOVERY_FAIL_CLOSED_STATE_PRESERVATION_FREEZE.txt
+
+Do not:
+- convert expected global Recovery prerequisites into stock REVIEW_REQUIRED
+- weaken the Production Recovery fail-closed gate
+- remove diagnostics for unknown or exceptional Recovery failures
+- change the immediate-liquidation one-shot command into a persistent mode
+- stage, clean, restore, or delete the protected working state
