@@ -1,0 +1,45 @@
+WORK RESUME LATEST
+Date: 2026-07-31
+Scope: Review isolation and auto-trade performance UI contract closing
+
+Completed Scope
+
+- Restored review-management isolation for the auto-trade setting lower stock table.
+- Review-managed stocks are skipped before normal row creation.
+- General lower stock rows no longer use review management as a normal "검토종목" label path.
+- Performance tree current-stock data keeps review-managed records for analysis.
+- Period filters 전체/현재/과거 are enabled by visible stock-row presence.
+- Badge state refreshes immediately after routine tree collapse/expand and visibility refresh.
+
+Verification
+
+- Focused test: python -m unittest tests.test_auto_trade_setting_routine_tree
+- Result: Ran 80 tests, OK.
+- 32-bit py_compile:
+  - gui_auto_trade_table_loader.py
+  - gui_auto_trade_setting_window.py
+  - tests/test_auto_trade_setting_routine_tree.py
+  - Result: passed.
+- git diff --check: passed.
+
+Repository Baselines
+
+- Code repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Code branch: feat/restore-auto-trade-setting-ui
+- Code commit: 298e1c9334021766658f2a2db957a831fc831005
+- Docs repository: C:\Users\JIN KWANG CHUL\Documents\docs
+- Docs branch: agent/project-prompt-standard
+- Docs commit: the commit containing this file; exact SHA is recorded in the closing report.
+
+Protected Dirty/Untracked State
+
+- Existing code repository dirty and untracked files were preserved.
+- Existing docs repository dirty and untracked files were preserved.
+- 00_REFERENCE_INDEX.md was not modified in this closing step because it already had pre-existing dirty changes.
+
+Next Session Start Point
+
+- Start from the pushed code baseline above and this docs freeze record.
+- Do not infer review management as a normal operation label.
+- Keep review isolation and performance visibility separate.
+- Keep period scope controls synchronized with actual visible stock rows.

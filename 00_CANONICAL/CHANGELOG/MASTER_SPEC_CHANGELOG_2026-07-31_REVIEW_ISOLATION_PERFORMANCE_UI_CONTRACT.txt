@@ -1,0 +1,29 @@
+MASTER SPEC CHANGELOG
+Date: 2026-07-31
+Scope: Review isolation and performance UI contract freeze
+
+Changed
+
+- Restored the review-management isolation contract in the auto-trade setting lower stock table.
+- Review-managed stocks are excluded before normal stock-table row creation.
+- Removed the normal-row path that could present review management as a "검토종목" display label in the lower stock table.
+- Restored performance tree visibility so review-managed stocks remain visible in performance records.
+- Updated period scope badge enablement to follow actual visible stock rows instead of display-level name alone.
+- Collapse/expand now refreshes the period scope badge state immediately.
+
+Preserved
+
+- Internal review_required and related state remain intact.
+- Review management still blocks normal auto-trade execution paths.
+- Existing monitoring/start safety contracts remain unchanged.
+- Performance records remain visible for current and historical analysis.
+- Existing dirty and untracked files in both repositories were not reset, restored, stashed, cleaned, or deleted.
+
+Validation
+
+- Code branch: feat/restore-auto-trade-setting-ui
+- Code commit: 298e1c9334021766658f2a2db957a831fc831005
+- Focused test: python -m unittest tests.test_auto_trade_setting_routine_tree
+- Result: 80 tests passed
+- 32-bit py_compile: passed
+- git diff --check: passed

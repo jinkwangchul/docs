@@ -1,0 +1,41 @@
+MASTER SPEC CANONICAL
+Date: 2026-07-31
+Scope: Review isolation and auto-trade performance UI contract
+
+1. Review management is an execution isolation state.
+
+- A stock in review management must not be treated as a normal auto-trade row.
+- The internal review state remains durable and must continue to support review management, execution blocking, and return approval.
+- The review state is not a normal operation display label.
+
+2. Normal operation lists exclude review-managed stocks before row creation.
+
+- Auto-trade setting lower stock table must skip review-managed stocks before creating table items.
+- General operation/monitoring lists must keep the existing exclusion contract.
+- Operation start targets must not include review-managed stocks.
+- General operation UI must not render a normal row with a "검토종목" label.
+
+3. Review management does not hide performance records.
+
+- Performance records are historical/analytical data.
+- Review management is an execution state.
+- Auto-trade performance trees must keep stock and routine records regardless of review-management state.
+- Current and historical performance visibility follow performance data contracts, not review isolation.
+
+4. Period scope filter enablement follows visible stock rows.
+
+- The 전체/현재/과거 scope controls are enabled when the current tree display has visible stock rows.
+- Stock display level enables the scope controls.
+- Routine/group display levels also enable the scope controls when expanded rows expose visible stock rows.
+- When collapsing hides all visible stock rows, the scope controls become disabled.
+- Badge state must be refreshed immediately after collapse/expand and routine tree visibility refresh.
+
+5. Verified code baseline.
+
+- Code repository: kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: 298e1c9334021766658f2a2db957a831fc831005
+- Focused test: python -m unittest tests.test_auto_trade_setting_routine_tree
+- Result: 80 tests passed
+- 32-bit py_compile: passed for gui_auto_trade_table_loader.py, gui_auto_trade_setting_window.py, tests/test_auto_trade_setting_routine_tree.py
+- git diff --check: passed
