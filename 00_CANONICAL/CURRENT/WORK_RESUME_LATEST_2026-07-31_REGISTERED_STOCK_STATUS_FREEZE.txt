@@ -1,0 +1,87 @@
+WORK RESUME LATEST
+Date: 2026-07-31
+Scope: Registered stock status views and exclusion controls freeze
+
+1. Repository Baselines
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Local path: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: 24bf1010e1f9325dddd5af973366f893fd59dc76
+- Remote SHA: 24bf1010e1f9325dddd5af973366f893fd59dc76
+- Push: successful
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Local path: C:\Users\JIN KWANG CHUL\Documents\docs
+- Branch: agent/project-prompt-standard
+- Commit: this freeze commit
+- Remote SHA: to be verified after push and recorded in the closing report
+
+2. Completed In This Freeze
+
+- Registered-stock-status top counts were frozen as `종목`, `운영/정지`, `제외`, and `검토`.
+- The count equation is `종목 = 운영/정지 + 제외 + 검토`.
+- The default registered-stock-status view is the normal `운영/정지` view.
+- `운영/정지`, `제외`, and `검토` views use canonical state and show only their matching stock group.
+- Normal stocks can be moved to `제외` by double-click or context-menu `제외지정`.
+- Excluded stocks can be returned by double-click or context-menu `제외해제`.
+- Exclusion state changes preserve registration identity and reuse the existing backend path.
+- REVIEW_REQUIRED remains protected and is handled by review management.
+- The registered-stock-status table keeps the bottom horizontal scrollbar.
+- Row numbers are center aligned.
+- Header, row-number, corner, and grid treatment is opt-in for the registered-stock-status table.
+
+3. Verification
+
+- 32-bit Python py_compile: passed.
+- Focused registered-stock-status tests: 6 passed.
+- tests.test_auto_trade_gui_e2e_sync: 6 passed.
+- git diff --check: passed.
+- Full tests.test_auto_trade_setting_routine_tree module: attempted, but PyQt process stopped with -1073740791.
+- Whole project green: not confirmed.
+
+4. Protected Local State
+
+The following local code repository paths were not included in the code freeze commit and must remain protected unless a future task explicitly targets them:
+
+- runtime/**
+- stocks/**
+- routine_instances/**
+- archived_stocks/**
+- artifacts/**
+- runtime/archive/**
+- deleted dirty stock files
+- gui_windows.py recovery-related unstaged changes
+- main monitoring changes
+- recovery and operation-service related dirty/untracked files
+- unrelated untracked service files and tests
+
+The following documentation repository dirty/untracked state existed before this document freeze and was protected unless explicitly staged for this freeze:
+
+- 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+- 00_CANONICAL/TRACE/MASTER_SPEC_DEDUP_REPORT_2026-07-03.txt
+- 10_UPDATE/MERGED/UPDATE_20260708_LIFECYCLE_COMMIT_WRITER_SERVICE.txt
+- 마스터스펙정리/_CANONICAL_OUTPUT/MASTER_SPEC_DEDUP_REPORT_2026-07-03.txt
+- pre-existing untracked 2026-07-22 and 2026-07-28 document files
+
+5. Current Big Feature State
+
+- Goal: restore and freeze the registered-stock-status part of the auto-trade setting UI.
+- Status: completed and pushed as a separate code commit.
+- Completion evidence: this Canonical, Changelog, Work Resume, and the code commit above.
+- Remaining blocker: full routine-tree module still has a PyQt process stop and is not a project-green signal.
+- Unrelated recovery/main-monitoring work remains outside this freeze.
+- No next Big Feature is selected by this Work Resume.
+
+6. Next Session Start Point
+
+- First verify both repositories by remote, branch, HEAD, status, and diff when local Git execution is available.
+- Preserve protected dirty and untracked files.
+- Use this Work Resume and the new Canonical as the recovery baseline.
+- Do not infer the next Big Feature from this document.
+- Do not treat the PyQt full-module stop as an automatically authorized next implementation task.
+- Do not modify recovery or main-monitoring work without explicit user instruction.

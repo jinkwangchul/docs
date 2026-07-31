@@ -1,0 +1,55 @@
+MASTER SPEC CHANGELOG
+Date: 2026-07-31
+Scope: Registered stock status views and exclusion controls freeze
+
+Purpose:
+
+- Record the completed registered-stock-status UI baseline.
+- Preserve older Canonical, Changelog, and Work Resume files.
+- Add a new Canonical snapshot for the code commit that restored status views and exclusion controls.
+
+New Canonical:
+
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-31_REGISTERED_STOCK_STATUS_VIEWS_AND_EXCLUSION_CONTROLS.txt
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: 24bf1010e1f9325dddd5af973366f893fd59dc76
+- Remote SHA: 24bf1010e1f9325dddd5af973366f893fd59dc76
+
+Contract recorded:
+
+- Registered-stock-status counts use only `종목`, `운영/정지`, `제외`, and `검토`.
+- The required count equation is `종목 = 운영/정지 + 제외 + 검토`.
+- The default view is the normal `운영/정지` view.
+- `운영/정지`, `제외`, and `검토` views each display only their matching stock group.
+- `제외지정` changes a normal registered stock into the session-excluded group.
+- `제외해제` returns an excluded stock to the normal registered-stock group.
+- Exclusion is not registration removal.
+- Existing backend and canonical state-change paths are reused.
+- REVIEW_REQUIRED remains protected and is not resolved through exclusion actions.
+- The registered-stock-status table owns the completed horizontal scrollbar, row-number alignment, and opt-in header/grid treatment.
+
+Preserved:
+
+- Existing review-management contracts.
+- Existing registration identity and backend mutation paths.
+- Existing runtime, stock, routine-instance, order, fill, and broker data.
+- Existing dirty and untracked files outside the committed freeze baseline.
+- Older Canonical, Changelog, and Work Resume documents.
+
+Validation:
+
+- 32-bit Python py_compile: passed.
+- Registered-stock-status focused tests: 6 passed.
+- tests.test_auto_trade_gui_e2e_sync: 6 passed.
+- git diff --check: passed.
+
+Limitations:
+
+- The full tests.test_auto_trade_setting_routine_tree module stopped with PyQt process code -1073740791.
+- The whole project is not recorded as green.
+- This changelog does not record uncommitted local changes as completed work.
