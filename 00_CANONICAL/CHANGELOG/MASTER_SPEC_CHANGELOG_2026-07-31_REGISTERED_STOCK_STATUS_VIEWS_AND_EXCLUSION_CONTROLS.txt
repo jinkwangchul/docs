@@ -17,8 +17,17 @@ Code baseline:
 
 - Repository: jinkwangchul/kiwoom_auto
 - Branch: feat/restore-auto-trade-setting-ui
-- Commit: 24bf1010e1f9325dddd5af973366f893fd59dc76
-- Remote SHA: 24bf1010e1f9325dddd5af973366f893fd59dc76
+- Initial freeze commit: 24bf1010e1f9325dddd5af973366f893fd59dc76
+- Cleanup commit: 5f60409fe882d8e91a29e9edfbe274d062c36266
+- Final code baseline: 5f60409fe882d8e91a29e9edfbe274d062c36266
+
+Follow-up cleanup:
+
+- Purpose: remove unrelated changes from the registered-stock-status freeze.
+- Git history was not rewritten.
+- The Canonical contract remained unchanged.
+- The documentation baseline was corrected to match the final code SHA.
+- The cleanup commit removed unrelated emergency-stop context-menu wiring, stock-registration context-menu wiring, performance color helper work, operation-mode double-click conversion, and menu-label changes outside the approved scope.
 
 Contract recorded:
 
@@ -44,12 +53,12 @@ Preserved:
 Validation:
 
 - 32-bit Python py_compile: passed.
-- Registered-stock-status focused tests: 6 passed.
+- Registered-stock-status cleanup focused routine/status tests: 15 passed.
 - tests.test_auto_trade_gui_e2e_sync: 6 passed.
 - git diff --check: passed.
 
 Limitations:
 
-- The full tests.test_auto_trade_setting_routine_tree module stopped with PyQt process code -1073740791.
+- The full tests.test_auto_trade_setting_routine_tree module still has failures.
 - The whole project is not recorded as green.
 - This changelog does not record uncommitted local changes as completed work.

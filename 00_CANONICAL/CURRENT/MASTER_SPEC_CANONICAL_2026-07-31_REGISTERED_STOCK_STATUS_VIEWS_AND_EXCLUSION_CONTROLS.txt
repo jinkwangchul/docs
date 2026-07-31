@@ -6,9 +6,27 @@ Reference code baseline:
 
 - Code repository: jinkwangchul/kiwoom_auto
 - Branch: feat/restore-auto-trade-setting-ui
-- Commit: 24bf1010e1f9325dddd5af973366f893fd59dc76
-- Remote SHA: 24bf1010e1f9325dddd5af973366f893fd59dc76
-- Commit message: feat: restore registered stock status views and exclusion controls
+- Freeze base commit: 24bf1010e1f9325dddd5af973366f893fd59dc76
+- Cleanup commit: 5f60409fe882d8e91a29e9edfbe274d062c36266
+- Final remote baseline: 5f60409fe882d8e91a29e9edfbe274d062c36266
+- Freeze base commit message: feat: restore registered stock status views and exclusion controls
+- Cleanup commit message: fix: remove unrelated changes from registered stock status freeze
+
+Baseline correction note:
+
+- Final Freeze verification found that the initial Freeze commit included unrelated hunks outside the approved scope.
+- The already-pushed history was not rewritten.
+- The Cleanup commit removed only the unrelated changes and approved-scope test adjustments.
+- The final Canonical recovery SHA is the Cleanup commit result, `5f60409fe882d8e91a29e9edfbe274d062c36266`.
+- This correction does not change the registered-stock-status functional contract recorded below.
+
+Cleanup removed the following unrelated changes from the Freeze baseline:
+
+- Emergency stop / stop-release context-menu wiring.
+- Stock-registration context-menu and registration-window wiring.
+- Performance color helper.
+- Operation-mode double-click conversion.
+- Menu-label changes outside the approved registered-stock-status scope.
 
 1. Registered Stock Status Counts
 
@@ -85,12 +103,12 @@ Explicitly not included:
 Verified for the code baseline:
 
 - 32-bit Python py_compile passed for the committed Python files.
-- Registered-stock-status focused tests: 6 passed.
+- Registered-stock-status cleanup focused routine/status tests: 15 passed.
 - tests.test_auto_trade_gui_e2e_sync: 6 passed.
 - git diff --check passed.
 
 Known limitation:
 
-- The full tests.test_auto_trade_setting_routine_tree module was attempted, but the PyQt process stopped with -1073740791.
+- The full tests.test_auto_trade_setting_routine_tree module still has failures.
 - The whole project is not recorded as green.
 - This Canonical must not be used as evidence that unrelated dirty or untracked work is complete.

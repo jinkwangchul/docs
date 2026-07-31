@@ -9,8 +9,9 @@ Code repository:
 - Repository: jinkwangchul/kiwoom_auto
 - Local path: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
 - Branch: feat/restore-auto-trade-setting-ui
-- Commit: 24bf1010e1f9325dddd5af973366f893fd59dc76
-- Remote SHA: 24bf1010e1f9325dddd5af973366f893fd59dc76
+- Freeze base commit: 24bf1010e1f9325dddd5af973366f893fd59dc76
+- Cleanup commit: 5f60409fe882d8e91a29e9edfbe274d062c36266
+- Final remote SHA: 5f60409fe882d8e91a29e9edfbe274d062c36266
 - Push: successful
 
 Documentation repository:
@@ -38,10 +39,10 @@ Documentation repository:
 3. Verification
 
 - 32-bit Python py_compile: passed.
-- Focused registered-stock-status tests: 6 passed.
+- Cleanup focused routine/status tests: 15 passed.
 - tests.test_auto_trade_gui_e2e_sync: 6 passed.
 - git diff --check: passed.
-- Full tests.test_auto_trade_setting_routine_tree module: attempted, but PyQt process stopped with -1073740791.
+- Full tests.test_auto_trade_setting_routine_tree module: failures remain.
 - Whole project green: not confirmed.
 
 4. Protected Local State
@@ -68,20 +69,26 @@ The following documentation repository dirty/untracked state existed before this
 - 마스터스펙정리/_CANONICAL_OUTPUT/MASTER_SPEC_DEDUP_REPORT_2026-07-03.txt
 - pre-existing untracked 2026-07-22 and 2026-07-28 document files
 
+Additional protected state after the cleanup baseline correction:
+
+- The original code local branch may be behind the remote cleanup commit by 1.
+- Do not pull, reset, restore, or otherwise change the protected dirty/untracked code worktree without explicit user approval.
+- Before the next local code task, verify the local/remote baseline difference and decide how to protect the existing worktree.
+
 5. Current Big Feature State
 
 - Goal: restore and freeze the registered-stock-status part of the auto-trade setting UI.
-- Status: completed and pushed as a separate code commit.
-- Completion evidence: this Canonical, Changelog, Work Resume, and the code commit above.
-- Remaining blocker: full routine-tree module still has a PyQt process stop and is not a project-green signal.
+- Status: completed and pushed as a freeze base commit followed by a cleanup commit.
+- Completion evidence: this Canonical, Changelog, Work Resume, freeze base commit, and cleanup commit above.
+- Remaining blocker: full routine-tree module still has failures and is not a project-green signal.
 - Unrelated recovery/main-monitoring work remains outside this freeze.
 - No next Big Feature is selected by this Work Resume.
 
 6. Next Session Start Point
 
-- First verify both repositories by remote, branch, HEAD, status, and diff when local Git execution is available.
+- First verify both repositories by remote, branch, HEAD, status, and diff.
+- Confirm that the code remote baseline is 5f60409fe882d8e91a29e9edfbe274d062c36266.
+- Confirm whether the local code branch is behind the remote cleanup SHA before doing any local code work.
 - Preserve protected dirty and untracked files.
-- Use this Work Resume and the new Canonical as the recovery baseline.
-- Do not infer the next Big Feature from this document.
-- Do not treat the PyQt full-module stop as an automatically authorized next implementation task.
-- Do not modify recovery or main-monitoring work without explicit user instruction.
+- Use this Work Resume and the corrected Canonical as the recovery baseline.
+- Wait for explicit user instruction for the next feature.
