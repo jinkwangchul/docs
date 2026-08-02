@@ -1,0 +1,120 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-02
+Scope: Stock management, review-state display, status sorting, unregister result, and stock-register GUI entry contracts
+
+Reference code baseline:
+
+- Code repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Final remote baseline: 7ff4bae8f0d06a3b6f0bb016e055685f9cbe22f9
+- Baseline status at freeze: pushed, origin ahead/behind 0/0
+
+1. REVIEW_REQUIRED Display Contract
+
+- REVIEW_REQUIRED is an independent protected state that requires operator review.
+- REVIEW_REQUIRED is not a child state of running, emergency stop, or operation exclusion.
+- A REVIEW_REQUIRED stock must not automatically transition back into an operable state.
+- In GUI rows, REVIEW_REQUIRED is displayed as `검토종목`.
+- A REVIEW_REQUIRED row uses orange foreground across the row text columns.
+- This row-color contract is separate from the situation-signal contract.
+
+2. Situation Signal Contract
+
+- The situation signal column represents trading availability.
+- REVIEW_REQUIRED displays a red situation signal.
+- Emergency stop displays a red situation signal.
+- Data mismatch displays a red situation signal.
+- Monitoring/waiting displays the existing gray situation signal.
+- Existing normal operation signal behavior is preserved unless a higher-priority protected condition applies.
+- The situation signal foreground must not be overwritten by row-wide protection styling.
+
+3. Status And Situation Sorting Contract
+
+- The status column and situation column use the same state-rank Source of Truth for sorting.
+- Clicking either column must produce the same row order for the same sort direction.
+- REVIEW_REQUIRED and emergency stop have different ranks and must not be mixed into one sort group.
+- The sort contract changes only sort keys; it does not change status labels, signal colors, row colors, filters, or counts.
+
+4. Registered Stock Unregister Contract
+
+- Unregister targets are the rows explicitly selected by the user in the registered-stock-status table.
+- Whole visible lists must not be treated as unregister targets unless those rows are selected.
+- A specific routine selection is not required when selected rows carry enough identity.
+- Running stocks, emergency-stopped stocks, and REVIEW_REQUIRED stocks are unregister-blocked.
+- Backend unregister execution receives only unregister-eligible stocks.
+- Blocked stocks remain registered and are not passed to the backend.
+- The result toast is exactly one line:
+
+  `종목해제 N종목 | 해제불가 M종목`
+
+- Both counts are always shown, including zero.
+- The toast must not show stock names, stock codes, reasons, or extra words such as completion/success/processing.
+
+5. Stock Register Entry From Performance Tree
+
+- The auto-trade performance tree provides a `종목등록` entry for routine areas where a valid routine instance identity exists.
+- Routine rows and stock rows may both be entry points to the same routine stock-register function.
+- A stock-row `종목등록` action does not register the right-clicked stock.
+- A stock row is used only to obtain its owning `instance_id`.
+- The implementation must reconstruct normal routine metadata from that `instance_id` and open the same general routine stock-register dialog used by the routine-row path.
+- Stock-row metadata such as stock code, stock name, stock path, stock status, and other stock-specific fields must not be passed as registration-dialog metadata.
+- Current, past, and all performance views do not change the target routine identity.
+
+6. Stock Register Dialog Contract
+
+- The routine stock-register dialog title is:
+
+  `<루틴명> - 종목등록`
+
+- The routine name comes from the official routine metadata display value.
+- The dialog has bottom buttons in this order:
+
+  `등록`, `닫기`
+
+- The `등록` button registers the currently selected search result through the same backend path as the existing double-click or Enter registration path.
+- The button is disabled when no search result is selected and enabled when a result is selected.
+- Search, search results, duplicate checks, backend registration, saving, and refresh contracts are unchanged.
+
+7. Auto-Trade Setting Stock Management Entry Contract
+
+- The bottom button in the auto-trade setting window is labeled `종목관리`.
+- This is a UI-label change only.
+- Its existing signal, slot, backend, and window-opening behavior are preserved.
+
+8. Stock Management Window UI Contract
+
+- The stock management window title is `종목관리`.
+- The duplicated top label `중앙 종목 관리` is removed.
+- The window layout may remove only the empty space caused by that label removal.
+- Search, table, columns, sorting, buttons, context menu behavior, backend, and storage contracts are unchanged.
+
+9. Stock Management Context Menu Contract
+
+- The stock management window context menu order is:
+
+  1. `전체 선택`
+  2. `선택 해제`
+  3. separator
+  4. `종목삭제`
+  5. separator
+  6. `루틴등록`
+  7. `루틴해제`
+
+- `종목삭제` is the UI label for the previous `선택 삭제` action.
+- `루틴등록` is the UI label for the previous `등록` action.
+- `루틴해제` is the UI label for the previous `등록대기 전환` action.
+- The previous `등록대기 선택` menu entry is removed.
+- Menu labels and placement changed; backend functions and enable/disable conditions did not change.
+
+10. GUI Execution Path Verification Rule
+
+- When the same feature name exists in multiple windows or context menus, the actual visible GUI event path must be verified before modifying code.
+- Tests against a different window, helper, or similarly named function are not sufficient evidence of user-visible completion.
+- For context-menu changes, the implementation path must be traced from the actual widget signal to the final `QMenu.exec_()` action list.
+
+11. Explicitly Excluded From This Canonical
+
+- No final decision is recorded about whether the stock management window should remain or be removed.
+- The unassigned-stock-register redesign is not recorded as confirmed implementation.
+- Runtime, config, stocks, and routine-instance storage structures are not changed by this Canonical.
+- State writers, registration backend, unregister backend, close backend, emergency-stop backend, and order/broker logic are not redefined here.

@@ -1,0 +1,54 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-02
+Scope: Stock management and auto-trade setting GUI contract freeze
+
+New Canonical:
+
+- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-02_STOCK_MANAGEMENT_GUI_CONTRACT_FREEZE.txt
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Final code baseline: 7ff4bae8f0d06a3b6f0bb016e055685f9cbe22f9
+- Push status: successful
+- Remote ahead/behind after push: 0/0
+
+Changed:
+
+- Clarified REVIEW_REQUIRED as an independent protected state for GUI display contracts.
+- Recorded REVIEW_REQUIRED row-wide orange text display.
+- Recorded red situation signal behavior for REVIEW_REQUIRED, emergency stop, and data mismatch.
+- Recorded that situation signal foreground is preserved against row-wide protection styling.
+- Unified situation-column sorting and status-column sorting through the same state-rank contract.
+- Recorded registered-stock unregister selection, blocked-target, backend-target, and one-line toast contracts.
+- Recorded performance-tree `종목등록` entry points for routine rows and stock rows.
+- Clarified that stock-row `종목등록` uses the stock row only to identify the owning routine instance.
+- Recorded that stock-specific metadata is not passed to the routine stock-register dialog.
+- Recorded routine stock-register dialog title and bottom `등록`/`닫기` button contract.
+- Recorded the auto-trade setting bottom button label `종목관리`.
+- Recorded the stock management window title and duplicated-label removal.
+- Recorded the stock management context-menu order and label changes.
+- Removed `등록대기 선택` from the current stock management context-menu contract.
+- Added a GUI execution-path verification rule for same-name GUI features.
+
+Preserved:
+
+- Existing stock registration backend and duplicate-registration logic.
+- Existing unregister backend and blocked-target policy.
+- Existing runtime/config/stocks/routine-instance storage structures.
+- Existing state writers and common state helper contracts.
+- Existing close, emergency-stop, operation-mode, order, and broker contracts.
+- Existing dirty and untracked files in the main code and documentation worktrees.
+
+Explicitly not recorded:
+
+- Any final decision to remove or keep the stock management window as a larger design issue.
+- The unassigned-stock-register redesign proposal.
+- Any unconfirmed future migration or storage-structure change.
+
+Validation:
+
+- Code branch `feat/restore-auto-trade-setting-ui` was pushed at 7ff4bae8f0d06a3b6f0bb016e055685f9cbe22f9.
+- Code remote and local integration worktree were verified at ahead/behind 0/0 before this document freeze.
+- This changelog records confirmed implementation only.

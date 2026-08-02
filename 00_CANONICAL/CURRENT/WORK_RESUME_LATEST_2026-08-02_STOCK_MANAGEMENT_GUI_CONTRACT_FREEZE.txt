@@ -1,0 +1,68 @@
+WORK RESUME LATEST
+Date: 2026-08-02
+Scope: Stock management and auto-trade setting GUI contract closing
+
+1. Repository Baselines
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Main protected local path: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Integration worktree path: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto_close_integrate_worktree
+- Branch: feat/restore-auto-trade-setting-ui
+- Final remote SHA: 7ff4bae8f0d06a3b6f0bb016e055685f9cbe22f9
+- Push: successful
+- Remote ahead/behind after push: 0/0
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Main protected local path: C:\Users\JIN KWANG CHUL\Documents\docs
+- Document freeze worktree path: C:\Users\JIN KWANG CHUL\Documents\docs_close_freeze_worktree
+- Branch: agent/project-prompt-standard
+- Document SHA: this freeze commit; exact pushed SHA is recorded in the closing report.
+
+2. Completed In This Window
+
+- REVIEW_REQUIRED rows are displayed with row-wide orange text.
+- REVIEW_REQUIRED, emergency stop, and data mismatch use red situation signals.
+- Situation-column sorting and status-column sorting use the same state rank.
+- Registered-stock unregister uses selected rows only, separates eligible and blocked targets, and reports `종목해제 N종목 | 해제불가 M종목`.
+- Performance-tree routine and stock rows provide a normal `종목등록` entry when they have a valid routine instance identity.
+- A stock-row `종목등록` action opens the owning routine's normal stock-register dialog; it does not register or pass the right-clicked stock.
+- Routine stock-register dialog title uses `<루틴명> - 종목등록`.
+- Routine stock-register dialog has bottom `등록` and `닫기` buttons; `등록` reuses the existing registration backend path.
+- Auto-trade setting bottom button label changed to `종목관리` without changing its action.
+- Stock management window title changed to `종목관리`.
+- The duplicated `중앙 종목 관리` label was removed.
+- Stock management context menu was reorganized as `전체 선택`, `선택 해제`, `종목삭제`, `루틴등록`, `루틴해제`.
+- The old `등록대기 선택` menu entry was removed.
+- The workflow lesson was confirmed: same-name GUI features must be modified only after tracing the actual visible event path.
+
+3. Verification Baseline
+
+- Code integration worktree final SHA: 7ff4bae8f0d06a3b6f0bb016e055685f9cbe22f9.
+- Code branch push completed successfully.
+- Code remote and local integration worktree were verified at ahead/behind 0/0 before this document freeze.
+- This Work Resume does not claim a full-project green test run.
+
+4. Protected Dirty And Untracked State
+
+- The main code worktree at C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto retained its pre-existing dirty and untracked files.
+- The main docs worktree at C:\Users\JIN KWANG CHUL\Documents\docs retained its pre-existing dirty and untracked files.
+- This document freeze was performed in a separate clean docs worktree.
+- Runtime, config, stocks, routine_instances, artifacts, and archive data were not modified by this document freeze.
+
+5. Not Completed Or Not Confirmed
+
+- Final design decision on whether the stock management window should remain or be removed: 사용자 결정 대기.
+- Unassigned-stock-register redesign: 사용자 결정 대기.
+- Any migration or storage-structure change for unassigned stocks: 사용자 결정 대기.
+- Next implementation task: 사용자 결정 대기.
+
+6. Next Session Start Point
+
+- Start from code branch `feat/restore-auto-trade-setting-ui` at 7ff4bae8f0d06a3b6f0bb016e055685f9cbe22f9.
+- Start from docs branch `agent/project-prompt-standard` at the pushed document freeze commit reported in the closing report.
+- Preserve main worktree dirty/untracked state unless the user explicitly targets it.
+- Do not infer a next feature from the unconfirmed stock management or unassigned-registration discussions.

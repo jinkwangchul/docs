@@ -430,6 +430,10 @@ Examples of evidence:
 - Log line
 - Queue or state record
 
+GUI execution-path rule:
+- When the same feature name exists in multiple windows, tables, or context menus, trace the actual visible widget signal, slot, condition branch, and final menu/action list before changing code.
+- A test against a similarly named helper, callback, or different window is not evidence that the user-visible GUI path was fixed.
+
 If evidence is missing, report "not confirmed".
 
 Report order for bug/feature work:
