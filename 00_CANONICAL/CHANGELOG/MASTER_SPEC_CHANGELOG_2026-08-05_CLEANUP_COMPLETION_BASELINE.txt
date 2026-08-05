@@ -1,0 +1,54 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-05
+Scope: Cleanup completion baseline
+
+New Canonical:
+
+- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-05_CLEANUP_COMPLETION_BASELINE.txt
+
+New Work Resume:
+
+- 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-05_CLEANUP_COMPLETION_BASELINE.txt
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: finalize/stock-management-20260803
+- Final code baseline: 1ff9d09bcfffa0f572137d39d44e8fd48097a2b8
+- Push status: completed before this document freeze
+
+Changed:
+
+- Recorded finalize cleanup completion as the latest implementation baseline.
+- Recorded removal of obsolete duplicate files:
+  - gui_global_review_required_window.py
+  - gui_operation_environment_settings_dialog.py
+  - gui_search_stock_register_dialog.py
+  - _state_policy.py
+- Recorded review integrity Source of Truth consolidation through gui_auto_trade_integrity.py.
+- Recorded operation policy Source of Truth consolidation through state_policy.py.
+- Recorded force-unregister reset Source of Truth consolidation through gui_auto_trade_unregister.py.
+- Recorded removal of the legacy SearchStockRegisterDialog path in favor of InstanceStockSearchRegisterDialog.
+- Recorded two production defect fixes:
+  - manual ATS selected-target contract alignment
+  - force-unregister read_orders_data import fix
+
+Preserved:
+
+- Runtime/config/stocks/orders contracts.
+- Queue, SendOrder, Chejan, OperationCommandService, writer, review, emergency, recovery, close, liquidation, archive, and delete boundaries.
+- Compatibility wrappers needed by current or dirty-branch import surfaces.
+- Original dirty code worktree and original dirty docs worktree state.
+
+Explicitly not recorded:
+
+- No structure-improvement work is confirmed here.
+- No UI prototype result is confirmed here.
+- No next Big Feature is selected here.
+- No dirty branch feature is merged here.
+
+Validation:
+
+- Finalize branch remote and local SHA were verified at 1ff9d09bcfffa0f572137d39d44e8fd48097a2b8 before this document freeze.
+- Cleanup commits were validated with targeted compile, import, smoke, focused test, search, and diff checks.
+- This changelog records confirmed cleanup implementation only.

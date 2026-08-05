@@ -1,0 +1,68 @@
+WORK RESUME LATEST
+Date: 2026-08-05
+Scope: Cleanup completion and next-session recovery baseline
+
+1. Repository Baselines
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Protected main local path: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Finalize worktree path: C:\Users\JIN KWANG CHUL\Documents\_worktrees\kiwoom_auto_finalize_20260803
+- Branch: finalize/stock-management-20260803
+- Finalize HEAD: 1ff9d09bcfffa0f572137d39d44e8fd48097a2b8
+- Remote branch: origin/finalize/stock-management-20260803
+- Remote SHA verified before document freeze: 1ff9d09bcfffa0f572137d39d44e8fd48097a2b8
+- Finalize worktree status before document freeze: clean, staged none
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Protected main local path: C:\Users\JIN KWANG CHUL\Documents\docs
+- Document freeze worktree path: C:\Users\JIN KWANG CHUL\Documents\_worktrees\docs_freeze_cleanup_20260805
+- Source branch: origin/agent/project-prompt-standard
+- Source SHA before this freeze document work: c3444890cb44d5dd54447e3a1cbd333e736b3a20
+- This Work Resume is part of the document freeze commit reported in the closing result.
+
+2. Completed In This Window
+
+- Removed verified unused imports, constants, helpers, shadowed functions, and dead methods from the finalize branch.
+- Removed obsolete duplicate files for global review window, operation environment settings dialog, search stock registration dialog, and legacy state policy.
+- Centralized review integrity helpers through gui_auto_trade_integrity.py.
+- Centralized operation policy default/read behavior through state_policy.py.
+- Converted gui_operation_environment.py and gui_auto_trade_setting_window.py public helpers to state_policy wrappers.
+- Centralized force-unregister reset helpers through gui_auto_trade_unregister.py.
+- Removed the legacy SearchStockRegisterDialog route and kept InstanceStockSearchRegisterDialog as the registration path.
+- Fixed the manual ATS selected-target contract.
+- Fixed the force-unregister read_orders_data NameError path.
+
+3. Verification Summary
+
+- Each cleanup commit was verified with targeted py_compile, import gui_main, offscreen GUI smoke tests, focused tests, search checks, and git diff --check appropriate to the changed files.
+- The final _state_policy.py removal was verified with import gui_main, state_policy smoke checks, operation environment and auto-trade setting offscreen creation, operation/status/ATS/review/emergency focused tests, repo search for _state_policy, and git diff --check.
+- The finalize branch was clean and matched its remote SHA at the start of this document freeze.
+- This Work Resume does not claim a full repository test run beyond the focused verification performed during cleanup.
+
+4. Protected Dirty And Untracked State
+
+- The original code worktree at C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto remains dirty on feat/restore-auto-trade-setting-ui and was not modified by this freeze.
+- The original docs worktree at C:\Users\JIN KWANG CHUL\Documents\docs had pre-existing modified files and was not used for file edits.
+- This document freeze was prepared in a separate clean docs worktree to avoid mixing with protected local changes.
+- Runtime, config, stocks, orders, docs runtime data, PROJECT_CHANGELOG.txt, and operation_policy.json were not modified by code cleanup closure.
+
+5. Not Completed Or Not Confirmed
+
+- Structure-improvement work is excluded from this freeze.
+- UI prototype work must be confirmed by the user before any structure-improvement work starts.
+- No next Big Feature is selected.
+- No dirty branch hunk is merged by this document freeze.
+- Remaining deferred compatibility decisions must be handled only after explicit user instruction.
+
+6. Next Session Start Point
+
+- Start from code branch finalize/stock-management-20260803 at 1ff9d09bcfffa0f572137d39d44e8fd48097a2b8.
+- Start from docs branch agent/project-prompt-standard at the pushed document freeze commit reported in the closing result.
+- Treat cleanup as complete unless the user explicitly asks for another audit.
+- Do not begin structure-improvement work until the UI prototype is confirmed.
+- Do not select the next feature without user instruction.
+- Preserve protected dirty/untracked state in the original code and docs worktrees.

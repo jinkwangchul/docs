@@ -1,0 +1,80 @@
+UPDATE
+Date: 2026-08-03
+Scope: Stock management recovery point, protected review lifecycle, emergency release gate, and RoutineAssignWindow removal
+
+Reference code commit:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: finalize/stock-management-20260803
+- Commit: e7c1101
+- Commit message: feat: consolidate stock management and remove routine assignment window
+
+1. Stock Management Display Contract
+
+- The stock management window keeps its current storage contracts.
+- Runtime, config, stocks, orders, and routine-instance schemas are unchanged.
+- The stock management operation-status column displays operator-facing states only:
+  - 미지정
+  - 운영정지
+  - 운영중
+  - 긴급정지
+  - 검토종목
+- The auto-trade setting window keeps its existing detailed runtime status display contract.
+- The review-required window keeps its existing case-based status display contract.
+
+2. Stock Management Performance Contract
+
+- The previous 검증상태 column is replaced by 실적.
+- The stock management 실적 value reuses the auto-trade operation performance Source of Truth.
+- The visible format is:
+
+  횟수(N) | 손익(X%) | 금액(Y원) | 효율(Z)
+
+- Count, profit rate, realized profit amount, and efficiency definitions follow the existing auto-trade operation performance helpers.
+- Sorting badges for 횟수, 손익, 금액, 효율 are outside the table header and use the existing badge style.
+- The 전체결산 summary bar is a fixed footer between the table and bottom buttons.
+- 전체결산 is display-only and reads performance data only.
+
+3. Protected Review State Contract
+
+- A stock collected into review management is protected until the operator completes an explicit review-management procedure.
+- Protected review state blocks:
+  - routine assignment
+  - routine unassignment
+  - registered-stock unregister
+  - stock delete
+  - general state changes that bypass review management
+- The shared review-state predicate remains the Source of Truth.
+- Writers must not be reached when the policy Gate blocks an operation.
+- Review-management entry and official review-management return/removal flows remain allowed.
+
+4. Emergency Release Gate Contract
+
+- Emergency release is not a simple flag clear.
+- Emergency release must pass the existing operation data integrity checks before resolving review state.
+- Operation data inconsistency, including holding quantity 0 with average price present, blocks emergency release.
+- A blocked release must not store review_status=RESOLVED.
+- The review return Gate is not relaxed.
+
+5. Routine Assignment Window Removal
+
+- The separate RoutineAssignWindow GUI is removed from production.
+- The bottom stock-management 루틴등록 button that opened the separate window is removed.
+- Legacy open functions and imports for RoutineAssignWindow are removed.
+- Stock-management right-click routine assignment remains the supported visible path:
+
+  right-click stock row -> 루틴등록 -> select routine instance -> existing direct backend
+
+- Existing routine assignment Gate, Writer, blocked report, Toast, and refresh contracts remain.
+
+6. Explicit Exclusions
+
+- close, liquidation, early-close, and completion-check work is not part of this recovery point.
+- gui_schedule_window.py large reduction is not part of this recovery point.
+- Runtime/config/stocks/orders data files are not changed.
+- tests/test_auto_trade_operation_exclusion.py is not included in this recovery point.
+
+7. Follow-Up
+
+- Next investigation target: classify junk/dead code in major code files.
+- gui_schedule_window.py cleanup must be handled in a separate commit if still required.

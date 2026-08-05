@@ -25,6 +25,29 @@ Rules:
 - If implementation and contract conflict, fix the implementation. Do not rewrite the contract to fit AI interpretation.
 - User-unapproved contract change is project contamination.
 
+Close Process Reference Rule:
+- For 조기마감, 자동마감, 청산정책, 마감정책, and 즉시청산, use
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-01_CLOSE_PROCESS_OPERATION_CONTRACT.txt`
+  as the first technical Source of Truth.
+- Archive and Legacy close-process material is historical evidence only and
+  must not be used to decide current operating contracts.
+- If Archive or Legacy material conflicts with Current Canonical, Current
+  Canonical wins.
+- If UI terminology and document terminology conflict, the confirmed UI term
+  wins.
+
+GUI State And Context Menu Reference Rule:
+- For REVIEW_REQUIRED, data inconsistency, protected-row display, situation
+  signal color, status/situation sorting, and AutoTradeSettingWindow
+  routine-tree `종목등록` context-menu behavior, use
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`
+  as the first technical Source of Truth.
+- When the same action label appears in multiple GUI screens, first trace the
+  actual visible event path and handler used by the user. Fixing another screen
+  with the same label is not a valid implementation.
+- Tests must target the actual visible GUI handler for the requested screen,
+  not only a similarly named helper or another window's context menu.
+
 ## 2. Project Identity
 
 Automatic Trading Project:
@@ -46,10 +69,51 @@ Documentation Repository:
   `origin`
 
 Repository verification rule:
-- At new-session startup, run `git remote -v` for each repository that will be used.
-- Verify that the remote URL matches the corresponding Project Identity GitHub Repository.
-- Do not start project work if the local repository remote does not match Project Identity.
-- Report the mismatch and wait for user instruction instead of guessing or switching repositories.
+- At new-session startup, first determine the execution environment.
+- If local Git command execution is available, run `git remote -v` for each repository that will be used.
+- If local Git command execution is not available, do not invent or infer local Git command results.
+- Verify the remote URL against the corresponding Project Identity GitHub Repository only from evidence available in the current execution environment.
+- Do not start project work if an available repository remote does not match Project Identity.
+- Report a confirmed mismatch, or report that local verification is unavailable, and wait for user instruction instead of guessing or switching repositories.
+
+Execution Environment Policy:
+- Before starting project work, the agent must identify what repository evidence
+  it can actually access in the current environment.
+- Report this first:
+
+```text
+Execution Environment
+
+- Local Repository Access: Available / Not Available
+- Local Git Command Execution: Available / Not Available
+- GitHub Repository Access: Available / Not Available
+```
+
+Environment A: local Git execution available.
+- Examples: Codex CLI, local Codex, VSCode, or an agent with direct access to
+  the user's local repositories.
+- Actually run, when relevant:
+
+```text
+git remote -v
+git branch --show-current
+git rev-parse HEAD
+git status -sb
+git diff --stat
+```
+
+- Use the command results as evidence.
+
+Environment B: local Git execution unavailable.
+- Examples: ChatGPT Web, GitHub Connector only, or an agent without local
+  repository access.
+- Do not guess local repository state.
+- Do not fabricate `git remote`, `git status`, `git diff`, branch, commit, or
+  dirty-state results.
+- Clearly separate information that is visible through GitHub from information
+  that is not locally verifiable.
+- If local state is required, ask the user to run the local commands or move the
+  work to a local-execution agent.
 
 ## 3. Work Purpose
 
@@ -184,19 +248,26 @@ Before reading project documents or source code, identify the active work enviro
 - Local Codex / VSCode: use the local docs repository and local code repository as the working baseline.
 
 Use the source that matches the active environment. Do not mix GitHub connector state and local repository state unless the user explicitly asks for a comparison.
+Apply the Execution Environment Policy before reporting repository state. Local Git command results may be reported only when local Git command execution is available.
 
 Startup execution flow:
 
 1. Read the Latest Work Resume only for the previous completion state and next implementation target.
-2. Confirm the current Git Baseline (branch and commit). Report to the user only if it differs from the expected baseline.
+2. Confirm the current Git Baseline (branch and commit) using evidence available in the current execution environment. If local Git command execution is available, run the required local Git commands. If it is not available, report local-only fields as not confirmed instead of guessing.
 3. If the next implementation scope is clear from the Work Resume, start implementation immediately.
-4. If no explicit next implementation task exists in the Source of Truth, identify the earliest user-visible production gap in the current baseline, select that gap as this session's implementation starting point, briefly report the rationale, and immediately begin implementation.
+4. If the Latest Work Resume explicitly states that no next implementation item
+   is authorized, do not infer or select a production gap. Wait for the user's
+   next implementation instruction.
+5. If no explicit next implementation task exists and the Latest Work Resume
+   does not prohibit selecting one, identify the earliest user-visible
+   production gap in the current verified baseline, briefly report the
+   rationale, and begin only within the established Source of Truth.
 
 Reference rules:
 
-5. Refer to the corresponding Latest Canonical section only when needed during implementation.
-6. Use Reference Index only to locate a required document.
-7. Re-read this file only when operating rules changed, a new operating rule must be applied, or the user asks.
+6. Refer to the corresponding Latest Canonical section only when needed during implementation.
+7. Use Reference Index only to locate a required document.
+8. Re-read this file only when operating rules changed, a new operating rule must be applied, or the user asks.
 
 Forbidden:
 - Broad structure audit without need
@@ -204,6 +275,67 @@ Forbidden:
 - Adding startup checks inferred from general development or Git practices
 - Treating old Work Resume next steps as current user instruction
 - Starting implementation before the fixed problem and allowed scope are known
+
+### PR History Exclusion Policy
+
+Session Startup and restoration after Project Freeze must not use Pull Request
+or merge history as the working baseline.
+
+The following are not Startup Sources:
+- Pull Request lists
+- closed or merged Pull Requests
+- merge history
+- the latest state of the GitHub default branch such as `master` or `main`
+- recent merge commits
+- past feature branches
+- past review records
+
+These may be inspected only when the user explicitly requests them. Even then,
+they are reference material and cannot replace the approved restoration
+baseline.
+
+Startup Source priority is:
+1. Latest user instruction
+2. `AGENT_WORKFLOW_REFERENCE.txt`
+3. Latest Official Canonical
+4. Latest Work Resume
+5. user-specified branch
+6. user-specified commit
+7. actual Git state available in the current execution environment
+
+Pull Request or merge history cannot replace, reorder, or reinterpret these
+sources.
+
+Branch Resolution Rule:
+- When the user specifies a branch and commit, that pair is the restoration
+  baseline.
+- Verify only whether the specified branch exists and whether the specified
+  commit exists in the available repository evidence.
+- If the remote branch cannot be found, do not infer or replace it from a Pull
+  Request, merge history, a recent merge commit, a past feature branch, or the
+  default branch.
+- If the specified branch or commit cannot be confirmed, report exactly what
+  could not be confirmed and stop until the user provides direction.
+
+Work Resume Rule:
+- If the Latest Work Resume states that no next implementation item is
+  authorized, do not infer a Production Gap.
+- Do not inspect Pull Requests or merge history to invent or select the next
+  feature.
+- Wait for the user's explicit implementation instruction.
+
+GitHub Interpretation Rule:
+- GitHub is used for backup, recovery, and baseline verification.
+- A recent Pull Request, merge, commit, or default-branch state is not an
+  implementation-start authority.
+
+Forbidden:
+- Inferring that `master` or `main` is the current baseline because it contains
+  work merged after a Pull Request.
+- Replacing a user-specified branch with the default branch.
+- Interpreting current implementation state from a Pull Request number.
+- Finding and starting work from a Pull Request when the Latest Work Resume
+  does not authorize a next task.
 
 Reference Index is only an index. It is not an operating policy document.
 Follow only the operating procedures defined by this project. Documents support implementation; they must not become a repeated startup gate when the Latest Work Resume already provides the next implementation point.
@@ -327,12 +459,83 @@ Forbidden:
 The final prompt must include:
 - Environment resolution
 - Source of Truth selection
-- `git remote -v` verification against Project Identity before work starts
+- Conditional repository verification against Project Identity before work starts:
+  run `git remote -v`, `git branch --show-current`, `git rev-parse HEAD`,
+  `git status -sb`, and `git diff --stat` only when local Git command execution
+  is available; otherwise report GitHub-visible information and mark local-only
+  verification fields as not confirmed.
+- Repository Information block from the Conversation Closing Template
 - Latest repository branch and commit
 - Dirty or untracked state to preserve
 - Recently completed work
 - Current implementation location
 - The first concrete next implementation task, if one is defined by the Source of Truth
+
+Conversation Closing Template:
+
+The Next Session Startup Prompt must include the following Repository Information
+block. Do not omit, abbreviate, move, or manually rewrite this block. Fill Local
+Repository, GitHub Repository, and Remote from Project Identity. Fill Branch and
+Commit from the verified Conversation Closing result.
+
+```text
+==================================================
+Repository Information
+==================================================
+
+자동매매 프로젝트
+
+Local Repository
+
+<Project Identity에서 자동 참조>
+
+GitHub Repository
+
+<Project Identity에서 자동 참조>
+
+Remote
+
+<Project Identity에서 자동 참조>
+
+현재 Branch
+
+<Conversation Closing 완료 후 실제 Branch>
+
+현재 Commit
+
+<Conversation Closing 완료 후 실제 Commit>
+
+--------------------------------------------------
+
+문서 저장소
+
+Local Repository
+
+<Project Identity에서 자동 참조>
+
+GitHub Repository
+
+<Project Identity에서 자동 참조>
+
+Remote
+
+<Project Identity에서 자동 참조>
+
+현재 Branch
+
+<Conversation Closing 완료 후 실제 Branch>
+
+현재 Commit
+
+<Conversation Closing 완료 후 실제 Commit>
+```
+
+Repository Information rules:
+- The Repository Information block is mandatory in every Next Session Startup Prompt.
+- The block must include both the Automatic Trading Project and the Documentation Repository.
+- Local Repository, GitHub Repository, and Remote values must be copied from Project Identity.
+- Branch and Commit values must be copied from the final verified Conversation Closing result.
+- The prompt author must not manually invent, abbreviate, omit, or relocate repository information.
 
 ## 12. Local Git And GitHub
 
@@ -429,6 +632,10 @@ Examples of evidence:
 - Runtime file content
 - Log line
 - Queue or state record
+
+GUI execution-path rule:
+- When the same feature name exists in multiple windows, tables, or context menus, trace the actual visible widget signal, slot, condition branch, and final menu/action list before changing code.
+- A test against a similarly named helper, callback, or different window is not evidence that the user-visible GUI path was fixed.
 
 If evidence is missing, report "not confirmed".
 
