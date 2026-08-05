@@ -561,6 +561,11 @@ Rules:
 - Stage only specified files.
 - Do not reset, restore, stash, clean, or delete protected dirty/untracked files unless the user explicitly asks.
 - Report branch, local SHA, remote SHA, ahead/behind, status, diff, and untracked files when doing baseline verification.
+- Use the original code repository and original docs repository as the normal
+  working baselines.
+- Do not create a new worktree unless the user explicitly approves it.
+- Completion is judged by confirmed changes in the original repository plus
+  the required verification, not by an isolated temporary worktree alone.
 
 ## 12. Document Roles
 

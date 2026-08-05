@@ -52,3 +52,10 @@ Validation:
 - Finalize branch remote and local SHA were verified at 1ff9d09bcfffa0f572137d39d44e8fd48097a2b8 before this document freeze.
 - Cleanup commits were validated with targeted compile, import, smoke, focused test, search, and diff checks.
 - This changelog records confirmed cleanup implementation only.
+
+Project maintenance:
+
+- Worktree cleanup is complete. Temporary verify, freeze, baseline, patch, and
+  cleanup worktrees were removed, and the original code and docs repositories
+  are now the sole working baselines unless the user explicitly approves a new
+  worktree.
