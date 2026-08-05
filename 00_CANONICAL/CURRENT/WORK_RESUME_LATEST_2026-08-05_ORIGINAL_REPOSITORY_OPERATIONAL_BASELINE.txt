@@ -1,0 +1,78 @@
+WORK RESUME LATEST
+Date: 2026-08-05
+Scope: Original repository operational baseline after worktree cleanup
+
+1. Current Working Baseline
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Original local path: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- HEAD: 137a94cc0ac38ffbb8274bafac4b4102266c29e0
+- Upstream: origin/feat/restore-auto-trade-setting-ui
+- Upstream SHA: 137a94cc0ac38ffbb8274bafac4b4102266c29e0
+- Local and remote SHA match.
+- Staged files: none at baseline check.
+- Existing dirty and untracked files are protected and must not be deleted, reset, restored, stashed, or cleaned without explicit user instruction.
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Original local path: C:\Users\JIN KWANG CHUL\Documents\docs
+- Branch: agent/project-prompt-standard
+- HEAD: 7f1b298a44e545b0a0ab21e2d65b7a1fa628e29b
+- Upstream: origin/agent/project-prompt-standard
+- Upstream SHA: 7f1b298a44e545b0a0ab21e2d65b7a1fa628e29b
+- Local and remote SHA match at baseline check.
+- Staged files: none at baseline check.
+- Existing dirty and untracked files are protected and must not be deleted, reset, restored, stashed, or cleaned without explicit user instruction.
+
+2. Workspace Policy
+
+- Use only the original code repository and original docs repository as the working baselines.
+- Registered Git worktrees have been reduced to one original worktree per repository.
+- Temporary, verification, freeze, and cleanup worktrees were removed after their useful content was confirmed reflected, superseded, or not required.
+- Do not create a new worktree unless the user explicitly approves it.
+- Completion must be judged by actual original repository code, actual original repository docs, and verification evidence from those originals.
+
+3. Recently Completed Work
+
+- Stock integrity automation was reflected into the original code repository.
+- The legacy manual integrity-check button and legacy dialog route were removed from the original stock register flow.
+- Stock register integrity status label and toast notification paths are present.
+- REVIEW_REQUIRED integrity issues are connected through the official review writer path.
+- Server consistency checking remains unimplemented and is represented as SERVER_NOT_CHECKED.
+- The force-unregister read_orders_data import defect was fixed in the original code repository.
+- The related local commits were pushed to the original code branch.
+- Code and docs temporary worktrees, local branches, metadata, empty worktree folders, and temporary patch folders were cleaned up after review.
+
+4. Preserved State
+
+- The original code repository remains dirty with existing production, test, runtime, stock, report, and untracked changes.
+- The original docs repository remains dirty with existing documentation changes and untracked documents.
+- Staged files were empty at this operational baseline check.
+- No reset, restore, stash, or clean operation is permitted for protected dirty or untracked state without explicit user instruction.
+- Do not modify unrelated files while performing future focused tasks.
+
+5. Current Restrictions
+
+- Do not start structure-improvement work without explicit user instruction.
+- Do not begin large GUI structure separation before the UI prototype is confirmed by the user.
+- Do not redesign shared changelog, log, or now_text helpers without a specific approved task.
+- Do not redesign assignment-aware helpers without a specific approved task.
+- Do not select the next feature or Big Feature without user instruction.
+
+6. Known Unresolved State
+
+- Server-side stock integrity checking is not implemented.
+- Some pre-existing dirty production contracts and dirty test expectations are known to be out of sync.
+- Large PyQt single-process test runs have a history of abnormal teardown behavior.
+- These items must not be fixed opportunistically; handle them only when the user gives a specific next goal.
+
+7. Next Resume Rules
+
+- Before any implementation, check both repositories for remote, branch, HEAD, upstream SHA, status, staged files, and registered worktrees.
+- If documentation and actual code conflict, prefer actual code and execution evidence, then report the mismatch.
+- Report the current baseline before starting work.
+- Wait for the user to choose the next implementation goal.
