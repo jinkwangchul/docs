@@ -1,0 +1,66 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-05
+Scope: Cleanup completion baseline for stock management finalize branch
+
+Reference code baseline:
+
+- Code repository: jinkwangchul/kiwoom_auto
+- Finalize worktree: C:\Users\JIN KWANG CHUL\Documents\_worktrees\kiwoom_auto_finalize_20260803
+- Branch: finalize/stock-management-20260803
+- Final code baseline: 1ff9d09bcfffa0f572137d39d44e8fd48097a2b8
+- Push status: completed before this document freeze
+- Remote baseline: origin/finalize/stock-management-20260803 at 1ff9d09bcfffa0f572137d39d44e8fd48097a2b8
+
+1. Cleanup Completion State
+
+- The finalize branch cleanup pass is complete for the confirmed dead-code and duplicate-code scope handled in the closing window.
+- Removed items were limited to verified unused imports, constants, helpers, shadowed functions, obsolete files, and legacy registration/review/environment copies.
+- No new feature implementation, UI redesign, storage migration, or broad structure-improvement work is recorded as complete in this Canonical.
+- Remaining structure-improvement ideas are excluded from this Canonical and must wait until the UI prototype is confirmed by the user.
+
+2. Removed Legacy Files And Paths
+
+The following obsolete or duplicate production files were removed from the finalize branch:
+
+- gui_global_review_required_window.py
+- gui_operation_environment_settings_dialog.py
+- gui_search_stock_register_dialog.py
+- _state_policy.py
+
+These removals preserve the current production replacements:
+
+- gui_review_required_window.py remains the review-required window path.
+- gui_operation_environment.py remains the operation environment dialog path.
+- InstanceStockSearchRegisterDialog remains the stock registration path.
+- state_policy.py remains the operation policy and state/session policy Source of Truth.
+
+3. Source Of Truth Results
+
+- Review integrity helper logic is centralized through gui_auto_trade_integrity.py.
+- Operation policy default/read logic is centralized through state_policy.py.
+- gui_operation_environment.py keeps public wrappers that delegate to state_policy.py.
+- gui_auto_trade_setting_window.py keeps compatibility wrappers that delegate to state_policy.py.
+- Force-unregister reset logic is centralized through gui_auto_trade_unregister.py.
+- gui_auto_trade_setting_window.py keeps compatibility wrappers for force-unregister reset helper names.
+- The legacy _state_policy.py copy was removed after state_policy.py was confirmed as the active replacement.
+
+4. Production Defect Fixes Confirmed In This Window
+
+- Manual ATS selected target contract was aligned so wrapper/backend selected-target calls no longer raise TypeError and explicit snapshots are preserved.
+- gui_auto_trade_unregister.py now imports read_orders_data for force-unregister order reset, removing the NameError path.
+- Regression tests were added or strengthened for these defect fixes.
+
+5. Maintained Safety Boundaries
+
+- Runtime/config/stocks/orders data contracts were not redefined by this cleanup.
+- Queue, SendOrder, Chejan, OperationCommandService, writer, review transition, emergency, recovery, close, liquidation, archive, and delete boundaries were preserved.
+- PROJECT_CHANGELOG.txt and operation_policy.json were not part of the final code cleanup commits.
+- The original dirty worktree at C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto was preserved and not normalized, reset, restored, stashed, or cleaned.
+
+6. Explicitly Excluded From This Canonical
+
+- UI prototype work is not started or approved by this Canonical.
+- Broad structure-improvement work is not started or approved by this Canonical.
+- No next Big Feature is selected by this Canonical.
+- Dirty branch functionality is not merged by this Canonical.
+- Remaining compatibility surfaces or dirty-branch-dependent helpers are not declared removable here.
