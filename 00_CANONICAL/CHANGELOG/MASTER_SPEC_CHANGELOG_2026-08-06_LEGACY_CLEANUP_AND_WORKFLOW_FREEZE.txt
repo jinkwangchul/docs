@@ -1,0 +1,55 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-06
+Scope: Legacy cleanup implementation and workflow freeze
+
+New Canonical:
+
+- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-06_LEGACY_CLEANUP_AND_WORKFLOW_FREEZE.txt
+
+New Work Resume:
+
+- 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-06_LEGACY_CLEANUP_AND_WORKFLOW_FREEZE.txt
+
+Changed operating reference:
+
+- 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: 8c6d48f6609e7aeb073649bd5047a035095ea65a
+- Push: completed
+
+Recorded implementation:
+
+- Blocked-action report removal.
+- Stock order history entry-point migration to Stock Management.
+- Permanent stock initialization contract.
+- Legacy state/time policy Writer removal.
+- Shared selection style and integrity Reader restoration.
+- Missing GUI service dependency restoration.
+- Early-close Toast feedback restoration.
+- Force unregister, Force reset, Force dialogs, and dead order-archive Writer
+  removal.
+
+Recorded workflow policy:
+
+- Feature-centered concise task prompts.
+- No repeated common operating procedures or oversized procedural checklists.
+- Function-and-result-centered reporting and limited Git-internal terminology.
+- Official retirement of Git Worktree operation and original-repository-only
+  execution.
+
+Preserved:
+
+- Existing unrelated dirty and untracked files in both repositories.
+- Runtime, Queue, Broker, SendOrder, review, emergency, and stock initialization
+  boundaries outside the committed scopes.
+
+Not recorded as complete:
+
+- ATS explicit-target recovery.
+- Scheduled multi-target recovery.
+- Toast reference cleanup recovery.
+- Any uncommitted working-tree implementation.

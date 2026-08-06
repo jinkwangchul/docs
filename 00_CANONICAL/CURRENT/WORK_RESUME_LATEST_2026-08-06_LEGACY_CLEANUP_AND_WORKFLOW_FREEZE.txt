@@ -1,0 +1,93 @@
+WORK RESUME LATEST
+Date: 2026-08-06
+Scope: Legacy cleanup completion and original-repository workflow freeze
+
+1. Current Baselines
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Local repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: 8c6d48f6609e7aeb073649bd5047a035095ea65a
+- Remote: origin/feat/restore-auto-trade-setting-ui
+- Local and remote SHA match.
+- Staged files: none at code freeze verification.
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Local repository: C:\Users\JIN KWANG CHUL\Documents\docs
+- Branch: agent/project-prompt-standard
+- Baseline: the pushed commit on this branch that contains this Work Resume
+  and the 2026-08-06 Reference Index pointers.
+- Confirm the exact SHA with `git rev-parse HEAD` at session startup.
+
+2. Completed Work
+
+Code commits after the previous operational baseline:
+
+- 2678c5f: removed the blocked-action report feature and outputs.
+- 6df8719: moved stock order history to Stock Management.
+- 141147e: replaced stock deletion with permanent stock initialization.
+- e1e0d91: removed legacy state and time policy Writers.
+- 3742c47: restored the shared table selection style.
+- a7996ce: restored stock integrity Readers.
+- fb1b259: restored missing GUI service dependencies.
+- a73c8d1: restored early-close Toast feedback.
+- 8c6d48f: removed Force unregister and dead archive paths.
+
+User-visible final behavior:
+
+- Stock history is opened from Stock Management.
+- Stock initialization permanently removes an eligible stock after explicit
+  confirmation and does not use Force or archive behavior.
+- Early-close feedback is non-blocking for login, no-target, and success cases.
+- Unsafe unregister targets remain unchanged and are reported as blocked.
+
+Documentation update:
+
+- Task prompts are feature-centered and concise.
+- Repeated common Git procedure and oversized procedural checklists are
+  forbidden.
+- Reports focus on implemented behavior and verified results; Git internals are
+  used only when required.
+- Git Worktree operation is retired. Work uses only the original repository
+  assigned to the task, and discovered extra worktrees are reported without
+  modification.
+
+3. Validation State
+
+- Code local and remote SHA match at
+  8c6d48f6609e7aeb073649bd5047a035095ea65a.
+- The committed code scopes passed their focused 32-bit compile, import, GUI,
+  service, integrity, review, initialization, and Force cleanup checks.
+- The documentation freeze files pass `git diff --check` before commit.
+
+4. Protected Dirty And Untracked State
+
+- The code repository intentionally remains dirty with pre-existing
+  Production, Runtime, stock, routine-instance, test, diagnostic, archive, and
+  untracked changes outside the completed commits.
+- The docs repository intentionally retains pre-existing modified Historical,
+  Current, Update, and untracked documents outside this freeze.
+- Do not reset, restore, stash, clean, delete, or include those protected files
+  in unrelated work.
+
+5. Known Unresolved State
+
+- The full multi-target regression module is not green on the committed
+  baseline because ATS explicit-target handling, scheduled multi-target result
+  handling, and Toast reference cleanup are not fully restored there.
+- Large PyQt single-process test runs may terminate abnormally; use isolated
+  focused processes when required by the test contract.
+- These gaps are not approved next work merely because they are recorded here.
+
+6. Next Session Start Point
+
+- No next implementation feature is approved.
+- Wait for the user's next functional goal.
+- If the user selects multi-target recovery, begin by comparing the committed
+  test contracts with the existing protected working-tree implementations for
+  ATS, scheduled target snapshots, and Toast cleanup. Do not infer that work as
+  approved from this note alone.

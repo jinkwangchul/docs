@@ -1,0 +1,74 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-06
+Scope: Original repository legacy cleanup and operational workflow freeze
+
+Reference code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Local repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: 8c6d48f6609e7aeb073649bd5047a035095ea65a
+- Remote: origin/feat/restore-auto-trade-setting-ui
+- Local and remote SHA match.
+
+1. Confirmed Implementation
+
+- The blocked-action report UI, Writer path, dedicated module, and generated
+  blocked-action report files were removed.
+- Stock order history is entered from Stock Management as `종목이력`; the old
+  Auto Trade Setting `주문상태 보기` entry point was removed.
+- Stock deletion was replaced by permanent `종목초기화`. Initialization is
+  allowed only after the official eligibility check and removes the stock
+  directory without Force deletion or archive creation.
+- Legacy `_state_policy.py`, `time_policy.py`, legacy state Writers, and their
+  dead compatibility paths were removed after active helpers were retained in
+  the current policy modules.
+- Shared table selection styling and stock integrity Readers required by the
+  active GUI import path were restored.
+- Pending-order integrity review transition, new-assignment operation
+  exclusion, selected-stock emergency stop/release, and the active schedule
+  dialog import boundary were restored.
+- Early-close login, no-target, and success feedback uses the common Toast
+  path instead of the obsolete blocking feedback path.
+- Force unregister was removed. Stocks with holdings, pending orders, active
+  operation, REVIEW_REQUIRED, emergency stop, or integrity problems are
+  blocked from unregister instead of being reset.
+
+2. Force Unregister Safety Contract
+
+- Unregister classification is `immediate` or `blocked`; `force` is not a
+  valid category.
+- Only safe immediate targets reach the existing unregister Writer.
+- A blocked target does not mutate state.json or orders.json.
+- Force state reset, Force order reset, Force confirmation dialogs, and the
+  `orders_archive.json` Writer do not exist in Production.
+- Review, emergency, integrity, Runtime, Queue, Broker, SendOrder, and stock
+  initialization safety boundaries remain separate.
+
+3. Validation Evidence
+
+- The committed changes were verified with 32-bit Python 3.11.9 compile and
+  GUI import checks.
+- Early-close command-service regression: 78 tests passed.
+- Force cleanup validation passed for command service, status recalculation,
+  integrity, review transition, stock initialization, and Force-related
+  multi-target contracts.
+- Force symbols and the Production `orders_archive.json` Writer were confirmed
+  absent before the final Force cleanup commit.
+- Git diff checks passed for the committed scopes.
+
+4. Excluded And Unresolved State
+
+- Existing dirty and untracked code, Runtime, stock data, diagnostics, tests,
+  and experimental files are not part of this Canonical.
+- The full multi-target test module still exposes separate baseline gaps in
+  ATS explicit-target handling, scheduled multi-target handling, and Toast
+  reference cleanup. These are not Force unregister regressions and are not
+  recorded as completed.
+- No next feature is approved by this Canonical.
+
+5. AI Operating Rules
+
+- AI operating procedure is defined only in
+  `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt` and is not duplicated
+  in this technical Canonical.

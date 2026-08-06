@@ -561,11 +561,15 @@ Rules:
 - Stage only specified files.
 - Do not reset, restore, stash, clean, or delete protected dirty/untracked files unless the user explicitly asks.
 - Report branch, local SHA, remote SHA, ahead/behind, status, diff, and untracked files when doing baseline verification.
-- Use the original code repository and original docs repository as the normal
-  working baselines.
-- Do not create a new worktree unless the user explicitly approves it.
+- Use only the original repository assigned to the task. The original code
+  repository and original docs repository are the sole working baselines for
+  their respective roles.
+- Git Worktree operation is officially retired. Do not create, switch to, or
+  operate additional worktrees for isolation, verification, or parallel work.
+- If another worktree is discovered, do not modify, remove, prune, or otherwise
+  operate it. Report it and continue only from the original repository when safe.
 - Completion is judged by confirmed changes in the original repository plus
-  the required verification, not by an isolated temporary worktree alone.
+  the required verification.
 
 ## 12. Document Roles
 
@@ -591,15 +595,21 @@ Rules:
 
 ## 13. Prompt Standard
 
-Permanent operating rules are not repeated in every task prompt.
+Task prompts are concise execution directions, not repeated operating manuals.
 
 Task prompt should contain only:
 
-1. Purpose
-2. Target scope
-3. Additional restrictions unique to this task
-4. Verification
-5. Report format
+1. Functional goal
+2. Change scope
+3. Required verification
+4. Additional restrictions unique to the task, only when needed
+5. Result report requirements, only when needed
+
+Do not repeat permanent rules already defined in this document. Do not write a
+long checklist whose procedure is larger than the feature being implemented.
+User reports focus on the implemented function, verified result, and remaining
+real blocker. Use Git internals only when an exact Git operation or diagnosis
+requires them.
 
 Default prompt length should stay small:
 - Analysis: about 10-20 lines when possible
@@ -612,6 +622,7 @@ Prompt checklist:
 - Does it avoid unrelated Git, test, document, or collaboration workflow instructions?
 - Is the purpose one sentence?
 - Is the report format not excessive?
+- Is the procedure shorter and simpler than the feature work it directs?
 
 ## 14. Verification And Reporting
 
