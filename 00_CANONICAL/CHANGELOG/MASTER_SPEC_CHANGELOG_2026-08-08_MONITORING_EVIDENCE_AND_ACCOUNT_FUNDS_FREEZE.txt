@@ -1,0 +1,57 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-08
+Scope: Main monitoring, diagnostic evidence, and Account Funds freeze
+
+New Canonical:
+
+- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-08_MONITORING_EVIDENCE_AND_ACCOUNT_FUNDS_FREEZE.txt
+
+New Work Resume:
+
+- 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-08_MONITORING_EVIDENCE_AND_ACCOUNT_FUNDS_FREEZE.txt
+
+New Changelog:
+
+- 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-08_MONITORING_EVIDENCE_AND_ACCOUNT_FUNDS_FREEZE.txt
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: fb4282bae7e6c87db88fb589819fc92af8c8a2e5
+- Push: completed
+
+Recorded implementation:
+
+- Main-window Operation Host ownership and duplicate-consumer prevention.
+- Shared operation exclusion/release and excluded-stock view.
+- Independent situation/status sorting.
+- Manual Stability Check Legacy removal and automatic integrity boundaries.
+- Event Record GUI and Event Journal Production observations.
+- Decision Trace, Diagnostic, Market Evidence, identity, and stage evidence.
+- Signal, approval, policy, execution, SendOrder, Broker, Chejan/fill, close,
+  and liquidation evidence connections.
+- Operator default Event view hiding of four normal internal events while raw
+  Writer/Reader evidence remains intact.
+- Memory-only AccountFundsSnapshot and OPW00001 Adapter.
+- Recovery-triggered account query, account-change invalidation, timeout,
+  in-flight, coalescing, stale-response protection, and existing-label binding.
+
+Explicitly not completed:
+
+- Actual Kiwoom OPW00001 server verification.
+- Final server-login information and reconnect contract.
+- Broker funds/project Budget relationship and available-cash contract.
+- Reserve amount and total/routine/stock budget hierarchy.
+- Pending-order occupancy and restoration rules.
+- Post-fill funds refresh/debounce.
+- Official `매수가능상태` calculation.
+- Broker funds in Production order Gates.
+- Account-funds Event Journal connection.
+- Final long-running Event Journal operator-view approval.
+
+Preserved:
+
+- Existing unrelated dirty and untracked files in both repositories.
+- Runtime, stock, routine-instance, diagnostic, archive, backup, and user data
+  outside the selected Freeze commits.

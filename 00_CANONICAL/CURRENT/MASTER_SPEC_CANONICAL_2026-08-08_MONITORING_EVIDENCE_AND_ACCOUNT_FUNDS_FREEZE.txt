@@ -1,0 +1,110 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-08
+Scope: Main monitoring operation host, diagnostic evidence, and account funds foundation freeze
+
+Reference code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Local repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: fb4282bae7e6c87db88fb589819fc92af8c8a2e5
+- Remote: origin/feat/restore-auto-trade-setting-ui
+- Local and remote SHA match after push.
+
+1. Main Monitoring Operation Contract
+
+- The Main monitoring window owns the persistent Operation Host lifecycle.
+- Opening, closing, or reopening Auto Trade Setting does not create a second
+  operation timer, signal consumer, Queue dispatcher, or SendOrder path.
+- Operation exclusion and release use one existing Source of Truth and common
+  Backend in Main monitoring and Auto Trade Setting.
+- Main monitoring provides the operation-excluded stock view without creating
+  a second exclusion list or Runtime schema.
+- Situation and status remain separate display and sorting axes. Situation uses
+  its situation sort value; status uses the established status priority.
+- The manual Stability Check entry point and its Legacy mutation flow are
+  removed. Retained integrity checks run at their established automatic
+  lifecycle boundaries.
+
+2. Event Journal And Decision Trace Contract
+
+- Event Journal is an append-only diagnostic evidence path with a Reader and
+  an operator-facing Event Record window.
+- Production observation covers application and Recovery events, signal,
+  approval, policy, execution, SendOrder, Broker response, Chejan/fill, close,
+  liquidation, emergency, and operation exclusion boundaries implemented in
+  the frozen code.
+- Decision Trace records decision-stage evidence and preserves correlation,
+  market evidence, rules/settings identity, engine identity, and stage
+  observations without becoming a Production decision Source of Truth.
+- Diagnostic recording is fail-open with respect to Production trading flow:
+  evidence write failure must not create a second order path or mutate the
+  trading decision.
+- The operator default Event Record view hides only ORDER_QUEUED,
+  OPERATION_HOST_STARTED, RECOVERY_COMPLETED, and
+  SEND_ORDER_REQUEST_ACCEPTED. Writer, JSONL, Reader, identity, and correlation
+  evidence remain intact.
+- Event Journal category/severity normalization and Legacy read compatibility
+  are retained by the frozen implementation.
+
+3. Account Funds Foundation Contract
+
+- The existing selected account remains the account identity Source used by
+  MainWindow, Recovery, order Guard, and Auto Trade Setting.
+- AccountFundsSnapshot is a memory-only UI Projection. It is not persisted to
+  Runtime and is not a Recovery, Budget, or order-authorization Source.
+- KiwoomAccountFundsAdapter requests OPW00001 after successful Recovery for the
+  currently selected account.
+- The request uses the selected account, blank password, media code `00`, and
+  query code `2`; the response reads summary-row `예수금` and
+  `주문가능금액`.
+- GetServerGubun maps `1` to simulation account display, other non-empty values
+  to real account display, and an empty value to an unconfirmed display.
+- Account changes invalidate the previous Projection. Timeout, one in-flight
+  request per account, one coalesced follow-up, account identity, request
+  identity, and stale callback checks prevent an old response from replacing
+  the current account display.
+- READY money values use the existing money normalization and display format.
+  Blank or invalid required values fail; a numeric zero remains a valid READY
+  value.
+- The account funds Projection is not connected to SendOrder, Operation Policy,
+  Execution Gate, project Budget, or `매수가능상태` authorization.
+
+4. Validation Evidence
+
+- All 85 changed Production Python files compiled with 32-bit Python 3.11.
+- `gui_main` imported successfully in the 32-bit environment.
+- Account Funds focused tests passed: 30 of 30.
+- The cross-feature focused regression executed 603 tests: 595 passed and 8
+  exposed pre-existing Runtime/fixture-dependent baseline failures.
+- Three failures assume that the protected root Runtime has no
+  `order_executions.json`; two transition tests depend on existing stock state;
+  three close-completion tests depend on fixture/current-state assumptions.
+- One protected modified test file outside the freeze scope contains an
+  existing invalid U+0080 character and was not committed.
+- The committed staged scope passed `git diff --check`.
+
+5. Explicitly Unresolved Contracts
+
+- Event Journal UI behavior under long-running real operation is not finally
+  approved and requires observation validation.
+- OPW00001 has not been verified against an actual Kiwoom server response.
+- Initial server-login information ordering and reconnect/stale policy are not
+  fully defined.
+- Broker deposit/orderable cash and project Budget remain separate.
+- Project available cash, reserve amount, total/routine/stock budget hierarchy,
+  pending-order budget occupancy, and budget restoration after fill, cancel,
+  or liquidation are not defined.
+- Post-order or post-fill account-funds refresh/debounce is not implemented.
+- The official `매수가능상태` calculation is not defined.
+- Broker funds are not connected to existing Production order Gates.
+- Account-funds Event Journal recording is not implemented.
+
+6. Safety Boundary
+
+- Do not connect Broker funds to Budget or any order Gate until the server and
+  funds/budget operating contract is explicitly approved.
+- Existing protected Runtime, stock, routine-instance, diagnostic, backup,
+  archived, dirty, and untracked files are outside this Canonical.
+- AI operating procedure remains defined only in
+  `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`.

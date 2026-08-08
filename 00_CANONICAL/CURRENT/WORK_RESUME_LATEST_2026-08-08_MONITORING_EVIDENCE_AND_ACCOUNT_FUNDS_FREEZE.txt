@@ -1,0 +1,98 @@
+WORK RESUME LATEST
+Date: 2026-08-08
+Scope: Main monitoring, Event Journal/Decision Trace, and Account Funds freeze
+
+1. Current Baselines
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Local repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: fb4282bae7e6c87db88fb589819fc92af8c8a2e5
+- Remote: origin/feat/restore-auto-trade-setting-ui
+- Local and remote SHA match after push.
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Local repository: C:\Users\JIN KWANG CHUL\Documents\docs
+- Branch: agent/project-prompt-standard
+- Baseline: the pushed commit containing this Work Resume and the 2026-08-08
+  Reference Index pointers.
+- Confirm the exact documentation SHA with `git rev-parse HEAD` at startup.
+
+2. Completed Big Features
+
+- Main monitoring now owns the persistent Operation Host lifecycle. Auto Trade
+  Setting no longer owns a duplicate continuous-operation lifecycle.
+- Operation exclusion/release is shared across Main monitoring and Auto Trade
+  Setting, including context-menu, name double-click, and excluded-stock view
+  entry points.
+- Situation/status sorting is separated by its actual meaning.
+- The manual Stability Check and Legacy mutation path were removed; retained
+  integrity checks are attached to automatic lifecycle boundaries.
+- Event Record GUI, Event Journal foundation, Production observations, category
+  and severity normalization, operator default-view hiding, and Legacy Reader
+  compatibility are implemented.
+- Decision Trace and Diagnostic foundations preserve correlation, market
+  evidence, rules/settings/engine identity, and Signal through Execution-stage
+  observations.
+- SendOrder, Broker response, Chejan/fill, close, and liquidation events are
+  connected to the diagnostic evidence path implemented in the frozen code.
+- Account Funds foundation and OPW00001 Production Adapter are implemented.
+  Recovery triggers the selected-account request; account changes invalidate
+  old values; timeout, in-flight, coalescing, and stale-callback protection are
+  implemented; deposit, orderable cash, and account type bind to the existing
+  Main-window labels.
+
+3. Exact Incomplete Boundary
+
+- OPW00001 requires actual Kiwoom server response validation.
+- Event Journal and Decision Trace require long-running backtest/simulation and
+  real-operation observation before final operator wording/density approval.
+- Initial server connection information, receive order, reconnect behavior, and
+  stale policy are not fully contracted.
+- Broker funds versus project Budget is not contracted.
+- Project available cash, reserve amount, total/routine/stock budget allocation,
+  pending-order occupancy, and fill/cancel/liquidation restoration rules are
+  not contracted.
+- Post-order and post-fill account-funds debounce is not implemented.
+- `매수가능상태` has no official calculation contract.
+- Broker funds do not participate in SendOrder, Operation Policy, Execution
+  Gate, or project Budget.
+- Account-funds Event Journal recording is not implemented.
+
+4. Validation State
+
+- Production Python compile: 85 files passed under 32-bit Python 3.11.
+- `gui_main` 32-bit import: passed.
+- Account Funds focused tests: 30 passed.
+- Cross-feature focused regression: 603 run, 595 passed, 6 failed, 2 errored.
+- The eight non-green cases are separated as protected root Runtime, stock-state,
+  or fixture/current-state assumptions; Production contracts were not changed
+  to force them green.
+- `git diff --check` passed for the committed code scope.
+
+5. Protected Working State
+
+- The code repository intentionally retains dirty and untracked Runtime, stock,
+  routine-instance, Project Changelog, diagnostics, archives, backups, and
+  unrelated files outside commit fb4282b.
+- `tests/test_auto_trade_gui_e2e_sync.py` remains protected and uncommitted with
+  its pre-existing invalid U+0080 encoding character.
+- The docs repository intentionally retains pre-existing modified and untracked
+  documents outside this freeze.
+- Do not reset, restore, stash, clean, delete, or broadly stage these files.
+
+6. Next Session Start Point
+
+- Do not begin coding first.
+- First investigate and define the `서버 연결 및 자금·예산 운영 계약`.
+- Minimum contract topics are initial server information, receive order, Broker
+  deposit, Broker orderable cash, project available cash, reserve amount,
+  total/routine/stock budget relationship, pending-order amount occupancy,
+  restoration after fill/cancel/liquidation, stale/reconnect policy, and the
+  meaning of `매수가능상태`.
+- Until that contract is approved, do not connect Broker funds to any order Gate
+  or Budget calculation.
