@@ -1,0 +1,100 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-11
+Scope: Main Monitoring and AutoTradeSettingWindow shared Production operation freeze
+
+1. Authority
+
+This document records the confirmed Production contract after the 1-8 stage
+integration and final audit. It supplements, and does not erase, prior Current
+Canonical contracts for Recovery, emergency, close, Review, and order safety.
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze commit: 8231797fe828430ab6d8cb3f125cf7f6909aa662
+- Remote branch SHA verified equal to the Freeze commit.
+
+2. Shared Production Architecture
+
+The confirmed ownership structure is:
+
+Common Production Backend
+<- Main Monitoring UI Adapter
+<- AutoTradeSettingWindow UI Adapter
+
+- AutoTradeOrderExecutionBoundary owns the shared Queue snapshot, execution
+  preflight, Runtime commit, final Gate, durable dispatch claim, automatic
+  ORDER_QUEUED processing, pending cancel, and SendOrder environment contract.
+- AutoTradeOperationHost does not dynamically borrow AutoTradeSettingWindow
+  methods. The host and settings window explicitly call the same boundary.
+- Runtime Stock State Mutation Boundary is shared by ordinary state changes,
+  emergency stop/release, signal probe, and Review return paths.
+- Context-menu actions, labels, ordering, enablement, and dispatch are shared
+  between Main Monitoring and AutoTradeSettingWindow.
+- Stock schedule change and default-time reset use the same Backend.
+- MainWindow is the multi-view owner. One screen does not directly invoke the
+  other screen's refresh_all().
+
+3. Operation Start Contract
+
+- Main Monitoring and AutoTradeSettingWindow have two UI entry points for one
+  operation-start contract.
+- MainWindow owns program operation and both entry points use the same
+  MainWindow Recovery context, participation set, and Backend.
+- Under the same state, both buttons must present matching text and enablement.
+- A persisted RUNNING value alone does not establish current participation.
+  Participation requires a valid current Recovery session,
+  operation_excluded=False, and a valid actual operation state.
+- A stock registered before operation starts is operation-eligible.
+- A stock registered during operation is written operation_excluded=True and is
+  not immediately enrolled in the current operation.
+- Before operation starts, multi-select context-menu start enrolls the selected
+  stocks and excludes unselected assigned stocks.
+- Bottom operation start enrolls only stocks whose operation_excluded is False.
+- During operation, context-menu start on an excluded stock may clear exclusion
+  and enroll it only after the common Guard and Recovery checks pass.
+
+4. Read-only Refresh And Projection
+
+- AutoTradeSettingWindow table refresh is read-only with respect to Runtime
+  stock state. Display-only changes use local projection.
+- Session-status projection is shared by both screens.
+- View synchronization is performed through
+  MainWindow.refresh_auto_trade_assignment_views().
+
+5. Safety Boundaries
+
+- Queue, Approval, Gate, SendOrder, Chejan, Recovery, Review, close, and state
+  transition contracts are unchanged by this integration.
+- Tests install a fail-closed Production mutable guard before project tests.
+- Protected mutable data includes runtime, stocks, routine_instances,
+  archived_stocks, Event Journal, PROJECT_CHANGELOG, and realized-PnL ledger.
+- GUI test modules are executed in isolated 32-bit Python processes to prevent
+  cumulative PyQt QWidget lifecycle termination from hiding results.
+
+6. Final Audit
+
+FINAL AUDIT PASS
+
+- User-confirmed functional contract: PASS
+- Same-function C-type mismatch between the two screens: 0
+- Test modules: 404/404 executed
+- Tests: 6,746 total; 6,611 PASS; 116 FAIL; 13 ERROR; 6 SKIP
+- Abnormal process termination: 0
+- Production mutable SHA: 353/353 unchanged
+- Guard violations: 0
+- Actual Kiwoom SendOrder: 0
+- py_compile, compileall, and git diff --check: PASS
+
+The remaining FAIL/ERROR cases are existing legacy fixture or expectation
+issues, not regressions introduced by this integration.
+
+7. Explicitly Incomplete
+
+- Review Bypass is not implemented.
+- Bootstrap UI/operator command is not implemented.
+- Historical fill routine_instance_id migration is not performed.
+- The final optimized PnL refresh interval is not decided.
+
+No next implementation item is authorized by this Freeze.

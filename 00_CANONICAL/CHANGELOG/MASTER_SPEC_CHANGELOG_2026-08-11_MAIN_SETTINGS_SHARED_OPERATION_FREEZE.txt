@@ -1,0 +1,37 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-11
+Scope: Main Monitoring and AutoTradeSettingWindow shared operation Freeze
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze commit: 8231797fe828430ab6d8cb3f125cf7f6909aa662
+- Push and remote SHA equality: verified
+
+Recorded changes:
+
+- Extracted AutoTradeOrderExecutionBoundary and removed dynamic settings-window
+  method borrowing from AutoTradeOperationHost.
+- Made AutoTradeSettingWindow refresh read-only for Runtime state.
+- Consolidated stock-state mutation, context-menu action, schedule change/reset,
+  session projection, and multi-view owner synchronization contracts.
+- Restored one operation-start contract for the two UI entry points, including
+  current participation, registration timing, exclusion, and selected-start rules.
+- Isolated Production mutable data from tests and added a module-per-process
+  32-bit PyQt regression runner.
+
+Final audit:
+
+- FINAL AUDIT PASS
+- 404/404 modules; 6,746 tests
+- 6,611 PASS; 116 FAIL; 13 ERROR; 6 SKIP
+- Abnormal process termination 0; guard violations 0
+- Production mutable SHA 353/353 unchanged
+- Actual Kiwoom SendOrder 0
+- py_compile, compileall, and git diff --check PASS
+
+Preserved:
+
+- Runtime, stock data, logs, archives, artifacts, diagnostics, backups,
+  operation policy, routine-instance data, and unrelated dirty/untracked files.

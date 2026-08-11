@@ -1,0 +1,119 @@
+WORK RESUME LATEST
+Date: 2026-08-11
+Scope: Main Monitoring and AutoTradeSettingWindow shared Production operation Freeze
+
+1. Git Baselines
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Local repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze commit: 8231797fe828430ab6d8cb3f125cf7f6909aa662
+- Remote branch SHA: 8231797fe828430ab6d8cb3f125cf7f6909aa662
+- Push: complete
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Local repository: C:\Users\JIN KWANG CHUL\Documents\docs
+- Branch: agent/project-prompt-standard
+- The documentation Freeze commit containing this file is the baseline; confirm
+  its exact local and remote SHA with git rev-parse HEAD and git ls-remote.
+
+2. Completed Big Feature
+
+- AutoTradeSettingWindow and Main Monitoring now use the same explicit order
+  execution Production boundary.
+- AutoTradeOperationHost no longer uses __getattr__, MethodType, or dynamic
+  AutoTradeSettingWindow method-provider imports.
+- Refresh is read-only for Runtime stock state and display changes are projected locally.
+- General, emergency, signal-probe, and Review-return stock-state writes share
+  the Runtime Stock State Mutation Boundary.
+- MainMonitoringStockOperationAdapter no longer treats AutoTradeSettingWindow
+  as a Production method provider.
+- The two screens share context-menu actions, schedule change/reset Backend,
+  session-status projection, and owner synchronization.
+
+3. Production Architecture
+
+Common Production Backend
+<- Main Monitoring UI Adapter
+<- AutoTradeSettingWindow UI Adapter
+
+MainWindow owns Recovery context and multi-view synchronization.
+AutoTradeOrderExecutionBoundary owns the common order-execution responsibility.
+
+4. Operation Start Contract
+
+- The monitoring and settings buttons are two entry points to one Backend.
+- Both use the same MainWindow Recovery context and participation set and must
+  show matching state text and enablement.
+- Persisted RUNNING alone does not establish current participation. A current
+  Recovery session, operation_excluded=False, and valid actual state are required.
+- Pre-operation registration is operation-eligible.
+- During-operation registration is excluded from immediate participation.
+- Pre-operation multi-select context start enrolls selected stocks and excludes
+  unselected assigned stocks.
+- Bottom start enrolls only non-excluded stocks.
+- During operation, an excluded stock may be enrolled through context start only
+  after the common Guard and Recovery checks pass.
+
+5. Runtime And Test Safety
+
+- Production mutable baseline: 353 files.
+- SHA result: 353/353 unchanged after regression.
+- Production mutable guard violations: 0.
+- Actual Kiwoom SendOrder: 0.
+- Runtime, stocks, routine_instances, archives, Event Journal,
+  PROJECT_CHANGELOG, and realized-PnL ledger are protected by the test guard.
+
+6. Final Audit
+
+FINAL AUDIT PASS
+
+- Test modules: 404/404 executed
+- Total: 6,746
+- PASS: 6,611
+- FAIL: 116
+- ERROR: 13
+- SKIP: 6
+- Abnormal process termination: 0
+- py_compile: PASS
+- compileall: PASS
+- git diff --check: PASS
+
+The 32-bit PyQt single-process termination was a cumulative QWidget deferred
+deletion issue in a test fixture, not a Production lifecycle defect. Final
+regression used isolated module processes.
+
+7. Existing Unrelated Failures
+
+- execution-runtime initialization/open-policy legacy expectations
+- removed display/timer helper expectations
+- outdated Recovery callback and badge-helper arguments
+- GUI preview/monitoring fixtures
+- fixed-date expectations
+- historical metadata/transition expectations
+
+8. Protected Working State
+
+- Existing Runtime, stock config/state/order/candle data, routine-instance JSON,
+  archive, diagnostics, backup, artifact, logs, PROJECT_CHANGELOG, and
+  operation_policy dirty/untracked state remains protected.
+- Do not reset, restore, stash, clean, delete, or broadly stage it.
+- Existing unrelated dirty/untracked documentation state also remains protected.
+
+9. Explicit Incomplete Boundary
+
+- Review Bypass: not implemented.
+- Bootstrap UI/operator command: not implemented.
+- Historical fill routine_instance_id migration: not performed.
+- PnL 1,000 ms final optimization: not decided.
+
+The shared-operation integration is complete.
+
+10. Authorization
+
+Next implementation item is not authorized.
+Wait for the user's explicit instruction.
