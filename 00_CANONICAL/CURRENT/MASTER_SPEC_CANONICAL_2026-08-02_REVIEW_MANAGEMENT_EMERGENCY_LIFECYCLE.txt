@@ -1,0 +1,333 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-02
+Scope: Review Management emergency lifecycle, collector status, emergency release, and return gate
+
+Document role:
+
+- This Current Canonical records the Review Management lifecycle contract
+  confirmed by the 2026-08-02 local implementation work.
+- It supersedes older interpretations only for Review Management collector
+  status, emergency-stop collection, emergency-release review flow, and
+  Review Management table display.
+- It does not change registration, unregister, close process, order execution,
+  Chejan, runtime storage layout, stocks storage layout, or state writer schema.
+- The implementation basis is the current local dirty code state, not a pushed
+  GitHub Freeze SHA.
+
+1. Screen-Specific REVIEW_REQUIRED Display Contract
+
+REVIEW_REQUIRED has different display meaning by screen.
+
+AutoTradeSetting, Stock Management, and general stock lists:
+
+- REVIEW_REQUIRED remains displayed as `검토종목`.
+- Existing row color, status color, situation signal, filter, and count
+  contracts for those screens remain in force.
+- The general stock-list protection style may continue to render REVIEW_REQUIRED
+  rows with orange row text where that screen owns such styling.
+
+Review Management window:
+
+- `검토종목` is not a status-column tag.
+- The Review Management status column must not show REVIEW_REQUIRED as
+  `검토종목`.
+- The Review Management window does not use whole-row orange styling for review
+  rows.
+- Review Management table text is black by default.
+- Review Management status-column values are limited to:
+  - `긴급정지`
+  - `미해결`
+  - `해결`
+
+2. Review Management Collector Role
+
+The Review Management collector is the Source of Truth for the Review
+Management table and the main review-management badge count.
+
+The collector's role is to collect program issues and operation-blocking
+targets that require operator review. It is not a normal stock-status renderer.
+
+Review Management table columns:
+
+1. 코드
+2. 종목
+3. 위치
+4. 상태
+5. 검토 전환 시각
+6. 사유
+7. 검출
+
+Column meaning:
+
+- 상태: current review-processing stage.
+- 사유: the cause that put the stock into Review Management.
+- 검출: the actual production point where that cause was detected.
+- 검토 전환 시각: first time the stock entered the current review collection
+  record.
+
+Reasons are concise cause tags. They must not be complete explanatory
+sentences, internal code names, module names, loader names, or function names.
+
+Confirmed current reasons:
+
+- `운영 데이터 없음`
+- `운영 데이터 읽기 오류`
+- `운영 데이터 불일치`
+- `긴급정지 해제 시 보유잔량 존재`
+
+3. Review Management Status Lifecycle
+
+Review Management status is not produced by copying `state.status`, by copying
+REVIEW_REQUIRED, or by comparing reason strings.
+
+Allowed status values:
+
+- `긴급정지`
+- `미해결`
+- `해결`
+
+Status contracts:
+
+- `긴급정지`: the stock is actually emergency-stopped; trading is blocked; the
+  item is collected immediately.
+- `미해결`: no active emergency stop is being shown for the row, but operation
+  availability is not confirmed. This includes missing or unreadable state data
+  and failed availability checks. Operator normalization is required and return
+  is blocked.
+- `해결`: emergency stop has been released and the existing operation
+  availability check passed. The stock is not automatically returned to
+  operation; it waits for the Review Management return button.
+
+Forbidden:
+
+- Showing REVIEW_REQUIRED as a Review Management status tag.
+- Determining Review Management status from `review_reason` text.
+- Treating emergency release alone as resolved.
+- Automatically starting operation after the row becomes `해결`.
+
+4. Emergency Stop Entry Contract
+
+Every actual emergency-stop activation must be collected into Review Management.
+
+Confirmed entry points:
+
+- Operating data mismatch while already running.
+- Pre-start data mismatch during operation start.
+- User global emergency stop.
+- Stock right-click emergency stop.
+
+On emergency stop:
+
+1. Only the target stock is emergency-stopped.
+2. The canonical emergency state is active.
+3. `trade_enabled=False`.
+4. Routine BUY and SELL permission is blocked by the canonical emergency and
+   review state through `canonical_routine_order_permission()`.
+5. Review classification is recorded.
+6. Review status is displayed as `긴급정지`.
+7. Review reason, detection point, and first transition time are saved through
+   the existing review metadata contract.
+
+`buy_enabled` and `sell_enabled` are legacy compatibility state fields. They
+are not the Source of Truth for current order permission and are not required
+emergency-stop state mutations. Current order permission is calculated from
+canonical runtime state and operation policy.
+
+Operating data mismatch while already running:
+
+- 상태: `긴급정지`
+- 사유: `운영 데이터 불일치`
+- 검출: `운영 중`
+
+Pre-start data mismatch during operation start:
+
+- 상태: `긴급정지`
+- 사유: `운영 데이터 불일치`
+- 검출: `운영 시작`
+
+5. Emergency Release Contract
+
+The actual emergency-release path is:
+
+`gui_main_emergency_ops.release_emergency_stop_target()`
+
+Emergency release is not operation return.
+
+After emergency release, the system must run the existing operation availability
+check:
+
+- Pass:
+  - Review status becomes `해결`.
+  - No automatic operation return occurs.
+  - The row waits for the Review Management return button.
+- Fail:
+  - Review status becomes `미해결`.
+  - Operator normalization is required.
+  - Return is blocked.
+
+Emergency release does not restore `buy_enabled` or `sell_enabled` permission.
+After the integrity, Review, and Recovery checks pass, the stock remains
+`STOPPED` with `trade_enabled=False`. Operation resumes only after an explicit
+operator start request passes the common start guard. The successful start
+records `RUNNING` with `trade_enabled=True`; BUY and SELL permission is then
+calculated by `canonical_routine_order_permission()` from the canonical state
+and policy context.
+
+Example:
+
+- If holding quantity remains after emergency release:
+  - 상태: `미해결`
+  - 사유: `긴급정지 해제 시 보유잔량 존재`
+  - 검출: `긴급정지 해제`
+
+6. Return Button Contract
+
+The actual return path is:
+
+`GlobalReviewRequiredWindow.return_selected_items_to_auto_list()`
+
+Return gate:
+
+- Only rows whose collector `display_status` is `해결` may return.
+- `미해결` rows are blocked.
+- `긴급정지` rows are blocked.
+
+Return means returning to the operation-eligible list. It does not mean
+immediate auto-start.
+
+7. General Collector Cases
+
+Missing `state.json`:
+
+- 상태: `미해결`
+- 사유: `운영 데이터 없음`
+- 검출: `종목관리`
+- The collector must not create or mutate the missing file.
+
+Unreadable `state.json`:
+
+- JSON parse failure or top-level non-dict state data is unreadable.
+- 상태: `미해결`
+- 사유: `운영 데이터 읽기 오류`
+- 검출: `종목관리`
+- The collector must not repair, overwrite, or normalize the bad file.
+
+Normal REVIEW_REQUIRED rows:
+
+- Existing `review_reason`, `review_location`, and `review_entered_at` remain
+  the Source of Truth for cause, detection point, and first transition time.
+- Opening or refreshing the Review Management window must not create, change,
+  or overwrite the detection point.
+
+8. Review Status Source of Truth
+
+The collector supplies:
+
+- `row["display_status"]`
+
+The UI displays `display_status`.
+
+Status must be determined from:
+
+- actual emergency-stop state,
+- the official operation availability check result,
+- missing or unreadable operation data,
+- existing resolved/unresolved review metadata.
+
+`return_availability` and `display_status` have different meanings. Current
+local implementation still has compatibility overlap in this area; this is a
+follow-up investigation item and is not the canonical model.
+
+9. Count Synchronization
+
+The Review Management window and the main button must use the same collector
+result.
+
+- Review Management window summary:
+  - `len(collect_global_review_required_rows())`
+- Main button:
+  - `review_required_stock_count()` must use the same collector.
+  - 0 -> `검토관리종목`
+  - N -> `검토관리종목(N)`
+
+The main button must not maintain a separate REVIEW_REQUIRED-only count.
+
+10. Review Management Display Contract
+
+Top table:
+
+- Final columns are:
+  1. 코드
+  2. 종목
+  3. 위치
+  4. 상태
+  5. 검토 전환 시각
+  6. 사유
+  7. 검출
+- The `검출` header and cells are centered.
+- Table text is black by default.
+- The old 보유/미수/미도 columns are not part of the current Review Management
+  table contract.
+- The removed lower order Reconciliation area is not part of the current Review
+  Management screen contract.
+
+11. Confirmed Local Reproduction Snapshot
+
+The following local reproduction rows were verified in the current dirty
+implementation state:
+
+- SK하이닉스:
+  - 상태: `미해결`
+  - 사유: `긴급정지 해제 시 보유잔량 존재`
+  - 검출: `긴급정지 해제`
+- NAVER:
+  - 상태: `미해결`
+  - 사유: `운영 데이터 없음`
+  - 검출: `종목관리`
+- LG화학:
+  - 상태: `미해결`
+  - 사유: `운영 데이터 읽기 오류`
+  - 검출: `종목관리`
+- 카카오뱅크:
+  - 상태: `긴급정지`
+  - 사유: `운영 데이터 불일치`
+  - 검출: `운영 중`
+
+12. Validation Baseline
+
+Confirmed local validation:
+
+- `tests.test_review_required_transition_time`: 15 tests OK.
+- 32-bit `py_compile`: OK for the touched review lifecycle files.
+- `python -c "import gui_main"`: OK.
+- `git diff --check`: OK, with existing CRLF warnings only.
+
+Known unrelated or unresolved validation:
+
+- `tests.test_auto_trade_status_recalculation_pipeline`: 17 tests executed, 6
+  failures remain in registration/unregister expectations. These are not
+  recorded as passing and remain an unresolved regression item.
+
+13. Out of Scope
+
+This Canonical does not define or change:
+
+- unregister policy,
+- registration policy,
+- close process,
+- liquidation,
+- order execution,
+- Chejan,
+- runtime or stocks storage layout,
+- automatic recovery,
+- resolved-row auto-start behavior.
+
+14. Follow-Up Items
+
+- Visible GUI roundtrip verification for `해결` row return.
+- Emergency duplicate reason accumulation and merge rule.
+- Operator UX for unresolved normalization.
+- Whether a returned resolved row should ever auto-start later.
+- Separation of `return_availability` from `display_status` in local code.
+- The 6 registration/unregister failures in
+  `tests.test_auto_trade_status_recalculation_pipeline`.

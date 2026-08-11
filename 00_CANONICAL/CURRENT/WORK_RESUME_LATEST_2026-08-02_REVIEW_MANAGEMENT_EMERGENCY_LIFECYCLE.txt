@@ -1,0 +1,138 @@
+WORK RESUME LATEST
+Date: 2026-08-02
+Scope: Review Management emergency lifecycle local implementation state
+
+Status:
+
+- Documentation Freeze update only.
+- Code implementation exists in the local dirty code tree and has not been
+  frozen to a GitHub commit by this documentation step.
+- This Work Resume records the current Review Management lifecycle state so the
+  next task starts from the confirmed local contract, not from older Canonical
+  wording.
+
+Repositories:
+
+- Code repository: `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`
+- Docs repository: `C:\Users\JIN KWANG CHUL\Documents\docs`
+- Code branch/SHA: local dirty state; no new code commit or push in this step.
+- Docs branch/SHA: local dirty state; no documentation commit or push in this
+  step.
+
+Latest Source of Truth:
+
+- `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-02_REVIEW_MANAGEMENT_EMERGENCY_LIFECYCLE.txt`
+- `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-02_REVIEW_MANAGEMENT_EMERGENCY_LIFECYCLE.txt`
+
+Completed Local Implementation Scope:
+
+- Review Management uses screen-specific status values rather than displaying
+  REVIEW_REQUIRED as `검토종목`.
+- Review Management status values are `긴급정지`, `미해결`, and `해결`.
+- All actual emergency-stop activation paths are collected into Review
+  Management.
+- Operating data mismatch while already running is collected as:
+  - 상태 `긴급정지`
+  - 사유 `운영 데이터 불일치`
+  - 검출 `운영 중`
+- Pre-start data mismatch is distinguished from running mismatch and keeps
+  검출 `운영 시작`.
+- Emergency release now runs the existing operation availability check.
+- Emergency release with remaining holding is collected as:
+  - 상태 `미해결`
+  - 사유 `긴급정지 해제 시 보유잔량 존재`
+  - 검출 `긴급정지 해제`
+- Missing state data is collected as:
+  - 상태 `미해결`
+  - 사유 `운영 데이터 없음`
+  - 검출 `종목관리`
+- Unreadable state data is collected as:
+  - 상태 `미해결`
+  - 사유 `운영 데이터 읽기 오류`
+  - 검출 `종목관리`
+- Review Management main button count and Review Management window count use
+  the same collector result.
+- Review Management table uses 7 columns:
+  - 코드
+  - 종목
+  - 위치
+  - 상태
+  - 검토 전환 시각
+  - 사유
+  - 검출
+- Review Management table text is black.
+- The old lower order Reconciliation area was removed from the Review
+  Management window.
+
+Modified Local Code Files Observed In This Work Scope:
+
+- `gui_review_required_window.py`
+- `gui_main_emergency_ops.py`
+- `tests/test_review_required_transition_time.py`
+
+Other local dirty files and data may exist from earlier tasks. They were not
+cleaned, reverted, staged, committed, or pushed by this documentation step.
+
+Confirmed Local Collector Snapshot:
+
+- SK하이닉스:
+  - 상태 `미해결`
+  - 사유 `긴급정지 해제 시 보유잔량 존재`
+  - 검출 `긴급정지 해제`
+- NAVER:
+  - 상태 `미해결`
+  - 사유 `운영 데이터 없음`
+  - 검출 `종목관리`
+- LG화학:
+  - 상태 `미해결`
+  - 사유 `운영 데이터 읽기 오류`
+  - 검출 `종목관리`
+- 카카오뱅크:
+  - 상태 `긴급정지`
+  - 사유 `운영 데이터 불일치`
+  - 검출 `운영 중`
+
+Validation Completed:
+
+- `python -m unittest tests.test_review_required_transition_time -v`
+  - 15 tests OK.
+- 32-bit `py_compile`
+  - OK for touched Review Management lifecycle files and `gui_main.py`.
+- `python -c "import gui_main"`
+  - OK.
+- `git diff --check`
+  - OK with existing CRLF warnings only.
+
+Validation Not Complete:
+
+- `tests.test_auto_trade_status_recalculation_pipeline`
+  - 17 tests executed.
+  - 6 failures remain.
+  - Failures are in registration/unregister expectations and must not be
+    reported as resolved by the Review Management lifecycle work.
+
+Protected State:
+
+- Existing local dirty and untracked files were preserved.
+- Runtime/config/stocks data were not cleaned or globally reset.
+- Reproduction rows and backup artifacts created before this documentation step
+  remain part of the local dirty runtime/data state unless separately cleaned by
+  user-approved instructions.
+- Stage, commit, and push were not performed.
+
+Incomplete Or User-Decision Items:
+
+- Visible GUI roundtrip verification for returning a `해결` row.
+- Emergency duplicate reason accumulation and merge rule.
+- UX and exact workflow for unresolved normalization.
+- Whether any later flow should auto-start after resolved return.
+- Investigation and cleanup of local `return_availability` /
+  `display_status` compatibility overlap.
+- The 6 failures in `tests.test_auto_trade_status_recalculation_pipeline`.
+
+Recommended Next Start:
+
+- Do not start a new feature automatically.
+- If the user wants to continue the Review Management lifecycle, begin with
+  visible GUI roundtrip verification for the `해결` return button.
+- Otherwise wait for the user's next explicit target.

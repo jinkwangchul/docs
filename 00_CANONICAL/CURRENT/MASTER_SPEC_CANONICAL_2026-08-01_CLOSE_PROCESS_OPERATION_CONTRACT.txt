@@ -1,0 +1,321 @@
+MASTER_SPEC_CANONICAL_2026-08-01_CLOSE_PROCESS_OPERATION_CONTRACT
+
+Status:
+- This is the Current Canonical for automatic close, early close, close policy,
+  liquidation policy, and immediate liquidation terminology.
+- It supersedes older Archive, Legacy, and merged-source interpretations of
+  early close or automatic close.
+- This document records the operating contract only. It does not claim that
+  production code or tests have been modified.
+
+Source of Truth Priority:
+- Questions about 조기마감, 자동마감, 청산정책, 마감정책, and 즉시청산 must use
+  this Current Canonical first.
+- Archive and Legacy documents are historical evidence only.
+- If this document conflicts with Archive or Legacy material, this document
+  wins.
+- If document wording and confirmed UI wording differ, the confirmed UI term
+  wins and the document must be corrected.
+
+1. Terms
+
+The approved UI and document terms are:
+- 루틴마감
+- 시장가
+- 현재가
+- 손/익절
+- 이월
+- 자동마감
+- 조기마감
+- 즉시청산
+
+These terms are fixed for Canonical, Reference, Changelog, UI, and future work
+instructions unless the user explicitly changes the contract.
+
+2. Common Close Process
+
+자동마감 and 조기마감 use the same close process.
+
+The difference is only the entry trigger:
+- 자동마감 starts from the environment time policy.
+- 조기마감 starts when the operator chooses to start it.
+
+조기마감 is not a persistent operating mode change.
+
+조기마감 and 즉시청산 are not the same function.
+
+3. Default Close Policy
+
+The default close policy is 루틴마감.
+
+Unless explicitly specified otherwise, references to 자동마감 or 조기마감 mean the 루틴마감 policy.
+
+The close policy UI options are:
+- 루틴마감
+- 시장가
+- 현재가
+- 손/익절
+- 이월
+
+시장가, 현재가, 손/익절, and 이월 are extra or replacement options for
+situational response. They do not redefine the normal 루틴마감 process.
+They are not the default policy; an operator must intentionally choose them when that alternative behavior is needed.
+
+4. 루틴마감 Runtime Behavior
+
+During 루틴마감, the routine continues to operate.
+
+After 루틴마감 starts:
+- later buy signals are handled in the same way as normal routine operation
+- later sell signals are handled in the same way as normal routine operation
+- existing pending buy orders are not immediately cancelled
+- existing pending sell orders are not immediately cancelled
+
+The first valid sell signal after 루틴마감 starts is the first trigger for the
+close-completion procedure.
+
+The first sell signal itself is not complete termination.
+
+5. Complete Termination
+
+Complete termination is reached only when all of the following are true:
+- holding quantity is 0
+- there is no pending buy order
+- there is no pending sell order
+
+No other shortcut, UI state, command request, or first sell-signal event may be
+treated as complete termination.
+
+6. Liquidation Policy Entry
+
+If 루틴마감 has only buy-signal activity and no sell signal, or if settings or
+environment conditions leave holding quantity at the liquidation-policy start
+time, the existing liquidation policy starts.
+
+When liquidation policy starts:
+- existing pending buy orders are cancelled
+- existing pending sell orders are cancelled
+- liquidation proceeds until market close according to the environment setting:
+  시장가, 현재가, 손/익절, or 이월
+
+State handling after liquidation follows the existing state rules.
+
+7. Operator Entry Contract for 조기마감 and 즉시청산
+
+The two UI actions remain distinct operator intentions, but both enter the
+canonical EARLY_CLOSE command path:
+
+조기마감:
+- command mode is EARLY_CLOSE
+- method is 루틴
+- routine operation continues until the first final SELL broker acceptance
+
+즉시청산:
+- command mode is EARLY_CLOSE
+- method is 시장가
+- it does not enter the individual-liquidation or scheduled liquidation-time
+  policy path
+
+The Stock Instance Chart, Main Monitoring instance/category actions, and the
+corresponding context-menu actions must use the same backend contract. They must
+not call SendOrder directly; Queue, Approval, Gate, SendOrder, and Chejan remain
+the execution path.
+
+8. Deprecated Historical Interpretation
+
+Older documents may describe early close or automatic close using historical
+concepts that are no longer the current contract.
+
+Those historical interpretations are deprecated and must not be used for:
+- implementation decisions
+- UI wording
+- test expectations
+- future Changelog or Work Resume baseline decisions
+
+The only current contract is this document unless the user explicitly replaces
+it.
+
+9. Non-implementation Boundary
+
+This Canonical does not modify:
+- production code
+- tests
+- runtime data
+- environment settings
+- order queue format
+- SendOrder, Chejan, fill, or broker API behavior
+- current persisted user data
+
+Any code work must be separately authorized and verified against this contract.
+
+10. Confirmable Cumulative PnL Cycle
+
+The 확정가능 누적손익 Cycle is the performance interval after the last
+official completion boundary. It combines:
+- realized profit or loss confirmed by SELL fills after that boundary
+- unrealized profit or loss obtained by valuing the current open position at
+  the screen's approved valuation price
+
+The Cycle scope and the valuation-price source are separate contracts. A shared
+Cycle boundary does not authorize changing a screen from completed-candle close
+to state current price, or vice versa.
+
+확정가능 누적손익 is:
+
+  realized PnL after the boundary
+  + unrealized PnL of the current open position at the valuation price
+
+확정가능 누적손익률 is:
+
+  확정가능 누적손익
+  / (actual BUY cost matched to quantities sold after the boundary
+     + current open-position cost)
+  * 100
+
+Partial SELL handling must not count matched completed cost and remaining open
+cost twice. A zero denominator makes the rate unavailable; it does not invent a
+rate.
+
+11. Cycle Start
+
+A new Cycle starts with the first new BUY fill after the preceding official
+completion boundary.
+
+None of the following starts a new Cycle:
+- program startup
+- an operation-start command
+- a date change or regular-market opening
+- scheduled or manual operation start
+- emergency-stop release
+- Review resolution or return to the operating list
+- holding quantity becoming 0 without an official completion boundary
+
+BUY, SELL, and a later BUY without an official completion boundary remain in
+the same Cycle, even if the intermediate SELL temporarily reduced holding to 0.
+
+12. Official Completion Boundary
+
+A Cycle boundary may be recorded only when all of the following are confirmed:
+- an official early-close, automatic-close, or liquidation procedure exists
+- that procedure passed the canonical completion decision
+- holding quantity is 0
+- pending BUY quantity is 0
+- pending SELL quantity is 0
+- unresolved cancel, close, and liquidation evidence is 0
+- broker and Runtime reconciliation is valid
+
+The boundary timestamp and identity are persistent evidence. A routine SELL that
+incidentally makes holding quantity 0 is not an official completion boundary.
+
+The boundary ends the preceding Cycle. No new Cycle exists until a later BUY
+fill occurs.
+
+13. Carry-over Exception
+
+CARRY_OVER never creates a Cycle boundary, even when it was selected through an
+official close or liquidation command.
+
+Across the date change:
+- the same Cycle continues
+- realized PnL remains in the Cycle
+- open-position cost remains in the Cycle
+- later BUY and SELL fills belong to that same Cycle
+
+CARRY_OVER is an intentional continuation, not failed completion.
+
+14. Residual Position and Review
+
+For a non-CARRY_OVER policy, any residual holding, pending BUY, pending SELL,
+pending cancel, unresolved close/liquidation, or broker/Runtime mismatch blocks
+the completion boundary.
+
+The stock or instance enters the existing Review contract where required. The
+system must not create a boundary or reset PnL to conceal residual evidence.
+
+Entering Review is not a Cycle boundary. After integrity recovery, operator
+Bypass, or an already-approved policy option that intentionally accepts the
+condition, the existing Cycle continues.
+
+15. Review Bypass Meaning
+
+Review Bypass means that the operator acknowledges the current residual state
+and continues it as part of the existing trade history.
+
+Bypass preserves:
+- realized PnL
+- open-position cost basis
+- fill history
+- the current Cycle boundary identity
+
+Bypass is not Runtime deletion, migration, reset, or a new PnL baseline. Review
+release alone must never create a new Cycle.
+
+16. Bootstrap
+
+An installation may have no prior official Cycle boundary. It must not include
+all historical fills and realized-PnL records automatically.
+
+Bootstrap requires a persistent baseline established only after inspecting the
+current holding, pending-order, Recovery, and reconciliation state.
+
+If the initial state is clean, the baseline may be recorded and the first later
+BUY fill starts the first Cycle. If an existing holding, pending order, unresolved
+close/liquidation, Recovery failure, or reconciliation mismatch exists, automatic
+Bootstrap is fail-closed. Review or an explicit continuation decision is
+required; no baseline may be invented silently.
+
+17. Persistent Source of Truth
+
+Cycle scope must not be reconstructed from a date string. Persistent evidence
+must identify at least:
+- boundary identity
+- boundary timestamp
+- boundary reason and official completion evidence
+- the first BUY fill identity or equivalent ordered sequence after the boundary
+- whether the record is a Bootstrap baseline
+
+Existing canonical Runtime state or ledgers must be reused when they can express
+this evidence safely. Historical fill, realized-PnL, position, and broker-holding
+records must not be deleted or rewritten merely to establish a Cycle.
+
+18. Identity and Recovery
+
+Cycle attribution must preserve stock, account, and routine-instance identity.
+Historical records without sufficient identity must not be assigned silently to
+the currently selected instance.
+
+Recovery must preserve the same boundary identity and must not create a boundary
+from emergency release, Review resolution, operation restart, or a date change.
+Boundary creation must remain connected to the existing completion, Queue,
+Chejan, position, and broker-reconciliation evidence.
+
+19. Shared Current Valuation Contract
+
+Auto Trade Setting, Main Monitoring, and Stock Instance Chart use the same
+confirmable cumulative PnL projection. The current open position is valued from
+Runtime state in this order:
+
+  current_price
+  -> last_checked_price
+  -> market_price
+  -> price
+
+The screen must not create a synthetic price when all sources are unavailable.
+Historical realized PnL and open cost remain governed by the Cycle contract;
+the latest price changes only the unrealized component.
+
+20. PnL Refresh Boundary
+
+The initial Production UI refresh interval for PnL is 1,000 milliseconds on all
+three screens. This is an initial operating value, not a final optimized value.
+
+The PnL timer is independent from full-screen refresh, candle collection,
+completed-candle Projection refresh, and the operation cycle. Setting the PnL
+interval does not authorize changing those other cycles to one second.
+
+21. Legacy Permission Source
+
+Persistent buy_enabled and sell_enabled fields are not a Production permission
+Source. Routine BUY and SELL permission is calculated read-only by
+canonical_routine_order_permission() from canonical operation, emergency,
+Review, close, liquidation, time-policy, and global state evidence.

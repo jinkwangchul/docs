@@ -1,0 +1,99 @@
+WORK RESUME LATEST
+Date: 2026-08-11
+Scope: Canonical permission, close entries, Stock Instance Chart, and confirmable PnL freeze
+
+1. Git Baselines
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Local repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze commit: a7d8fcee06181795483d6d5aaa22e1e0632187a8
+- Push was blocked by the execution environment because origin was not accepted
+  as a verified trusted destination. Local commit is complete.
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Local repository: C:\Users\JIN KWANG CHUL\Documents\docs
+- Branch: agent/project-prompt-standard
+- The documentation Freeze commit containing this file is the baseline; confirm
+  its exact SHA with git rev-parse HEAD.
+
+2. Completed Big Feature
+
+- Production permission no longer reads or writes the legacy persistent
+  buy_enabled/sell_enabled keys. canonical_routine_order_permission() evaluates
+  canonical operation, emergency, Review, global, time, close, carry-over, and
+  liquidation evidence.
+- Same-day restart restores RUNNING + trade_enabled only after the common Guard.
+  Emergency release remains STOPPED + trade_enabled=False and requires a later
+  explicit start after Recovery, reconciliation, pending-cancel, and active
+  close/liquidation checks pass.
+- Routine EARLY_CLOSE/AUTO_CLOSE continues normal BUY/SELL before the first final
+  SELL broker acceptance and blocks additional routine orders afterward.
+- Stock Instance Chart and Main Monitoring instance/category actions use:
+  조기마감 = EARLY_CLOSE + 루틴; 즉시청산 = EARLY_CLOSE + 시장가.
+  Both reuse adapter/backend and Queue -> Approval -> Gate -> SendOrder -> Chejan.
+- Stock Instance Chart is connected from monitoring/settings, reloads Projection
+  after operation cycles for today's chart, keeps manual refresh, displays only
+  canonical completed candles/signals, and has a memory-only preview fixture.
+- Confirmable PnL Cycle boundary SoT is runtime/pnl_cycle_boundaries.json. A
+  boundary requires official completion and clean holding, pending, close,
+  Recovery, and broker reconciliation evidence. CARRY_OVER and ordinary
+  zero-holding routine SELL do not create a boundary.
+- Bootstrap backend is fail-closed on dirty integrity evidence. There is no
+  operator UI/command. New fills may store optional routine_instance_id;
+  historical fills are not migrated.
+- Shared PnL computes realized PnL after the boundary plus current unrealized
+  PnL without partial-SELL cost duplication.
+- Auto Trade Setting, Main Monitoring, and Stock Instance Chart use the same
+  projection. Valuation fallback is current_price -> last_checked_price ->
+  market_price -> price.
+- PNL_REFRESH_INTERVAL_MS is initially 1,000 ms on the three screens, separate
+  from full-screen, candle/indicator, and operation-cycle timing.
+- tests/test_auto_trade_gui_e2e_sync.py is restored and its 19 tests pass.
+
+3. Core Production Call Graph
+
+- Routine permission: OrderManager -> canonical_routine_order_permission().
+- Operator close: chart/monitoring/context adapter -> early-close backend ->
+  OperationCommandService -> state/command evidence -> Queue -> Approval ->
+  Gate -> SendOrder -> Chejan.
+- Cycle completion: canonical completion check -> clean integrity evidence ->
+  confirmable_pnl_cycle_service boundary append.
+- Screen PnL: screen timer -> pnl_ui_refresh.project_current_stock_pnl() ->
+  confirmable PnL projection + current_price_from_state().
+
+4. Validation State
+
+- Focused regression: 367 run, 366 passed, 1 failed.
+- Unrelated failure: test_stock_instance_chart_entry_connections.py
+  test_parent_ownership_keeps_repeated_windows_and_both_views_share_projection
+  expects 2026-08-10 while the current trading date is 2026-08-11.
+- Global emergency module: 51/51 passed as isolated 32-bit test processes; its
+  combined process terminates after accumulated Qt tests.
+- 32-bit Python compileall: passed.
+- Legacy permission key state: buy Reader/Writer 0/0; sell 0/0.
+
+5. Protected Working State
+
+- Runtime, stock state/order/config/candle data, routine-instance JSON, archives,
+  diagnostics, backups, artifacts, logs, PROJECT_CHANGELOG.txt,
+  operation_policy.json, and unrelated documentation changes remain protected.
+- Do not reset, restore, stash, clean, delete, or broadly stage these files.
+
+6. Explicit Incomplete Boundary
+
+- Review Bypass is not implemented.
+- Bootstrap UI/operator command is absent; backend API only.
+- Historical fill routine_instance_id migration was not performed.
+- The 1,000 ms PnL interval is initial, not final optimized value.
+- Auto Trade Setting versus Main Monitoring duplicate-function structure has not
+  received a full audit or consolidation.
+
+7. Authorization
+
+Next implementation item is not authorized.
+Wait for the user's explicit instruction.

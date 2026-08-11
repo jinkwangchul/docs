@@ -1,0 +1,56 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-11
+Scope: Canonical permission, close entry, Stock Instance Chart, and confirmable PnL freeze
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze commit: a7d8fcee06181795483d6d5aaa22e1e0632187a8
+- Push: blocked by the execution environment pending trusted-remote approval
+
+Recorded implementation:
+
+- Runtime buy_enabled/sell_enabled permission Readers and Writers removed; the
+  read-only canonical_routine_order_permission() contract is the permission SoT.
+- Same-day restart and emergency-release integrity Guards align with the
+  canonical STOPPED/RUNNING transition contract.
+- EARLY_CLOSE and AUTO_CLOSE routine operation permits BUY/SELL until the first
+  final SELL broker acceptance, then blocks later routine orders.
+- 조기마감 uses EARLY_CLOSE + 루틴, while 즉시청산 uses EARLY_CLOSE + 시장가
+  across Stock Instance Chart and Main Monitoring instance/category entry points.
+- Direct-close actions reuse Queue, Approval, Gate, SendOrder, and Chejan;
+  individual liquidation is not used by these entries.
+- Stock Instance Chart entry, Projection, completed-candle rendering, signal
+  markers, automatic cycle refresh, preview fixture, and operator actions are implemented.
+- Confirmable Cumulative PnL Cycle uses persistent
+  runtime/pnl_cycle_boundaries.json boundary evidence. CARRY_OVER does not create a boundary.
+- Shared PnL combines Cycle realized PnL with current unrealized PnL and avoids
+  partial-SELL cost duplication.
+- Auto Trade Setting, Main Monitoring, and Stock Instance Chart use the shared
+  PnL backend and current-price fallback chain.
+- PnL refresh uses the initial 1,000 ms interval independently of full-screen,
+  candle, and operation-cycle refresh.
+- The damaged E2E test file was reconstructed; 19 tests and the canonical
+  emergency-state assertion are preserved.
+
+Explicitly not completed:
+
+- Review Bypass implementation.
+- Bootstrap operator UI or command; backend API only.
+- Historical fill routine_instance_id migration.
+- Final optimized Production PnL refresh interval.
+- Full duplication audit/consolidation of Auto Trade Setting and Main Monitoring.
+
+Validation at Freeze:
+
+- Focused regression: 367 run, 366 passed, 1 unrelated fixed-date failure.
+- The 51-test global emergency module passed test-by-test in isolated 32-bit
+  processes after its combined run hit a cumulative Qt process termination.
+- 32-bit Python compileall: passed.
+- Production legacy permission key Reader/Writer: buy 0/0, sell 0/0.
+
+Preserved:
+
+- Existing Runtime, stocks, routine-instance, archive, artifact, backup, log,
+  configuration, and unrelated dirty/untracked files were not included.

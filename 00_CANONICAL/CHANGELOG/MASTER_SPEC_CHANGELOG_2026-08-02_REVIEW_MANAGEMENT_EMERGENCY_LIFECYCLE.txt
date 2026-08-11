@@ -1,0 +1,100 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-02
+Scope: Review Management emergency lifecycle contract
+
+New Canonical:
+
+- `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-02_REVIEW_MANAGEMENT_EMERGENCY_LIFECYCLE.txt`
+
+New Work Resume:
+
+- `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-02_REVIEW_MANAGEMENT_EMERGENCY_LIFECYCLE.txt`
+
+Changed:
+
+- Split REVIEW_REQUIRED display by screen:
+  - AutoTradeSetting, Stock Management, and general stock lists keep their
+    existing `검토종목` and row-style contracts.
+  - Review Management no longer uses `검토종목` as a status-column tag.
+- Defined Review Management status values:
+  - `긴급정지`
+  - `미해결`
+  - `해결`
+- Defined the Review Management collector as the Source of Truth for both:
+  - Review Management window count.
+  - Main button `검토관리종목(N)` count.
+- Confirmed that all actual emergency-stop activation enters Review Management.
+- Confirmed operating data mismatch while running:
+  - 상태 `긴급정지`
+  - 사유 `운영 데이터 불일치`
+  - 검출 `운영 중`
+- Confirmed pre-start data mismatch remains distinct:
+  - 사유 `운영 데이터 불일치`
+  - 검출 `운영 시작`
+- Defined emergency release as a review lifecycle transition, not operation
+  return.
+- Defined emergency-release outcomes:
+  - availability pass -> `해결`
+  - availability fail -> `미해결`
+- Defined resolved-only return:
+  - `해결` rows may return.
+  - `미해결` and `긴급정지` rows are blocked.
+- Defined missing and unreadable operation data collection:
+  - `운영 데이터 없음`
+  - `운영 데이터 읽기 오류`
+- Recorded that Review Management text is black and uses a 7-column table:
+  - 코드
+  - 종목
+  - 위치
+  - 상태
+  - 검토 전환 시각
+  - 사유
+  - 검출
+- Recorded that the old lower order Reconciliation area is not part of the
+  current Review Management window contract.
+
+Clarified:
+
+- `상태`, `사유`, and `검출` are separate Review Management columns with separate
+  meanings.
+- `검출` is the actual detection point of the review cause, not the location
+  from which the Review Management window was opened.
+- Review Management status must not be derived from reason-string comparison.
+- `display_status` is the Review Management status Source of Truth supplied by
+  the collector.
+- `return_availability` and `display_status` are different concepts; local
+  compatibility overlap remains a follow-up.
+
+Preserved:
+
+- Runtime/config/stocks storage layout.
+- Existing review metadata storage fields.
+- Registration policy.
+- Unregister policy.
+- Close process.
+- Liquidation.
+- Order execution.
+- Chejan.
+- Broker execution.
+- Existing Stock Management and AutoTradeSetting color/status contracts.
+
+Validation:
+
+- `tests.test_review_required_transition_time`: 15 tests OK.
+- 32-bit `py_compile`: OK for touched local review lifecycle files.
+- `python -c "import gui_main"`: OK.
+- `git diff --check`: OK with existing CRLF warnings only.
+
+Known unresolved:
+
+- `tests.test_auto_trade_status_recalculation_pipeline` still has 6
+  registration/unregister failures out of 17 tests.
+- Visible GUI roundtrip verification for `해결` return remains open.
+- Emergency duplicate reason merge policy remains open.
+- Unresolved normalization UX remains open.
+
+Documentation Step Limits:
+
+- This changelog was created as a documentation-only update.
+- No code, test, runtime, config, stocks, stage, commit, or push action is
+  claimed by this documentation step.

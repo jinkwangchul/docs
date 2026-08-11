@@ -1,0 +1,71 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-01
+Scope: Close process operation contract documentation update
+
+Purpose:
+
+- Record the latest automatic close and early close operating contract.
+- Prevent older Archive and Legacy concepts from being reused as current
+  implementation authority.
+- Fix the canonical terminology for close policy and liquidation-policy
+  discussions.
+
+New Canonical:
+
+- `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-01_CLOSE_PROCESS_OPERATION_CONTRACT.txt`
+- `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_READABLE_2026-08-01_CLOSE_PROCESS_OPERATION_CONTRACT.txt`
+
+Contract recorded:
+
+- 자동마감 and 조기마감 use the same close process.
+- 자동마감 starts from environment time policy.
+- 조기마감 starts from operator action.
+- The default close policy is 루틴마감.
+- Unless explicitly specified otherwise, 자동마감 and 조기마감 mean the 루틴마감 policy.
+- The approved policy option terms are 루틴마감, 시장가, 현재가, 손/익절, and 이월.
+- 시장가, 현재가, 손/익절, and 이월 are extra or replacement options for
+  situational response.
+- 시장가, 현재가, 손/익절, and 이월 are operator-selected alternatives, not the default policy.
+- During 루틴마감, routine operation continues.
+- Later buy and sell signals are handled under normal routine-operation rules.
+- Existing pending buy and sell orders are not immediately cancelled when
+  루틴마감 starts.
+- The first valid sell signal after 루틴마감 starts is only the first trigger
+  for the close-completion procedure.
+- Complete termination requires holding quantity 0, no pending buy order, and
+  no pending sell order.
+- If holding remains at liquidation-policy start time, the existing liquidation
+  policy starts.
+- When liquidation policy starts, existing pending buy and sell orders are
+  cancelled.
+- 조기마감 is not a persistent operating mode change.
+- 조기마감 and 즉시청산 are different functions.
+
+Deprecated wording:
+
+- Historical wording that described early close as a new-buy stop, buy-signal
+  discard, immediate liquidation, persistent operating state, or first sell
+  signal as complete termination is deprecated.
+- Older separated labels for the profit/loss close behavior are deprecated.
+- Current documents must use the UI term `손/익절`.
+
+Reference updates:
+
+- Reference Index now points to the 2026-08-01 Close Process Operation Contract
+  as the latest official Canonical.
+- AGENT_WORKFLOW_REFERENCE now states that questions about 조기마감, 자동마감,
+  청산, and 즉시청산 must use the Current Canonical first.
+- Archive/Legacy files that match deprecated close-process concepts were marked
+  with a historical-contract warning instead of being deleted.
+
+Validation:
+
+- Documentation-only change.
+- No production code was modified.
+- No tests were modified.
+- `git diff --check` was run after the update.
+
+Limitations:
+
+- This Changelog does not claim implementation completion.
+- Code and tests still require a separate authorized implementation task.
