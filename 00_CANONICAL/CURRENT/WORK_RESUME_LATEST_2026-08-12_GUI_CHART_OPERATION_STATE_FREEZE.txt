@@ -1,0 +1,95 @@
+WORK RESUME LATEST
+Date: 2026-08-12
+Scope: GUI chart lifecycle, current-running operation state, and stock-management display Freeze
+
+1. Git Baselines
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Local: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze commit: ae89af31e41849e8f145bc2c4d01df32f2b280da
+- Confirm local and origin branch SHA equality before resuming work.
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Local: C:\Users\JIN KWANG CHUL\Documents\docs
+- Branch: agent/project-prompt-standard
+- The single docs Freeze commit containing this file is the baseline; confirm
+  its exact local and origin SHA after push.
+
+2. Completed Production Scope
+
+- Deferred operation-exclusion double-click UI refresh prevents re-entrant
+  QTableWidgetItem deletion while preserving immediate mutation.
+- Main and Settings use one chart opener and one program-wide per-stock chart
+  singleton registry.
+- Single and batch opens use the same free-slot tile placement without moving
+  existing live windows.
+- Persistent feature windows are independent top-level windows with MainWindow
+  as logical lifecycle owner; transient confirmations keep their caller parent.
+- Main `모든창닫기` closes persistent feature windows without mutating operation
+  state or closing MainWindow.
+- Current-day charts share one 1,000 ms timer and one tick-local batch PnL
+  snapshot; calculation meaning is unchanged.
+- Chart title, PnL format, header geometry, and identity color priority are
+  frozen by the 2026-08-12 Canonical.
+- Main stock-row PnL unavailable fallback is numeric zero.
+- General operation-stop command entry points are absent. Emergency Stop and
+  close/liquidation policy remain the two termination families.
+- Main, Settings, chart identity, and StockRegister use the common
+  current-running Source of Truth instead of persisted RUNNING alone.
+- StockRegister computes the common target set once per refresh and preserves
+  Review then emergency priority before current-running membership.
+
+3. StockRegister Verification
+
+With no valid current-session participation, the visible StockRegister table
+projects the following as 운영정지:
+
+- 028260, 035720, 068270, 086520, 091990, 247540
+- comparison stock 005380
+
+Persisted state was not cleaned or rewritten to produce this projection.
+
+4. Verification
+
+- Focused isolated scope: 22 modules / 588 test IDs.
+- 576 reliable PASS, 5 legacy FAIL, 6 legacy ERROR, 1 known 32-bit Qt teardown
+  abnormal outcome.
+- Newly added and modified contract-focused tests: PASS.
+- Production mutable guard: PASS.
+- py_compile: PASS.
+- compileall: PASS.
+- Production imports: PASS (27 modules).
+- git diff --check: PASS.
+- Actual Kiwoom SendOrder calls: 0.
+
+5. Preserved Working State
+
+- Runtime, stock state/config/order/candle data, routine-instance JSON,
+  archived stocks, Event Journal, PROJECT_CHANGELOG, operation_policy,
+  diagnostics, backups, artifacts, and logs remain outside the code Freeze
+  commit and must not be reset, restored, stashed, cleaned, or broadly staged.
+- The docs repository also contains broad pre-existing dirty/untracked history.
+  Only the four official 2026-08-12 closure documents/index changes belong to
+  this docs Freeze commit.
+
+6. Known Legacy Test Outcomes
+
+The remaining focused-suite outcomes do not represent a new Production
+regression in this Freeze. They cover old Main layout pixel expectations,
+removed helper patch targets, incomplete Harness methods, historical config
+metadata expectations, and a known 32-bit Qt post-test teardown termination.
+
+7. Explicit Remaining Work
+
+- StockRegisterWindow operation-cycle automatic refresh is not connected.
+  The decision is correct on refresh; automatic refresh is a separate task.
+- Review Bypass remains unimplemented.
+- Bootstrap UI/operator command remains unimplemented.
+- Historical fill routine_instance_id migration is not performed.
+
+Do not begin another implementation without explicit user authorization.

@@ -1,0 +1,346 @@
+UPDATE
+Date: 2026-08-12
+Scope: Post-Freeze GUI chart lifecycle, operation-state Source of Truth, and operation-stop contract
+
+1. Authority And Baseline
+
+This document records implementation and contract updates completed after the
+2026-08-11 Main/Settings Shared Operation Freeze.
+
+The following Freeze remains valid and is not replaced or rewritten:
+
+- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-11_MAIN_SETTINGS_SHARED_OPERATION_FREEZE.txt
+- 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-11_MAIN_SETTINGS_SHARED_OPERATION_FREEZE.txt
+
+This update does not declare a new Freeze and does not establish a new Git
+baseline. Its implementation evidence is the current local working tree.
+
+2. Operation-Exclusion Double-Click Lifecycle Fix
+
+AutoTradeSettingWindow could terminate with a native Qt crash when the operator
+double-clicked a stock name to change operation_excluded while a stock-instance
+chart was open.
+
+The root cause was re-entrant table reconstruction within the
+QTableWidget.itemDoubleClicked signal stack:
+
+itemDoubleClicked
+-> operation_excluded mutation
+-> synchronous owner refresh
+-> stock_table.clearContents()/setRowCount(0)
+-> deletion of the QTableWidgetItem that emitted the active signal
+-> a later connected handler receiving an invalid item
+
+The corrected contract is:
+
+- The operation_excluded mutation is committed immediately.
+- Only owner/UI refresh is deferred with QTimer.singleShot(0, ...).
+- The originating signal stack completes before the table item is destroyed.
+- A queued callback exits safely if the settings window has already closed.
+- The existing operation-exclusion policy and storage meaning are unchanged.
+
+3. Stock-Instance Chart Entry Points
+
+AutoTradeSettingWindow and Main Monitoring use the same common chart opener:
+
+open_stock_instance_chart(stock_code, trade_date=None, parent=...)
+
+The actual entry paths are:
+
+- AutoTradeSettingWindow: double-click the visible stock-code cell.
+- Main Monitoring: double-click the stock-code token in the stock child row of
+  MainWindow.routine_table.
+- Main Monitoring obtains the code from ROUTINE_STOCK_CODE_ROLE and handles the
+  visible custom-delegate eventFilter path.
+
+The hidden running_stock_table is not the visible Production entry point. The
+earlier analysis that treated it as the active Main Monitoring entry was wrong
+and is superseded by this correction.
+
+4. Per-Stock Chart Singleton
+
+At most one live StockInstanceChartWindow exists for each stock_code across the
+whole program.
+
+- Reopening the same stock does not create another window.
+- The existing window is shown, raised, activated, and projection-refreshed.
+- Different stock codes may each have one window.
+- Settings-to-Main and Main-to-Settings entry reuse the same registry entry.
+- Closing a chart removes its live registry entry.
+- Reopening after close creates a new valid window.
+- Deleted/stale Qt objects are detected safely.
+- A late destroyed signal from an older window cannot remove a newer registry
+  entry for the same stock.
+
+5. Chart Lifecycle Ownership
+
+The chart lifecycle is independent of the feature window that opened it.
+
+- Closing AutoTradeSettingWindow does not close a chart opened from Settings.
+- MainWindow is the logical program lifecycle owner.
+- Closing MainWindow closes the live chart windows.
+- Qt parent ownership and logical lifecycle ownership are intentionally
+  separate.
+
+6. Persistent And Transient Window Policy
+
+Windows are classified by usage, not only by their Qt base class.
+
+A. Persistent Feature Window
+
+- Independent top-level window with no Qt parent ownership.
+- Qt.NonModal and show()-based.
+- Can be freely activated alongside other feature windows.
+- MainWindow remains the logical lifecycle owner.
+
+The implemented scope includes AutoTradeSettingWindow,
+StockInstanceChartWindow, stock management, stock performance, Review
+Management, environment settings, routine settings, logs, stock history, and
+event-record feature windows.
+
+B. Transient Message Or Confirmation Dialog
+
+- Keeps the actual invoking feature window as its parent.
+- Existing modal/exec_ behavior is preserved where required.
+- Remains above and associated with the work that requested the response.
+
+This class includes QMessageBox, deletion confirmation, operation confirmation,
+close/liquidation confirmation, risk and real-order approval, and short input
+dialogs. Persistent feature-window independence does not mean that every dialog
+is independent.
+
+7. Common Chart PnL Timer
+
+The former per-chart PnL timer structure was replaced by one program-level PnL
+timer that dispatches to the live chart registry.
+
+- One chart: one common timer.
+- Ten charts: one common timer.
+- Thirty charts: one common timer.
+- Per-chart PnL timers: zero.
+- The display refresh interval remains 1,000 ms.
+- Formatting, colors, last_projection, and the separate operation-cycle full
+  projection contract are unchanged.
+- Historical-date charts are excluded from live PnL refresh.
+
+8. PnL Batch Snapshot And Tick-Local Cache
+
+Each common timer tick calls
+project_current_stock_pnl_snapshot(stock_codes) once and creates a tick-local
+ConfirmablePnlRuntimeSnapshot. Per-stock results reuse the same calculation core
+as the single-stock API.
+
+For thirty charts, related reads change from:
+
+- Five common Runtime files x 30 = 150 reads.
+- Thirty stock state reads.
+- Total = 180 reads.
+
+to:
+
+- Five common Runtime reads.
+- Thirty fresh per-stock state reads.
+- Total = 35 reads.
+
+The shared tick snapshot includes:
+
+- pnl_cycle_boundaries.json
+- fills.json
+- realized_pnl.json
+- positions.json
+- broker_holdings.json
+- stock-directory resolution snapshot
+
+Per-stock state.json, current price, and timestamp remain fresh. No long-lived
+cache is introduced; cache lifetime is one PnL tick. Single and batch APIs keep
+identical calculation meaning.
+
+9. Main Monitoring Operation-State Source Of Truth
+
+A Production audit found three incompatible definitions:
+
+- The instance operation badge used stale trade_enabled/trade_started_at.
+- The displayed operation count represented normal registered stocks rather
+  than actual running stocks.
+- The former general-stop collector used raw status != STOPPED.
+
+This produced a visible operation badge and operation count even while the
+server was disconnected, Recovery was REVIEW_REQUIRED, and the current-running
+set was empty. It also produced different displayed and command-target sets.
+
+The confirmed current-running Source of Truth is the common current-session
+helper. Current participation requires:
+
+- a valid current MainWindow Recovery/session context;
+- operation_excluded=False;
+- no Review isolation;
+- actual participation in the current operation session.
+
+Persisted RUNNING or trade_enabled alone does not establish current operation.
+Main Monitoring and AutoTradeSettingWindow use the same current-session Source
+of Truth for their operation projection.
+
+10. Stale RUNNING Policy
+
+The audit observed stale persisted RUNNING evidence for the following stocks:
+
+- 028260
+- 035720
+- 068270
+- 086520
+- 091990
+- 247540
+- 293490
+
+The implementation did not delete those records or force them to STOPPED.
+Runtime cleanup remains a separate Recovery responsibility. Display projection
+and command targeting must not mistake stale persisted state for current-session
+participation.
+
+11. Instance Badge Contract
+
+The two displayed badge states are:
+
+- 정지
+- 운영중
+
+정지 means that the instance is not participating in the current operation.
+Double-clicking 정지 attempts operation start for the instance through the
+existing connection, Recovery, and Guard contracts.
+
+운영중 means actual current-session participation. Double-clicking 운영중:
+
+- performs no general-stop mutation;
+- opens no general force-stop confirmation;
+- may show `운영 중단은 긴급정지를 사용하십시오.` as guidance.
+
+12. General Operation-Stop Production Removal
+
+The project no longer has a separate general operation-stop command. This is a
+Production call-graph removal, not merely a hidden UI action.
+
+Removed:
+
+- auto_trade_stop_selected_auto_trades()
+- split_stop_targets()
+- stop_risk_parts()
+- the general force-stop confirmation dialog
+- Settings/Main general-stop wrappers
+- NO_STOPPABLE_TARGETS
+- general STOP_FAILED handling
+- running-badge-to-general-stop dispatch
+- general-stop-only tests and assertions
+
+The final search found zero general-stop-only Production symbols.
+
+13. STOPPED State Is Preserved
+
+Removal of the general stop command does not remove the STOPPED state.
+
+STOPPED remains valid for:
+
+- pre-operation state;
+- normal completion;
+- Recovery;
+- status projection;
+- normal close results and other existing lifecycle contracts.
+
+STOPPED state and a general operation-stop command are different concepts.
+
+14. Final Operation-Termination Contract
+
+There are two operation-termination families:
+
+A. Immediate interruption
+
+- Emergency Stop is the only forced interruption mechanism.
+- It is used for failures, hazards, explicit immediate interruption, and other
+  situations requiring immediacy.
+
+B. Normal operation completion
+
+- normal close;
+- early close;
+- automatic close;
+- close and liquidation policies;
+- individual and immediate liquidation;
+- existing end-of-market policy.
+
+The resulting structure is:
+
+operation start
+-> running
+   -> urgent/immediate interruption: Emergency Stop
+   -> normal completion: close/liquidation policy
+
+No separate general operation-stop command exists.
+
+15. Emergency Stop Preservation
+
+The existing Emergency Stop Backend and emergency-release contract are
+unchanged. Future UI entries may use whole-program, instance, or selected-stock
+scopes, but they must share the same Emergency Stop Production meaning.
+
+This update does not claim completion of any new instance-scoped Emergency Stop
+entry point.
+
+16. Verification Evidence
+
+General-stop removal and the associated contracts were verified as follows:
+
+- Direct focused tests: 250/250 PASS.
+- Badge, stale-state, and blocked-start tests: 6/6 PASS.
+- Emergency, operation-start, and exclusion tests: 89/89 PASS.
+- Close, liquidation, completion, and mutable-guard tests: 110/110 PASS.
+- Current-session SoT, Host, Recovery, and lifecycle tests: 45/45 PASS.
+- Production mutable guard: PASS.
+- Actual Kiwoom SendOrder: 0.
+- py_compile: PASS.
+- git diff --check: PASS.
+
+Existing unrelated GUI layout and legacy-fixture failures were not changed as
+part of this update.
+
+17. Explicit Exclusions
+
+- No existing Canonical or Freeze baseline is deleted or rewritten.
+- No Runtime, stock state, configuration, order, or log data is changed by this
+  documentation update.
+- No new Freeze is declared.
+- No commit, push, PR, or merge is part of this update.
+- Functionality without a completed implementation report is not recorded as
+  complete here.
+
+18. StockRegisterWindow Current-Running Projection
+
+StockRegisterWindow previously displayed ordinary registered stocks as 운영중
+from persisted trade_enabled evidence without validating current-session
+participation. This allowed stale previous-session RUNNING records to appear as
+current operation.
+
+The corrected path resolves the persistent feature logical owner and computes
+auto_trade_running_registered_operation_targets(owner) once per table refresh.
+Review and emergency display remain higher priority. Every other registered
+stock displays 운영중 only when its code is in that common target set; otherwise
+it displays 운영정지. StockRegister does not duplicate Recovery, session,
+trading-day, or exclusion logic.
+
+Verified no-current-session results:
+
+- 028260, 035720, 068270, 086520, 091990, 247540: 운영정지
+- 005380: 운영정지
+
+No Runtime record was deleted or normalized by this display correction.
+
+19. Closure Baseline
+
+- Code Freeze commit: ae89af31e41849e8f145bc2c4d01df32f2b280da
+- Focused isolated scope: 22 modules / 588 test IDs.
+- Reliable PASS: 576; known legacy FAIL: 5; legacy ERROR: 6;
+  known 32-bit Qt teardown abnormal outcome: 1.
+- Production mutable guard, py_compile, compileall, imports, and
+  git diff --check: PASS.
+- Actual Kiwoom SendOrder calls: 0.
+
+StockRegister operation-cycle automatic refresh is explicitly not completed.
+Only its decision at refresh time is corrected.

@@ -1,0 +1,158 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-12
+Scope: GUI chart lifecycle, current-running operation state, and stock-management display Freeze
+
+1. Authority And Baseline
+
+This document records only implementation confirmed in the local Production
+call paths and verified after the 2026-08-11 Main/Settings Shared Operation
+Freeze. Earlier Recovery, Review, emergency, close, Queue, Approval, Gate,
+SendOrder, and Chejan contracts remain in force unless explicitly refined here.
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze commit: ae89af31e41849e8f145bc2c4d01df32f2b280da
+
+The documentation baseline is the single docs Freeze commit containing this
+document. Its exact local and remote SHA is verified after push.
+
+2. Operation-Exclusion Double-Click Lifecycle
+
+- Stock-name double-click still commits operation_excluded immediately.
+- Owner and UI refresh is deferred with QTimer.singleShot(0, ...).
+- The QTableWidget.itemDoubleClicked stack completes before the originating
+  item can be deleted by table reconstruction.
+- This is a UI lifecycle correction only; exclusion policy is unchanged.
+
+3. Common Stock-Instance Chart Contract
+
+- Main Monitoring uses the visible MainWindow.routine_table stock-code path.
+- AutoTradeSettingWindow uses its stock-code double-click path.
+- Both call the same open_stock_instance_chart() Production opener.
+- One live StockInstanceChartWindow is allowed per stock_code program-wide.
+- A singleton hit performs show, raise, activate, and projection refresh while
+  preserving the user's current size and position.
+- Different stocks may have separate live charts.
+- Closed or deleted windows are removed safely and may be reopened.
+- Single and multi-selection opens use the same minimum-size tile allocator.
+- Only newly created charts occupy the first free slot; existing live charts
+  are never forcibly rearranged.
+- Main and Settings multi-selection opens every captured selected stock before
+  clearing the Main selection highlight.
+
+4. Persistent Feature Window Lifecycle
+
+- Persistent work windows are independent top-level, modeless windows.
+- MainWindow is their logical lifecycle owner, not their Qt parent owner.
+- Closing Settings does not close charts.
+- MainWindow shutdown closes registered persistent feature windows.
+- Main's `모든창닫기` closes persistent feature windows only and does not close
+  MainWindow or mutate Production state.
+- Transient messages and confirmation dialogs retain the actual invoking
+  feature window as parent and keep their existing modal contract.
+
+5. Chart PnL And Header
+
+- Live current-day charts share one QApplication-owned 1,000 ms PnL timer.
+- The timer starts when a current-day chart exists and stops after the last
+  eligible chart closes.
+- One timer tick builds one tick-local batch Runtime snapshot. No long-lived
+  PnL cache is introduced.
+- Single-stock and batch projection use the same calculation meaning.
+- Chart PnL is always `손익금(손익율)`, for example:
+  `0(0.00%)`, `+12,500(+1.25%)`, `-8,300(-0.83%)`.
+- The Chart PnL header does not display `원`, `확인 필요`, or `-` fallbacks.
+- Window title begins with stock code and name and preserves instance,
+  operation method, bar interval, and buy/sell counts.
+- The header keeps a two-row left identity/operation block and a right PnL plus
+  vertically stacked early-close/immediate-liquidation button block.
+- State, method, and liquidation text use stable fixed-width columns inside one
+  shared outline without internal badges or separators.
+
+6. Chart Identity Color Priority
+
+Stock code and stock name use one identity color with this priority:
+
+1. operation_excluded or Review-managed: gray
+2. emergency stopped: red
+3. actual current-running participation: blue
+4. otherwise stopped/nonparticipating: orange
+
+The state/method/liquidation text continues to show its own canonical state.
+Identity color does not redefine Production state.
+
+7. Current-Running Source Of Truth
+
+- Persisted RUNNING or trade_enabled alone does not mean current operation.
+- Current participation uses the shared MainWindow Recovery/session context,
+  current operation identity/trading day, operation_excluded=False, Review
+  isolation, and actual current participation.
+- Main Monitoring, AutoTradeSettingWindow, chart identity projection, and
+  StockRegisterWindow reuse the common current-running target contract.
+- Stale previous-session Runtime data is not deleted by display projection.
+
+8. StockRegisterWindow Operation Status
+
+StockRegisterWindow.refresh_stock_table() resolves the logical owner and calls
+auto_trade_running_registered_operation_targets(owner) once per refresh.
+
+Display priority is:
+
+1. Review-managed / 검토종목
+2. 긴급정지
+3. membership in the common current-running target set
+
+For an ordinary registered stock, membership displays 운영중; nonmembership
+displays 운영정지. StockRegisterWindow does not implement a duplicate Recovery,
+session, trading-day, or exclusion decision.
+
+Verified local projections with no current-session participation:
+
+- 028260, 035720, 068270, 086520, 091990, 247540: 운영정지
+- comparison stock 005380: 운영정지
+
+9. Operation Termination Contract
+
+- There is no separate general operation-stop command.
+- An 운영중 badge does not create or dispatch a general stop operation.
+- Immediate forced interruption uses Emergency Stop.
+- Normal completion uses normal close, early close, automatic close, and the
+  existing close/liquidation policies.
+- STOPPED remains a valid lifecycle state and is not a command entry point.
+- General-stop Production entry points must not be reintroduced.
+
+10. Main Monitoring PnL Display
+
+- A stock-row PnL slot remains numeric.
+- Missing or unavailable evidence projects `수익(0 / 0.00%)`.
+- Positive values use red, negative values blue, and zero neutral.
+- A real available value is never overwritten by the numeric fallback.
+
+11. Verification And Safety
+
+- Focused isolated scope: 22 modules / 588 test IDs.
+- Reliable PASS: 576; existing legacy failures: 5; legacy errors: 6;
+  post-test 32-bit Qt abnormal termination: 1.
+- All newly added and contract-focused lifecycle, chart, PnL, current-running,
+  exclusion, StockRegister, and menu tests passed.
+- The remaining outcomes are pre-existing layout measurements, incomplete test
+  harness callbacks, historical metadata expectations, and one known 32-bit Qt
+  teardown termination after an otherwise passing test.
+- Production mutable guard: PASS.
+- Runtime, stocks, routine_instances, archived_stocks, Event Journal, and
+  PROJECT_CHANGELOG fingerprints remained unchanged across the verification.
+- Actual Kiwoom SendOrder calls: 0.
+- py_compile, compileall, Production imports, and git diff --check: PASS.
+
+12. Explicitly Incomplete
+
+- StockRegisterWindow operation-cycle automatic refresh is not connected.
+  Its status decision is correct when refresh_stock_table() runs; automatic
+  operation-cycle refresh is a separate future task.
+- Review Bypass is not implemented.
+- Bootstrap UI/operator command is not implemented.
+- Historical fill routine_instance_id migration is not performed.
+
+No additional implementation is authorized by this Freeze.

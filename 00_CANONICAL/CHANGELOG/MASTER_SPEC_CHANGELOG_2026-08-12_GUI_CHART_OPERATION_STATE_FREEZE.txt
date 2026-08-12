@@ -1,0 +1,43 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-12
+Scope: GUI chart lifecycle, current-running operation state, and StockRegister display Freeze
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze commit: ae89af31e41849e8f145bc2c4d01df32f2b280da
+
+Recorded changes:
+
+- Deferred the UI refresh after operation-exclusion double-click mutation.
+- Added Main visible-table chart entry and common program-wide per-stock chart
+  singleton, free-slot tiling, and multi-selection open behavior.
+- Established independent persistent feature-window lifecycle with MainWindow
+  logical ownership while preserving transient dialog parenting.
+- Consolidated chart PnL into one 1,000 ms timer and one tick-local batch
+  snapshot without changing calculation meaning.
+- Froze chart title, compact numeric PnL, header geometry, and identity colors.
+- Added Main `모든창닫기` for persistent feature windows only.
+- Removed the separate general operation-stop Production command contract.
+- Unified Main, Settings, chart, and StockRegister current-running projection.
+- Corrected StockRegister stale RUNNING display without changing Runtime data.
+
+Verification:
+
+- Focused isolated scope: 22 modules / 588 IDs.
+- 576 reliable PASS; 5 legacy FAIL; 6 legacy ERROR; 1 known Qt teardown
+  abnormal outcome.
+- Production mutable guard, py_compile, compileall, Production imports, and
+  git diff --check: PASS.
+- Actual Kiwoom SendOrder calls: 0.
+
+Preserved:
+
+- Runtime, stocks, routine_instances, archived_stocks, Event Journal,
+  PROJECT_CHANGELOG, operation_policy, logs, backups, diagnostics, artifacts,
+  and unrelated code/docs dirty state were not included in the Freeze commits.
+
+Explicit remaining item:
+
+- StockRegisterWindow operation-cycle automatic refresh is not connected.
