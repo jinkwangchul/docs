@@ -1,0 +1,106 @@
+MASTER_SPEC_CANONICAL_2026-08-14_BUDGET_SEMANTIC_CONTRACT_CLARIFICATION
+
+Status:
+- This is the Current supplemental Canonical for the confirmed budget semantic
+  contract.
+- It supplements
+  `MASTER_SPEC_CANONICAL_2026-07-26_MAIN_MONITORING_BADGE_AND_BUDGET_CONCEPT_FREEZE.txt`
+  without rewriting that older Canonical.
+- This document clarifies confirmed terminology and interpretation boundaries
+  only. It does not claim or authorize a code, Runtime, schema, JSON, storage,
+  calculation, Queue, Broker, or SendOrder change.
+
+1. System Budget Setting
+
+- 시스템에서 사전에 설정하는 예산은 `전체예산` 하나뿐이다.
+- `전체예산`은 시스템 전체 범위의 상위 예산 개념이다.
+- 루틴 정의, 루틴 인스턴스, 또는 종목에 `전체예산`의 일부를 사전에
+  배정하는 구조가 아니다.
+- 메인 `예산현황`의 `전체예산`, `가용`, `완충`은 모두 시스템
+  `전체예산` 기준의 상위 개념이다. 이를 루틴별 `budget` 값의 합계로
+  해석하지 않는다.
+- `가용`/`완충`의 비율, 계산, 저장 Source of Truth는 별도 확정 계약이
+  생기기 전까지 정의되거나 구현된 것으로 간주하지 않는다. 임의의
+  공식, 필드, writer, 기본 비율을 생성하지 않는다.
+
+2. Routine And Routine-Instance Boundary
+
+- 루틴 정의 또는 루틴 인스턴스에 별도 예산을 사전 배정하지 않는다.
+- 루틴 또는 루틴 인스턴스에 `전체예산`의 몫을 할당하지 않는다.
+- `루틴예산` 또는 `인스턴스예산`이라는 새 개념을 만들지 않는다.
+- `routine.json > budget`처럼 코드나 JSON의 필드명이 `budget`으로
+  보이더라도, 실제 Production 의미와 Canonical 계약을 확인하지 않고
+  이를 루틴별 예산 배정액으로 해석하지 않는다.
+- 기존 필드명은 그 자체로 reserved allocation, portfolio allocation,
+  또는 hierarchical budget allocation의 증거가 아니다.
+
+3. Limit Amount (`한도금액`)
+
+- `한도금액`은 예산 배정액이 아니다.
+- `한도금액`은 실제 사용할 수 있는 최대 범위를 제한하는 상한값
+  (ceiling)이다.
+- 돈을 미리 떼어 놓는 개념, reserved allocation, reserved budget,
+  또는 계층별 budget allocation으로 해석하지 않는다.
+- `한도금액`은 actual spending eligibility의 최대 범위를 제한할 뿐,
+  그 금액이 이미 특정 루틴, 인스턴스, 또는 종목에 배정되었음을 뜻하지
+  않는다.
+
+4. Initial Stock Budget (`종목 최초예산`)
+
+- `종목 최초예산`은 해당 종목의 초기 매수 크기를 산정하는 기준이다.
+- `전체예산`에서 해당 종목 몫을 사전에 떼어 놓은 allocation이 아니다.
+- `종목 최초예산`을 reserved budget, stock-level portfolio allocation,
+  또는 계층 배분 결과로 해석하지 않는다.
+
+5. Current Purchase Budget (`현재 구매예산`)
+
+- `현재 구매예산`은 연속매수, 추가매수, 능동매수 등 실제 매수 흐름이
+  발생할 때 적용 가능한 기존 매수 규칙에 따라 그 시점에 계산 또는
+  결정되는 실행용 금액이다.
+- `현재 구매예산`은 루틴, 인스턴스, 또는 종목에 미리 저장해 둔 계층별
+  배분값이 아니다.
+- `현재 구매예산`을 `전체예산`, `종목 최초예산`, `한도금액`, 또는
+  `운영금액`과 서로 대체 가능한 개념으로 해석하지 않는다.
+
+6. Explicitly Forbidden Interpretations
+
+The following interpretations and implementations are prohibited without a new
+explicit user-approved Canonical contract:
+
+- `routine.json > budget`라는 필드명만 보고 `루틴 예산`으로 해석하기
+- 루틴 정의 또는 루틴 인스턴스별 예산 배분 구조 만들기
+- `전체예산`을 루틴별 또는 인스턴스별로 자동 분배하기
+- `종목 최초예산`을 `전체예산`의 사전 allocation으로 해석하기
+- `한도금액`을 reserved budget 또는 이미 확보된 사용액으로 해석하기
+- 일반적인 portfolio allocation 모델을 이 프로젝트에 임의 적용하기
+- 코드 필드명이나 일반 금융 용어를 근거로 새로운 예산 hierarchy,
+  persistence field, Runtime state, calculation policy, 또는 writer 만들기
+- `전체예산`, `가용`, `완충`을 루틴별 `budget` 합계로 투영하기
+
+7. AI And Agent Interpretation Rule
+
+- 예산 관련 코드 필드명과 일반 금융 용어보다 프로젝트 Canonical 계약을
+  우선한다.
+- `예산`, `한도금액`, `종목 최초예산`, `현재 구매예산`, `운영금액`,
+  `완충금액`을 서로 대체 가능한 개념으로 해석하지 않는다.
+- 이름이 비슷하다는 이유로 Source of Truth, ownership, calculation,
+  persistence, 또는 lifecycle을 합치지 않는다.
+- 새로운 계층별 예산 배분 개념은 사용자의 명시적 승인과 새 Canonical
+  계약 없이는 생성하지 않는다.
+- 구현 요청이 이 문서에 정의되지 않은 가용/완충 비율, 계산식, 저장
+  필드, writer, 또는 hierarchy를 필요로 하면 추론하여 구현하지 말고
+  미확정 계약으로 보고한다.
+- 이 해석 규칙은
+  `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`의 문서 역할 및
+  architecture contamination 방지 원칙과 함께 적용한다.
+
+8. Preserved Boundary
+
+- 2026-07-26 Canonical에 기록된 `전체예산 설정`, `종목 최초예산`,
+  `예산방식(금액/주수)`, `현재 구매예산`, `운영금액`, `완충금액`,
+  `한도금액` 용어 경계는 유지한다.
+- 이 보완 문서는 그 용어들의 서로 다른 의미와 금지된 해석을 명시할
+  뿐, 예산 계산식이나 Production 구현을 추가하지 않는다.
+- Production code, Runtime, stocks, routine definitions, routine instances,
+  JSON schema, `routine.json`, Queue, Broker, Recovery, and SendOrder contracts
+  are unchanged by this documentation update.

@@ -30,6 +30,7 @@ This Reference Index is an index. It is not an AI operating policy document.
 ## Current Policy References
 
 - Agent workflow and operation rules: `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
+- Budget Semantic Contract Clarification (예산 관련 질문/작업 전 우선 확인): `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-14_BUDGET_SEMANTIC_CONTRACT_CLARIFICATION.txt`
 - GUI State and Stock Register Context Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`
 - GUI State and Stock Register Context Readable Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_READABLE_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`
 - GUI State and Stock Register Context Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`
