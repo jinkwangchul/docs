@@ -1,0 +1,98 @@
+WORK RESUME LATEST
+Date: 2026-08-15
+Scope: normalized close action and completed buffer-response execution Freeze
+
+1. Git Baselines
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Local: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze commit: 51c26c411c3330efc2280fdb553f761ff6c7abc7
+- Local and origin branch SHA were equal after push.
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Local: C:\Users\JIN KWANG CHUL\Documents\docs
+- Branch: agent/project-prompt-standard
+- The single docs Freeze commit containing this file is the baseline; confirm
+  local and origin SHA equality before resuming work.
+
+2. Completed Close-Action Contract
+
+- `조기마감` is the common `EARLY_CLOSE + routine` route.
+- `즉시청산` is the common `EARLY_CLOSE + market` route.
+- Chart, Main routine-category, Main routine-instance, and buffer-response UI
+  and callers use this normalized meaning.
+- Global automatic early-close method remains
+  `operation_policy.json > early_close.method`.
+- Stock-level method remains the existing per-stock instant method.
+- Separate immediate-liquidation command, request key/status, executor, and
+  persistent operation mode are removed.
+- `IMMEDIATE_LIQUIDATION_REQUIRED` is only a durable buffer intent and is not a
+  separate command or executor.
+
+3. Completed Buffer-Response Execution Loop
+
+- Official system-budget consumption projection is based on OPEN position cost
+  plus confirmable unresolved BUY reservation.
+- Stable entry increase creates a durable event and ownership record.
+- One event owns at most one target; replay is idempotent across restart and
+  Recovery.
+- Candidate selection is fail-closed, returns zero or one stock, and supports
+  the three confirmed single factors and two directions.
+- `투입금액` ranking is `open_cost`; BUY reservation is not part of that
+  ranking value.
+- Below threshold: owned target uses `EARLY_CLOSE + routine`.
+- At or above threshold: one existing buffer-owned EARLY_CLOSE pending target
+  is escalated through BUY-only cancellation, confirmation, actual holding
+  reconciliation, and `EARLY_CLOSE + market`.
+- SELL cancellation, ordinary-holding expansion, predicted recovery, and
+  multi-target escalation are prohibited.
+- `evaluate_operation_close_completion()` provides completion evidence.
+- Only `DONE` or `CARRYOVER_DONE` completes ownership.
+- After actual completion the official budget projection is recalculated. If
+  still at or above threshold, only one next owned pending target is escalated.
+- Below-threshold, zero-buffer, and no-owned-target results stop or return
+  non-execution without fabricating work.
+
+4. Verification
+
+- Buffer-response focused discovery: 100 PASS.
+- Related account-budget, BUY-only cancellation, and budget-panel: 72 PASS.
+- Normalized close-action GUI focused: 5 PASS.
+- OperationCommand focused: 46 PASS.
+- Close completion, Recovery, and operation-cycle: 147 PASS.
+- Total relevant/focused: 370 PASS.
+- Broad related GUI: 165 tests, with 5 existing unrelated failures and
+  2 existing unrelated errors.
+- Actual SendOrder: 0.
+- Production Runtime fingerprint change: 0.
+- 32-bit py_compile: PASS.
+- git diff --check: PASS.
+
+5. Preserved Working State
+
+- Runtime, stock state/config/order/candle data, routine-instance JSON,
+  operation_policy, archived stocks, Event Journal, diagnostics, artifacts,
+  logs, and PROJECT_CHANGELOG remain outside the code Freeze commit.
+- The docs repository contains broad pre-existing unrelated dirty/untracked
+  history. Only this Canonical, this Work Resume, and the Reference Index update
+  belong to the docs Freeze commit.
+- Do not reset, restore, stash, clean, or broadly stage those preserved files.
+
+6. Known Unrelated Test Outcomes
+
+The seven broad-GUI outcomes are existing layout or test-fixture issues: a
+missing mock patch target, a missing widget fixture, a historical badge-style
+expectation, two old width expectations, one hit-rectangle expectation, and one
+elision expectation. They are not changed by this Freeze.
+
+7. Resume Rule
+
+The normalized close-action contract and the buffer-response execution loop are
+complete. Do not reopen them as unfinished work. Resume only an explicitly
+authorized unrelated item, and preserve the existing Runtime, Recovery, Queue,
+order, and SendOrder contracts.

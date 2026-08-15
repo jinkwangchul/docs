@@ -1,0 +1,167 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-15
+Scope: normalized close action and completed buffer-response execution Freeze
+
+1. Authority And Baseline
+
+This Current Canonical records the Production contracts confirmed after the
+2026-08-12 GUI Chart And Operation-State Freeze and the 2026-08-14 Budget
+Semantic Contract Clarification. Earlier Runtime, Recovery, Queue, Approval,
+SendOrder, Chejan, budget-semantic, and operation-state contracts remain in
+force unless explicitly refined here.
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze commit: 51c26c411c3330efc2280fdb553f761ff6c7abc7
+
+The documentation baseline is the single docs Freeze commit containing this
+document. Confirm its exact local and remote SHA after push.
+
+2. Normalized Close Action Contract
+
+Operator-facing close actions are projections of the existing common
+EARLY_CLOSE Production contract:
+
+- `조기마감` = `EARLY_CLOSE` with liquidation method `routine`.
+- `즉시청산` = `EARLY_CLOSE` with liquidation method `market`.
+
+These labels do not define two independent close systems. State, method, and
+liquidation remain separate display concepts, while execution continues through
+the existing close, order, completion, Recovery, and reconciliation pipelines.
+
+The normalized projection applies to:
+
+- stock-instance chart controls;
+- Main Monitoring routine-category actions;
+- Main Monitoring routine-instance actions; and
+- buffer-response policy and execution.
+
+The automatic-trading settings global early-close method remains
+`operation_policy.json > early_close.method`. A stock-level immediate method is
+the user's per-stock close-method choice and does not create a separate durable
+operation mode.
+
+3. Removed Excess Immediate-Liquidation Contract
+
+The following separate contract surface is removed from Production Python:
+
+- `COMMAND_IMMEDIATE_LIQUIDATION`;
+- `immediate_liquidation_request`;
+- `IMMEDIATE_LIQUIDATION_REQUEST_KEY`;
+- `IMMEDIATE_LIQUIDATION_STATUS_REQUESTED`;
+- a separate immediate-liquidation executor; and
+- a separate persistent immediate-liquidation operation mode.
+
+`IMMEDIATE_LIQUIDATION_REQUIRED` may remain only as a durable buffer-response
+policy/ownership intent. It is not an OperationCommand, an executor, or an
+independent stock operation state. Its execution meaning is the normalized
+`EARLY_CLOSE + market` route.
+
+4. System-Budget Buffer Basis
+
+- Buffer response uses the confirmed system-level total budget contract.
+- Buffer consumption is projected from actual OPEN position cost basis plus
+  unresolved BUY reservation that can be confirmed safely.
+- SELL orders do not increase budget consumption.
+- Filled BUY quantity belongs to position cost; only remaining BUY quantity may
+  belong to open reservation, preventing double counting.
+- Missing, malformed, account-mismatched, or otherwise uncertain evidence is
+  fail-closed.
+- Routine, routine-instance, or stock budget allocation is not introduced.
+
+5. Stable Entry, Event, And Ownership
+
+- A stable buffer-entry increase creates a durable event and ownership record.
+- A single event can own at most one selected stock target.
+- Event identity, target ownership, response intent, and dispatch/completion
+  evidence survive process restart and Recovery.
+- Reprocessing the same event is idempotent and must not select a new stock.
+- A new stable increase may create a new event and select the next eligible
+  stock independently.
+- Ordinary holdings are never converted into buffer-owned targets merely
+  because the current entry ratio is high.
+
+6. Candidate And Policy Contract
+
+- Candidate selection uses only actually OPEN, auto-trade-owned positions with
+  confirmable snapshots.
+- Stocks already in close, liquidation, SELL progression, or another confirmed
+  termination flow are excluded fail-closed.
+- One policy evaluation returns zero or one new target.
+- Supported single evaluation factors are cumulative profit amount,
+  cumulative profit rate, and OPEN position cost.
+- `투입금액` ranking uses `open_cost`; open BUY reservation is not mixed into
+  that ranking value.
+- Direction is only high-to-low or low-to-high.
+- Exact ties use stable stock identity only; no secondary strategy score is
+  introduced.
+
+7. Threshold And Response Contract
+
+The configured threshold `T` comes from the buffer-response setting and is not
+hard-coded to 80.
+
+- Below `T`: an owned target receives the normalized `EARLY_CLOSE + routine`
+  action.
+- At or above `T`, including `구간마감`: only an existing buffer-owned
+  EARLY_CLOSE pending target may be escalated.
+- Escalation handles one stock at a time.
+- The escalated target first uses BUY-only cancellation.
+- SELL cancellation is prohibited.
+- Cancellation confirmation and actual holding reconciliation must complete
+  before the market close route proceeds.
+- The execution route is the existing normalized `EARLY_CLOSE + market`
+  pipeline; no new immediate executor exists.
+
+8. Completion And Sequential Escalation
+
+- Dispatch is not completion.
+- Completion is accepted only from the existing
+  `evaluate_operation_close_completion()` result.
+- Only actual `DONE` or `CARRYOVER_DONE` evidence completes ownership.
+- Predicted recovery or projected proceeds are not completion evidence.
+- After completion, the official budget projection is evaluated again.
+- If the buffer remains at or above `T`, at most one next buffer-owned
+  EARLY_CLOSE pending target is escalated.
+- The next target is never escalated before the previous target has actual
+  completion evidence.
+- If the buffer falls below `T`, escalation stops.
+- If the buffer becomes zero, the response sequence terminates.
+- If no eligible owned pending target exists, the result is non-execution.
+
+9. Safety And Idempotency
+
+- Recovery resumes durable ownership and intent without duplicating target
+  selection, cancellation, close dispatch, or completion.
+- One cycle cannot issue multiple escalations for the same ownership event.
+- Other stocks' BUY orders are not cancelled.
+- SELL mutation is not introduced by buffer response.
+- No separate immediate command, mode, executor, or fallback liquidation path
+  may be reintroduced.
+- Runtime and stock state are changed only by their existing canonical writers
+  during real Production execution; verification uses mocks or isolated paths.
+
+10. Verification
+
+- Buffer-response focused discovery: 100 PASS.
+- Related account-budget, BUY-only cancellation, and budget-panel scope:
+  72 PASS.
+- Normalized close-action GUI focused scope: 5 PASS.
+- OperationCommand focused scope: 46 PASS.
+- Close completion, Recovery, and operation-cycle scope: 147 PASS.
+- Total relevant/focused verification: 370 PASS.
+- Broad related GUI run: 165 tests with 5 existing unrelated failures and
+  2 existing unrelated errors; no new failure was attributed to this Freeze.
+- Actual Kiwoom SendOrder calls: 0.
+- Production Runtime fingerprint change: 0.
+- 32-bit Python py_compile: PASS.
+- Code and documentation git diff --check: PASS.
+
+11. Explicit Boundary
+
+This Freeze does not authorize a new feature, a new Runtime schema, a new
+immediate-liquidation command, a new executor, a UI redesign, or a change to
+unrelated legacy failures. Historical documents remain evidence only where they
+do not conflict with this Current Canonical.
