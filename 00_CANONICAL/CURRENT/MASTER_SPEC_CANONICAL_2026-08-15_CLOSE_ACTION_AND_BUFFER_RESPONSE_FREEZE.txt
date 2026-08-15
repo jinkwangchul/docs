@@ -39,9 +39,24 @@ The normalized projection applies to:
 - buffer-response policy and execution.
 
 The automatic-trading settings global early-close method remains
-`operation_policy.json > early_close.method`. A stock-level immediate method is
-the user's per-stock close-method choice and does not create a separate durable
-operation mode.
+`operation_policy.json > early_close.method`.
+
+Entry-point precedence is fixed as follows:
+
+- In a paired `조기마감 / 즉시청산` control, the two labels explicitly select
+  `routine` and `market`, respectively.
+- A standalone `조기마감` control uses the current
+  `operation_policy.json > early_close.method`; the paired-control rule must not
+  hard-code that standalone action to `routine`.
+- A stock context-menu command uses the one-shot method selected by the operator
+  for that invocation: `루틴마감`, `시장가`, `현재가`, `손/익절`, or `이월`.
+  The environment default may initialize the choice but must not overwrite the
+  explicit context-menu selection, and the one-shot selection must not rewrite
+  the environment default.
+
+All three entry forms retain the same canonical state, method, liquidation,
+Recovery, Queue, order, fill, and completion contracts. A stock-level one-shot
+method does not create a separate durable operation mode.
 
 3. Removed Excess Immediate-Liquidation Contract
 
@@ -62,6 +77,25 @@ independent stock operation state. Its execution meaning is the normalized
 4. System-Budget Buffer Basis
 
 - Buffer response uses the confirmed system-level total budget contract.
+- The canonical storage is `operation_policy.json > system_budget` with
+  `total_budget` and `available_budget_percent`.
+- `available_budget_percent` is the only stored available/buffer ratio value.
+  `buffer_budget_percent` is derived as `100 - available_budget_percent` and is
+  not an independent Source of Truth.
+- The system-level amounts are projected as
+  `available_budget = floor(total_budget * available_budget_percent / 100)` and
+  `buffer_budget = total_budget - available_budget`; any integer remainder stays
+  in the buffer so the two amounts always equal `total_budget`.
+- `available_budget_percent == 100` means buffer disabled. In that state the
+  stored value remains 100 while the UI may project inactive ratio/entry fields
+  as `-`.
+- This system-level ratio and amount contract refines only the 2026-08-14
+  Canonical statements that the available/buffer calculation and storage were
+  then unconfirmed. The 2026-08-14 prohibition on routine, instance, and stock
+  allocation remains fully in force.
+- Buffer is a response region inside the one system total-budget model. It is
+  not a routine budget, stock budget, reserved portfolio allocation, or a new
+  hierarchical allocation system.
 - Buffer consumption is projected from actual OPEN position cost basis plus
   unresolved BUY reservation that can be confirmed safely.
 - SELL orders do not increase budget consumption.
@@ -80,6 +114,11 @@ independent stock operation state. Its execution meaning is the normalized
 - Reprocessing the same event is idempotent and must not select a new stock.
 - A new stable increase may create a new event and select the next eligible
   stock independently.
+- The event unit is one stable buffer-entry increase batch. Distinct stable
+  batches may accumulate EARLY_CLOSE ownership on multiple stocks over time,
+  while each individual event still owns at most one target.
+- Crossing the configured threshold does not convert every accumulated
+  EARLY_CLOSE ownership to market close at once.
 - Ordinary holdings are never converted into buffer-owned targets merely
   because the current entry ratio is high.
 
@@ -98,15 +137,53 @@ independent stock operation state. Its execution meaning is the normalized
 - Exact ties use stable stock identity only; no secondary strategy score is
   introduced.
 
+6.1 Buffer-Response Settings Surface
+
+- `일괄적용` and `손익별 적용` are mutually exclusive application modes.
+- `손익별 적용` contains exactly `▪ 수익` and `▪ 손실`. The selected row is
+  based on the confirmable total automatic-trading cumulative PnL amount:
+  total amount greater than or equal to zero selects `수익`; a negative total
+  selects `손실`.
+- Each active strategy row has exactly one evaluation factor and one direction.
+  The retired first/second/third-priority model must not be recreated.
+- Evaluation factors are exactly `손익비율`, `손익금액`, and `투입금액`.
+  Directions are exactly `높은순` and `낮은순`. No secondary score or implicit
+  tie-breaking strategy is authorized.
+- Each row owns an independent response badge. Only a double-click cycles
+  `조기마감 -> 즉시청산 -> 구간마감 -> 조기마감`; a single click changes
+  nothing, and a disabled row cannot cycle.
+- The current Production policy reads the open settings surface fail-closed.
+  Missing, closed, or invalid settings do not authorize an inferred default or
+  an executable response.
+
+6.2 Candidate Interpretation Boundary
+
+- The stock whose activity happened to cross the threshold is not automatically
+  the market-close target.
+- A new stable event uses the configured single filter to select one eligible
+  OPEN candidate. Threshold escalation re-evaluates only the existing
+  buffer-owned EARLY_CLOSE pending pool with that filter.
+- `손익금액` uses cumulative PnL amount, `손익비율` uses cumulative PnL rate,
+  and `투입금액` uses OPEN position `open_cost`.
+
 7. Threshold And Response Contract
 
 The configured threshold `T` comes from the buffer-response setting and is not
 hard-coded to 80.
 
-- Below `T`: an owned target receives the normalized `EARLY_CLOSE + routine`
-  action.
-- At or above `T`, including `구간마감`: only an existing buffer-owned
-  EARLY_CLOSE pending target may be escalated.
+- The UI allows 10 through 90 percent in 10-percent steps.
+- `80%` is only the current initial display choice; it is not a Production
+  constant.
+- `T` is a buffer-entry-ratio threshold, not a time threshold.
+- The display meaning is `조기마감  ◁ T ▷  즉시청산`.
+- The `< T` and `>= T` split is applied when the row response mode is
+  `구간마감`. Explicit `조기마감` or `즉시청산` badge choices retain their
+  explicit response meaning.
+
+- In `구간마감` mode below `T`, an owned target receives the normalized
+  `EARLY_CLOSE + routine` action.
+- In `구간마감` mode at or above `T`, only an existing buffer-owned EARLY_CLOSE
+  pending target may be escalated.
 - Escalation handles one stock at a time.
 - The escalated target first uses BUY-only cancellation.
 - SELL cancellation is prohibited.
@@ -128,6 +205,8 @@ hard-coded to 80.
 - The next target is never escalated before the previous target has actual
   completion evidence.
 - If the buffer falls below `T`, escalation stops.
+- Remaining buffer-owned targets stay in their EARLY_CLOSE state when
+  escalation stops; falling below `T` does not clear or rewrite their ownership.
 - If the buffer becomes zero, the response sequence terminates.
 - If no eligible owned pending target exists, the result is non-execution.
 
@@ -136,6 +215,15 @@ hard-coded to 80.
 - Recovery resumes durable ownership and intent without duplicating target
   selection, cancellation, close dispatch, or completion.
 - One cycle cannot issue multiple escalations for the same ownership event.
+- A buffer event cannot overwrite or duplicate an active buffer ownership held
+  by another event. Conversely, buffer response cannot seize a stock that has
+  another confirmed close, liquidation, or SELL flow. Any ownership or command
+  conflict is fail-closed.
+- BUY-only cancellation is scoped to unresolved BUY remainder for the selected
+  target stock. A partial fill remains actual holding; only its unresolved BUY
+  remainder may be cancelled.
+- Uncertain cancellation confirmation blocks market close until confirmed
+  state and actual holding reconciliation are available.
 - Other stocks' BUY orders are not cancelled.
 - SELL mutation is not introduced by buffer response.
 - No separate immediate command, mode, executor, or fallback liquidation path
@@ -165,3 +253,20 @@ This Freeze does not authorize a new feature, a new Runtime schema, a new
 immediate-liquidation command, a new executor, a UI redesign, or a change to
 unrelated legacy failures. Historical documents remain evidence only where they
 do not conflict with this Current Canonical.
+
+For the specific contracts in this document:
+
+- Section 4 refines the 2026-08-14 Budget Semantic Contract's earlier
+  `가용/완충` calculation-and-storage-unconfirmed statements. Its terminology
+  and no-allocation boundaries are not superseded.
+- Sections 2 and 3 supersede the 2026-07-19 statement that
+  `IMMEDIATE_LIQUIDATION` is an existing independent command and the 2026-07-20
+  statement that `즉시청산` uses a separate Immediate Liquidation
+  OperationCommandService path or REQUESTED contract.
+- The 2026-08-01 statement that `조기마감` and `즉시청산` are distinct operator
+  intentions remains valid, but their current execution interpretation is the
+  shared EARLY_CLOSE route with `routine` and `market` methods defined here.
+
+No other section of those earlier Current Canonicals is globally retired by
+this precedence clarification. A UI label named `즉시청산` must never be used
+as authority to recreate a separate command architecture.

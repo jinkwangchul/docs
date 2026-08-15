@@ -28,7 +28,9 @@ Documentation repository:
   and callers use this normalized meaning.
 - Global automatic early-close method remains
   `operation_policy.json > early_close.method`.
-- Stock-level method remains the existing per-stock instant method.
+- Paired controls fix `조기마감 / 즉시청산` to `routine / market`; a standalone
+  조기마감 uses the environment default, while a stock context menu uses its
+  explicit one-shot selection without rewriting that default.
 - Separate immediate-liquidation command, request key/status, executor, and
   persistent operation mode are removed.
 - `IMMEDIATE_LIQUIDATION_REQUIRED` is only a durable buffer intent and is not a
@@ -36,11 +38,23 @@ Documentation repository:
 
 3. Completed Buffer-Response Execution Loop
 
+- `operation_policy.json > system_budget.total_budget` and
+  `available_budget_percent` are the canonical system-level settings. Buffer
+  percent and amount are derived; 100 percent available disables buffer.
+- This confirmed implementation refines the 2026-08-14 document's earlier
+  available/buffer-unconfirmed statement only. Its no-allocation contract stays
+  authoritative.
+- The settings surface uses mutually exclusive 일괄/손익별 modes, one filter per
+  row, the exact three factors and two directions, independent double-click
+  response badges, and a 10-90 percent buffer-entry threshold in 10-percent
+  steps. Missing or invalid live settings fail closed.
 - Official system-budget consumption projection is based on OPEN position cost
   plus confirmable unresolved BUY reservation.
 - Stable entry increase creates a durable event and ownership record.
 - One event owns at most one target; replay is idempotent across restart and
   Recovery.
+- Distinct stable entry batches may accumulate owned EARLY_CLOSE targets, but a
+  threshold crossing promotes only one existing owned pending target at a time.
 - Candidate selection is fail-closed, returns zero or one stock, and supports
   the three confirmed single factors and two directions.
 - `투입금액` ranking is `open_cost`; BUY reservation is not part of that
@@ -51,6 +65,8 @@ Documentation repository:
   reconciliation, and `EARLY_CLOSE + market`.
 - SELL cancellation, ordinary-holding expansion, predicted recovery, and
   multi-target escalation are prohibited.
+- Buffer ownership cannot overwrite another event's ownership or seize a stock
+  already in another confirmed close/SELL flow; conflicts fail closed.
 - `evaluate_operation_close_completion()` provides completion evidence.
 - Only `DONE` or `CARRYOVER_DONE` completes ownership.
 - After actual completion the official budget projection is recalculated. If
