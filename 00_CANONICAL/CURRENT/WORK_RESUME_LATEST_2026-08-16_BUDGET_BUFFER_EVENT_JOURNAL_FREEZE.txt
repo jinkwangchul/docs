@@ -1,0 +1,181 @@
+WORK RESUME LATEST
+Date: 2026-08-16
+Scope: persisted budget-buffer policy, Main performance presentation, and Event Journal phase-1 Freeze
+
+1. Git Baselines
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Local: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Code Freeze SHA: d94f1291bc9adf0088cedbdc9079f2935f7f07b6
+- Commit message: feat: finalize budget buffer ui and event journal
+- Local and origin branch SHA were equal after push.
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Local: C:\Users\JIN KWANG CHUL\Documents\docs
+- Branch: agent/project-prompt-standard
+- The pushed docs Freeze commit containing this file, the matching Canonical,
+  and the Reference Index update is the documentation baseline.
+- Confirm the exact docs SHA from Git history and local/origin equality before
+  resuming. The final commit cannot embed its own SHA without changing it.
+
+2. Completed Budget/Buffer Persistence
+
+- Production Buffer Response policy SoT is
+  `operation_policy.json > buffer_response`.
+- Production reads it through `read_buffer_response_policy()`.
+- The settings surface is an editor only, not a Production SoT.
+- Unsaved changes, Cancel, and window close have zero Production effect.
+- Saved policy is available with the window closed and after restart.
+- Missing persisted policy returns
+  `BUFFER_RESPONSE_POLICY_NOT_CONFIGURED` fail-closed.
+- Malformed persisted policy returns `BUFFER_RESPONSE_POLICY_MALFORMED`
+  fail-closed.
+- Persisted schema contains `application_mode`, `threshold_percent`, and
+  `strategies.unified/profit/loss`; each strategy contains only
+  `evaluation_factor`, `direction`, and `response_mode`.
+- UI defaults are not Production authorization.
+
+3. Preserved Budget/Buffer And Close Execution
+
+- The only preconfigured budget is the system `total_budget`.
+- Routine/instance/stock budget allocation remains prohibited.
+- `available_budget_percent` is stored; buffer percent is derived only.
+- The completed 8/15 stable-event, durable ownership, candidate, threshold,
+  BUY-only cancellation, reconciliation, completion, sequential escalation,
+  idempotency, and Recovery contracts remain closed and authoritative.
+- One stable event owns at most one target, and only the existing buffer-owned
+  pending pool may be sequentially escalated after actual completion.
+- `조기마감` = `EARLY_CLOSE + routine`.
+- `즉시청산` = `EARLY_CLOSE + market`.
+- There is no `COMMAND_IMMEDIATE_LIQUIDATION`, separate immediate persistent
+  mode, command writer, or execution architecture.
+
+4. Completed Main GUI Freeze
+
+- Main top row contains `실적` to the right of `예산설정`.
+- It shows `누적` and `현재` values.
+- Initial/unavailable presentation is `0 (0.00%)`.
+- Positive values use `+` and red `#ED1C24`; negative values use `-` and blue
+  `#3F48CC`; zero is neutral; values are right-aligned.
+- The former `수익 0 / 0.00%` routine-summary badge is removed.
+- Shared PnL snapshots/calculation helpers were not removed with that badge.
+
+Explicit boundary: `실적` is not yet connected to an official Production
+aggregate PnL Source. The zero presentation is not business evidence of actual
+zero PnL, and no fake zero is written to Runtime or PnL state.
+
+5. Completed Event Journal Phase 1
+
+P1 operator decisions:
+
+- `OPERATOR_SYSTEM_DECISION`
+- `OPERATOR_OPERATION_DECISION`
+- `OPERATOR_SETTING_DECISION`
+- `OPERATOR_ORDER_DECISION`
+
+Operator choice and Production outcome are separate evidence. `ACCEPTED` does
+not mean backend/order/broker/fill success.
+
+P2 setting/management:
+
+- `SETTING_CHANGED`
+- `TRADING_TIME_CHANGED`
+- `ATS_CHANGED`
+- `ROUTINE_CHANGED`
+- `ROUTINE_INSTANCE_CREATED`
+- `ROUTINE_INSTANCE_DELETED`
+
+Only successful canonical mutation plus required read-back and a real
+before/after difference produces a change event. Same-value, Cancel, unsaved,
+validation-failed, writer-failed, and read-back-failed paths produce no success
+event.
+
+P3 operational warnings/errors:
+
+- `PROCESSING_ERROR`
+- `RUNTIME_WARNING`
+- `INTEGRITY_WARNING`
+
+Important operation, emergency, budget/buffer evidence, Runtime, and integrity
+failures are recorded without duplicating existing Recovery/account/connection/
+order evidence. Unchanged abnormal polling does not repeat events; recovery and
+recurrence may create a new event.
+
+Corrected existing boundaries:
+
+- `PNL_CYCLE_BOUNDARY_CREATED` records only creation of a confirmable PnL cycle
+  boundary.
+- `LIQUIDATION_REQUESTED` is recorded after atomic state write, verified
+  read-back, and `STOCK_APPLIED`; operator decision remains separate.
+
+6. Completed Event Record GUI
+
+- Existing columns remain `일시 / 구분 / 중요도 / 대상 / 이벤트 / 결과 / 내용`.
+- Existing period/category/severity filters remain.
+- Search covers stock, routine, event label/type, summary, reason code,
+  operator selection, and changes.
+- Details show operator selection, before-to-after changes, source, reason code,
+  correlation IDs, and sanitized details without a raw JSON dump.
+- Local-time display, actual timestamp sorting, immediate filter refresh,
+  explicit manual refresh, malformed record safety, and empty-journal safety are
+  complete.
+- No new thread/background worker was introduced.
+
+Journal append failure remains Production fail-open. Existing correlation
+fields are reused. Raw account number, password/authentication, API key/token,
+full traceback, Runtime absolute path, broker raw response, and full JSON dump
+must not be stored.
+
+7. Scope Closure And Verification
+
+- Event Journal P1/P2/P3: complete.
+- Event Record GUI: complete.
+- P4 general notices, ordinary Toasts, no-search-result messages, simple input
+  validation, and routine result confirmations: intentionally excluded.
+- Current Event Journal event-type gap: 0.
+
+Code verification:
+
+- Code Freeze SHA: d94f1291bc9adf0088cedbdc9079f2935f7f07b6
+- Tests: 470 / 470 PASS
+- FAIL: 0
+- ERROR: 0
+- Actual SendOrder: 0
+- Production mutable side effect: 0
+- 32-bit py_compile: PASS
+- git diff --check: PASS
+
+8. Preserved Working State
+
+- The code repository retains excluded Runtime, stock, routine-instance,
+  operation-policy, archive, artifact, log, and user-data changes outside the
+  code Freeze commit.
+- The docs repository retains broad pre-existing unrelated dirty/untracked
+  files. Only the 8/16 Canonical, this Work Resume, and the Reference Index
+  update belong to this docs Freeze.
+- Do not reset, restore, stash, clean, broadly stage, or delete preserved work.
+
+9. Explicit Incomplete
+
+The Main `실적` cumulative/current values still require an official Production
+aggregate PnL Source contract and connection. Until then, `0 (0.00%)` is UI
+fallback only and must not be interpreted or persisted as actual PnL evidence.
+
+Other explicit incompletes from earlier Current Canonicals remain open unless a
+separate completed implementation and verification proves otherwise.
+
+10. Resume Rule
+
+Treat Budget/Buffer persistence, the existing Buffer Response execution loop,
+the normalized close contract, Main performance UI skeleton, Event Journal
+P1/P2/P3, and the Event Record GUI as Frozen at the code SHA above. Do not
+reopen them based on old open-surface or separate-immediate-command language.
+
+Select the next task from the latest user instruction and Current Canonical.
+Do not infer that the explicit Main performance PnL-source incomplete is
+automatically the next task without user authorization.

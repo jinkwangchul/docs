@@ -1,0 +1,328 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-16
+Scope: persisted budget-buffer policy, Main performance presentation, and Event Journal phase-1 Freeze
+
+1. Authority And Freeze Baseline
+
+This Current Canonical supplements and, only where stated, refines the
+2026-08-15 Close Action And Buffer Response Freeze. All earlier Runtime,
+Recovery, Queue, Approval, SendOrder, Chejan, budget-semantic, close-action,
+buffer ownership, and operation-state contracts remain in force unless this
+document explicitly changes them.
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Code Freeze SHA: d94f1291bc9adf0088cedbdc9079f2935f7f07b6
+- Commit message: feat: finalize budget buffer ui and event journal
+
+The documentation baseline is the pushed docs Freeze commit containing this
+document, the matching Work Resume, and the Reference Index update. Its exact
+SHA is repository metadata and must be confirmed by local/remote equality after
+push; a Git commit cannot embed its own final SHA without changing that SHA.
+
+2. Production Buffer-Response Policy Source Of Truth
+
+The official Production Buffer Response policy Source of Truth is:
+
+`operation_policy.json > buffer_response`
+
+The official Production reader is:
+
+`read_buffer_response_policy()`
+
+The settings surface is an editor. It is not a Production Source of Truth.
+Production policy evaluation must not read unsaved widget memory as authority.
+
+Consequences:
+
+- Unsaved changes in an open settings surface have zero Production effect.
+- Cancel or window close does not change the persisted policy.
+- A saved policy remains usable while the settings window is closed.
+- A saved policy is restored after process restart.
+- A missing persisted section returns
+  `BUFFER_RESPONSE_POLICY_NOT_CONFIGURED` and is fail-closed.
+- A malformed persisted policy returns `BUFFER_RESPONSE_POLICY_MALFORMED` and
+  is fail-closed.
+- UI defaults and persisted Production state are distinct. A default visible
+  in an editor does not authorize Production execution until saved.
+
+This section supersedes only the 2026-08-15 Section 6.1 statements that
+Production reads the open settings surface or that a closed/missing surface is
+the policy-availability boundary. Missing or invalid persisted policy remains
+fail-closed.
+
+3. Persisted Buffer-Response Schema
+
+The canonical `operation_policy.json > buffer_response` section contains only:
+
+- `application_mode`
+- `threshold_percent`
+- `strategies`
+
+`strategies` contains exactly:
+
+- `unified`
+- `profit`
+- `loss`
+
+Each strategy contains exactly:
+
+- `evaluation_factor`
+- `direction`
+- `response_mode`
+
+No additional persistent buffer-response field, widget-memory fallback, or
+secondary policy store is authorized by this Freeze.
+
+4. Preserved Budget And Buffer Semantics
+
+The 2026-08-14 Budget Semantic Contract and the 2026-08-15 confirmed system
+budget implementation remain authoritative:
+
+- The system `total_budget` is the only preconfigured budget Source of Truth.
+- Routine, routine-instance, and stock budget allocation do not exist.
+- A stock limit amount is a ceiling, not a reserved allocation.
+- Initial stock budget is a sizing basis, not a pre-allocation.
+- Current purchase budget is an execution-time amount.
+- `operation_policy.json > system_budget` stores `total_budget` and
+  `available_budget_percent`.
+- `buffer_budget_percent` is derived only as
+  `100 - available_budget_percent` and is not stored independently.
+
+The completed Buffer Response execution contract is preserved:
+
+- `일괄적용` and `손익별 적용` are mutually exclusive.
+- Profit/loss segment selection uses confirmable total automatic-trading PnL.
+- Evaluation factors are exactly `손익비율`, `손익금액`, and `투입금액`.
+- Directions are exactly `높은순` and `낮은순`.
+- Response labels are exactly `조기마감`, `즉시청산`, and `구간마감`.
+- The threshold is dynamic from 10 through 90 percent in 10-percent steps.
+- `T` is the buffer-entry-ratio threshold.
+- The `< T` / `>= T` split applies only to `구간마감`.
+- One stable event owns at most one durable selected target.
+- Sequential escalation uses only the existing buffer-owned pending pool.
+- The next target is considered only after actual close completion evidence.
+- Recovery resumes the same ownership and close intent idempotently.
+- Candidate `투입금액` ranking uses OPEN position `open_cost`; unresolved BUY
+  reservation remains part of budget consumption but not this ranking value.
+
+This summary does not redefine the detailed ownership, cancellation,
+reconciliation, completion, or sequential escalation rules in the 2026-08-15
+Canonical.
+
+5. Normalized Close Contract
+
+The normalized close contract remains:
+
+- `조기마감` = `EARLY_CLOSE + routine`
+- `즉시청산` = `EARLY_CLOSE + market`
+
+The UI label `즉시청산` does not define an independent command architecture.
+Production has no:
+
+- `COMMAND_IMMEDIATE_LIQUIDATION`;
+- separate immediate persistent mode;
+- separate immediate command writer; or
+- separate immediate execution architecture.
+
+Existing orchestration helper, preparer, or dispatcher names do not constitute
+a separate command architecture. `IMMEDIATE_LIQUIDATION_REQUIRED` may remain
+only as the buffer policy/ownership intent whose execution meaning is the
+existing `EARLY_CLOSE + market` route.
+
+6. Main GUI Performance Presentation
+
+The Main top row now contains a `실적` QGroupBox to the right of `예산설정`.
+It contains two rows:
+
+- `누적`
+- `현재`
+
+The initial or unavailable presentation is `0 (0.00%)`.
+
+Display rules are:
+
+- positive amount includes a leading `+` and uses red `#ED1C24`;
+- negative amount includes `-` and uses blue `#3F48CC`;
+- zero uses the neutral color; and
+- value labels are right-aligned.
+
+The `실적` values are not yet connected to an official Production aggregate
+PnL Source. Therefore `0 (0.00%)` is an unavailable UI presentation, not
+business evidence that actual PnL is zero. No fake zero is written to Runtime,
+PnL snapshots, or accounting state, and no new PnL accounting contract is part
+of this Freeze.
+
+The former Main routine-summary badge `수익 0 / 0.00%` is removed. Its removal
+does not remove or redefine shared PnL snapshots, calculation helpers, or other
+PnL backends that may later supply the `실적` projection.
+
+7. Event Journal Phase 1
+
+Event Journal phase 1 covers P1 operator decisions, P2 setting/management
+changes, P3 important operational warnings/errors, and their Event Record GUI
+projection. P4 general information and routine Toast noise are intentionally
+excluded.
+
+7.1 P1 Operator Decision Evidence
+
+The operator-decision event types are:
+
+- `OPERATOR_SYSTEM_DECISION`
+- `OPERATOR_OPERATION_DECISION`
+- `OPERATOR_SETTING_DECISION`
+- `OPERATOR_ORDER_DECISION`
+
+Operator approval, rejection, cancellation, or selection is recorded separately
+from the resulting Production action. Result values include `ACCEPTED`,
+`REJECTED`, and `CANCELLED`. `ACCEPTED` is evidence of the operator decision;
+it is not evidence that a backend, order, broker request, or fill succeeded.
+
+For example, an accepted market early-close decision is an operator decision.
+The canonical liquidation request is later `LIQUIDATION_REQUESTED`, followed by
+separate order, SendOrder, broker, and fill evidence as applicable.
+
+7.2 P2 Setting And Management Evidence
+
+The setting/management event types are:
+
+- `SETTING_CHANGED`
+- `TRADING_TIME_CHANGED`
+- `ATS_CHANGED`
+- `ROUTINE_CHANGED`
+- `ROUTINE_INSTANCE_CREATED`
+- `ROUTINE_INSTANCE_DELETED`
+
+A change event is recorded only after the canonical writer succeeds, required
+read-back succeeds, and `before != after`. Same-value saves, Cancel, unsaved UI
+changes, validation failure, writer failure, and read-back failure produce no
+successful change event.
+
+`changes` uses the existing `field_key`, `before`, and `after` structure. A full
+JSON dump is prohibited. `ROUTINE_CHANGED` means a stock/routine relationship
+change; routine-instance creation/deletion means the lifecycle of the instance
+itself. These are distinct events.
+
+7.3 P3 Operational Warning And Error Evidence
+
+P3 reuses:
+
+- `PROCESSING_ERROR`
+- `RUNTIME_WARNING`
+- `INTEGRITY_WARNING`
+
+It covers important operation-start failures, emergency stop/release failures,
+uncertain budget or buffer execution evidence, and important Runtime/integrity
+failures. Existing Recovery, account, connection, or order failure evidence is
+not duplicated.
+
+Normal fail-closed polling must not flood the journal. The transition rule is:
+
+- normal to abnormal: one event;
+- unchanged abnormal state: zero additional events;
+- recovery to normal followed by recurrence: one new event is allowed.
+
+General Toasts, selection guidance, input validation, no-search-result messages,
+save-complete notices, and other routine information remain outside phase 1.
+
+8. Corrected Existing Event Boundaries
+
+8.1 `PNL_CYCLE_BOUNDARY_CREATED`
+
+- Category: `OPERATION`
+- Severity: `NOTICE`
+- Result: `COMPLETED`
+- Label: `손익 주기 경계 생성`
+- Summary: `확정 가능한 PnL 주기 경계가 생성되었습니다.`
+
+Its meaning is limited to creation of a confirmable PnL cycle boundary. It does
+not independently assert that profit/loss occurred or was finalized.
+
+8.2 `LIQUIDATION_REQUESTED`
+
+The event is recorded only after the operation-state atomic write, read-back
+verification, and confirmed `STOCK_APPLIED` canonical liquidation-request
+boundary.
+
+- `EARLY_CLOSE + routine` before an actual liquidation request produces zero
+  `LIQUIDATION_REQUESTED` events.
+- `EARLY_CLOSE + market` records `LIQUIDATION_REQUESTED` when the actual
+  liquidation request is entered.
+- Operator UI decision evidence remains separate.
+
+9. Event Journal Safety Contract
+
+Journal append failure is fail-open for Production. It must not block or roll
+back orders, liquidation, Recovery, setting save, operation start, emergency
+stop, or program shutdown.
+
+Existing correlation fields are reused, including `signal_id`, `order_id`,
+`execution_id`, `broker_order_no`, `command_id`, stock, routine, and session
+identity. No new correlation architecture is introduced.
+
+Event Journal records must not contain:
+
+- raw account numbers;
+- passwords or authentication values;
+- API keys or tokens;
+- complete tracebacks;
+- Runtime absolute paths;
+- broker raw responses; or
+- full JSON dumps.
+
+When account identity is needed, only the existing masked display is allowed.
+
+10. Event Record GUI Contract
+
+The existing main columns remain:
+
+- `일시`
+- `구분`
+- `중요도`
+- `대상`
+- `이벤트`
+- `결과`
+- `내용`
+
+The existing period, category, and severity filters remain. Search covers stock,
+routine, event label/type, summary, reason code, operator selection, and changes.
+
+Details show operator selection, before-to-after changes, source, reason code,
+correlation IDs, and sanitized details. Raw JSON dump presentation is not used.
+Time is displayed in local time and sorted by the actual timestamp. Filter
+changes refresh immediately, and an explicit manual refresh is available. No
+new thread or background worker is introduced.
+
+11. Phase-1 Completion And Verification
+
+Event Journal P1, P2, P3, and the Event Record GUI are complete for the defined
+phase-1 scope. P4 remains intentionally excluded. The current Event Journal
+event-type gap is zero.
+
+Code Freeze verification:
+
+- Code Freeze SHA: d94f1291bc9adf0088cedbdc9079f2935f7f07b6
+- Tests: 470 / 470 PASS
+- FAIL: 0
+- ERROR: 0
+- Actual SendOrder: 0
+- Production mutable side effect: 0
+- 32-bit Python py_compile: PASS
+- git diff --check: PASS
+
+12. Explicit Incomplete And Boundary
+
+The Main `실적` cumulative/current values remain explicitly incomplete because
+they are not connected to an official Production aggregate PnL Source. Future
+work must first confirm the canonical source and projection contract; this
+Freeze does not infer one.
+
+Other explicit incompletes in earlier Current Canonicals remain open unless
+there is separate code and verification evidence of completion.
+
+This Freeze does not authorize P4 journal expansion, new PnL accounting, new
+Runtime state, a separate immediate-liquidation system, a UI redesign, or any
+change to existing Queue, Recovery, order, SendOrder, Chejan, fill, and close
+contracts.
