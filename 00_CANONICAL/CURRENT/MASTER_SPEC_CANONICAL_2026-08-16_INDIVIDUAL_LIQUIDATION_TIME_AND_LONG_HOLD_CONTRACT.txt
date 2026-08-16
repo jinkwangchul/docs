@@ -1,0 +1,190 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-16
+Scope: Individual-liquidation time boundary and global long-term holding Review policy
+
+Status:
+- This is the Current supplemental Canonical for individual liquidation and
+  long-term holding.
+- It conditionally supersedes the unconditional Liquidation Policy rollback
+  restrictions in
+  `MASTER_SPEC_CANONICAL_2026-07-27_CLOSE_LIQUIDATION_TRANSITION_CONTRACT.txt`.
+- Existing Queue, Approval, Gate, SendOrder, Chejan, Fill, Recovery, Runtime,
+  close, and immediate-liquidation contracts remain unchanged.
+
+1. Immediate Liquidation and Individual Liquidation Are Different
+
+Immediate liquidation is an operator command for immediate market liquidation:
+
+  EARLY_CLOSE command path -> method=시장가 -> immediate execution intent
+
+Individual liquidation from the stock context menu is not immediate
+liquidation. It is a per-stock scheduled liquidation-policy override:
+
+- N분 / 시장가
+- N분 / 현재가
+- 이월
+
+Choosing an individual policy stores the policy only. The setting action must
+not cancel pending orders, create a candidate or Queue record, call SendOrder,
+or enter the close/liquidation execution pipeline.
+
+2. Time Source of Truth
+
+The execution start is derived only from the existing operation policy:
+
+  operation_policy.regular_market.end_time
+  - minutes_before_regular_close
+
+No new clock, time policy, or persistent time Source of Truth is authorized.
+
+3. Before the Liquidation Time Window
+
+Before the configured start time, the individual policy is a reservation. The
+operator may replace the final policy freely among:
+
+- 시장가
+- 현재가
+- 이월
+
+This includes 시장가/현재가 -> 이월 and 이월 -> 시장가/현재가. Only the
+last durably stored policy is evaluated at the time boundary.
+
+A newly chosen minutes value must not create a retroactive time window. If the
+new or currently stored start time has already been reached, the change is
+blocked fail-closed.
+
+4. At and After the Liquidation Time Window
+
+At the start time, the final stored policy is fixed for that execution cycle.
+
+- 시장가/현재가: enter the existing Production liquidation pipeline.
+- 이월: do not cancel, create a candidate, create a Queue record, or execute an
+  order; holding continues normally.
+
+After time-window entry, a different individual liquidation policy cannot
+replace the fixed policy. In particular, an active 시장가/현재가 policy cannot
+retreat to 이월.
+
+5. Existing Production Execution Path
+
+For 시장가/현재가, the operation-cycle timer reads the durable request and,
+only after the existing time gate opens, enters the existing path:
+
+  Recovery -> pending cancel -> Candidate -> Approval -> Policy Gate
+  -> Queue -> SendOrder -> Chejan -> Fill/holding reconciliation
+
+This Canonical creates no new executor, Queue, Writer, or SendOrder path.
+
+6. Close Carry-over and Final Operator Intent
+
+Automatic-close or early-close method 이월 means the liquidation phase was not
+entered. Its liquidation display is `-`, and normal holding continuation is
+allowed.
+
+A later explicit individual-liquidation request is newer operator intent and
+outranks the earlier close carry-over evidence:
+
+- final individual 시장가/현재가 that entered execution + residual holding
+  -> HOLDING_REMAINS -> Review
+- final individual 이월 before execution entry
+  -> CARRYOVER_DONE may be valid
+
+Earlier carry-over evidence must not conceal a later active liquidation
+residual.
+
+7. Long-term Holding Policy
+
+Long-term holding ON/OFF is one program-wide Review-classification policy. It
+is stored in the existing global operation policy:
+
+  operation_policy.json
+  review_policy.long_term_holding_enabled: boolean
+
+Default is false. The existing operation-policy reader/writer and read-back
+verification are reused. No Runtime field, per-stock policy, new file, or
+separate persistent subsystem is added.
+
+Existing development-era values under:
+
+  stocks/<stock>/config.json > long_term_holding_enabled
+
+are legacy data. Production classification ignores them. This contract does
+not authorize bulk migration, cleanup, or mutation of user stock data.
+
+Long-term holding ON means only:
+
+  a normal holding-continuation route may be excluded from the holding-residual
+  Review classification.
+
+Normal routes include:
+- manual operation with no close/liquidation entry
+- automatic/early close whose final close method is 이월
+- an individual policy changed back to 이월 before its time window
+- a final individual 이월 that never entered active liquidation
+
+Long-term holding OFF preserves the existing holding-residual Review behavior,
+including for every otherwise normal holding-continuation route.
+
+Whether a stock is a normal long-term holding route is determined separately
+from its own Production evidence. The global setting only decides whether such
+a proven normal route is accepted or classified as Review.
+
+8. Long-term Holding Is Not a Global Review Bypass
+
+Long-term holding ON must not exclude or hide any of the following:
+
+- residual holding after active individual 시장가/현재가 execution
+- unresolved or unknown pending orders
+- Recovery or reconciliation failure
+- state/config/order damage
+- Broker/Runtime or identity mismatch
+- Queue conflict
+- close/liquidation execution failure
+- uncertain/rejected SendOrder evidence
+- emergency state or any integrity/safety issue
+
+Safety and integrity classification always outrank long-term holding.
+
+9. Review and Completion Classification
+
+Classification order is:
+
+  other integrity/safety Review reasons
+  -> durable holding quantity
+  -> per-stock normal long-term holding route evidence
+  -> global long-term holding policy
+  -> completion/Review result
+
+Therefore:
+
+- any integrity, Recovery, Queue, Broker, identity, or active-liquidation
+  problem remains Review regardless of the global setting;
+- holding quantity zero has no holding-residual Review reason;
+- positive holding on a non-normal route remains Review;
+- only a proven normal route with the global policy ON may be excluded from
+  holding-residual Review.
+
+The existing completion evaluator and Review Management collector remain the
+read-only classification sources. The UI must not use row hiding as a substitute
+for classification, and long-term holding does not create a new Review SoT or
+Writer.
+
+10. UI and Persistence
+
+Review Management provides one global `[장기보유 ON]` / `[장기보유 OFF]`
+badge. It is independent of table selection and reuses the established compact
+warning-badge structure with a blue active color. A click writes the global
+policy through the existing operation-policy writer, verifies read-back, and
+recalculates the Review collector. Per-stock selection, multi-selection,
+mixed-state display, and per-stock writes are prohibited. Observer failure
+remains fail-open and cannot change the settings result.
+
+11. Non-change Boundary
+
+This contract does not change:
+- immediate liquidation
+- close/liquidation execution stages
+- Queue, SendOrder, Chejan, Fill, Recovery, or Runtime schemas
+- Review safety/integrity reasons
+- operation-policy time ownership
+- user Runtime or historical stock data
