@@ -3,8 +3,8 @@
 Reference Edition
 
 - Reference Base Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
-- Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-08-16_BUDGET_BUFFER_EVENT_JOURNAL_FREEZE.txt
-- Latest Operational Work Resume: WORK_RESUME_LATEST_2026-08-16_BUDGET_BUFFER_EVENT_JOURNAL_FREEZE.txt
+- Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt
+- Latest Operational Work Resume: WORK_RESUME_LATEST_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt
 - Cleanup Completion Baseline Work Resume: WORK_RESUME_LATEST_2026-08-05_CLEANUP_COMPLETION_BASELINE.txt
 - Latest Changelog: MASTER_SPEC_CHANGELOG_2026-08-12_GUI_CHART_OPERATION_STATE_FREEZE.txt
 - Latest Readable Changelog: MASTER_SPEC_READABLE_CHANGELOG_2026-08-05_CLEANUP_COMPLETION_BASELINE.txt
@@ -18,19 +18,24 @@ Reference Edition
 4. Actual local code, Runtime files, logs, and execution evidence for implementation state
 5. Legacy PART files only when the latest Canonical does not supersede them
 
-For Budget/Buffer persistence, 조기마감, 자동마감, 청산정책, 마감정책,
-즉시청산, and Event Journal phase 1, use
-`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_BUDGET_BUFFER_EVENT_JOURNAL_FREEZE.txt`
-as the first technical Source of Truth. Archive and Legacy files are historical
-evidence only for this area. If they conflict with Current Canonical, Current
-Canonical wins. If UI terminology and document terminology conflict, the
-confirmed UI term wins.
+For Global Diagnostic Observer and Event diagnostic security contracts, use
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt`
+as the first technical Source of Truth. For Budget/Buffer persistence,
+조기마감, 자동마감, 청산정책, 마감정책, 즉시청산, and Event Journal phase 1,
+continue to use
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_BUDGET_BUFFER_EVENT_JOURNAL_FREEZE.txt`.
+Archive and Legacy files are historical evidence only for these areas. If they
+conflict with Current Canonical, Current Canonical wins. If UI terminology and
+document terminology conflict, the confirmed UI term wins.
 
 This Reference Index is an index. It is not an AI operating policy document.
 
 ## Current Policy References
 
 - Agent workflow and operation rules: `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
+- Global Diagnostic Observer Final Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt`
+- Global Diagnostic Observer Final Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt`
+- Global Diagnostic Observer Phase 2 Contract Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_PHASE2_CONTRACT_FREEZE.txt`
 - Budget Buffer And Event Journal Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_BUDGET_BUFFER_EVENT_JOURNAL_FREEZE.txt`
 - Budget Buffer And Event Journal Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-16_BUDGET_BUFFER_EVENT_JOURNAL_FREEZE.txt`
 - Close Action And Buffer Response Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-15_CLOSE_ACTION_AND_BUFFER_RESPONSE_FREEZE.txt`
@@ -64,16 +69,16 @@ This Reference Index is an index. It is not an AI operating policy document.
 - GUI Chart And Operation-State Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-12_GUI_CHART_OPERATION_STATE_FREEZE.txt`
 - GUI Chart And Operation-State Freeze Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-12_GUI_CHART_OPERATION_STATE_FREEZE.txt`
 - GUI Chart And Operation-State Update: `10_UPDATE/MERGED/UPDATE_20260812_GUI_CHART_OPERATION_STATE_AND_STOP_CONTRACT.txt`
-- Latest Operational Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-16_BUDGET_BUFFER_EVENT_JOURNAL_FREEZE.txt`
+- Latest Operational Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt`
 - Stock Management Review Protection Update: `10_UPDATE/MERGED/UPDATE_20260803_STOCK_MANAGEMENT_REVIEW_PROTECTION_ROUTINE_ASSIGN_REMOVAL.txt`
 - AI Architecture Contamination Policy: `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt`
 - AI Architecture Contamination Changelog: `20_ARCHIVE/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt`
 - AI Architecture Contamination Readable Changelog: `20_ARCHIVE/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt`
 - Runtime / Startup Recovery Canonical: `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME.txt`
 - Current State Resync Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-17_CURRENT_STATE_RESYNC.txt`
-- Latest Official Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_BUDGET_BUFFER_EVENT_JOURNAL_FREEZE.txt`
+- Latest Official Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt`
 - SELL Preview, Runtime / Queue / SendOrder / Chejan / Fill / Position, Projection / Recovery / Reconciliation / Startup Recovery Living Contracts: sections 11, 12, and 14 of `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME.txt`
-- Latest Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-16_BUDGET_BUFFER_EVENT_JOURNAL_FREEZE.txt`
+- Latest Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt`
 - Historical Cleanup Completion Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-05_CLEANUP_COMPLETION_BASELINE.txt`
 - Architecture glossary: `00_CANONICAL/REFERENCE/ARCHITECTURE_GLOSSARY.md`
 

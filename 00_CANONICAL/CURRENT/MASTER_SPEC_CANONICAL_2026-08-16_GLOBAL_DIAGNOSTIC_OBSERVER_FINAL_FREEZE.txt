@@ -1,0 +1,316 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-16
+Scope: Global Diagnostic Observer final implementation Freeze
+
+1. Authority And Freeze Baseline
+
+This Current Canonical supersedes the implementation-stage scope boundary in
+`MASTER_SPEC_CANONICAL_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_PHASE2_CONTRACT_FREEZE.txt`
+by recording the completed Phase 2 through Phase 7 implementation. It does not
+replace any domain Canonical for orders, Runtime, Recovery, Queue, Fill,
+Positions, close/liquidation, budget, buffer response, or Decision Trace.
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Previous Freeze: d94f1291bc9adf0088cedbdc9079f2935f7f07b6
+- Global Diagnostic Observer Freeze:
+  c33a41a5b09e4739ad86f6783b402b9415ebd209
+- Commit: `feat: promote event journal to global diagnostic observer`
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Branch: agent/project-prompt-standard
+- Previous Freeze: 4a765a81d981b88e1670c60fe9b520e9f041d23e
+- The documentation Freeze is the pushed branch HEAD containing this
+  Canonical, the matching Work Resume, and the Reference Index update.
+- A commit cannot embed its own literal SHA without changing that SHA. Confirm
+  the exact documentation Freeze from local/origin branch equality.
+
+2. Official Definition
+
+The existing Event Journal is promoted to the official Global Diagnostic
+Observer:
+
+"A program-wide observation layer that observes, records, correlates, and
+queries diagnostically meaningful events needed to reconstruct program
+operation and failure causes without intervening in Production."
+
+It is an Observer, not a Production Source of Truth, command bus, retry engine,
+Recovery engine, or state-correction layer.
+
+3. Meaningful Observation Scope
+
+The Observer covers:
+
+- important operator decisions;
+- confirmed setting and management changes;
+- Operation state and stop outcomes;
+- login, connection, and account changes;
+- Routine import, evaluation, and result-contract outcomes;
+- Signal, Approval, Policy, Execution, Queue, and SendOrder outcomes;
+- normalized Broker, Chejan, and Fill outcomes;
+- Close, Liquidation, and command outcomes;
+- Recovery and Runtime-integrity outcomes;
+- important Warning, Error, and final processing failures;
+- Python main-thread, worker-thread, Timer, callback, and unhandled exceptions.
+
+The default scope intentionally excludes normal polling, valid empty Queue,
+valid zero positions, unchanged normal state, low-level Qt events, individual
+FID noise, and repetitive information without diagnostic value.
+
+4. Production Non-Intervention Invariant
+
+The only allowed dependency direction is:
+
+`Production -> Observer`
+
+The required call order is:
+
+`confirmed Production result -> immutable observation -> fail-open append ->
+discard Observer return value`
+
+The Observer must never alter an order decision, create or mutate Queue or
+Runtime state, change settings, start Recovery, call Broker/SendOrder, retry a
+Production operation, or correct a Production result. Observer, writer,
+sanitizer, formatter, and GUI failures do not change Production results.
+
+5. Source And Evidence Relationship
+
+The following remain independent authoritative Production or professional
+Evidence Sources:
+
+- Decision Trace and immutable evidence snapshots;
+- Execution state and ExecutionJournal;
+- Queue, Fill, Positions, and order evidence;
+- Broker and Chejan evidence;
+- Trade-cost diagnostics;
+- Transition Evidence;
+- Runtime Commit Transaction/Audit and Recovery Journal;
+- Runtime/Integrity results;
+- Operation/Command state.
+
+The Observer stores only an event summary and existing correlation identities.
+It does not absorb these Sources, become their canonical reader, or copy their
+complete payloads.
+
+6. Event Schema And Compatibility
+
+The schema remains `event_journal_v1`. The Observer adds only backward-
+compatible optional diagnostic fields:
+
+- `component`
+- `operation`
+- `exception_type`
+- `exception_message`
+- `correlation_id`
+- `parent_event_id`
+- `stack_fingerprint`
+- `build_version`
+
+Schema v1 is retained because no existing required field or event meaning was
+changed, old JSONL records remain readable, and all new fields are optional.
+
+7. Sanitizer And Security
+
+Every append passes through the central Event sanitizer before validation and
+write. The following must not be stored or displayed raw:
+
+- full account number;
+- password, authentication value, token, API key, secret, or credential;
+- user-home absolute path;
+- complete Python traceback;
+- raw Broker payload or response;
+- raw Chejan FID map;
+- complete Queue, Fill, Position, Recovery, or Decision Trace record;
+- complete raw JSON diagnostic dump.
+
+`exception_message` is bounded to 512 characters, ordinary diagnostic text to
+2,048 characters, and diagnostic identities to 256 characters. Failed string
+conversion or sanitizer failure yields a safe unavailable result. Unsafe data
+is fail-closed for the Event write while the Observer remains fail-open for
+Production.
+
+8. Global Exception Coverage
+
+Completed coverage includes:
+
+- `gui_main.py` top-level exception boundary while preserving console
+  traceback and QMessageBox behavior;
+- `sys.excepthook` and `threading.excepthook` while preserving previous hooks;
+- Operation Host final cycle failure;
+- signal-cycle and deferred completion callback failures;
+- candle-refresh request and callback failures;
+- Routine import/evaluate/malformed-result failures;
+- Runtime and Integrity final failures;
+- normalized Broker/OpenAPI/Chejan processing failures.
+
+The Observer does not replace existing logger, traceback, return value, dialog,
+or failure behavior.
+
+9. Confirmed Lifecycle Emitters
+
+The formerly declaration-only events are connected only at confirmed state
+boundaries:
+
+- `LOGIN_SUCCEEDED`
+- `CONNECTION_LOST`
+- `ACCOUNT_CHANGED`
+- `OPERATION_STOPPED`
+
+A button click or request is not projected as a false success.
+
+10. Correlation Rules
+
+Correlation reuses existing durable domain identities and does not invent a
+new persistent identity. General event priority is:
+
+`execution_id -> order_id -> signal_id`
+
+Command flows use `command_id`. Recovery flows use `recovery_session_id`.
+Existing `app_session_id`, `signal_id`, `order_id`, `execution_id`,
+`broker_order_no`, and `command_id` remain preserved and searchable.
+
+The intended searchable flows are:
+
+- Signal -> Approval/Policy -> Execution -> Queue -> SendOrder -> Broker ->
+  Fill;
+- Command -> Close/Liquidation;
+- Recovery session stages.
+
+11. parent_event_id Meaning
+
+`parent_event_id` is a process-memory best-effort causal convenience only.
+The cache is bounded to 4,096 correlation keys, updates only after a successful
+append, does not update after writer failure, and does not persist to Production
+state. Restart loss is allowed. Duplicate-suppressed events do not create a
+false chain. This field is not durable causal proof or a Production SoT.
+
+12. Decision Trace Relationship
+
+Decision Trace remains independent and never depends on Event append success.
+`event_journal_event_id` is not fabricated or backfilled. Cross-search uses
+existing `signal_id`, `order_id`, `execution_id`, and other domain identities.
+
+13. Dedupe And Failure Transition
+
+Repeated Timer, callback, polling, and equivalent failures use session-local
+failure-transition suppression:
+
+- normal -> abnormal: one Event;
+- unchanged abnormal: suppressed;
+- abnormal -> normal: in-memory failure state cleared;
+- later recurrence: one new Event allowed.
+
+This mechanism is noise suppression, not durable exactly-once evidence.
+
+14. Observer Self-Health
+
+Observer append failures are bounded to logger/stderr fallback and must not
+recursively append through the same failing writer. No Production retry,
+mutation, new persistent fallback logger, or state correction is authorized.
+
+15. Duplicate Logging Normalization
+
+Phase 5 intentionally removed only the routine-signal probe error writes that
+were fully duplicated by sanitized Event observations. The probe retains its
+general BUY, SELL, NONE, SKIP, and cycle-detail records.
+
+The following are retained because they have independent value:
+
+- PROJECT_CHANGELOG;
+- stock `logs/*.log` and LogViewWindow;
+- Recovery Journal;
+- Decision Trace;
+- logger and console traceback;
+- legacy stub log pending a separate proven-unused decision.
+
+No historical Runtime or user log file is deleted by this Freeze.
+
+16. Operator Event UI
+
+The official user-visible name is `이벤트` in the Main control button and the
+Event window title. The existing seven list columns remain stable. The default
+view emphasizes time, category, severity, target, event, result, and readable
+summary without exposing every technical field as a column.
+
+The detail view groups basic information, target information, and correlation
+identities. Empty optional values do not produce large blank areas. Search
+includes event content plus correlation, parent, component, operation, signal,
+order, execution, Broker-order, and command identities.
+
+17. Developer Diagnostic UI
+
+Developer diagnostic detail is collapsed by default and can be expanded in the
+same Event window. It shows only populated, sanitized values for component,
+operation, exception type/message, stack fingerprint, and build version. It
+does not expose raw traceback or professional Evidence payloads.
+
+18. Read-Only Refresh Contract
+
+The Event window refreshes every 3,000 ms only while visible. Refresh invokes
+the Reader only, preserves filters/search/selection/scroll where possible,
+survives missing files and malformed lines, and stops its Timer when hidden or
+closed. The GUI never invokes the Writer or a Production mutation.
+
+19. LogViewWindow Role
+
+The Event window is the global operational and diagnostic Observer Viewer.
+LogViewWindow remains the stock-specific detailed text-log viewer for existing
+tick/reason/detail information. The two surfaces do not duplicate raw data and
+neither replaces the other.
+
+20. Future Tool Separation
+
+Observer Core contains no GUI import and Production does not manipulate the
+Event window. The Reader-to-UI boundary permits a future developer diagnostic
+Tool or Plugin, but this Freeze creates no Plugin framework, permissions
+system, new Event Bus, or persistent store.
+
+21. Final Verification
+
+Current-code execution:
+
+- Formal Observer/GUI integration: 370 / 370 PASS.
+- Expanded supporting integration: 539 executed; 535 PASS, 4 unrelated FAIL,
+  0 ERROR, 0 SKIP.
+- Combined current-code execution: 909 tests; 905 PASS, 4 known unrelated
+  FAIL, 0 ERROR, 0 SKIP.
+- The previously reported single ERROR was a stale test patch target and
+  fixture name already stale at the previous Freeze; a test-only correction
+  now passes without Production modification.
+- Two expanded timer failures reproduce unchanged at the previous Freeze.
+- Two SendOrder-adapter failures arise only because preserved user
+  `runtime/order_executions.json` exists; the same tests pass in a clean archive
+  and no user Runtime is changed.
+- Actual SendOrder: 0.
+- Observer/Production mutation side effect: 0.
+- Runtime/user-data modification by verification: 0.
+- 185-file Production mutable fingerprint:
+  `3ADE207FEA20D555BE83DC3A89807228294FE7274F5C52D91128232A5BF393D2`
+- Observer-writer and sanitizer failure injection: Production result unchanged.
+- Duplicate suppression: one event per failure transition.
+- Sensitive raw-data detection: 0.
+- 32-bit Python py_compile: PASS.
+- git diff --check: PASS.
+
+22. Intentional Out-Of-Scope Items
+
+- P4 routine information and ordinary Toast noise;
+- raw Evidence viewers inside the Event window;
+- causal graph/tree visualization;
+- authorization or password-gated developer view;
+- a new Developer Plugin framework;
+- durable `parent_event_id` storage;
+- cleanup of the unrelated pre-existing timer-test expectations;
+- mutation or removal of user Runtime required merely to satisfy non-isolated
+  SendOrder-adapter tests.
+
+23. Freeze Rule
+
+Treat the Global Diagnostic Observer implementation as Frozen at the code SHA
+above. Subsequent work must preserve Production non-intervention, professional
+Evidence ownership, sanitizer/security limits, schema-v1 compatibility,
+correlation identity reuse, and read-only GUI behavior.

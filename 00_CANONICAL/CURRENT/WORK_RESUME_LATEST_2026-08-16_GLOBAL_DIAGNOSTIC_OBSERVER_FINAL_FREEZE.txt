@@ -1,0 +1,152 @@
+WORK RESUME LATEST
+Date: 2026-08-16
+Scope: Global Diagnostic Observer final Freeze
+
+1. Final Git Baselines
+
+Code repository:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Local: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze SHA: c33a41a5b09e4739ad86f6783b402b9415ebd209
+- Commit: `feat: promote event journal to global diagnostic observer`
+- Local and origin branch SHA were verified equal after push.
+
+Documentation repository:
+
+- Repository: jinkwangchul/docs
+- Local: C:\Users\JIN KWANG CHUL\Documents\docs
+- Branch: agent/project-prompt-standard
+- Previous Freeze: 4a765a81d981b88e1670c60fe9b520e9f041d23e
+- The final Docs Freeze is the pushed origin branch HEAD containing this file,
+  the matching Final Canonical, the Phase 2 Canonical, and Reference Index.
+- Confirm its exact SHA from local/origin branch equality. A commit cannot
+  embed its own literal SHA without changing that SHA.
+
+2. Completed Big Feature
+
+The existing Event Journal is now the Global Diagnostic Observer: a fail-open,
+program-wide observation layer for meaningful operator, setting, Operation,
+Routine, Signal, execution, Broker, Fill, close, Recovery, integrity, warning,
+error, and exception events. It observes Production results but never changes
+them.
+
+3. Main Implementation Files
+
+- `event_journal_contract.py`: compatible schema-v1 diagnostic fields,
+  sanitizer, security limits, event presentation contract.
+- `event_journal_writer.py`: central sanitization before validation/append.
+- `event_journal_production.py`: fail-open Production observations, exception
+  projection, failure-transition suppression, best-effort parent linking.
+- `event_journal_trade_observer.py`: trade-flow observations and correlation.
+- `event_journal_reader.py`: filtering and expanded identity/diagnostic search.
+- `gui_event_record_window.py`: operator detail groups, collapsed developer
+  diagnostics, read-only 3-second visible refresh.
+- `gui_main.py`, `gui_windows.py`, `gui_auto_trade_operation_host.py`,
+  `gui_auto_trade_timer.py`, `kiwoom_api.py`,
+  `operation_close_completion_check_service.py`, and
+  `routine_signal_probe.py`: confirmed Production-boundary observation calls.
+
+4. Preserved Sources And Evidence
+
+Decision Trace, ExecutionJournal, Queue, Fill, Positions, Broker/Chejan
+Evidence, trade-cost diagnostics, Transition Evidence, Recovery Journal,
+Runtime Commit Transaction/Audit, and Operation/Command state remain separate
+and authoritative. The Observer stores only summary and existing identities.
+
+5. Normalized Duplicate Logs
+
+Only fully duplicated routine-signal probe error writes were removed. General
+BUY/SELL/NONE/SKIP probe detail remains. PROJECT_CHANGELOG, stock logs,
+LogViewWindow, Recovery Journal, logger/traceback, and the legacy stub log are
+retained. Historical user log files were not deleted.
+
+6. Final Coverage
+
+- important operator decisions and confirmed setting/management changes;
+- Operation lifecycle, login success, connection loss, account change, stop;
+- Routine import/evaluate/malformed result;
+- Signal through Approval/Policy/Execution/Queue/SendOrder/Broker/Fill;
+- command through Close/Liquidation;
+- Recovery session stages;
+- Runtime/Integrity and meaningful Warning/Error;
+- top-level, sys, threading, Timer, callback, and final cycle exceptions.
+
+Normal polling, valid empty Queue, valid zero position, low-level Qt events,
+individual FID noise, P4 ordinary notices, and routine Toasts remain excluded.
+
+7. Correlation And Parent Contract
+
+General correlation priority is execution_id -> order_id -> signal_id.
+Command uses command_id and Recovery uses recovery_session_id. No new durable
+correlation identity exists. `parent_event_id` is a bounded 4,096-key,
+append-success-only, process-memory best-effort link and is not durable proof.
+
+8. UI State
+
+The official user-facing name is `이벤트`. The seven-column operator list is
+unchanged. Details group basic, target, and connection data. Developer
+diagnostics are collapsed by default and show populated sanitized fields only.
+Search includes correlation/parent and domain identities plus component and
+operation. The visible-only read-only refresh interval is 3,000 ms and preserves
+current view state where possible.
+
+LogViewWindow remains the stock-specific detailed text-log viewer.
+
+9. Security And Non-Intervention
+
+Raw account, credential/token/API key, user-home absolute path, traceback,
+Broker payload, Chejan FID map, and full professional Evidence records are not
+stored or displayed. Exception text is limited to 512 characters, general
+diagnostic text to 2,048, and identities to 256.
+
+Observer, sanitizer, writer, Reader, and GUI failures cannot change Production
+results. Event UI has no Writer call, Production action, Runtime mutation,
+Recovery action, Broker action, or SendOrder call.
+
+10. Verification
+
+- Formal Observer/GUI integration: 370 / 370 PASS.
+- Expanded supporting integration: 535 / 539 PASS, 4 known unrelated FAIL,
+  0 ERROR, 0 SKIP.
+- Combined current-code execution: 905 / 909 PASS, 4 known unrelated FAIL,
+  0 ERROR, 0 SKIP.
+- Actual SendOrder: 0.
+- Production side effect: 0.
+- Runtime/user-data modification: 0.
+- Production mutable files: 185.
+- Fingerprint:
+  `3ADE207FEA20D555BE83DC3A89807228294FE7274F5C52D91128232A5BF393D2`
+- Writer/sanitizer failure injection: Production result unchanged.
+- Duplicate suppression and sensitive-data checks: PASS.
+- 32-bit py_compile: PASS.
+- git diff --check: PASS.
+
+11. Known Unrelated Test Issues
+
+The single ERROR reported before Phase 7 was a stale test patch target and
+fixture field already stale at code Freeze d94f129. It was corrected test-only
+and now passes.
+
+Expanded validation found two timer expectations that fail identically in an
+untouched d94f129 archive, proving no Phase 2-6 causality. It also found two
+SendOrder-adapter assertions that assume `runtime/order_executions.json` does
+not exist; they pass in the clean archive and fail only in the preserved local
+user Runtime. Production code and user Runtime were not changed for these
+unrelated cases.
+
+12. Preserved Dirty Work
+
+The code repository still contains excluded user Runtime, stock,
+routine-instance, policy, archive, artifact, and log changes outside the code
+Freeze commit. The docs repository also retains broad pre-existing unrelated
+dirty/untracked files. Do not reset, restore, stash, clean, broadly stage, or
+delete them.
+
+13. Resume Rule
+
+Use the Final Global Diagnostic Observer Canonical and the code Freeze SHA as
+the next-session baseline. Do not reopen the Observer implementation from the
+Phase 2 work-stage boundary. No PR or merge was created. Select the next task
+only from the latest explicit user instruction.

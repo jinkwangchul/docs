@@ -1,0 +1,274 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-16
+Scope: Global Diagnostic Observer Phase 2 contract and security Freeze
+
+1. Authority And Baseline
+
+This Current Canonical supplements the 2026-08-16 Budget Buffer And Event
+Journal Freeze. It does not replace or weaken any Production Runtime, Recovery,
+Queue, order, SendOrder, Chejan, fill, close, budget, buffer, or Event Journal
+phase-1 contract.
+
+Code baseline:
+
+- Repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Baseline Freeze SHA: d94f1291bc9adf0088cedbdc9079f2935f7f07b6
+
+Documentation baseline:
+
+- Repository: jinkwangchul/docs
+- Branch: agent/project-prompt-standard
+- Baseline Freeze SHA: 4a765a81d981b88e1670c60fe9b520e9f041d23e
+
+Phase 1 investigation of the actual Event, Log, Trace, Journal, Evidence,
+exception, callback, Timer, Runtime, Routine, Broker, and Recovery boundaries is
+the input evidence for this contract.
+
+2. Global Diagnostic Observer Definition
+
+The existing Event Journal is the official Global Diagnostic Observer Core.
+`OBSERVER CORE` is a distinct role. TYPE A/B/C/D classification applies only to
+existing functions that may supply, correlate with, be absorbed into, or remain
+outside the Observer Core.
+
+The Global Diagnostic Observer observes diagnostically meaningful events needed
+to reconstruct program operation and failure causes. Its scope includes:
+
+- important operator actions;
+- confirmed setting and management changes;
+- operation and external-connection lifecycle changes;
+- Routine and Signal results;
+- Approval, Policy, Execution, Queue, and SendOrder results;
+- Broker, Chejan, and Fill results;
+- Close and Liquidation results;
+- Recovery and Runtime-integrity results;
+- important warnings, processing failures, and unhandled exceptions.
+
+The Observer does not attempt to record every raw program event. The following
+are outside the default observation scope:
+
+- low-level paint, mouse-move, and equivalent Qt events;
+- normal polling ticks;
+- a valid empty Queue;
+- a valid zero-position state;
+- unchanged normal state;
+- routine Toast or informational noise without diagnostic value.
+
+3. Production Non-Intervention Invariants
+
+The only authorized dependency direction is:
+
+`Production -> Observer`
+
+`Observer -> Production Mutation` is prohibited.
+
+The Observer never:
+
+- changes BUY or SELL decisions;
+- permits or blocks an order;
+- creates or mutates Runtime or Queue state;
+- changes settings;
+- starts Recovery;
+- calls SendOrder or another Broker command;
+- retries a Production operation automatically; or
+- corrects or reinterprets a Production result.
+
+The normal connection order is:
+
+`Production result confirmed -> immutable observation payload -> fail-open
+Observer call -> Observer return value discarded`
+
+Writer, sanitizer, formatter, or Observer failure must not alter the Production
+result. Existing safety protocols such as Runtime Commit Recovery Journal are
+not Observers and retain their original fail-closed or transaction-blocking
+semantics.
+
+4. Observer Core And Source Relationship
+
+The Event Journal is the Observer Core. The following remain independent
+Observer Sources or professional evidence stores:
+
+- Decision Trace and its immutable evidence snapshots;
+- Execution state and ExecutionJournal;
+- Queue, Fill, Positions, and order evidence;
+- Broker and Chejan evidence;
+- Transition Evidence;
+- Runtime Commit and Recovery Journal;
+- Runtime-integrity results;
+- GUI/settings and operator decisions;
+- Routine, Operation Host, Timer, and external-connection results.
+
+The Observer records only the necessary summary and correlation identities. It
+does not copy complete source payloads. Existing professional evidence and
+Production Sources of Truth remain authoritative in their own domains.
+
+5. Event Schema Compatibility And Diagnostic Fields
+
+The schema remains `event_journal_v1`.
+
+The following backward-compatible optional fields are authorized:
+
+- `component`
+- `operation`
+- `exception_type`
+- `exception_message`
+- `correlation_id`
+- `parent_event_id`
+- `stack_fingerprint`
+- `build_version`
+
+No schema-version promotion is required because:
+
+- all new fields are optional;
+- no existing required field changes;
+- existing event meaning and category mapping remain unchanged;
+- old v1 JSONL records remain valid and readable; and
+- unknown or unapproved fields remain rejected.
+
+Existing domain identities remain preferred:
+
+- `app_session_id`
+- `signal_id`
+- `order_id`
+- `execution_id`
+- `broker_order_no`
+- `command_id`
+- `routine`
+- `stock_code`
+
+Module, function, line, thread, and process information may initially be placed
+only in sanitized `details`. They are not promoted to top-level fields until a
+confirmed search/filter contract requires that promotion.
+
+6. Central Diagnostic Sanitizer Contract
+
+All Event Journal writes pass through the central Event record sanitizer before
+validation and append. Callers must not rely on ad hoc caller-specific masking.
+
+The sanitizer contract is:
+
+- raw account identity remains prohibited; records containing an unmasked
+  account value in account fields are rejected before append;
+- password, passwd, pwd, token, API key, secret, credential, authorization,
+  authentication, and auth values are redacted;
+- known raw Broker/Chejan payload and response fields are redacted;
+- Windows and POSIX user-home absolute paths are replaced with `<USER_HOME>`;
+- JSON objects or arrays supplied as raw diagnostic strings are replaced with a
+  raw-JSON redaction marker;
+- a raw Python traceback is never stored and is replaced with a traceback
+  redaction marker;
+- `exception_message` is newline-normalized and limited to 512 characters;
+- other diagnostic strings are bounded to 2,048 characters;
+- diagnostic identity fields are bounded to 256 characters;
+- malformed objects and failed `repr`/string conversion produce a safe
+  unavailable marker rather than an exception.
+
+The sanitizer is fail-open for Production but fail-closed for unsafe diagnostic
+data. If sanitization itself fails, the Event write may fail, but the exception
+must not escape into Production and no unsanitized record may be written.
+
+`stack_fingerprint` is a stable digest derived from sanitized exception type,
+path-free relative module identity, function, and line. An absolute path is not
+part of the fingerprint identity. Complete traceback text is not retained.
+
+7. Severity And Event-Type Policy
+
+Event-type proliferation is prohibited. General diagnostic observations reuse:
+
+- `PROCESSING_ERROR`
+- `RUNTIME_WARNING`
+- `INTEGRITY_WARNING`
+
+The already-declared but currently unconnected event types remain Phase 3
+connection targets:
+
+- `LOGIN_SUCCEEDED`
+- `CONNECTION_LOST`
+- `ACCOUNT_CHANGED`
+- `OPERATION_STOPPED`
+
+A new event type requires evidence that the event cannot be expressed without
+changing the meaning of an existing type.
+
+8. Repeated-Failure Suppression
+
+Timer, polling, and callback failures use failure-transition suppression. The
+default diagnostic identity is composed from:
+
+`component + operation + target + reason_code + stack_fingerprint`
+
+The state contract is:
+
+- normal to abnormal: record one Event;
+- unchanged abnormal state: suppress repeats;
+- abnormal to normal: clear the in-memory failure state;
+- later recurrence: allow one new Event.
+
+Time-only suppression is not the default. Process-memory dedupe is session-local
+noise suppression and must never be represented as durable exactly-once proof.
+
+9. Observer Self-Health
+
+Observer failure is never recorded recursively through the same failing Event
+writer. The minimum authorized self-health design is:
+
+- bounded stderr/logger fallback;
+- an optional process-memory health flag or counter for diagnostics;
+- no Production retry or mutation;
+- no new Production Source of Truth;
+- no new persistent fallback log or large logging subsystem in Phase 2.
+
+This section defines the design boundary only. No new self-health subsystem is
+implemented by this Phase.
+
+10. Event UI Separation
+
+The Observer Core is independent of its GUI. The same Event data may later
+support:
+
+- an operator view of event, state, result, warning, error, and related
+  stock/routine/order identities; and
+- a developer diagnostic view of component, operation, sanitized exception,
+  correlation, stack fingerprint, and related detailed evidence.
+
+Phase 2 does not add or redesign GUI functionality. A future developer view may
+be hidden or separated after stabilization, but no Plugin framework is created
+by this contract.
+
+11. Phase 2 Boundary And Phase 3 Targets
+
+Phase 2 contains only the compatible Event contract extension, central
+sanitizer, focused contract tests, and this Canonical.
+
+Phase 2 does not connect Production exception boundaries and does not install
+global hooks. It does not delete or absorb an existing log.
+
+The exact Phase 3 connection targets are:
+
+1. `gui_main.py` top-level uncaught exception boundary;
+2. process-level `sys.excepthook` boundary;
+3. `threading.excepthook` and the Kiwoom login/UAC observer thread boundary;
+4. `AutoTradeOperationHost.run_operation_cycle()` failure boundary;
+5. routine signal operation-cycle and deferred-completion callback failures;
+6. automatic candle-refresh request and callback failures;
+7. Routine import, evaluate, and result-contract failures;
+8. final file/JSON/Runtime read-write and integrity outcome boundaries;
+9. normalized Broker/OpenAPI/Chejan evidence-incomplete outcomes;
+10. login success, connection loss, account change, and operation stop emitters.
+
+Recovery failures already covered by the Event Journal are not duplicated.
+Individual low-level FID, cleanup, valid empty-state, or normal polling results
+are not connected as independent Events.
+
+12. Explicit Prohibitions
+
+This Phase does not authorize:
+
+- Production exception-hook installation;
+- Timer, Routine, Broker, SendOrder, Recovery, Queue, or Runtime mutation;
+- Event-type proliferation;
+- complete traceback or raw payload storage;
+- PROJECT_CHANGELOG or routine signal log deletion;
+- Event GUI redesign;
+- a new Event Bus, log Source of Truth, common writer, or Plugin framework.
