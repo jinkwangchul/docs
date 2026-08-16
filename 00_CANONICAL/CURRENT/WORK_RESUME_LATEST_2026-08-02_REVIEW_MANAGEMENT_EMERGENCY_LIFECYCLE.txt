@@ -29,8 +29,12 @@ Completed Local Implementation Scope:
 - Review Management uses screen-specific status values rather than displaying
   REVIEW_REQUIRED as `검토종목`.
 - Review Management status values are `긴급정지`, `미해결`, and `해결`.
-- All actual emergency-stop activation paths are collected into Review
-  Management.
+- Emergency-stop Review entry is scope-sensitive: a global emergency stop
+  blocks all trading without creating new Review rows, while explicit selected
+  single/multi-stock emergency stop creates Review rows immediately.
+- Global emergency release applies the existing per-stock safety guards; normal
+  stocks return to `STOPPED` without Review entry and only failed stocks enter
+  Review with detection point `긴급정지 해제`.
 - Operating data mismatch while already running is collected as:
   - 상태 `긴급정지`
   - 사유 `운영 데이터 불일치`

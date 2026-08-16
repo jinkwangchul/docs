@@ -88,8 +88,9 @@ Allowed status values:
 
 Status contracts:
 
-- `긴급정지`: the stock is actually emergency-stopped; trading is blocked; the
-  item is collected immediately.
+- `긴급정지`: the stock is individually emergency-stopped by an explicit
+  selected-stock operator action; trading is blocked; the item is collected
+  immediately. A global emergency stop alone does not create this Review row.
 - `미해결`: no active emergency stop is being shown for the row, but operation
   availability is not confirmed. This includes missing or unreadable state data
   and failed availability checks. Operator normalization is required and return
@@ -107,16 +108,40 @@ Forbidden:
 
 4. Emergency Stop Entry Contract
 
-Every actual emergency-stop activation must be collected into Review Management.
+Emergency-stop Review entry is scope-sensitive.
 
-Confirmed entry points:
+Confirmed Review entry points:
 
 - Operating data mismatch while already running.
 - Pre-start data mismatch during operation start.
-- User global emergency stop.
 - Stock right-click emergency stop.
 
-On emergency stop:
+`GLOBAL_EMERGENCY_STOP`:
+
+- Activates the global emergency latch and blocks trading for all runtime
+  targets.
+- Changes applicable stock operation state to `EMERGENCY_STOPPED` and
+  `trade_enabled=False`.
+- Does not create new Review metadata and does not increase the Review count.
+- Existing Review metadata is not re-entered or assigned a new transition time.
+
+`SELECTED_STOCK_EMERGENCY_STOP`:
+
+- Stops only the explicitly selected single or multiple stocks.
+- Does not activate the global emergency latch.
+- Creates Review metadata immediately with status display `긴급정지` and
+  detection point `종목 긴급정지`.
+
+`GLOBAL_EMERGENCY_RELEASE_FAILURE`:
+
+- Global release runs the existing stock availability, integrity, pending-order,
+  active close/liquidation, server reconciliation, and Recovery guards.
+- A normal target returns to `STOPPED` with `trade_enabled=False` without Review
+  entry.
+- Only a target whose guard fails enters Review, using the official reason for
+  the actual failure and detection point `긴급정지 해제`.
+
+On selected-stock emergency stop:
 
 1. Only the target stock is emergency-stopped.
 2. The canonical emergency state is active.
@@ -157,9 +182,9 @@ After emergency release, the system must run the existing operation availability
 check:
 
 - Pass:
-  - Review status becomes `해결`.
+  - No Review row is created solely by the global emergency lifecycle.
+  - The stock becomes `STOPPED` with `trade_enabled=False`.
   - No automatic operation return occurs.
-  - The row waits for the Review Management return button.
 - Fail:
   - Review status becomes `미해결`.
   - Operator normalization is required.
@@ -216,6 +241,17 @@ Normal REVIEW_REQUIRED rows:
 
 - Existing `review_reason`, `review_location`, and `review_entered_at` remain
   the Source of Truth for cause, detection point, and first transition time.
+- `review_reason` may accumulate multiple official operator-facing causes in
+  first-seen order using the existing `A / B / C` text format. Repeated causes
+  are not duplicated; no parallel `review_reasons` durable field is created.
+- A follow-up cause never overwrites the first non-empty `review_entered_at` or
+  `review_location`. Cause-specific internal evidence remains in
+  `review_detail` and Observer evidence; there is no location-history SoT.
+- Cause text does not determine `review_status`, `display_status`, or return
+  availability. Those lifecycle projections continue to use current evidence.
+- GLOBAL emergency activation itself is not a Review cause to merge. An actual
+  Review entry caused by a failed emergency release uses that failure as its
+  official cause.
 - Opening or refreshing the Review Management window must not create, change,
   or overwrite the detection point.
 
@@ -224,19 +260,44 @@ Normal REVIEW_REQUIRED rows:
 The collector supplies:
 
 - `row["display_status"]`
+- `row["return_availability"]`
 
-The UI displays `display_status`.
+The UI displays only `display_status`. Its allowed values are:
 
-Status must be determined from:
+- `긴급정지`: the actual emergency stop remains active.
+- `미해결`: emergency is not active, but the current return safety evidence is
+  blocked or unavailable.
+- `해결`: emergency is not active and the current return safety evidence is
+  allowed.
+
+`return_availability` is a separate read-only projection with values
+`ALLOWED` or `BLOCKED`. It is determined from current Production evidence:
 
 - actual emergency-stop state,
-- the official operation availability check result,
-- missing or unreadable operation data,
-- existing resolved/unresolved review metadata.
+- state/config/orders readability,
+- holding and pending-order integrity,
+- active queue and close/liquidation evidence,
+- Broker/Runtime mismatch evidence,
+- Production Recovery readiness.
 
-`return_availability` and `display_status` have different meanings. Current
-local implementation still has compatibility overlap in this area; this is a
-follow-up investigation item and is not the canonical model.
+`review_status=RESOLVED` or an emergency-release marker alone is not sufficient
+for `해결`. `해결` is possible only when the same official availability contract
+returns `ALLOWED`.
+
+The collector result is a read-only preview. `복귀` and `미지정` must rerun the
+same availability contract immediately before mutation. A stale `ALLOWED`
+screen value never bypasses the latest safety check. Missing/corrupt virtual
+rows are always `미해결/BLOCKED`, and collection must not create or repair a
+state file.
+
+Emergency release and Review return remain separate transitions:
+
+- emergency release does not auto-start operation,
+- a pre-existing Review row remains in Review after successful emergency
+  release and may become `RESOLVED`,
+- explicit Review return must pass the latest availability check and ends at
+  `STOPPED` with `trade_enabled=False`,
+- Review return is never an operation-start command.
 
 9. Count Synchronization
 
@@ -297,16 +358,19 @@ implementation state:
 
 Confirmed local validation:
 
-- `tests.test_review_required_transition_time`: 15 tests OK.
+- Integrated Review lifecycle regression: 446 tests OK.
+- `tests.test_review_required_transition_time` and the resolved-return GUI
+  roundtrip are included in that integrated result.
+- Actual `KiwoomApi.send_order` and QAx `SendOrder` boundary calls: 0.
 - 32-bit `py_compile`: OK for the touched review lifecycle files.
-- `python -c "import gui_main"`: OK.
 - `git diff --check`: OK, with existing CRLF warnings only.
 
 Known unrelated or unresolved validation:
 
-- `tests.test_auto_trade_status_recalculation_pipeline`: 17 tests executed, 6
-  failures remain in registration/unregister expectations. These are not
-  recorded as passing and remain an unresolved regression item.
+- `tests.test_auto_trade_status_recalculation_pipeline`: 18 tests executed,
+  16 passed and 2 existing timer-fixture failures remain. One expects an old
+  startup-recovery callback invocation; the other embeds a fixed past date.
+  Neither failure is caused by the Review lifecycle changes.
 
 13. Out of Scope
 
@@ -319,15 +383,70 @@ This Canonical does not define or change:
 - order execution,
 - Chejan,
 - runtime or stocks storage layout,
-- automatic recovery,
-- resolved-row auto-start behavior.
+- automatic recovery.
 
 14. Follow-Up Items
 
-- Visible GUI roundtrip verification for `해결` row return.
-- Emergency duplicate reason accumulation and merge rule.
-- Operator UX for unresolved normalization.
-- Whether a returned resolved row should ever auto-start later.
-- Separation of `return_availability` from `display_status` in local code.
-- The 6 registration/unregister failures in
-  `tests.test_auto_trade_status_recalculation_pipeline`.
+- The 2 unrelated timer-fixture failures in
+  `tests.test_auto_trade_status_recalculation_pipeline` remain outside this
+  Review lifecycle scope.
+
+15. Unresolved Review Operator Guidance
+
+The existing Review Management window provides a compact, read-only guidance
+area for the selected row. It projects only already available evidence:
+
+- operator-facing Review reason(s), with duplicates removed,
+- persisted detection point,
+- current return block reason,
+- the operator action needed to normalize the evidence,
+- the condition under which return can become available.
+
+Internal reason codes are not presented as operator instructions. Missing and
+corrupt virtual rows remain fail-closed and the guidance must not create,
+repair, or overwrite their files. Emergency-active rows instruct the operator
+to release emergency stop first. An allowed row states that explicit return
+ends at `STOPPED` and does not start automatic operation.
+
+The guidance projection is not a Gate or a new Review SoT. `복귀` and `미지정`
+continue to rerun the canonical `review_return_availability()` contract at the
+moment of mutation. `강제초기화` remains a separate dangerous operation and is
+not suggested as the normal resolution path. No automatic normalization,
+Recovery execution, queue mutation, order request, or SendOrder is introduced.
+
+16. Resolved Return GUI Roundtrip
+
+Only a selected row whose current projection is `해결/ALLOWED` enables the
+normal `복귀` action. The displayed projection is never reused as execution
+authority: immediately before mutation, the existing RESTORE backend reruns
+`review_return_availability()`. If current pending, Recovery, Broker/Runtime,
+emergency, close/liquidation, or integrity evidence blocks return, no RESTORE
+mutation occurs and the row remains in Review.
+
+A successful RESTORE transition:
+
+- clears the active Review status/reason/location/timestamp metadata while the
+  existing `review_routine` identity remains available for RESTORE continuity,
+- writes `status=STOPPED`,
+- writes `trade_enabled=False`,
+- preserves the routine assignment,
+- removes the row on the same window reload,
+- refreshes the main Review count from the shared collector.
+
+Review return is not operation start. It must not write `RUNNING`, enable
+trading, resume routine signals, create Queue records, or call SendOrder.
+Multi-selection retains the existing per-row partial-success contract: each
+target reruns the same Gate, successful rows leave Review, and blocked rows
+remain selected when possible with updated guidance. Missing/corrupt virtual
+rows remain disabled and no file is created or repaired.
+
+17. PAUSED Legacy Retirement
+
+`PAUSED` is not a current operation status, Review reason, or Review transition.
+Current Production code must not write or enter `PAUSED`, and the retired
+`pause_signal_check_status`, `paused_at`, `missed_buy_signal_count`, and
+`missed_sell_signal_count` fields are not current state contracts.
+
+Legacy persisted `PAUSED` input may be recognized only for fail-closed display
+compatibility as `검토종목`. It must never be promoted into a current operation
+path, restored as a runnable state, or used to create a parallel Review SoT.

@@ -2,6 +2,15 @@ MASTER SPEC CANONICAL
 Date: 2026-07-31
 Scope: Review isolation and auto-trade performance UI contract
 
+2026-08-01 supersession note:
+
+- REVIEW_REQUIRED display, row color, situation signal, and protected-state
+  sorting are now governed by
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`.
+- This document's isolation rule remains valid for normal-operation execution
+  paths, but the later Current Canonical is authoritative for the updated GUI
+  display and sorting contract.
+
 1. Review management is an execution isolation state.
 
 - A stock in review management must not be treated as a normal auto-trade row.
@@ -39,3 +48,21 @@ Scope: Review isolation and auto-trade performance UI contract
 - Result: 80 tests passed
 - 32-bit py_compile: passed for gui_auto_trade_table_loader.py, gui_auto_trade_setting_window.py, tests/test_auto_trade_setting_routine_tree.py
 - git diff --check: passed
+
+6. PAUSED legacy residue retirement.
+
+- PAUSED/포즈 is not a current operation or Review state and must not be produced by new Production writers.
+- pause_signal_check_status, paused_at, missed_buy_signal_count, and missed_sell_signal_count are legacy input keys; Production decision and Review projection ignore them.
+- PAUSED itself and pause-period signal metadata must not create a Review reason.
+- A legacy persisted PAUSED input may be projected fail-closed as 검토종목 until a separate migration, but it must not be displayed or interpreted as a current pause feature.
+
+7. Review Entry metadata normalization.
+
+- `review_reason` is the short operator-facing cause tag; internal issue/reason codes remain diagnostic evidence and are not displayed directly in the Review reason column.
+- `review_location` identifies the actual Production detection point. Review-window refresh must not replace it with a UI refresh location.
+- Existing `state.json` Review metadata and existing Mutation Boundary writers remain canonical; no parallel Review SoT or writer is introduced.
+- Missing/corrupt `state.json` rows remain read-only virtual rows: `운영 데이터 없음` or `운영 데이터 읽기 오류`, detected at `종목관리`.
+- Pending/order integrity uses one operator reason, `미체결 데이터 오류`, while the actual location remains distinct (`종목 등록`, `종목 해제`, `루틴 등록`, `루틴 해제`).
+- Integrity Checker promotes only existing `requires_review` issues. CHECK_ERROR and read-only integrity issues do not become Review entries.
+- `review_entered_at` remains the first Review-entry time and is not rewritten by normalization or refresh.
+- PAUSED and its retired metadata are not Review Entry reasons.
