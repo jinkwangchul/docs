@@ -1,0 +1,85 @@
+# MASTER_SPEC CANONICAL — Main Monitoring Selection And Height Freeze
+
+Date: 2026-08-18
+Status: Latest Official Supplemental Canonical
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code freeze: c953abedaf15f64f684cff9354be0595ca559a8d
+
+## 1. Scope
+
+This Canonical records only the newly confirmed main monitoring contracts that
+were not already fixed by an earlier Current Canonical. Existing Review,
+Emergency, Recovery, close/liquidation, and operation contracts remain governed
+by their corresponding Current Canonical documents.
+
+## 2. Main Summary Selection Contract
+
+- The initial main monitoring selection is `종목 + 정지/운영`.
+- The visible summary order is:
+  `유효 | 그룹 / 루틴 / 종목 | 정지/운영 / 제외 / 검토`.
+- `종목` cannot remain selected by itself. Stock display always combines with
+  exactly one of `정지/운영`, `제외`, or `검토`.
+- Selecting `그룹` or `루틴` clears every stock sub-filter and displays only
+  that hierarchy level as active.
+- Selecting `정지/운영`, `제외`, or `검토` first changes the display level to
+  stock, then shows `종목 + selected sub-filter` as active.
+- These rules change selection projection only. Existing count calculation and
+  stock filtering evidence remain unchanged.
+
+## 3. Routine Entry And Double-click Contract
+
+- Group context-menu order begins with `신규루틴`, followed by a separator,
+  `조기마감`, and `즉시청산`.
+- `신규루틴` reuses the existing routine settings/registration entry point.
+- Group double-click no longer opens new-routine registration.
+- Double-clicking an instance name toggles operation exclusion for every stock
+  assigned to that instance.
+- Double-clicking a group name applies the same toggle to every stock assigned
+  to every instance under that group.
+- Toggle direction is deterministic:
+  - all targets already excluded -> set all targets to exclusion `False`;
+  - at least one target not excluded -> set all targets to exclusion `True`.
+- The existing canonical operation-exclusion writer is reused for every target.
+- Refresh occurs once after the batch. No new cache or Source of Truth is added.
+- This double-click action never starts actual RUNNING operation.
+
+## 4. Automatic Main Window Height Contract
+
+- The automatic table-height basis is:
+  `total groups + total routine instances + total registered stocks + 1 row`.
+- The calculation uses unfiltered registered totals, never the currently visible
+  filtered row count.
+- Automatic recalculation occurs only when the total group/instance/stock
+  signature changes.
+- Changing `정지/운영`, `제외`, or `검토` filters does not resize the window.
+- Group or instance collapse/expand does not resize the window.
+- The calculated height is a one-time resize target, not a fixed or minimum
+  height contract. The user may always shrink or enlarge the window vertically.
+- If the target exceeds available screen height, the window is capped to the
+  available screen and the table uses its vertical scrollbar.
+- Row height, font, horizontal width, and column widths are not changed by this
+  contract.
+
+## 5. Verification Evidence
+
+- 32-bit Python 3.11 py_compile: 49 changed Python files PASS.
+- Main summary/selection/context and directly related UI focused tests: 80 PASS.
+- Review/Emergency/Recovery/Reconciliation focused tests: 243 PASS.
+- Operation/Event/owner-resolution focused tests: 96 PASS.
+- PnL optimization and normalized Review reason focused tests: 5 PASS.
+- `git diff --check`: PASS before Code Freeze.
+
+## 6. Known Validation Blockers
+
+The wider 485-test main/settings batch is not fully clean: 9 FAIL and 3 ERROR
+remain in stale delegate/widget geometry expectations, a removed helper-identity
+expectation, mutable real stock metadata assumptions, and older display-string
+expectations. They are not evidence against the contracts in sections 2 through
+4, whose focused paths passed, but they remain explicit regression cleanup work.
+
+## 7. Excluded State
+
+- User Runtime, stocks, Queue, routine-instance configuration, and operation
+  policy files are not part of this Code Freeze.
+- No SendOrder or Broker TR was authorized or executed by this closing work.

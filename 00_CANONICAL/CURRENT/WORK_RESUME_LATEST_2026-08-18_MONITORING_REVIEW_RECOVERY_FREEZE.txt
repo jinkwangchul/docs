@@ -1,0 +1,86 @@
+# WORK RESUME LATEST — Monitoring, Review, And Recovery Freeze
+
+Date: 2026-08-18
+Status: Conversation Closing baseline
+
+## Repository Baseline
+
+Code repository: `jinkwangchul/kiwoom_auto`
+Code branch: `feat/restore-auto-trade-setting-ui`
+Code freeze: `c953abedaf15f64f684cff9354be0595ca559a8d`
+Code commit: `feat: finalize monitoring review and recovery workflows`
+
+Docs repository: `jinkwangchul/docs`
+Docs branch: `agent/project-prompt-standard`
+Docs parent baseline before this closing commit:
+`1f0c0e4747a3a8619e35d54e14de433523cf810c`
+The final Docs Freeze is the commit containing this Work Resume and is verified
+in the Conversation Closing report and remote branch head.
+
+## Completed In This Freeze
+
+- Main monitoring badge selection and hierarchy/sub-filter projection.
+- Group `신규루틴` context entry and group/instance operation-exclusion batch
+  double-click behavior.
+- Main monitoring total-count automatic height policy with manual resize.
+- Review Management UI/lifecycle normalization and operator guidance.
+- GLOBAL/SELECTED Emergency scope separation, terminal evidence preservation,
+  pre-connection guards, and release lifecycle coverage.
+- Recovery snapshot handoff and explicit position reconciliation support.
+- Legacy early-close reconciliation support.
+- AutoTradeSetting close owner resolution and related UI projection alignment.
+- One-second main PnL refresh change-detection/cache verification.
+
+## Main Monitoring Contract Added To Canonical
+
+- Initial state is `종목 + 정지/운영`.
+- `종목` is never a standalone selection.
+- Group/routine and stock sub-filters are mutually exclusive.
+- Group and instance name double-click perform deterministic exclusion toggle
+  only; they do not start operation.
+- Height uses total group + total instance + total stock + one row and changes
+  only when those totals change.
+- Filters and collapse state do not resize the window; manual vertical resize is
+  always available and screen overflow uses table scrolling.
+
+## Verification State
+
+- 32-bit Python 3.11 py_compile: 49/49 PASS.
+- Main summary/context/direct UI focused: 80/80 PASS.
+- Review/Emergency/Recovery/Reconciliation: 243/243 PASS.
+- Operation/Event/owner-resolution: 96/96 PASS.
+- PnL optimization and Review reason focused: 5/5 PASS.
+- Total direct passing evidence reported in closing: 424 tests.
+- Code and Docs diff checks: PASS for the staged closing scope.
+
+## Known Blocker
+
+The wider 485-test main/settings batch reports 9 FAIL and 3 ERROR. The remaining
+cases are concentrated in obsolete cell-widget/delegate assumptions, fixed-width
+font/geometry expectations, an old shared-helper identity assertion, mutable
+real stock metadata assumptions, and older display/sort string expectations.
+Do not treat the wide batch as clean until these fixtures/contracts are audited.
+The focused tests for the newly Canonicalized main-selection, entry, toggle, and
+height contracts are clean.
+
+## Protected Local State
+
+The Code worktree intentionally retains unstaged user/project state including:
+
+- `PROJECT_CHANGELOG.txt`;
+- `operation_policy.json`;
+- `routine_instances/*` local instance/rules changes;
+- `runtime/*`, Queue, logs, evidence, and diagnostic artifacts;
+- `stocks/*` config/state/orders/candles changes, deletions, and backups;
+- `archived_stocks/`, `artifacts/`, and other untracked user evidence.
+
+The Docs worktree also retains pre-existing modified/deleted/untracked Canonical,
+Archive, Trace, and reference files that were not part of this closing scope.
+They must not be reset, restored, cleaned, or silently staged.
+
+## Next Start Point
+
+No new feature is authorized by this Work Resume. If the user requests regression
+cleanup, begin with the 9 FAIL / 3 ERROR wide main/settings batch and separate
+stale test assumptions from actual display regressions without modifying user
+Runtime/stocks data.

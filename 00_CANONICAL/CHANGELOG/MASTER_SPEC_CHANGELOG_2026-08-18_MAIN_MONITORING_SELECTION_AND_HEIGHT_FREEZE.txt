@@ -1,0 +1,32 @@
+# MASTER_SPEC CHANGELOG — Main Monitoring Selection And Height Freeze
+
+Date: 2026-08-18
+Canonical:
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-18_MAIN_MONITORING_SELECTION_AND_HEIGHT_FREEZE.txt`
+Code freeze: `c953abedaf15f64f684cff9354be0595ca559a8d`
+
+## Added Confirmed Contracts
+
+- Fixed the initial main monitoring selection to `종목 + 정지/운영`.
+- Fixed hierarchy and stock sub-filter mutual exclusivity.
+- Fixed the summary grouping separator after `종목`.
+- Moved group new-routine registration to the first group context-menu action.
+- Reassigned group/instance name double-click to deterministic batch operation-
+  exclusion toggle without starting RUNNING operation.
+- Fixed automatic height calculation to unfiltered group/instance/stock totals
+  plus one row.
+- Limited automatic resize to registered-total signature changes and preserved
+  manual vertical resize and screen-limit scrolling.
+
+## Verification
+
+- Directly related focused tests: PASS.
+- 32-bit py_compile: PASS.
+- git diff check: PASS.
+- Wider main/settings regression retains 9 FAIL and 3 ERROR as explicit known
+  cleanup items; no unverified contract was promoted into Canonical.
+
+## Preservation
+
+- No older Canonical, Changelog, or Work Resume was modified for this update.
+- User Runtime/stocks/configuration data was excluded from Code staging.
