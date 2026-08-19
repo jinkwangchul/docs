@@ -115,6 +115,42 @@ Environment B: local Git execution unavailable.
 - If local state is required, ask the user to run the local commands or move the
   work to a local-execution agent.
 
+Computer Use / KOA Studio Session Handoff Policy:
+- One Phase should be performed from start to finish inside one Codex task by default.
+- When additional Kiwoom OpenAPI+ official technical contract confirmation is
+  needed, do not create a separate KOA Studio-only Codex conversation by default.
+- If Computer Use is available in the current Codex task, use Computer Use in
+  the same task to inspect KOA StudioSA, then return to the same task context
+  and compare the result against Production code and existing official Evidence.
+- Do not require the user to relay whether the active window is Codex or KOA
+  Studio, whether the window switched to KOA Studio, whether it switched back to
+  Codex, or the window-switching process itself.
+- When using Computer Use, Codex manages the needed Windows app switching and
+  rechecks the active app and visible screen state after switching.
+- Do not repeat KOA Studio investigation for Kiwoom contracts already recorded
+  as VERIFIED in Docs official Evidence or audit reports.
+- Use KOA Studio only when a new implementation needs an external contract that
+  is absent from existing Evidence or remains PARTIAL or unverified.
+- Do not assume Computer Use is always available. At new-session startup, judge
+  its availability from the current environment when possible.
+- If Computer Use is unavailable, do not invent GUI inspection results. Use
+  installed official Kiwoom materials, such as `C:\OpenAPI\koa_devguide.xml`,
+  only in read-only mode. If a contract can be confirmed only through GUI access,
+  leave it unverified instead of guessing.
+- The default purpose of KOA Studio / Computer Use is read-only official
+  technical-material inspection. Without explicit approval for the current
+  Phase, do not perform CommConnect login, real-server connection,
+  simulation-server connection, account lookup, account-password entry, real TR
+  requests, CommRqData, SetRealReg, SendOrder, orders, modifications,
+  cancellations, or any other Broker side effect.
+- Official function, event, TR definition, FID, Real Type, and development-guide
+  inspection is allowed when performed read-only.
+- Keep permanent operating rules separate from current environment state.
+  Current facts such as Computer Use availability, KOA StudioSA installed
+  version, installed official materials, latest official Kiwoom audit document,
+  and remaining PARTIAL or unverified contracts belong in Latest Work Resume or
+  the Next Session Startup Prompt, not as permanent Canonical facts.
+
 ## 3. Work Purpose
 
 The project goal is working automatic trading software, not document growth, structure growth, or Git activity.
@@ -269,6 +305,18 @@ Reference rules:
 7. Use Reference Index only to locate a required document.
 8. Re-read this file only when operating rules changed, a new operating rule must be applied, or the user asks.
 
+External Tool Environment restoration:
+- When the Latest Work Resume or Next Session Startup Prompt records external
+  tool environment state, restore at least Computer Use availability, KOA
+  StudioSA installed or confirmed version, installed official Kiwoom materials,
+  the latest official Kiwoom Evidence or audit document, and remaining PARTIAL
+  or unverified external contracts.
+- If this information is already recorded in the previous closing documents, do
+  not require the user to explain it again.
+- Do not make new-session recovery depend on reading the previous conversation.
+  The Work Resume and Next Session Startup Prompt must carry the environment
+  contract needed for the next task.
+
 Forbidden:
 - Broad structure audit without need
 - Re-reading AGENT, Reference Index, full Canonical, historical documents, or broad project structure by default
@@ -362,6 +410,10 @@ Freeze includes, when requested or needed:
 - New Latest Changelog for Canonical changes
 - Reference Index update when latest document pointers change
 - Final verification that local and remote baselines match
+- Environment handoff when the development environment, tools, Codex plugins,
+  Computer Use availability, external official-material access method, KOA
+  Studio version or installation state, or official Evidence inspection method
+  changed during the conversation
 
 Big Feature Freeze must record:
 - Current Big Feature Goal
@@ -373,6 +425,12 @@ Big Feature Freeze must record:
 Freeze is complete only when the next AI can continue the same work from GitHub and the recorded documents without reading the previous conversation.
 
 Freeze must not record ideas, unapproved plans, or discussed UI proposals as Canonical.
+
+Latest Work Resume environment handoff:
+- Conversation Closing must record the current environment state needed by the
+  next task when external tool contracts changed or matter to recovery.
+- Record reproducible environment contracts, not temporary UI positions or which
+  window happened to be foreground at shutdown.
 
 ## 11. Conversation Closing Standard Procedure
 
@@ -458,6 +516,8 @@ Forbidden:
 
 The final prompt must include:
 - Environment resolution
+- External Tool Environment, when needed for recovery or when external tool
+  contracts changed during the conversation
 - Source of Truth selection
 - Conditional repository verification against Project Identity before work starts:
   run `git remote -v`, `git branch --show-current`, `git rev-parse HEAD`,
@@ -470,6 +530,52 @@ The final prompt must include:
 - Recently completed work
 - Current implementation location
 - The first concrete next implementation task, if one is defined by the Source of Truth
+
+The Next Session Startup Prompt must hand off not only Repository Information
+and Work Resume state, but also the currently confirmed External Tool
+Environment and Computer Use / KOA Studio operating rules when they are needed
+for the next task.
+
+When needed, include this block after Repository Information and fill it from the
+final verified closing state:
+
+```text
+==================================================
+External Tool Environment
+==================================================
+
+- Computer Use:
+  Available / Not Available / Must Verify
+
+- KOA StudioSA:
+  <current confirmed version or state>
+
+- Installed Official Kiwoom Evidence:
+  <available official materials>
+
+- Latest Kiwoom Official Contract Audit:
+  <document path>
+
+- Remaining PARTIAL / Unverified Contracts:
+  <record if any>
+
+==================================================
+Computer Use / KOA Studio Operating Rule
+==================================================
+
+- This Phase is performed inside one Codex task.
+- If additional official-contract confirmation is needed, do not create a
+  separate Codex conversation by default.
+- If Computer Use is available in the current task, inspect KOA StudioSA
+  directly.
+- After inspection, return to the same task context.
+- The user does not need to relay window-switching state.
+- Do not reinvestigate existing VERIFIED Evidence.
+- Do not execute Broker side effects without separate approval.
+```
+
+Do not reinterpret this block manually each time. At Closing, fill it with the
+actual environment state that the next session needs.
 
 Conversation Closing Template:
 
