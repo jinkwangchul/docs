@@ -1,0 +1,585 @@
+Global Broker / Market Data Architecture
+Phase 0 - Official Contract Audit Finalization
+
+Report date: 2026-08-19
+Mode: read-only audit plus Docs-only report commit/push
+
+1. Executive Summary
+
+This Phase 0 normalized the already-obtained KOA StudioSA / installed
+koa_devguide.xml evidence and compared it with the current local Production
+working tree. No Production code, tests, runtime data, stock data, queue data,
+routine instance data, or operation policy files were modified by this phase.
+
+Primary result:
+- Keep one central KiwoomApi / one central QAxWidget ownership model.
+- Keep the existing Queue -> Approval -> Operation Policy -> Dispatch Claim ->
+  Final Send Gate -> SendOrder -> Chejan safety core.
+- Add broker/session/readiness and connection epoch before expanding TR,
+  realtime, or candle architecture.
+- Treat realtime market data as a future MarketDataHost capability, not as an
+  immediate replacement for current opt10080 candle acquisition.
+- Do not treat fixed "TR always 5/sec" as a verified contract. The official
+  evidence confirms common request limits and server-side flexible throttling,
+  but not a stable universal production scheduling number.
+
+2. Baseline
+
+Code repository:
+- path: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- branch: feat/restore-auto-trade-setting-ui
+- local HEAD: bd2894773ade0a70d19bea1f1dd96a2d6f71e043
+- remote branch SHA before Docs work: bd2894773ade0a70d19bea1f1dd96a2d6f71e043
+- local upstream ahead/behind before Docs work: 0/0
+- pushed baseline relation: local HEAD equals pushed baseline bd28947
+- Code commit/push in this phase: none
+- Code working tree before Docs report: dirty; user/runtime data and generated
+  artifacts present. Existing dirty files were preserved.
+
+Docs repository:
+- path: C:\Users\JIN KWANG CHUL\Documents\docs
+- branch: agent/project-prompt-standard
+- local HEAD before report: bb8e0516ce0ce014a645b2c73bfc97add9f4fdf8
+- remote branch SHA before report: bb8e0516ce0ce014a645b2c73bfc97add9f4fdf8
+- local upstream ahead/behind before Docs work: 0/0
+- existing staged files before report: none
+- existing report path before report: absent
+- Docs working tree before report: dirty; existing unrelated Canonical,
+  Archive, and untracked files were preserved.
+
+3. KOA Studio Environment
+
+KWM-OFFICIAL-KOA-001
+- authority_domain: KIWOOM_EXTERNAL_CONTRACT
+- title: KOA StudioSA
+- type: installed official lookup tool
+- publisher: KIWOOM Securities
+- version: 2.34, from prior read-only KOA investigation supplied for this phase
+- checked_at: 2026-08-19
+- locator: KOA StudioSA menus/tabs for function, event, TR, realtime/FID lookup
+- trust: VERIFIED for the specific inspected function/event/FID claims below
+- note: this phase reused the prior read-only KOA evidence and did not perform
+  login, TR, realtime registration, or order calls.
+
+KWM-OFFICIAL-GUIDE-001
+- authority_domain: KIWOOM_EXTERNAL_CONTRACT
+- title: koa_devguide.xml
+- type: installed official development guide
+- publisher: KIWOOM Securities
+- local path: C:\OpenAPI\koa_devguide.xml
+- size: 138886 bytes
+- last_modified: 2026-03-26 17:54:52 KST
+- sha256: 1BD2A3FADB782A3D39753E571FBC49224A22A6B0AE62F756A7C84D1116F5022D
+- checked_at: 2026-08-19
+- locators: lines around 99-104, 176-236, 398-449, 466-508,
+  1981-1985, 2211-2222, 2343-2377, 2430-2438, 2487-2502,
+  2508-2513, 2579-2591, 2618-2634
+- trust: VERIFIED for installed guide claims; exact Korean text was not copied
+  into this report.
+
+KWM-OFFICIAL-OCX-001
+- authority_domain: KIWOOM_EXTERNAL_CONTRACT
+- title: KHOpenAPI OCX
+- type: installed ActiveX/OCX
+- publisher: KIWOOM Securities
+- CLSID: {A1574A0D-6BFA-4BD7-9020-DED88711818D}
+- control name in project: KHOPENAPI.KHOpenAPICtrl.1
+- local path: C:\OpenAPI\KHOpenAPI.ocx
+- size: 492656 bytes
+- file_version: 1.0.0.1
+- product_version: 1.0.0.1
+- last_modified: 2026-06-04 17:49:04 KST
+- sha256: 446D387C455498F647F22F11DFCA1CA41AAE57B7B60F2AAAB6D1E2E6C01B8240
+- registry: HKLM\SOFTWARE\WOW6432Node\Classes\CLSID
+- trust: VERIFIED for local installation/32-bit COM registration evidence
+
+4. Official Claim Registry
+
+KWM-CLAIM-001 CommConnect
+- status: VERIFIED
+- source: KWM-OFFICIAL-KOA-001; KWM-OFFICIAL-GUIDE-001 lines around 99-104,
+  176-181, 2217
+- contract: CommConnect requests login and leads to OnEventConnect. Return 0
+  means the function request path succeeded, not that trading is ready.
+- project impact: login completion must remain event-driven.
+
+KWM-CLAIM-002 OnEventConnect
+- status: VERIFIED
+- source: KWM-OFFICIAL-KOA-001; KWM-OFFICIAL-GUIDE-001 lines around 228-236
+- contract: nErrCode 0 indicates login success; -100, -101, -102 are official
+  login failure categories.
+- project impact: server connection, login failure, and version processing must
+  remain separate operator evidence.
+
+KWM-CLAIM-003 GetConnectState
+- status: VERIFIED
+- source: KWM-OFFICIAL-GUIDE-001 lines around 190-196
+- contract: 1 means connected and 0 means not connected.
+- project impact: GetConnectState is a readiness input, not complete execution
+  permission.
+
+KWM-CLAIM-004 GetLoginInfo
+- status: VERIFIED
+- source: KWM-OFFICIAL-KOA-001; KWM-OFFICIAL-GUIDE-001 lines around 198-226
+- contract: login information includes account list and related login tags.
+- project impact: account provenance must be tied to the active login session.
+
+KWM-CLAIM-005 GetServerGubun
+- status: PARTIAL
+- source: KWM-OFFICIAL-KOA-001
+- contract: tag is available; exact return-value semantics are not fully
+  revalidated in this phase.
+- project impact: project may project server type, but exact semantics remain
+  a confirmation item.
+
+KWM-CLAIM-006 CommRqData
+- status: VERIFIED
+- source: KWM-OFFICIAL-GUIDE-001 lines around 398-414, 466-508, 2343-2377
+- contract: SetInputValue precedes CommRqData; OnReceiveTrData carries response;
+  sPrevNext 2 indicates continuation request is available.
+- project impact: pending request identity and continuation ownership are needed.
+
+KWM-CLAIM-007 TR rate limit
+- status: PARTIAL
+- source: KWM-OFFICIAL-GUIDE-001 lines around 2343-2348, 2487-2494
+- contract: CommRqData, CommKwRqData, and SendCondition share request limit
+  handling; limits may vary by server condition and repeated requests.
+- project impact: implement a global TR governor, but do not hard-code a single
+  universal "5/sec always safe" contract as the whole policy.
+
+KWM-CLAIM-008 OnReceiveTrData
+- status: VERIFIED
+- source: KWM-OFFICIAL-GUIDE-001 lines around 57, 398, 408-414, 2213-2221
+- contract: event follows TR request; GetCommData is used inside/after event
+  handling to extract response fields.
+- project impact: stale callback guards must compare pending request identity.
+
+KWM-CLAIM-009 SetRealReg
+- status: VERIFIED
+- source: KWM-OFFICIAL-KOA-001; KWM-OFFICIAL-GUIDE-001 lines around 424-442,
+  2430-2438
+- contract: registers realtime data for stock codes and FIDs; one registration
+  has 100-stock / 100-FID practical boundaries; optType 0 replaces, optType 1
+  appends.
+- project impact: screen/FID ownership must be explicit before realtime primary.
+
+KWM-CLAIM-010 SetRealRemove
+- status: VERIFIED
+- source: KWM-OFFICIAL-KOA-001
+- contract: removal is by screen/code or ALL; removing one screen registration
+  does not imply all registrations for the same stock are removed.
+- project impact: allocator/registry must track screen ownership.
+
+KWM-CLAIM-011 OnReceiveRealData and GetCommRealData
+- status: VERIFIED
+- source: KWM-OFFICIAL-KOA-001; KWM-OFFICIAL-GUIDE-001 lines around 422-431,
+  440-449, 2430-2438
+- contract: realtime data arrives by stock/real type and values are read by FID.
+- project impact: realtime shadow mode needs explicit Real Type/FID mapping.
+
+KWM-CLAIM-012 SendOrder
+- status: VERIFIED
+- source: KWM-OFFICIAL-KOA-001; KWM-OFFICIAL-GUIDE-001 lines around 61,
+  1981-1985, 2219-2222, 2588-2591, 2631-2634
+- contract: function return 0 is not final order success; later order number,
+  message, TR, and Chejan evidence determine actual lifecycle. Order calls are
+  limited separately; exceeded order pacing can return -308 per KOA evidence.
+- project impact: keep SendOrder return, broker acceptance, and fill separated.
+
+KWM-CLAIM-013 OnReceiveChejanData and GetChejanData
+- status: VERIFIED
+- source: KWM-OFFICIAL-KOA-001; KWM-OFFICIAL-GUIDE-001 lines around 451,
+  2219-2222, 2579-2591, 2618-2622
+- contract: order/fill/balance notifications are delivered through Chejan and
+  values are obtained by FID.
+- project impact: Chejan is a truth boundary for broker/fill evidence.
+
+KWM-CLAIM-014 Official FID sample set
+- status: VERIFIED
+- source: KWM-OFFICIAL-KOA-001
+- contract: sampled FIDs include realtime price/time/quote values and Chejan
+  account/order/code/status/quantity/price/fill/balance fields.
+- project impact: FID maps should be explicit constants with provenance.
+
+5. Production Call Graph
+
+PROJECT-CODE-001 KiwoomApi broker wrapper
+- file: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto\kiwoom_api.py
+- locators: CONTROL_NAME line 260; QAxWidget setup lines 335-343; login line
+  393; GetConnectState line 613; GetLoginInfo/account_numbers line 623;
+  server type line 643; login_session_id line 659; send_order line 663;
+  TR request functions lines 693, 795, 825, 856; pending TR response line
+  1219; recovery response line 1344; Chejan event line 1143.
+- role: central broker wrapper and QAxWidget owner.
+- audit: one QAxWidget is created per KiwoomApi instance. No evidence was found
+  of a production SetRealReg / OnReceiveRealData wiring path in current code.
+
+PROJECT-CODE-002 TR inventory in KiwoomApi
+- file: kiwoom_api.py
+- locators: opt10080 request lines 693-777; OPW00018 holdings lines 795-824;
+  OPT10075 open orders lines 825-855; OPW00001 account funds lines 856-951;
+  shared recovery submit lines 972-1099; continuation handling lines 1344-1394.
+- screens: opt10080 default 9001; holdings 9101; open orders 9102; account
+  funds 9103.
+- audit: all actual CommRqData calls are inside KiwoomApi. No global TR governor
+  was found. Pending identity is rqname based; recovery checks login_session_id
+  before request, but callback-time connection epoch is not implemented.
+
+PROJECT-CODE-003 Candle writer
+- file: kiwoom_candle_adapter.py
+- locators: normalize rows lines 21-84; save_minute_candles_for_stock lines
+  87-112.
+- role: convert opt10080 rows and merge current trading-day candles through
+  candle_manager.save_candles.
+- audit: single helper exists for opt10080 saves, but no BAR_COMMITTED event,
+  bar identity, or read-back contract is frozen yet.
+
+PROJECT-CODE-004 Signal probe
+- file: routine_signal_probe.py
+- locators: target predicate lines 200-217; queue bridge lines 221-256;
+  probe_routine_for_stock line 289; selected probe line 566; all-enabled probe
+  line 633.
+- role: imports routine, reads candles/state, evaluates signal, optionally
+  enqueues BUY/SELL.
+- audit: predicate blocks review, disabled trade_enabled, emergency, stopped,
+  and unregistered states. This is not yet a named Execution Universe contract.
+
+PROJECT-CODE-005 Operation policy gate
+- file: operation_policy_gate.py
+- locators: policy role lines 1-24; emergency writer line 127; operation
+  running writer line 156; normal close writer line 266; review predicate line
+  398; evaluate_operation_policy line 437; queue policy apply line 495.
+- role: final policy blocker before execution status transitions.
+- audit: emergency/review/close checks exist. Broker connection/session
+  provenance is handled later, not here.
+
+PROJECT-CODE-006 Queue and SendOrder safety
+- files: order_queue.py, auto_trade_order_execution_boundary.py,
+  kiwoom_send_order_executor.py, execution_queue_writer.py
+- locators: order_queue signal_to_order_candidate line 451; build queue line
+  525; manual environment in auto_trade_order_execution_boundary lines around
+  900-1040; default send order screen 0101 around line 995 and 1209;
+  execute_kiwoom_send_order line 76; execute_claimed_send_order line 212.
+- role: candidate creation, durable queue, claimed final send, one callable
+  SendOrder execution, writer recording.
+- audit: at-most-once claim and final gate are strong. SendOrder return handling
+  is separated from later broker/fill evidence. Screen number ownership is ad
+  hoc and not synchronized with screen_registry.json.
+
+PROJECT-CODE-007 Chejan evidence
+- files: kiwoom_api.py, chejan_event_normalizer.py, chejan_event_recorder.py,
+  broker_holding_recorder.py
+- locators: KiwoomApi _on_receive_chejan_data line 1143; normalizer account
+  and order fields around lines 131-134; broker holding FID fields around
+  lines 333-347.
+- role: raw Chejan capture, FID normalization, broker/fill/holding evidence.
+- audit: Chejan event path exists and is separated from SendOrder call return.
+  Full broker session provenance and reconnect behavior are not yet complete.
+
+PROJECT-CODE-008 UI and registration lifecycle
+- files: gui_windows.py, gui_auto_trade_setting_window.py, gui_main_table_loader.py
+- role: main monitoring, AutoTradeSetting, account/auth projections, selected
+  start roster, review/exclusion projection, operation refresh.
+- audit: UI is downstream of state/queue/recovery for most flows. Mini chart is
+  read-only by current internal contract. Per-stock fast path and event-driven
+  UI notification boundary are not complete.
+
+PROJECT-CANONICAL-001 Current internal contracts
+- path: C:\Users\JIN KWANG CHUL\Documents\docs\00_CANONICAL\CURRENT
+- relevant current files:
+  MASTER_SPEC_CANONICAL_2026-07-28_RECOVERY_FAIL_CLOSED_STATE_PRESERVATION_FREEZE.txt
+  MASTER_SPEC_CANONICAL_2026-08-01_CLOSE_PROCESS_OPERATION_CONTRACT.txt
+  MASTER_SPEC_CANONICAL_2026-08-08_MONITORING_EVIDENCE_AND_ACCOUNT_FUNDS_FREEZE.txt
+  MASTER_SPEC_CANONICAL_2026-08-11_MAIN_SETTINGS_SHARED_OPERATION_FREEZE.txt
+  MASTER_SPEC_CANONICAL_2026-08-12_GUI_CHART_OPERATION_STATE_FREEZE.txt
+  MASTER_SPEC_CANONICAL_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt
+  MASTER_SPEC_CANONICAL_2026-08-18_MAIN_MONITORING_SELECTION_AND_HEIGHT_FREEZE.txt
+- authority_domain: PROJECT_INTERNAL_CONTRACT
+- audit: these files are internal contract sources, not Kiwoom official sources.
+
+6. TR Inventory
+
+Current Production CommRqData callers:
+- opt10080 minute candles: KiwoomApi.request_minute_candles, screen 9001,
+  pending rqname identity, timeout 10000 ms, no continuation fetch beyond
+  warning.
+- opw00018 holdings snapshot: KiwoomApi.request_account_holdings_snapshot,
+  screen 9101, recovery identity required, continuation handled while sPrevNext
+  is 2.
+- opt10075 open orders snapshot: KiwoomApi.request_open_orders_snapshot,
+  screen 9102, recovery identity required, continuation handled while sPrevNext
+  is 2.
+- opw00001 account funds: KiwoomApi.request_account_funds_snapshot, screen
+  9103, account must be in current login account list, timeout 15000 ms.
+
+Observed gaps:
+- No global TR governor.
+- No common request pacing queue.
+- No per-request connection_epoch.
+- No callback-time stale connection generation guard.
+- No central screen allocator.
+
+7. Screen-number Inventory
+
+screen_registry.json:
+- ranges declared: 1000-1999 login/account/funds; 2000-2999 conditions;
+  3000-3999 daily/minute query; 4000-4999 realtime; 5000-5999 orders/fills;
+  9000-9999 admin GUI.
+- used_screens: empty.
+
+Production hardcoded screens:
+- 9001: opt10080 minute candles.
+- 9101: holdings recovery.
+- 9102: open orders recovery.
+- 9103: account funds.
+- 0101: SendOrder preview/manual/cancel default in execution boundary.
+- 9000: SendOrder preview default in adapter/preview paths.
+
+Finding:
+- screen_registry.json declarations do not match actual screen use. This is a
+  P1 collision/observability risk before realtime registration is added.
+
+8. Realtime Inventory
+
+Current Production:
+- SetRealReg wiring: not found.
+- SetRealRemove wiring: not found.
+- OnReceiveRealData signal connection: not found in KiwoomApi setup.
+- GetCommRealData usage: not found in current Production code scan.
+- Current market data source: opt10080 TR and persisted candles.
+
+Conclusion:
+- Realtime should enter as shadow mode after BrokerSession, TR governor, screen
+  allocator, and FID ownership exist.
+
+9. Order/Chejan Contract Audit
+
+SendOrder:
+- KiwoomApi.send_order calls the official 9-argument SendOrder signature.
+- kiwoom_send_order_executor.execute_claimed_send_order calls an injected
+  callable only after durable claim/final gate inputs are present.
+- return code 0 is recorded as send-call success, not fill success.
+
+Chejan:
+- KiwoomApi._on_receive_chejan_data collects FIDs with GetChejanData and emits
+  raw_chejan_received.
+- downstream normalizer/recorder/broker holding code handles account, broker
+  order number, code, status, quantity, price, fill, and holding evidence.
+
+Boundary:
+- Official contract and project implementation agree that SendOrder return,
+  broker acceptance, Chejan, and fill are separate lifecycle facts.
+
+10. Official to Production Matrix
+
+Claim ID | Official Contract | Production Implementation | Current Canonical | Status | Risk | Required Action
+KWM-CLAIM-001 | CommConnect requests login | KiwoomApi.login calls CommConnect and waits for OnEventConnect | login/auth separate from execution | MATCH | P1 | add session/readiness projection
+KWM-CLAIM-002 | OnEventConnect carries login result | _on_event_connect maps 0/-100/-101/-102 and emits login_state_changed | operator evidence separation | MATCH | P1 | preserve, add epoch
+KWM-CLAIM-003 | GetConnectState 1/0 | is_connected reads GetConnectState | readiness is not execution permission | MATCH | P1 | include in BrokerReadiness
+KWM-CLAIM-004 | GetLoginInfo exposes account info | account_numbers reads ACCNO; server type reads GetServerGubun | account provenance required | PARTIAL | P1 | formalize account/session snapshot
+KWM-CLAIM-005 | GetServerGubun exists | account_server_type maps 1 to SIMULATION, other to REAL | server evidence displayed | PARTIAL | P2 | verify exact values later
+KWM-CLAIM-006 | CommRqData -> OnReceiveTrData | all actual TR calls centralized in KiwoomApi | TR should be governed | PARTIAL | P0 | add global TR governor
+KWM-CLAIM-007 | TR limits are shared/flexible | no global pacing governor | no fixed unsafe assumption allowed | CONFLICT | P0 | implement governor before more TR load
+KWM-CLAIM-008 | sPrevNext 2 continuation | recovery handles continuation; opt10080 only reports more | Recovery complete required | PARTIAL | P1 | decide opt10080 continuation policy
+KWM-CLAIM-009 | SetRealReg screen/FID registration | no production wiring | realtime not yet primary | MISSING | P1 | defer to shadow mode phase
+KWM-CLAIM-010 | SetRealRemove per screen/code | no production wiring | screen ownership needed | MISSING | P1 | allocator before realtime
+KWM-CLAIM-011 | OnReceiveRealData/GetCommRealData | no production wiring | market data host planned | MISSING | P1 | implement shadow adapter later
+KWM-CLAIM-012 | SendOrder return != final success | executor separates call return and broker/fill | Queue/Final Send/Chejan protected | MATCH | P0 | keep safety core
+KWM-CLAIM-013 | Chejan truth boundary | raw Chejan capture and normalization exist | Chejan/fill evidence protected | MATCH | P0 | add session provenance
+KWM-CLAIM-014 | FID map official lookup | partial constants exist | evidence records planned | PARTIAL | P1 | centralize FID registry
+
+11. Findings
+
+P0 findings:
+1. No global TR governor exists although official evidence says CommRqData,
+   CommKwRqData, and SendCondition share request-limit handling and server
+   throttling can vary.
+2. Pending TR callbacks do not carry a common connection_epoch guard. Recovery
+   checks login_session_id before request, but callback-time stale response
+   defense is not globally frozen.
+3. Execution Universe is implicit. routine_signal_probe blocks obvious review,
+   emergency, stopped, and trade_disabled states, but the project has not yet
+   named and enforced a central Execution Universe across market data, signal,
+   queue, and send.
+
+P1 findings:
+1. screen_registry.json is declarative but empty while Production uses 9001,
+   9101, 9102, 9103, 0101, and 9000.
+2. Realtime is not wired; SetRealReg ownership, SetRealRemove ownership, FID
+   registry, and OnReceiveRealData dispatch are missing.
+3. GetServerGubun exact return semantics remain partially verified.
+4. opt10080 continuation is not fetched; current code records a warning when
+   more pages exist.
+5. Mini chart/main monitoring/AutoTradeSetting refresh remains downstream but
+   lacks a formal per-stock event notification boundary.
+
+P2 findings:
+1. Naming around BrokerReadiness, MarketDataHost, ExecutionUniverse, and
+   StrategyObservationUniverse should be frozen before implementation.
+2. Screen-number documentation exists but is not generated from code and can
+   drift.
+3. FID constants exist in multiple contexts and need source locators.
+
+12. Architecture Candidate Decision
+
+- BrokerSessionSnapshot / BrokerReadiness: NEEDED. Process-local source of
+  truth projection from KiwoomApi state; no new durable runtime file initially.
+- connection_epoch: NEEDED. Process-local generation incremented on login
+  success, disconnect observation, and reconnect.
+- global TR Governor: NEEDED. Central queue/pacer for all CommRqData,
+  CommKwRqData, SendCondition candidates.
+- screen number allocator/registry: NEEDED. Existing screen_registry.json must
+  be reconciled with actual code before realtime.
+- pending TR request identity: NEEDED. Extend existing rqname identity with
+  account/session/epoch/screen/trcode/request kind.
+- stale callback guard: NEEDED. Drop or quarantine callbacks whose epoch or
+  request identity no longer matches.
+- canonical candle single writer: NEEDED. Reuse candle_manager/save_candles;
+  do not create competing writers.
+- atomic candle commit: NEEDED. Verify candle_manager atomicity/read-back in a
+  later implementation phase.
+- BAR_COMMITTED(stock, bar_identity): NEEDED. Logical notification; not Event
+  Journal as source of truth.
+- logical MarketDataHost: NEEDED. Introduce after session/TR/screen foundations.
+- Strategy Observation Universe: NEEDED. Includes operation + waiting market
+  data observation.
+- Execution Universe: NEEDED. Strict subset allowed to signal/queue/send.
+- Risk Observation Universe: NEEDED. Holdings, open orders, uncertain orders,
+  broker/fill evidence regardless of strategy state.
+- per-stock Fast Path: NEEDED after candle commit identity.
+- realtime shadow mode: NEEDED before realtime primary.
+- UI downstream notification: NEEDED. UI consumes core notifications and should
+  not block execution.
+
+13. Revised Phase Sequence
+
+Phase 0: Official contract audit and Production call graph freeze. Docs-only.
+
+Phase 1: BrokerSessionSnapshot, BrokerReadinessSnapshot, and connection_epoch.
+- files: kiwoom_api.py, broker/session helper module candidates, focused tests
+- source of truth: process-local KiwoomApi state
+- mutation: no runtime/stocks/queue mutation
+- server use: no real login in tests
+- commit target: Code, then optional Docs note if contract changes
+
+Phase 2: Pending TR identity and stale callback guard.
+- files: kiwoom_api.py and tests for opt10080/opw00018/opt10075/opw00001
+- gate: epoch/account/screen/rqname/trcode identity
+
+Phase 3: Global TR Governor.
+- files: new or existing TR governor module, KiwoomApi request entrypoints
+- contract: no fixed universal 5/sec assumption; configurable conservative
+  pacing and queue visibility
+
+Phase 4: Screen-number registry/allocator reconciliation.
+- files: screen_registry.json, allocator helper, KiwoomApi/order adapter callers
+- contract: no hidden screen constants
+
+Phase 5: Universe normalization.
+- files: routine_signal_probe.py, gui loaders, operation policy, start/stop
+  lifecycle
+- contracts: StrategyObservationUniverse, ExecutionUniverse, RiskObservationUniverse
+
+Phase 6: Canonical candle commit identity.
+- files: kiwoom_candle_adapter.py, candle_manager.py, signal trigger bridge
+- contract: atomic commit, read-back, BAR_COMMITTED notification
+
+Phase 7: Per-stock fast path for TR-based market data.
+- files: operation cycle/candle refresh/signal probe orchestration
+- contract: committed stock only evaluates; UI downstream
+
+Phase 8: Realtime adapter shadow mode.
+- files: MarketDataHost/realtime adapter/FID registry/screen allocator
+- contract: SetRealReg shadow only; no SendOrder impact
+
+Phase 9: Realtime primary with TR reconciliation fallback.
+- files: market data host, candle aggregation, reconciliation scheduler
+- contract: realtime is primary only after shadow evidence passes
+
+Phase 10: MarketDataHost and OperationHost separation.
+- files: operation cycle host, UI notification bridge
+- contract: chart/UI cannot block core execution
+
+Phase 11: Registration and roster lifecycle.
+- files: stock registration, first routine assignment, operation_excluded policy
+- contract: new stock default location independent of server connection
+
+Phase 12: Load/reconnect/simulation validation.
+- files: tests and validation docs
+- contract: no force resume after reconnect without recovery/gap reconciliation
+
+Phase 13: Canonical freeze.
+- files: Docs Canonical only after implementation evidence
+- contract: promote only implemented and pushed behavior.
+
+14. Remaining UNVERIFIED Contracts
+
+- Exact GetServerGubun return-value mapping.
+- Dedicated disconnect notification event contract and ordering.
+- Whether reconnect preserves prior SetRealReg registrations.
+- Whether pending TR callbacks can arrive after reconnect/disconnect and under
+  what official ordering guarantees.
+- Full official screen-number global limit/ownership contract.
+- Exact Real Type/FID set required for production-grade 1-minute candle authority.
+- Stable minute/hour/day TR numerical ceilings.
+- Server-specific simulation/real differences beyond inspected claims.
+
+15. Next Single Phase Recommendation
+
+Next phase: Phase 1 - BrokerSessionSnapshot, BrokerReadinessSnapshot, and
+connection_epoch.
+
+Reason:
+- It is the smallest foundation that reduces P0 stale identity risk without
+  touching runtime/stocks/queue data.
+- It supports later TR governor, stale callback guard, realtime shadow mode,
+  recovery identity, and operator readiness wording.
+
+Expected scope:
+- Production files: kiwoom_api.py plus a small broker session/readiness helper
+  if needed.
+- Tests: focused no-login unit tests with fake controls/events.
+- Actual Kiwoom server use: none.
+- Code commit: yes in Phase 1 after tests.
+- Docs commit: only if internal contract is updated after code evidence.
+
+16. Safety Confirmation
+
+- Production code modified in Phase 0: 0
+- Tests modified in Phase 0: 0
+- Existing Canonical modified in Phase 0: 0
+- Runtime modified in Phase 0: 0
+- stocks modified in Phase 0: 0
+- routine_instances modified in Phase 0: 0
+- Queue modified in Phase 0: 0
+- operation_policy modified in Phase 0: 0
+- Actual Kiwoom login: 0
+- Account password input: 0
+- Actual TR request: 0
+- SetRealReg call: 0
+- SendOrder call: 0
+
+17. Git Completion Evidence
+
+Report path:
+- C:\Users\JIN KWANG CHUL\Documents\docs\30_REPORTS\KIWOOM_BROKER_INTEGRATION_PHASE0_OFFICIAL_CONTRACT_AUDIT_2026-08-19.txt
+
+Docs commit message:
+- docs: audit kiwoom broker integration contracts
+
+Docs commit SHA:
+- to be filled by commit verification after this report is committed.
+
+Push target:
+- origin agent/project-prompt-standard
+
+Remote branch head:
+- to be verified after push.
+
+Unrelated dirty/staged/untracked preservation:
+- Existing Docs dirty/untracked files are not staged by this phase.
+- Existing Code dirty/untracked runtime/data files are not staged or modified.
+
+Code no-change confirmation:
+- Code HEAD remains bd2894773ade0a70d19bea1f1dd96a2d6f71e043.
+- Code commit/push intentionally not performed because Phase 0 is Docs-only.
