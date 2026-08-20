@@ -1,0 +1,223 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-21
+Scope: Routine / Stock Limit Phases 1-7 final implementation Freeze
+Status: Latest Official Supplemental Canonical
+
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code Freeze: e603b95611cce41ddb2c23116004d8c45253e049
+
+Documentation repository: jinkwangchul/docs
+Docs branch: agent/project-prompt-standard
+Docs parent baseline before this Freeze:
+d04741a83b0abeb2505ef2d6eae55e5ca0d6d9f0
+
+==================================================
+1. Authority And Scope
+==================================================
+
+This Supplemental Canonical is the first technical Source of Truth for the
+Routine / Stock Limit feature set implemented in Phases 1 through 7:
+
+- Routine limit UI, persistence, recommendation, minimum, and adjustment ratio
+- Routine response settings and next-session recalculation
+- Stock and Routine invested-principal limit responses
+- durable Routine response ownership and same-event escalation
+- central Buffer > Routine > Stock response admission priority
+- account-wide system total-budget BUY admission safety
+
+It supplements, and does not replace, the independent Current Canonicals for
+Budget/Buffer, Close/Liquidation, Recovery, Review, Broker/Market Data, and UI.
+
+==================================================
+2. Limit State And Persistence
+==================================================
+
+RoutineInstance and Stock limits use three states:
+
+- disabled + no amount: UNSET
+- enabled + no amount: WAITING
+- enabled + positive integer amount: CONFIGURED
+
+The UI keeps the setting action visible for every state. Empty inline input
+does not silently disable a limit. Explicit disable uses the established
+double-click transition. Existing persisted instances remain readable.
+
+Recommendation and manual adjustment may produce an amount only when the
+existing recommendation/minimum contracts are satisfied. A recommendation or
+manual result above the system total budget returns the limit to UNSET. An
+amount exactly equal to the system total budget remains valid.
+
+Routine adjustment ratio is a next-session input. Saving a lower limit while
+RUNNING does not itself create an immediate response trigger; the next
+canonical principal-changing event or Recovery evaluation is required.
+
+==================================================
+3. Independent Ceiling Contract
+==================================================
+
+Every Routine and Stock limit is an independent ceiling, not an allocation,
+reservation, or partition of the system budget. Therefore multiple Routine or
+Stock limits may each equal the system total budget.
+
+Principal Source of Truth:
+
+- Stock principal: current OPEN position cost_basis for that Stock
+- Routine principal: sum of current OPEN position cost_basis for Stocks
+  assigned to that RoutineInstance
+
+Excluded from Routine/Stock principal:
+
+- market value and unrealized PnL
+- pending BUY and open BUY reservation
+- cumulative gross historical BUY
+- another Routine or Stock principal
+
+Limit overrun uses strict `principal > limit`. Equality does not overrun.
+
+==================================================
+4. Response Contract
+==================================================
+
+Default and configured response policies remain those persisted by Phase 3.
+General EARLY_CLOSE uses the automatic-trading environment close policy.
+Segment EARLY uses canonical routine-close policy `루틴매도신호`; legacy
+`루틴` evidence remains accepted as an alias.
+
+Routine segment boundaries are:
+
+- usage <= 90: no segment response
+- 90 < usage <= 100: EARLY
+- usage > 100: IMMEDIATE
+
+Only the same durable RoutineLimit event may promote EARLY to IMMEDIATE. A
+Buffer, StockLimit, manual, AUTO_CLOSE, or another Routine event cannot be
+captured, replaced, or promoted. Existing durable lower-layer commands are
+never rolled back by later upper-layer activity.
+
+==================================================
+5. Central Response Priority
+==================================================
+
+The final Production priority is:
+
+  Buffer > Routine > Stock
+
+Priority applies to new response admission for the same account and trading
+day. It is event-global and cross-stock, not selected-stock local.
+
+The central read-only arbiter interprets current results and durable ownership:
+
+- BUFFER_CLEAR / BUFFER_OWNS / BUFFER_UNCERTAIN
+- ROUTINE_CLEAR / ROUTINE_OWNS / ROUTINE_UNCERTAIN
+
+OWNS or UNCERTAIN blocks lower-layer admission. COMPLETED with no active durable
+ownership permits lower evaluation on the next normal cycle. Malformed result,
+ownership, account/day identity, or unsettled evidence fails closed. The
+arbiter does not write Runtime, enqueue orders, call SendOrder, or cancel an
+existing response.
+
+Live order:
+
+Chejan durable record -> fill durable record -> position atomic commit/read-back
+-> Buffer evaluation/resume -> central arbitration -> Routine evaluation/resume
+-> central arbitration -> Stock evaluation -> existing close/order pipeline.
+
+Recovery order:
+
+Recovery complete -> Buffer resume/ownership settlement -> central arbitration
+-> Routine ownership resume/completion/escalation/reconstruction -> central
+arbitration -> Stock resume.
+
+==================================================
+6. System Total-Budget BUY Admission
+==================================================
+
+`operation_policy.json.system_budget.total_budget` is the sole system-total
+setting Source of Truth. Available budget and Buffer percentage are not this
+hard ceiling.
+
+For a new BUY:
+
+  occupied_before = OPEN account position cost_basis
+                  + canonical outstanding admitted BUY reservation
+
+  projected_after = occupied_before
+                  + canonical candidate/execution-intent BUY amount
+
+Admission passes when `projected_after <= total_budget` and blocks with
+`SYSTEM_TOTAL_BUDGET_EXCEEDED` only when `projected_after > total_budget`.
+SELL is not subject to this Gate.
+
+The candidate amount is the existing deterministic execution-intent budget; no
+new price estimate is introduced. Missing/malformed total, account identity,
+Recovery, positions, candidate amount, reservation, or ambiguous active BUY
+lifecycle evidence fails closed.
+
+Admitted unsent BUY lifecycle states reserve their canonical candidate amount.
+Broker-accepted and partially-filled states reserve the unfilled canonical
+amount. Lifecycle copies sharing one source_signal_id reserve once.
+
+The existing `execution_queue_writer.mutate_order_queue` file/thread lock is
+the serialized admission boundary. `APPROVED -> EXECUTABLE/BLOCKED_POLICY` is
+evaluated while that lock is held. BUY A becomes durable and visible before BUY
+B evaluates, preventing A/B oversubscription without a new reservation file,
+ledger, lock, or budget Source of Truth.
+
+==================================================
+7. Extreme And Boundary Evidence
+==================================================
+
+- 4000 occupied + 100 BUY against total 4000: BLOCK, projected 4100.
+- 3900 occupied + 100 BUY against total 4000: PASS at equality.
+- 3901 occupied + 100 BUY: BLOCK.
+- total 4000, available 3600, occupied 3500 + 200 BUY: system Gate PASS at
+  projected 3700; later Buffer response remains authoritative.
+- Buffer 0% remains valid and creates no hidden reserve or minimum Buffer.
+- Routine A/B at principal 2000 each with independent limit 4000 remain at 50%;
+  no Routine 90/100 response occurs. A further positive BUY is blocked by the
+  system total Gate when account consumption is already 4000.
+- A Routine/Stock limit equal to total remains storable, while direct `> total`
+  overrun can be operationally unreachable through normal admitted BUY flow.
+
+The exact existing 0% warning remains:
+
+※완충 0%설정은 심각한 손실을 초래할수 있습니다. 권장 완충은 20%입니다.
+
+Buffer 0% is permitted with this strong warning and may be reconsidered by a
+future explicit policy decision; this Freeze does not declare it inherently
+safe.
+
+==================================================
+8. Verification And Residuals
+==================================================
+
+Verified on 32-bit Python with PyQt5 5.15.11 and Qt 5.15.2:
+
+- Phase 7 focused: 77/77 PASS
+- Phase 1-6 focused: 115/115 PASS
+- Shared Core broad isolated modules: 615/615 PASS
+- changed-module py_compile: PASS
+- git diff --check: PASS
+- direct priority-layer SendOrder/Queue append/write scan: no violation
+
+Known baseline reproduced separately:
+
+- test_gui_main_routine_monitoring: 5 failures + 5 errors
+- test_main_pnl_refresh_optimization: 1 removed-helper mock error
+
+One monolithic 32-bit unittest discovery process terminated with Windows status
+0xC0000409 before unittest emitted its final summary. This is recorded as a
+test-process residual, not silently reported as PASS. All required focused and
+Shared Core isolated module gates above completed normally, with no new module
+regression observed.
+
+==================================================
+9. Freeze State
+==================================================
+
+Routine / Stock Limit Phases 1 through 7 are COMPLETE / FROZEN at Code Freeze
+e603b95611cce41ddb2c23116004d8c45253e049.
+
+Protected Runtime, stocks, Queue, routine_instances, operation_policy, logs,
+artifacts, and unrelated dirty/untracked files are not part of this Freeze.

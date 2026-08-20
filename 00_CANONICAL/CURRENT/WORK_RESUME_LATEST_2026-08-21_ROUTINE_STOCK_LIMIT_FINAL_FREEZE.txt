@@ -1,0 +1,157 @@
+WORK RESUME LATEST
+Date: 2026-08-21
+Scope: Routine / Stock Limit Phases 1-7 Final Freeze
+Status: Project Freeze baseline
+
+==================================================
+1. Repository Baseline
+==================================================
+
+Code repository:
+  C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Remote:
+  https://github.com/jinkwangchul/kiwoom_auto
+Branch:
+  feat/restore-auto-trade-setting-ui
+Final Code Freeze:
+  e603b95611cce41ddb2c23116004d8c45253e049
+
+Docs repository:
+  C:\Users\JIN KWANG CHUL\Documents\docs
+Remote:
+  https://github.com/jinkwangchul/docs
+Branch:
+  agent/project-prompt-standard
+Docs parent baseline:
+  d04741a83b0abeb2505ef2d6eae55e5ca0d6d9f0
+Final Docs Freeze:
+  The pushed remote HEAD containing this Work Resume, matching Canonical,
+  Changelog, and Reference Index update. This file does not embed its own SHA.
+
+==================================================
+2. Completion State
+==================================================
+
+Routine / Stock Limit Phases 1 through 7 are COMPLETE / FROZEN.
+
+Final priority:
+  Buffer > Routine > Stock
+
+Priority is event-global new-response admission. Current result plus durable
+ownership is read fail-closed. Existing lower durable commands are not rolled
+back.
+
+Account-wide BUY safety is now enforced at two points: early execution-policy
+evidence and final serialized `APPROVED -> EXECUTABLE/BLOCKED_POLICY` admission
+inside the existing canonical queue mutation lock. No new reservation SoT was
+created.
+
+Latest Supplemental Canonical:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-21_ROUTINE_STOCK_LIMIT_FINAL_FREEZE.txt
+
+Matching Changelog:
+  00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-21_ROUTINE_STOCK_LIMIT_FINAL_FREEZE.txt
+
+==================================================
+3. Verification State
+==================================================
+
+Interpreter:
+  C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+  pointer width 32
+  PyQt5 5.15.11
+  Qt 5.15.2
+
+Results:
+
+- Phase 7 focused: 77/77 PASS
+- Phase 1-6 focused: 115/115 PASS
+- Shared Core broad isolated modules: 615/615 PASS
+- py_compile: PASS
+- git diff --check: PASS
+- Code local SHA equals remote SHA
+
+Known baseline reproduced:
+
+- test_gui_main_routine_monitoring: 5 failures + 5 errors
+- test_main_pnl_refresh_optimization: 1 removed-helper mock error
+
+Residual:
+
+- monolithic unittest discovery exited with Windows status 0xC0000409 before
+  final summary; required focused and isolated broad modules completed normally
+
+==================================================
+4. Contract Snapshot
+==================================================
+
+- Routine/Stock limits are independent ceilings, not allocations.
+- Principal is current OPEN cost_basis only.
+- strict `>` means equality does not overrun.
+- Routine usage <=90 none, >90 through 100 EARLY, >100 IMMEDIATE.
+- only same RoutineLimit event may promote EARLY to IMMEDIATE.
+- Buffer 0% remains permitted with the exact strong warning and no hidden reserve.
+- total-budget BUY admission uses OPEN cost_basis + outstanding admitted BUY
+  reservation + current canonical candidate amount.
+- projected equal to total passes; projected above total blocks.
+- available budget is not the system-total hard cap.
+- SELL is not blocked by the system-total Gate.
+- ambiguous or malformed account/Recovery/budget/reservation evidence fails closed.
+
+==================================================
+5. Protected Working-tree State
+==================================================
+
+Both repositories retain pre-existing dirty/untracked user work. Do not reset,
+restore, stash, clean, delete, move, rename, or bulk stage it. Runtime, stocks,
+Queue, routine_instances, operation_policy, logs, artifacts, and unrelated Docs
+changes remain outside these Freeze commits.
+
+==================================================
+6. External Tool Environment
+==================================================
+
+Computer Use:
+  Available in the current Codex environment; not used for this Phase
+
+KOA StudioSA:
+  2.34 (last confirmed official Evidence environment)
+
+Installed official material:
+  C:\OpenAPI\koa_devguide.xml
+  C:\OpenAPI\KHOpenAPI.ocx
+
+Latest official audit:
+  30_REPORTS/KIWOOM_BROKER_INTEGRATION_PHASE0_OFFICIAL_CONTRACT_AUDIT_2026-08-19.txt
+
+Remaining UNVERIFIED_EXTERNAL contracts:
+
+- actual Kiwoom network/reconnect timing
+- server-side realtime packet loss and registration preservation
+- actual market-hours burst and COM/Qt scheduling pressure
+- actual Chejan ordering and incomplete Chejan session provenance
+- broker outcome at the exact crash/SendOrder overlap boundary
+- complete official global screen limit
+- authoritative complete realtime candle FID set
+- exact stable TR minute/hour/day ceilings
+- exact GetServerGubun semantics, still PARTIAL
+
+Computer Use / KOA Studio operating rule:
+
+- Keep one Phase in one Codex task.
+- Do not create a separate KOA conversation by default.
+- Use Computer Use read-only in the same task only for a new unresolved
+  official external contract.
+- The user does not relay window switching.
+- Do not repeat already VERIFIED investigation.
+- Without separate approval, do not login/connect, query accounts, enter an
+  account password, issue TR, call SetRealReg or SendOrder, or send/modify/cancel
+  orders.
+- If Computer Use is unavailable, state that fact, use installed official
+  material read-only, and leave GUI-only claims unresolved.
+
+==================================================
+7. Next Start Point
+==================================================
+
+No next implementation item is authorized. Wait for explicit user instruction.

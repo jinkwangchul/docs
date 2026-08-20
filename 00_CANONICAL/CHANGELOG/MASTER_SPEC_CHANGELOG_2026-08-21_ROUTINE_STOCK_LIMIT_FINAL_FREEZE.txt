@@ -1,0 +1,55 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-21
+Scope: Routine / Stock Limit Phases 1-7 Final Freeze
+Status: Official Canonical promotion record
+
+Code Freeze:
+  e603b95611cce41ddb2c23116004d8c45253e049
+
+Docs parent baseline:
+  d04741a83b0abeb2505ef2d6eae55e5ca0d6d9f0
+
+==================================================
+Promoted Contracts
+==================================================
+
+- Routine/Stock three-state limit UI and persistence
+- recommendation, minimum, manual ratio, and next-session recalculation
+- independent ceiling and OPEN cost_basis principal semantics
+- Routine response settings, durable ownership, and exactly-once handling
+- strict 90/100 segment boundaries and same-event EARLY -> IMMEDIATE promotion
+- central event-global Buffer > Routine > Stock admission arbitration
+- durable upper ownership read-back and fail-closed uncertain evidence
+- no rollback of existing durable lower responses
+- account-wide system total-budget BUY hard ceiling
+- existing queue mutation lock as the serialized A/B BUY admission boundary
+- available budget excluded from the hard ceiling
+- Buffer 0% allowed with the established warning and no hidden reserve
+- equality with system total allowed for configured Routine/Stock limits
+
+==================================================
+Verification Promoted
+==================================================
+
+- 32-bit Phase 7 focused: 77/77 PASS
+- 32-bit Phase 1-6 focused: 115/115 PASS
+- 32-bit Shared Core broad isolated modules: 615/615 PASS
+- py_compile PASS
+- git diff --check PASS
+- concurrent BUY simulation: exactly one EXECUTABLE when A+B exceeds total
+- 4000 + 100 critical reproduction: BLOCK at projected 4100
+- no new reservation SoT, direct SendOrder, or direct SELL Queue append
+
+Known baseline remains separately classified as 5 failures + 5 errors in
+test_gui_main_routine_monitoring and 1 removed-helper mock error in
+test_main_pnl_refresh_optimization. Monolithic discovery terminated with
+0xC0000409 before a final unittest summary; required isolated gates passed.
+
+==================================================
+Authority Boundary
+==================================================
+
+The matching 2026-08-21 Supplemental Canonical is authoritative for Routine /
+Stock Limit Phases 1-7, central response priority, and system-total BUY
+admission. Existing independent Current Canonicals remain authoritative for
+their own domains.
