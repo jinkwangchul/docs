@@ -4,7 +4,7 @@ Scope: Routine / Stock Limit Phases 1-7 Final Freeze
 Status: Official Canonical promotion record
 
 Code Freeze:
-  e603b95611cce41ddb2c23116004d8c45253e049
+  f9666069940d6b45b147f3273eee2d813010056e
 
 Docs parent baseline:
   d04741a83b0abeb2505ef2d6eae55e5ca0d6d9f0
@@ -53,3 +53,21 @@ The matching 2026-08-21 Supplemental Canonical is authoritative for Routine /
 Stock Limit Phases 1-7, central response priority, and system-total BUY
 admission. Existing independent Current Canonicals remain authoritative for
 their own domains.
+
+==================================================
+Post-Freeze Semantic Correction
+==================================================
+
+- Unified all Routine Limit EARLY_CLOSE actions on canonical
+  `POLICY_ROUTINE_CLOSE` (`루틴매도신호`) with empty extra policy.
+- Removed Routine Limit dependence on `operation_policy.early_close` for
+  UNIFIED and SEGMENTED `조기마감`.
+- Preserved Segment EARLY, direct IMMEDIATE, Segment IMMEDIATE, SCOPE_STOCK,
+  same-event escalation, and Buffer > Routine > Stock priority.
+- Protected existing durable EARLY commands, including legacy
+  environment-policy writes, from rewrite or reissue.
+- Aligned Routine Limit routine-close `조기마감` and `구간마감` UI actions to
+  red `#DC2626` without changing environment-dependent blue EARLY_CLOSE,
+  Stock Limit, Buffer, or context-menu contracts.
+- No schema migration, new persistent Source of Truth, direct SendOrder, or
+  direct SELL Queue path was introduced.

@@ -14,7 +14,7 @@ Remote:
 Branch:
   feat/restore-auto-trade-setting-ui
 Final Code Freeze:
-  e603b95611cce41ddb2c23116004d8c45253e049
+  f9666069940d6b45b147f3273eee2d813010056e
 
 Docs repository:
   C:\Users\JIN KWANG CHUL\Documents\docs
@@ -33,6 +33,10 @@ Final Docs Freeze:
 ==================================================
 
 Routine / Stock Limit Phases 1 through 7 are COMPLETE / FROZEN.
+
+Post-Freeze Routine Limit semantic correction is COMPLETE. Every Routine Limit
+EARLY_CLOSE now uses canonical `POLICY_ROUTINE_CLOSE` (`루틴매도신호`) with an
+empty extra policy and does not depend on environment early-close settings.
 
 Final priority:
   Buffer > Routine > Stock
@@ -64,6 +68,11 @@ Interpreter:
 
 Results:
 
+- Post-Freeze Routine semantic/settings focused: 27/27 PASS
+- Post-Freeze Routine/Stock/priority focused: 48/48 PASS
+- Buffer/Routine/Stock/close core regression: 174/174 PASS
+- OperationCommand/Recovery regression: 180/180 PASS
+- context-menu non-target color checks: 3/3 PASS
 - Phase 7 focused: 77/77 PASS
 - Phase 1-6 focused: 115/115 PASS
 - Shared Core broad isolated modules: 615/615 PASS
@@ -89,6 +98,14 @@ Residual:
 - Principal is current OPEN cost_basis only.
 - strict `>` means equality does not overrun.
 - Routine usage <=90 none, >90 through 100 EARLY, >100 IMMEDIATE.
+- UNIFIED, SEGMENTED profit/loss, and Segment EARLY all use one EARLY_CLOSE
+  intent with `POLICY_ROUTINE_CLOSE`; Immediate semantics remain unchanged.
+- Existing durable EARLY commands are not rewritten or reissued by the
+  semantic correction.
+- Routine Limit routine-close actions are red `#DC2626`; environment-dependent
+  general EARLY_CLOSE outside Routine Limit remains blue `#2563EB`.
+- Stock Limit, Buffer response, and context-menu early-close contracts remain
+  unchanged.
 - only same RoutineLimit event may promote EARLY to IMMEDIATE.
 - Buffer 0% remains permitted with the exact strong warning and no hidden reserve.
 - total-budget BUY admission uses OPEN cost_basis + outstanding admitted BUY

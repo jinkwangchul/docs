@@ -5,7 +5,7 @@ Status: Latest Official Supplemental Canonical
 
 Code repository: jinkwangchul/kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
-Code Freeze: e603b95611cce41ddb2c23116004d8c45253e049
+Code Freeze: f9666069940d6b45b147f3273eee2d813010056e
 
 Documentation repository: jinkwangchul/docs
 Docs branch: agent/project-prompt-standard
@@ -79,10 +79,20 @@ Limit overrun uses strict `principal > limit`. Equality does not overrun.
 4. Response Contract
 ==================================================
 
-Default and configured response policies remain those persisted by Phase 3.
-General EARLY_CLOSE uses the automatic-trading environment close policy.
-Segment EARLY uses canonical routine-close policy `루틴매도신호`; legacy
-`루틴` evidence remains accepted as an alias.
+Default and configured response policy strings remain those persisted by Phase
+3. Every Routine Limit EARLY_CLOSE now uses one canonical EARLY_CLOSE intent
+with requested_policy `루틴매도신호` (`POLICY_ROUTINE_CLOSE`) and an empty
+extra policy. This includes UNIFIED `조기마감`, SEGMENTED profit/loss
+`조기마감`, and Segment EARLY. Routine Limit EARLY_CLOSE does not read or
+depend on `operation_policy.early_close`. Legacy `루틴` evidence remains
+accepted as an alias where routine-close evidence is read.
+
+Routine Limit UI color follows execution meaning. `조기마감` and `구간마감`
+actions using routine-close semantics are red `#DC2626`, including the lower
+Segment EARLY `조기마감` display. This does not change the existing blue
+`#2563EB` contract for environment-dependent general EARLY_CLOSE outside
+Routine Limit. Stock Limit, Buffer response, and stock context-menu colors and
+semantics are unchanged.
 
 Routine segment boundaries are:
 
@@ -93,7 +103,11 @@ Routine segment boundaries are:
 Only the same durable RoutineLimit event may promote EARLY to IMMEDIATE. A
 Buffer, StockLimit, manual, AUTO_CLOSE, or another Routine event cannot be
 captured, replaced, or promoted. Existing durable lower-layer commands are
-never rolled back by later upper-layer activity.
+never rolled back by later upper-layer activity. An existing durable Routine
+Limit EARLY command is not rewritten or reissued by this semantic correction,
+including a legacy command already written with an environment-derived close
+policy. The canonical routine-close semantic applies to events without an
+existing durable EARLY command and to new events.
 
 ==================================================
 5. Central Response Priority
@@ -194,6 +208,13 @@ safe.
 
 Verified on 32-bit Python with PyQt5 5.15.11 and Qt 5.15.2:
 
+- Post-Freeze Routine semantic/settings focused: 27/27 PASS
+- Post-Freeze Routine/Stock/priority focused: 48/48 PASS
+- Post-Freeze Buffer/Routine/Stock/close core regression: 174/174 PASS
+- Post-Freeze OperationCommand/Recovery regression: 180/180 PASS
+- stock/group/routine context-menu early-close color checks: 3/3 PASS
+- changed-module py_compile and git diff --check: PASS
+
 - Phase 7 focused: 77/77 PASS
 - Phase 1-6 focused: 115/115 PASS
 - Shared Core broad isolated modules: 615/615 PASS
@@ -216,8 +237,9 @@ regression observed.
 9. Freeze State
 ==================================================
 
-Routine / Stock Limit Phases 1 through 7 are COMPLETE / FROZEN at Code Freeze
-e603b95611cce41ddb2c23116004d8c45253e049.
+Routine / Stock Limit Phases 1 through 7 remain COMPLETE / FROZEN. The
+Post-Freeze Routine Limit EARLY semantic correction is COMPLETE at Code Freeze
+f9666069940d6b45b147f3273eee2d813010056e.
 
 Protected Runtime, stocks, Queue, routine_instances, operation_policy, logs,
 artifacts, and unrelated dirty/untracked files are not part of this Freeze.
