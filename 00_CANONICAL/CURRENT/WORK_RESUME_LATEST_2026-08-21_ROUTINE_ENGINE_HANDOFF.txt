@@ -1,0 +1,147 @@
+WORK RESUME LATEST
+Date: 2026-08-21
+Scope: Routine Limit Final Correction / Main UI Handoff / Routine Engine Handoff
+Status: Conversation Closing recovery baseline
+
+==================================================
+1. Repository State
+==================================================
+
+Code repository:
+  C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Remote:
+  https://github.com/jinkwangchul/kiwoom_auto
+Branch:
+  feat/restore-auto-trade-setting-ui
+Final Code Freeze:
+  40ed76db9a7797b38679f9dbeb0e8bb1aaf2b923
+Remote SHA:
+  40ed76db9a7797b38679f9dbeb0e8bb1aaf2b923
+
+Docs repository:
+  C:\Users\JIN KWANG CHUL\Documents\docs
+Remote:
+  https://github.com/jinkwangchul/docs
+Branch:
+  agent/project-prompt-standard
+Docs parent baseline:
+  882de0db08e8e1855efd9b4abf5f5adcf36fba0a
+Final Docs Freeze:
+  The pushed remote HEAD containing this Work Resume and the matching Reference
+  Index pointer update. This file does not embed its own SHA.
+
+==================================================
+2. Recently Completed
+==================================================
+
+- Routine / Stock Limit Phases 1 through 7: COMPLETE / FROZEN
+- Post-Freeze Routine Limit EARLY semantic correction: COMPLETE
+- Context-specific early-close color correction: COMPLETE
+- Routine Limit final visual correction: COMPLETE
+
+The final visual correction keeps lower Segment EARLY/Immediate displays as
+fixed, non-clickable labels. Active Routine Limit `조기마감` uses red text and
+border; a disabled-row `조기마감` uses disabled gray presentation. Other
+action modes retain their existing neutral/default presentation. Verification:
+32-bit py_compile PASS and 52 related tests PASS.
+
+Detailed Routine/Stock semantic and color contracts remain in:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-21_ROUTINE_STOCK_LIMIT_FINAL_FREEZE.txt
+
+==================================================
+3. Final Color Contract Reference
+==================================================
+
+- one-shot context-menu early close: #15803D
+- environment-dependent EARLY_CLOSE: #2563EB
+- active Routine Limit routine-close: #DC2626
+- upper Segment mode: neutral #374151
+- Immediate: neutral #374151
+
+This is a recovery summary only. Use the existing Final Freeze Canonical for
+the detailed contract.
+
+==================================================
+4. Current UI State
+==================================================
+
+Main UI visual structure is largely shaped. Remaining marked/display function
+semantics are intentionally UNRESOLVED / DEFERRED BY USER and are not
+authorized for implementation. Do not infer handlers or feature meaning.
+
+The previously observed Routine Limit disabled-row action-badge inconsistency
+was resolved by Code Freeze 40ed76db9a7797b38679f9dbeb0e8bb1aaf2b923.
+
+==================================================
+5. Known Unresolved
+==================================================
+
+Open investigation:
+
+Registered stocks are present, but basic stock information was observed not to
+load after server authentication. Root cause, actual Production call path, and
+exact stop point are NOT YET VERIFIED. No fix was made. Do not assume a cause.
+
+==================================================
+6. Next Big Feature
+==================================================
+
+Routine Engine Completion
+
+Target flow:
+  settings -> data input -> condition evaluation -> signal generation ->
+  duplicate/state control -> existing approval/policy/order production flow
+
+This implementation has not started in this Conversation Closing task.
+
+==================================================
+7. First Investigation
+==================================================
+
+First diagnostic / unresolved prerequisite candidate:
+
+- Trace registered-stock basic-information acquisition after server
+  authentication.
+- Confirm the actual Production call path and exact stop point.
+- Determine whether it is a real prerequisite or blocker for Routine Engine.
+- Do not assume the cause before tracing.
+
+After that diagnostic, trace the existing Routine Engine Production call graph.
+
+==================================================
+8. Protected Dirty
+==================================================
+
+Final Code protected state before Docs closing:
+  92 entries: 70 tracked dirty, 22 untracked.
+
+Final Docs protected state before this closing edit:
+  135 entries: 127 tracked dirty, 8 untracked.
+
+Protected categories include Runtime, stocks, Queue, routine_instances,
+operation_policy, logs, artifacts, unfinished Main UI, and unrelated Docs
+changes. Do not reset, restore, stash, clean, delete, move, rename, or bulk
+stage these paths.
+
+==================================================
+9. External Tool Environment
+==================================================
+
+Computer Use:
+  Available in this Codex environment; not used during this closing task
+
+KOA StudioSA:
+  2.34 (last confirmed official Evidence environment)
+
+Installed official Kiwoom material:
+  C:\OpenAPI\koa_devguide.xml
+  C:\OpenAPI\KHOpenAPI.ocx
+
+Latest official audit:
+  30_REPORTS/KIWOOM_BROKER_INTEGRATION_PHASE0_OFFICIAL_CONTRACT_AUDIT_2026-08-19.txt
+
+Remaining external contracts stay as recorded in the preceding Routine/Stock
+Limit Final Freeze Work Resume. Use Computer Use / KOA Studio read-only in the
+same task only for a newly unresolved official contract. Do not perform login,
+server connection, account query, TR, SetRealReg, SendOrder, or order side
+effects without separate user approval.
