@@ -1,0 +1,191 @@
+KIWOOM BROKER INTEGRATION PHASE 12
+LOAD / RECONNECT / SIMULATION VALIDATION REPORT
+Date: 2026-08-20
+
+1. Scope and baselines
+
+Code repository:
+  C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Code branch:
+  feat/restore-auto-trade-setting-ui
+Code baseline:
+  c292427877f22d35b0553623e811d04fc8218773
+
+Docs repository:
+  C:\Users\JIN KWANG CHUL\Documents\docs
+Docs branch:
+  agent/project-prompt-standard
+Docs baseline:
+  406a69e4106a85931a8232a6deef8ddde8fb7b21
+
+Actual Kiwoom server used: NO
+CommConnect / account TR / SetRealReg / SendOrder used: NO
+Computer Use / KOA Studio used: NO
+Validation method: deterministic fake/mock broker and Qt event simulation
+Interpreter:
+  C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+  Python 3.11 32-bit
+
+2. Result summary
+
+Phase 12 acceptance result: PASS
+Production defects reproduced: 0
+Production files changed: 0
+Test files changed: 5
+Docs files changed: 1 (this report)
+
+Focused Phase 12 matrix:
+  7 passed, 0 failed
+
+Phase-related broad regression, isolated by Qt application type:
+  230 passed, 0 failed
+
+Changed Python py_compile:
+  PASS
+
+3. Scenario matrix
+
+[SIMULATION_VERIFIED] Cold/process restart safety
+- Persisted RUNNING, trade_enabled, and trade_started_at do not recreate the
+  process-local participant set.
+- Recovery-ready state alone does not create execution membership.
+- WAITING and EXCLUDED fixtures remain outside Execution Universe.
+- Execution-ready stocks, routine candidates, and order entry remain zero until
+  an explicit current-process operation start registers participants.
+
+[SIMULATION_VERIFIED] Same-process reconnect and market-data reset
+- A new connection_epoch/login_session_id resets REALTIME_PRIMARY to
+  TR_PRIMARY_SHADOWING.
+- Old operation request ownership and pending reconciliation state are cleared.
+- Existing Phase 1 login tests verify disconnect invalidation and new reconnect
+  session identity.
+- Existing Recovery/startup tests verify fail-close before current Recovery.
+
+[SIMULATION_VERIFIED] Gap and no-gap reconciliation boundary
+- Existing realtime-primary reconciliation tests verify that a new session does
+  not reuse prior eligibility or primary authority.
+- Missing/incomplete realtime minutes enter governed TR reconciliation exactly
+  once; repaired canonical data returns to TR_PRIMARY_SHADOWING.
+- A full current-session MATCH and a later operation-cycle boundary are required
+  before REALTIME_PRIMARY promotion, including the no-gap case.
+
+[SIMULATION_VERIFIED] Stale broker events
+- Old-session opt10080 callback after disconnect/reconnect performs no candle
+  save or BAR_COMMITTED publication.
+- A stale Governor queued request is rejected before CommRqData and completes
+  its failure path once.
+- Old-session realtime events do not mutate shadow/canonical state or trigger
+  operation evaluation.
+
+[SIMULATION_VERIFIED] TR load
+- Explicit target boundaries 0, 1, 15, and 16 select at most 15 requests.
+- A 45-stock simulation issues 15 requests per cycle over three cycles.
+- All 45 stocks are selected with no starvation and no inflight leak.
+
+[SIMULATION_VERIFIED] Realtime registration load
+- 1 stock: 1 REALTIME screen.
+- 100 stocks: 1 REALTIME screen.
+- 101 stocks: 2 REALTIME screens.
+- 205 stocks: 3 REALTIME screens.
+- Every screen contains at most 100 stocks and uses the REALTIME 4xxx namespace.
+
+[SIMULATION_VERIFIED] Per-stock fast path and asynchronous ordering
+- Existing BAR_COMMITTED tests verify one-stock-only evaluation, two-stock
+  independent completion, consecutive duplicate suppression, and continued
+  processing after a stock-local error.
+- Request rqname/context and canonical path remain stock-local; no cross-stock
+  contamination was observed.
+
+[SIMULATION_VERIFIED] Realtime/TR authority race
+- First authority claim is the sole canonical writer for a stock minute.
+- Duplicate same-owner claims are idempotent.
+- TR-first blocks late realtime; realtime-first canonical commit makes later
+  normal TR skip; incomplete realtime requests reconciliation once.
+
+[SIMULATION_VERIFIED] Shutdown
+- MarketDataHost shutdown clears operation requests, canonical event queue,
+  shadow/reconciliation state, and authority state.
+- Late BAR_COMMITTED input after shutdown produces no ready event or mutation.
+- Existing host tests verify one shared KiwoomApi/MarketDataHost and one-time
+  signal binding without a new widget or polling timer.
+
+[SIMULATION_VERIFIED] Durable Queue and at-most-once SendOrder
+- A crash after SEND_CALL_IN_PROGRESS blocks automatic re-execution.
+- The restarted executor makes zero second callable/SendOrder calls and leaves
+  manual reconciliation required.
+- Same-claim thread/process tests permit exactly one callable execution.
+- SEND_CALL_ACCEPTED remains call acceptance evidence, not broker fill evidence.
+
+[CODE_VERIFIED] Resource bounds and isolation
+- Market-data minute authority is bounded to 512 identities.
+- Pending shadow comparisons are bounded to 512 entries in Production code.
+- Realtime commit tracking shares the bounded authority contract.
+- Request and reconciliation terminal paths remove their owned context.
+- Screen collision and exhaustion fail closed in allocator regression tests.
+
+4. Previously known failures
+
+Recovery timer failure classification: OBSOLETE TEST EXPECTATION
+
+The timer now calls startup_recovery_session_ready(refresh=True), whose
+canonical owner performs the refresh. The old test expected an additional
+update_startup_recovery_controls() call. The test now verifies the canonical
+refresh=True call while preserving RUNNING state and preventing refresh/trading
+work. No Production change was required.
+
+runtime/order_executions failures classification: TEST ENVIRONMENT LEAK
+
+Three tests assumed runtime/order_executions.json and runtime/order_locks.json
+must be absent in the real project. User runtime files may legitimately exist.
+The tests now snapshot file existence and hashes before execution and assert
+that both remain unchanged. No file is deleted, created, or rewritten by these
+tests. No Production change was required.
+
+5. Test runner note
+
+A single combined process containing QCoreApplication-oriented broker tests and
+later QWidget dialog tests exited without an unittest assertion summary. The
+same modules passed when isolated by Qt application type:
+
+- login/UAC: 19 passed
+- broker/realtime/reconciliation: 68 passed
+- market-data/fast-path/load: 37 passed
+- recovery/screen/order safety: 74 passed
+- registration roster GUI: 7 passed
+- status recalculation: 18 passed
+- focused Phase 12 matrix: 7 passed
+
+This is classified as a combined Qt test-runner lifecycle limitation, not a
+Production contract failure. Every acceptance module has an isolated PASS.
+
+6. Production changes
+
+None. Phase 12 found no reproducible Production contract defect. No simulator,
+broker process, QAxWidget, timer, trading feature, persistence contract, or
+Canonical document was added or changed.
+
+7. User-data preservation
+
+The real runtime/, stocks/, routine_instances/, Queue, and operation_policy
+contents were not edited, deleted, moved, staged, or cleaned. Tests that require
+file mutation use TemporaryDirectory. Existing dirty and untracked user files
+remain separated from the Phase 12 stage set.
+
+8. Residual risks
+
+[UNVERIFIED_EXTERNAL]
+- Actual Kiwoom network timing and reconnect timing.
+- Broker-side realtime loss and server-internal registration behavior.
+- Actual market-hours event bursts and COM/Qt callback scheduling pressure.
+- Actual Chejan ordering and incomplete Chejan session provenance.
+- Broker outcome reconciliation after a process crash at the exact SendOrder
+  call boundary.
+
+No claim about live latency, throughput, broker acceptance, fill confirmation,
+or server reconnect behavior is made from fake/mock elapsed time.
+
+9. Phase 13 freeze readiness
+
+READY. Phase 12 internal safety gates are validated with no Production changes,
+and the remaining risks are explicitly external. Phase 13 Canonical Freeze was
+not started in this work.
