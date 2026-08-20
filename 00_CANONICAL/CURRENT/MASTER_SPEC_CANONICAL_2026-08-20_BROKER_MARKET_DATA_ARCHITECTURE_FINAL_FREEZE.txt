@@ -1,0 +1,588 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-20
+Scope: Broker / Market Data Architecture final implementation Freeze
+Status: Latest Official Supplemental Canonical
+
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code Freeze: 951b86f3ecaa5151e91d16617e6c03ef91726930
+
+Documentation repository: jinkwangchul/docs
+Docs branch: agent/project-prompt-standard
+Docs parent baseline before Phase 13:
+a78fe1ab67b0496c2c48062f973455589f2219cc
+
+==================================================
+1. Authority And Evidence
+==================================================
+
+This Supplemental Canonical is the first technical Source of Truth for:
+
+- Kiwoom BrokerSession and readiness
+- connection_epoch and pending TR provenance
+- stale broker callback handling and the global TR Governor
+- screen namespaces and process-local leases
+- Execution Universe and current-session participant roster
+- canonical one-minute candle commit and BAR_COMMITTED
+- per-stock TR/realtime operation fast paths
+- realtime shadow, realtime primary, and TR reconciliation
+- MarketDataHost / AutoTradeOperationHost ownership
+- stock registration location and roster lifecycle
+- process restart and same-process reconnect safety
+
+It does not replace the independent Current Canonical contracts for Global
+Diagnostic Observer, Budget/Buffer, Close/Liquidation, Review/Emergency, Main
+monitoring UI, charts, or other unrelated domains.
+
+Evidence classifications used here:
+
+- OFFICIAL_CONTRACT_VERIFIED: verified from Phase 0 official installed material
+  or the Phase 8 read-only KOA StudioSA 2.34 inspection.
+- IMPLEMENTED_AND_CODE_VERIFIED: present in Code Freeze and covered by code or
+  focused contract tests.
+- SIMULATION_VERIFIED: verified by deterministic fake/mock and Qt simulation.
+- UNVERIFIED_EXTERNAL: not asserted as PASS and not treated as a defect merely
+  because live external evidence is unavailable.
+
+Evidence documents:
+
+- 30_REPORTS/KIWOOM_BROKER_INTEGRATION_PHASE0_OFFICIAL_CONTRACT_AUDIT_2026-08-19.txt
+- 30_REPORTS/KIWOOM_BROKER_INTEGRATION_PHASE12_LOAD_RECONNECT_SIMULATION_VALIDATION_2026-08-20.txt
+
+==================================================
+2. Production Topology
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+MainWindow
+  `- AutoTradeOperationHost
+       |- MarketDataHost
+       |    `- shared KiwoomApi
+       |         `- one KHOPENAPI QAxWidget
+       `- existing order execution boundary
+
+Invariants:
+
+- one KiwoomApi
+- one QAxWidget
+- one AutoTradeOperationHost
+- one MarketDataHost
+- one operation cadence timer
+- no MarketDataHost polling timer
+
+MarketDataHost is a logical process-local separation. It is not a second
+process, OCX, QAxWidget, worker thread, or persistent Event Bus.
+
+==================================================
+3. BrokerSession And Readiness
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+BrokerSessionSnapshot identifies broker connectivity with connection_epoch and
+login_session_id. BrokerReadinessSnapshot projects whether broker request
+prerequisites are currently satisfied. Readiness is an input to execution
+safety, not complete trading or order permission.
+
+connection_epoch rules:
+
+- Initial process state has an initial generation.
+- Successful login establishes a new login_session_id and session generation.
+- A confirmed connected-to-disconnected transition invalidates the session and
+  advances the generation.
+- Repeated disconnected observation alone does not advance it indefinitely.
+- Reconnect success establishes a new broker session.
+
+[OFFICIAL_CONTRACT_VERIFIED]
+
+GetConnectState returns connected/not-connected evidence. It does not by itself
+authorize Recovery, routine execution, or SendOrder.
+
+==================================================
+4. Pending TR And Stale Callback
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+Relevant pending TR ownership includes, as applicable:
+
+- request_connection_epoch
+- request_login_session_id
+- rqname and request kind
+- trcode and request inputs
+- screen ownership
+- callback/timeout terminal ownership
+
+At callback or continuation time, request provenance must match the current
+BrokerSession. A mismatch fails closed as STALE_BROKER_SESSION.
+
+A stale response must not:
+
+- write canonical candle data
+- project success
+- dispatch a continuation request
+- emit BAR_COMMITTED
+- create a later duplicate timeout side effect
+
+==================================================
+5. Global TR Governor
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+Production CommRqData flow passes through one process-local FIFO Governor owned
+by KiwoomApi. Current project-conservative pacing is 1,000 ms. This is project
+policy, not a claim that Kiwoom officially guarantees a universal fixed five
+requests per second.
+
+Queued requests recheck BrokerSession provenance immediately before broker
+dispatch. Broker timeout starts after successful dispatch, not at enqueue.
+
+[OFFICIAL_CONTRACT_VERIFIED]
+
+The installed official evidence indicates that CommRqData, CommKwRqData, and
+SendCondition families may share or receive dynamic request restrictions. It
+does not establish exact stable minute/hour/day ceilings.
+
+==================================================
+6. Screen Registry And Leases
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+Project-internal namespaces:
+
+- ACCOUNT_TR: 1000-1999
+- CONDITION: 2000-2999 reserved
+- MARKET_TR: 3000-3999
+- REALTIME: 4000-4999
+- ORDER: 5000-5999
+- ADMIN_GUI: 9000-9999
+
+screen_registry.json is the declarative Source of Truth.
+KiwoomScreenAllocator is the process-local lease owner.
+
+TR lifecycle:
+claim -> pending -> terminal release
+
+Realtime lifecycle:
+owned screen claim -> registration -> remove/release
+
+These ranges are project namespaces, not an assertion of Kiwoom's complete
+official global screen limit. Collision and exhaustion fail closed.
+
+==================================================
+7. Execution Universe And Roster
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+Execution Universe is the central projection of stocks that may participate in
+actual execution in the current process/current session. Membership and global
+broker/Recovery readiness are separate axes.
+
+Execution readiness includes at least:
+
+- current-session participant membership
+- local stock safety and status
+- Review and Emergency isolation
+- operation exclusion
+- Recovery/global readiness
+
+Persisted trade_enabled, RUNNING, or real_trade_enabled values alone do not
+create current Execution Universe membership.
+
+Operator-facing roster meaning:
+
+- operation: successful explicit current-session operation-start participant
+- waiting: registered but not a current execution participant
+- excluded: normal candidate with operation_excluded=True
+- review: Review/safety isolated
+
+Registration and participation are distinct. The participant set is
+process-local and is registered only for codes whose explicit operation start
+succeeded.
+
+Registration, exclusion release, Recovery completion, and persisted RUNNING do
+not create a participant. Exclusion release alone means excluded -> waiting; it
+does not start operation or create trade_started evidence.
+
+Initial selected start:
+
+- Successfully selected A/B become participants.
+- An unselected normal assigned C is excluded by the initial selected-roster
+  boundary.
+- Review-isolated stocks are not bulk-mutated.
+
+Already-running explicit add:
+
+- Starting waiting B adds B without changing other waiting/excluded stocks.
+- Starting excluded D first releases D's exclusion, then adds D only if start
+  succeeds.
+
+==================================================
+8. Canonical Candle Commit
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+The canonical one-minute candle Source of Truth is:
+
+stocks/<stock>/candles.json
+
+There is no additional candle database or ledger. The authoritative commit
+boundary uses:
+
+- per-path process-local RLock
+- read/merge/normalize
+- same-directory temporary file
+- flush and fsync
+- strict temporary read verification
+- os.replace
+- strict final read-back
+- semantic equality and SHA-256 content verification
+
+Only a verified commit is authoritative.
+
+Identity rules in Code Freeze:
+
+- canonical_content_hash: SHA-256 of normalized canonical candle content.
+- bar_key: `<stock_code>:1:<bar_time ISO seconds>`.
+- bar_identity: SHA-256 of sorted compact JSON containing stock_code,
+  timeframe_minutes=1, bar_time, open, high, low, close, and volume.
+- commit_identity: SHA-256 of sorted compact JSON containing stock_code,
+  timeframe_minutes=1, and canonical_content_hash.
+
+BAR_COMMITTED is emitted only for a verified and changed canonical commit.
+An unchanged verified commit or failed/unverified commit emits no event.
+
+==================================================
+9. BAR_COMMITTED And Per-stock Fast Path
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+BAR_COMMITTED means that canonical candle SoT changed and passed final
+read-back verification. It is not a raw market event, signal success, broker
+order, broker acceptance, or fill confirmation.
+
+Current sources are opt10080 and realtime_primary.
+
+TR operation flow:
+
+opt10080 canonical commit(A)
+-> BAR_COMMITTED(A)
+-> MarketDataHost validation
+-> canonical_bar_ready_for_operation(A)
+-> AutoTradeOperationHost
+-> current Execution Universe recheck
+-> routine evaluate(A) only
+
+A does not wait for candle refresh completion of B through N. The Production
+fast path does not use a normal automatic batch-end all-stock routine probe.
+
+An opt10080 BAR_COMMITTED event becomes an operation trigger only when it
+correlates with an operation-owned request context containing rqname, stock
+identity, canonical path/hash, and original operation-cycle minute key.
+Manual, diagnostic, or otherwise unowned opt10080 commits do not trigger
+automatic routine execution.
+
+OnReceiveTrData and OnReceiveRealData do not directly run routine evaluation or
+order processing. MarketDataHost/OperationHost queues use QTimer.singleShot(0,
+...) drains to leave the broker callback stack. This is not a worker-thread
+execution design.
+
+==================================================
+10. Official Realtime Contract
+==================================================
+
+[OFFICIAL_CONTRACT_VERIFIED]
+
+Phase 8 reused read-only KOA StudioSA 2.34 and installed official evidence for:
+
+- SetRealReg
+- SetRealRemove
+- OnReceiveRealData
+- GetCommRealData
+- Real Type: stock execution (`주식체결`)
+- FID 20: execution time
+- FID 10: current price
+- FID 13: cumulative volume
+- practical SetRealReg boundary: 100 stocks and 100 FIDs
+- optType 0: replace; optType 1: append
+- SetRealRemove screen/code and ALL semantics
+
+The following are not promoted to official verified guarantees:
+
+- registration preservation after reconnect
+- complete global screen capacity
+- authoritative complete realtime candle FID set
+- active subscription certainty from SetRealReg return alone
+
+==================================================
+11. Realtime Shadow And Primary
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+Realtime ticks are normalized process-locally and assembled into one-minute
+shadow bars for comparison with canonical TR bars and diagnostic evidence.
+Shadow bars do not write candles.json.
+
+Safety rules:
+
+- The first observed minute has volume_complete=False.
+- Cumulative-volume reset or a minute gap fails volume completeness
+  conservatively.
+- An out-of-order old tick cannot rewrite a past completed bar.
+
+Modes are process-local:
+
+- TR_PRIMARY_SHADOWING
+- REALTIME_ELIGIBLE
+- REALTIME_PRIMARY
+- TR_RECONCILING
+
+In the current broker session, a full-volume comparison means MATCH with
+price_match=True, volume_compared=True, and volume_match=True. With other
+readiness conditions satisfied, it permits TR_PRIMARY_SHADOWING ->
+REALTIME_ELIGIBLE. Promotion to REALTIME_PRIMARY occurs only after revalidation
+at the next normal operation-cycle boundary, never directly inside that
+comparison callback.
+
+One full match is project Phase 9 policy, not an official Kiwoom guarantee.
+REALTIME_PRIMARY and eligibility are never restored from persistence or reused
+across a broker-session change.
+
+Realtime primary flow:
+
+completed realtime one-minute bar
+-> validation and minute authority
+-> Phase 6 atomic canonical commit
+-> read-back verification
+-> BAR_COMMITTED(source=realtime_primary)
+-> MarketDataHost normalized ready event
+-> AutoTradeOperationHost
+-> routine evaluation
+
+Raw realtime ticks never directly trigger routine evaluation. If
+volume_complete=False, canonical write, BAR_COMMITTED, and routine evaluation
+are prohibited and TR reconciliation is required.
+
+==================================================
+12. Minute Authority And TR Reconciliation
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+Each stock_code + market minute has one process-local canonical writer
+authority: REALTIME or TR_RECONCILIATION. First claim owns the minute. If TR
+reconciliation owns it first, a late realtime bar cannot overwrite it.
+
+Minute authority and realtime commit tracking are bounded to 512 identities.
+Pending shadow/reconciliation comparison state is also bounded to 512 entries.
+
+Realtime-primary quality failures reuse KiwoomApi.request_minute_candles(). The
+fallback therefore retains BrokerSession provenance, the global TR Governor,
+screen allocation, opt10080, atomic canonical commit, and BAR_COMMITTED. No
+direct CommRqData fallback exists.
+
+Current reconciliation triggers include:
+
+- expected realtime minute missing
+- realtime volume incomplete
+- realtime primary canonical commit failure
+
+The same stock/minute request is deduplicated process-locally. TR callback
+ok=True is insufficient to prove repair; the target minute must exist in the
+canonical file on read-back.
+
+Successful repair returns TR_RECONCILING -> TR_PRIMARY_SHADOWING. Returning to
+REALTIME_PRIMARY requires a fresh full match, eligibility, and a later normal
+operation-cycle promotion.
+
+==================================================
+13. Host Ownership Boundary
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+MarketDataHost owns:
+
+- operation-owned TR request identity
+- realtime registration orchestration
+- realtime shadow queue/build/comparison lifecycle
+- MarketDataAuthority and minute source authority
+- reconciliation
+- canonical path/hash/source validation
+- source-specific evaluation_tick_key
+
+AutoTradeOperationHost owns:
+
+- operation timer and Recovery operation boundary
+- operation/status orchestration
+- normalized canonical-ready trigger queue
+- final Execution Universe recheck
+- single-stock routine probe
+- Consumer/Executor and existing order execution boundary
+
+MarketDataHost alone binds raw bar_committed and
+realtime_shadow_bar_completed. It emits canonical_bar_ready_for_operation after
+validation. OperationHost does not reinterpret raw TR/realtime meaning.
+
+evaluation_tick_key:
+
+- TR source: original operation-owned request operation_cycle_minute_key.
+- realtime primary: completed bar_time plus one minute in KST.
+
+Market data collection, commit, and routine execution do not depend on GUI
+visibility. UI/chart notification is downstream and cannot be a prerequisite
+for canonical commit, routine evaluation, Consumer, or Executor.
+
+==================================================
+14. Stock Registration Policy
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+operation_policy.json uses stock_registration.default_location with allowed
+values WAITING and EXCLUDED. Missing or malformed configuration defaults to
+WAITING. No separate registration settings file exists.
+
+The default applies once only to a true-new central stock. True-new is based on
+central repository record and physical stock-folder existence, not merely on
+routine assignment absence. Uncertainty is treated conservatively as existing.
+
+True-new WAITING:
+
+- operation_excluded=False
+- state STOPPED
+- no participant
+
+True-new EXCLUDED:
+
+- operation_excluded=True
+- state STOPPED
+- no participant
+
+Global operation RUNNING does not change new-registration placement. Changing
+the default is not retroactive. First assignment, routine move, unassign, and
+reassign do not rewrite an existing stock's exclusion category. The historical
+global-running `first assignment -> excluded` helper contract is retired.
+
+==================================================
+15. Restart And Reconnect Safety
+==================================================
+
+[SIMULATION_VERIFIED]
+
+On process restart, persisted RUNNING, trade_enabled, trade_started_at, and past
+global RUNNING state do not recreate the current-session participant set.
+Execution Universe remains fail-closed until explicit operation start.
+Recovery completion alone does not create participants.
+
+Same-process disconnect/reconnect is distinct: the process-local roster may
+remain, but the new broker session resets BrokerSession identity, Recovery
+readiness, MarketDataHost session state, REALTIME_PRIMARY, REALTIME_ELIGIBLE,
+registration assumptions, and prior MATCH evidence. Before fresh Recovery and
+market-data readiness, execution fails closed. Disconnect does not rewrite
+category or exclusion.
+
+A fresh session starts at TR_PRIMARY_SHADOWING. Required canonical gaps are
+repaired through governed opt10080 reconciliation.
+
+==================================================
+16. Load And Order-safety Relation
+==================================================
+
+[SIMULATION_VERIFIED]
+
+TR load:
+
+- 0, 1, 15, and 16 target boundaries
+- 45 stocks over three cycles
+- maximum 15 requests per cycle
+- round-robin without starvation
+
+Realtime registration:
+
+- 1 stock -> 1 screen
+- 100 stocks -> 1 screen
+- 101 stocks -> 2 screens
+- 205 stocks -> 3 screens
+- no screen exceeds 100 stocks
+
+Fake/mock elapsed time is not a live latency claim.
+
+This architecture does not alter the existing order safety chain:
+
+Signal -> Approval -> Operation Policy Gate -> Execution Enable / REAL_READY
+-> durable Queue -> Runtime Commit -> Dispatch Claim -> Final Send Gate
+-> SendOrder -> Broker/Chejan/Fill evidence
+
+Phase 12 verified that restart from SEND_CALL_IN_PROGRESS makes zero second
+automatic broker calls. SendOrder return 0 and SEND_CALL_ACCEPTED are call-path
+evidence, not broker acceptance or fill confirmation.
+
+==================================================
+17. Observer Relation
+==================================================
+
+Global Diagnostic Observer observes Production results and follows its own
+2026-08-16 Final Freeze Canonical. It is not Source of Truth for market-data
+authority, Recovery, Queue, canonical candles, or order lifecycle.
+
+==================================================
+18. Phase 12 Verification Evidence
+==================================================
+
+[SIMULATION_VERIFIED]
+
+- acceptance: PASS
+- Production defects reproduced: 0
+- Production files changed: 0
+- focused Phase 12: 7/7 PASS
+- phase-related broad isolated regression: 230/230 PASS
+- changed Python py_compile: PASS
+- user-data mutation: none
+- known Recovery failure: OBSOLETE TEST EXPECTATION
+- three runtime/order_executions failures: TEST ENVIRONMENT LEAK
+- acceptance suite after test isolation correction: clean
+
+==================================================
+19. UNVERIFIED_EXTERNAL
+==================================================
+
+The following are neither PASS claims nor implementation failures:
+
+- actual Kiwoom network and reconnect timing
+- server-side realtime packet-loss behavior
+- broker-internal SetRealReg preservation after reconnect
+- actual market-hours event bursts and COM/Qt scheduling pressure
+- actual Chejan ordering
+- incomplete Chejan session provenance
+- broker outcome when a crash exactly overlaps the SendOrder call boundary
+- complete official global screen limit
+- authoritative complete realtime candle FID set
+- exact stable TR minute/hour/day ceilings
+- still-PARTIAL exact GetServerGubun semantics
+
+==================================================
+20. Intentional Out Of Scope And Finality
+==================================================
+
+This Freeze does not declare implementation of:
+
+- centralized StrategyObservationUniverse or RiskObservationUniverse
+- waiting-stock realtime registration
+- realtime UI badge or realtime chart rendering
+- live broker latency or market-burst validation
+- a new broker process, second QAxWidget, or new Event Bus
+- participant persistence or automatic restart resume
+
+Phase 13 is the final authorized roadmap phase. This Canonical creates no Phase
+14 and authorizes no automatic next feature or architecture.
+
+No next implementation item is authorized.
+Wait for explicit user instruction.

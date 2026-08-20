@@ -1,0 +1,173 @@
+WORK RESUME LATEST
+Date: 2026-08-20
+Scope: Broker / Market Data Architecture Final Freeze
+Status: Project Freeze baseline
+
+==================================================
+1. Repository Baseline
+==================================================
+
+Code repository:
+  C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Remote:
+  https://github.com/jinkwangchul/kiwoom_auto
+Branch:
+  feat/restore-auto-trade-setting-ui
+Final Code Freeze:
+  951b86f3ecaa5151e91d16617e6c03ef91726930
+
+Docs repository:
+  C:\Users\JIN KWANG CHUL\Documents\docs
+Remote:
+  https://github.com/jinkwangchul/docs
+Branch:
+  agent/project-prompt-standard
+Docs parent baseline before Phase 13:
+  a78fe1ab67b0496c2c48062f973455589f2219cc
+Final Docs Freeze:
+  The pushed remote HEAD containing this Work Resume and the matching Phase 13
+  Canonical, Changelog, and Reference Index update. The commit intentionally
+  does not embed its own SHA.
+
+==================================================
+2. Completion State
+==================================================
+
+Global Broker / Market Data Architecture Phases 0 through 13 are complete.
+Phase 13 changed no Code, tests, runtime, stocks, Queue, routine_instances,
+operation_policy, logs, or artifacts. The Code Freeze remains the pushed Phase
+12 validation commit.
+
+Latest Official Supplemental Canonical:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt
+
+Matching Changelog:
+  00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt
+
+==================================================
+3. Frozen Production Topology
+==================================================
+
+MainWindow
+  `- one AutoTradeOperationHost
+       |- one MarketDataHost
+       |    `- shared one KiwoomApi / one KHOPENAPI QAxWidget
+       `- existing order execution boundary
+
+MarketDataHost is process-local logical separation. There is no second broker
+process, second QAxWidget, market-data polling timer, or persistent Event Bus.
+
+==================================================
+4. Current Broker And Market-data State
+==================================================
+
+- BrokerSession uses connection_epoch and login_session_id provenance.
+- Pending TR and Governor dispatch revalidate the current broker session.
+- Stale TR/realtime events fail closed.
+- Market data modes are TR_PRIMARY_SHADOWING, REALTIME_ELIGIBLE,
+  REALTIME_PRIMARY, and TR_RECONCILING.
+- New processes and new broker sessions never restore old realtime-primary
+  authority.
+- Canonical one-minute SoT remains stocks/<stock>/candles.json.
+- Only changed, read-back-verified atomic commits emit BAR_COMMITTED.
+- Operation-owned TR and verified realtime-primary events enter the per-stock
+  normalized MarketDataHost -> OperationHost fast path.
+- Missing/incomplete realtime minutes use governed opt10080 reconciliation and
+  return to TR_PRIMARY_SHADOWING after verified repair.
+
+==================================================
+5. Registration And Roster State
+==================================================
+
+- operation_policy.json stock_registration.default_location accepts WAITING or
+  EXCLUDED and defaults to WAITING when missing/malformed.
+- The default applies once to a true-new central stock and is not retroactive.
+- Registration, assignment changes, exclusion release, Recovery completion,
+  and persisted RUNNING do not create participants.
+- Current-session participants are created only from successful explicit
+  operation starts.
+- Process restart does not restore the participant set.
+
+==================================================
+6. Phase 12 Validation
+==================================================
+
+- acceptance: PASS
+- Production defects reproduced: 0
+- Production files changed: 0
+- focused simulation: 7/7 PASS
+- phase-related broad isolated regression: 230/230 PASS
+- py_compile: PASS
+- user-data mutation: none
+- Recovery known failure: OBSOLETE TEST EXPECTATION
+- runtime/order_executions failures: TEST ENVIRONMENT LEAK
+
+Validation evidence:
+  30_REPORTS/KIWOOM_BROKER_INTEGRATION_PHASE12_LOAD_RECONNECT_SIMULATION_VALIDATION_2026-08-20.txt
+
+==================================================
+7. Protected Working-tree State
+==================================================
+
+Both repositories contain pre-existing dirty/untracked user work. It is
+protected. Do not reset, restore, stash, clean, delete, move, rename, or bulk
+stage it. Runtime, stocks, Queue, routine_instances, operation_policy, logs,
+artifacts, and unrelated Docs changes must remain separate unless the user
+explicitly authorizes a later task.
+
+==================================================
+8. External Tool Environment
+==================================================
+
+Computer Use:
+  Available (confirmed in the current Codex environment; used read-only during
+  Phase 8 official evidence inspection, not used during Phases 12 or 13)
+
+KOA StudioSA:
+  2.34
+
+Installed official material:
+  C:\OpenAPI\koa_devguide.xml
+  C:\OpenAPI\KHOpenAPI.ocx
+
+Latest official audit:
+  30_REPORTS/KIWOOM_BROKER_INTEGRATION_PHASE0_OFFICIAL_CONTRACT_AUDIT_2026-08-19.txt
+
+Latest validation:
+  30_REPORTS/KIWOOM_BROKER_INTEGRATION_PHASE12_LOAD_RECONNECT_SIMULATION_VALIDATION_2026-08-20.txt
+
+Computer Use / KOA Studio operating rule:
+
+- Keep one Phase in one Codex task.
+- Do not create a separate KOA conversation by default.
+- Use Computer Use read-only in the same task only for a new unresolved
+  official external contract.
+- Do not repeat already recorded VERIFIED investigation.
+- Without separate user approval, do not login, connect to live/simulation
+  servers, query accounts, enter account passwords, issue TR, call SetRealReg,
+  call SendOrder, or send/modify/cancel orders.
+- If Computer Use is unavailable, state that fact and use installed official
+  material read-only. Leave GUI-only claims unresolved rather than guessing.
+
+==================================================
+9. Remaining External Uncertainty
+==================================================
+
+UNVERIFIED_EXTERNAL:
+
+- actual Kiwoom network/reconnect timing
+- server-side realtime packet loss and registration preservation
+- actual market-hours burst and COM/Qt scheduling pressure
+- actual Chejan ordering and incomplete Chejan session provenance
+- broker outcome at the exact crash/SendOrder overlap boundary
+- complete official global screen limit
+- authoritative complete realtime candle FID set
+- exact stable TR minute/hour/day ceilings
+- exact GetServerGubun semantics, still PARTIAL
+
+==================================================
+10. Next Start Point
+==================================================
+
+No next implementation item is authorized.
+Wait for explicit user instruction.

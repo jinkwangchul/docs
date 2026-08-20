@@ -1,0 +1,64 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-20
+Scope: Broker / Market Data Architecture Final Freeze
+Status: Official Canonical promotion record
+
+Code Freeze:
+  951b86f3ecaa5151e91d16617e6c03ef91726930
+
+Docs parent baseline:
+  a78fe1ab67b0496c2c48062f973455589f2219cc
+
+==================================================
+Promoted Contracts
+==================================================
+
+Phase 1 through Phase 12 implemented and verified contracts are promoted into
+the Supplemental Final Architecture Canonical:
+
+- BrokerSession snapshots, readiness, connection_epoch, and login_session_id
+- pending TR request provenance and stale-callback fail-close
+- one process-local FIFO TR Governor with project-conservative pacing
+- declarative screen namespaces and process-local screen leases
+- central current-session Execution Universe
+- process-local explicit-start participant roster
+- atomic canonical candle commit and changed+verified BAR_COMMITTED boundary
+- operation-owned per-stock TR fast path
+- official realtime function/event and FID evidence boundaries
+- realtime shadow comparison and guarded primary promotion
+- per-minute REALTIME/TR_RECONCILIATION authority
+- governed TR gap/quality reconciliation
+- MarketDataHost / AutoTradeOperationHost ownership separation
+- true-new WAITING/EXCLUDED registration policy
+- process restart and same-process reconnect fail-close behavior
+- durable Queue restart relation and at-most-once SendOrder safety
+
+==================================================
+Verification Promoted
+==================================================
+
+- Phase 12 acceptance PASS
+- Production defects reproduced: 0
+- Production files changed: 0
+- focused simulation 7/7 PASS
+- phase-related broad isolated regression 230/230 PASS
+- changed Python py_compile PASS
+- protected user data unchanged
+- prior Recovery failure classified OBSOLETE TEST EXPECTATION
+- runtime file failures classified TEST ENVIRONMENT LEAK
+
+==================================================
+Authority Boundary
+==================================================
+
+The new Canonical is authoritative for broker/session/TR/screen/market-data/
+Execution Universe/registration-roster/reconnect architecture only. Existing
+Current Canonical documents remain authoritative for Global Diagnostic
+Observer, Budget/Buffer, Close/Liquidation, Review/Emergency, Main monitoring
+UI, charts, and other independent domains.
+
+Residual live broker uncertainty is explicitly classified UNVERIFIED_EXTERNAL.
+It is neither promoted to PASS nor treated as an implementation failure.
+
+No Code or test file changed in Phase 13. No Phase 14 or next implementation
+item is authorized.

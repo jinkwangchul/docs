@@ -3,10 +3,10 @@
 Reference Edition
 
 - Reference Base Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
-- Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-08-18_MAIN_MONITORING_SELECTION_AND_HEIGHT_FREEZE.txt
-- Latest Operational Work Resume: WORK_RESUME_LATEST_2026-08-18_MONITORING_REVIEW_RECOVERY_FREEZE.txt
+- Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt
+- Latest Operational Work Resume: WORK_RESUME_LATEST_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt
 - Cleanup Completion Baseline Work Resume: WORK_RESUME_LATEST_2026-08-05_CLEANUP_COMPLETION_BASELINE.txt
-- Latest Changelog: MASTER_SPEC_CHANGELOG_2026-08-18_MAIN_MONITORING_SELECTION_AND_HEIGHT_FREEZE.txt
+- Latest Changelog: MASTER_SPEC_CHANGELOG_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt
 - Latest Readable Changelog: MASTER_SPEC_READABLE_CHANGELOG_2026-08-05_CLEANUP_COMPLETION_BASELINE.txt
 
 
@@ -28,11 +28,24 @@ Archive and Legacy files are historical evidence only for these areas. If they
 conflict with Current Canonical, Current Canonical wins. If UI terminology and
 document terminology conflict, the confirmed UI term wins.
 
+For BrokerSession, connection_epoch, TR provenance/Governor, screen allocation,
+market-data authority, Execution Universe, stock registration/roster, and
+restart/reconnect architecture, use
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt`.
+This supplemental Canonical does not supersede the independent Current
+Canonical contracts for Global Diagnostic Observer, Budget/Buffer,
+Close/Liquidation, Review/Emergency, Main monitoring UI, or charts.
+
 This Reference Index is an index. It is not an AI operating policy document.
 
 ## Current Policy References
 
 - Agent workflow and operation rules: `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
+- Broker / Market Data Architecture Final Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt`
+- Broker / Market Data Architecture Final Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt`
+- Broker / Market Data Architecture Final Freeze Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt`
+- Kiwoom Broker Integration Phase 0 Official Contract Audit: `30_REPORTS/KIWOOM_BROKER_INTEGRATION_PHASE0_OFFICIAL_CONTRACT_AUDIT_2026-08-19.txt`
+- Kiwoom Broker Integration Phase 12 Load/Reconnect Simulation Validation: `30_REPORTS/KIWOOM_BROKER_INTEGRATION_PHASE12_LOAD_RECONNECT_SIMULATION_VALIDATION_2026-08-20.txt`
 - Global Diagnostic Observer Final Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt`
 - Global Diagnostic Observer Final Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt`
 - Global Diagnostic Observer Phase 2 Contract Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_PHASE2_CONTRACT_FREEZE.txt`
@@ -76,9 +89,9 @@ This Reference Index is an index. It is not an AI operating policy document.
 - AI Architecture Contamination Readable Changelog: `20_ARCHIVE/CHANGELOG/MASTER_SPEC_READABLE_CHANGELOG_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt`
 - Runtime / Startup Recovery Canonical: `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME.txt`
 - Current State Resync Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-17_CURRENT_STATE_RESYNC.txt`
-- Latest Official Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-18_MAIN_MONITORING_SELECTION_AND_HEIGHT_FREEZE.txt`
+- Latest Official Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt`
 - SELL Preview, Runtime / Queue / SendOrder / Chejan / Fill / Position, Projection / Recovery / Reconciliation / Startup Recovery Living Contracts: sections 11, 12, and 14 of `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-07-16_STARTUP_RECOVERY_SESSION_RESUME.txt`
-- Latest Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-18_MONITORING_REVIEW_RECOVERY_FREEZE.txt`
+- Latest Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt`
 - Historical Cleanup Completion Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-05_CLEANUP_COMPLETION_BASELINE.txt`
 - Architecture glossary: `00_CANONICAL/REFERENCE/ARCHITECTURE_GLOSSARY.md`
 
