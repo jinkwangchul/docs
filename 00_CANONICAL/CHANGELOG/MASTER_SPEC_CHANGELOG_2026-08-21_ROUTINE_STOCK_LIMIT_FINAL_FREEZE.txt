@@ -4,7 +4,7 @@ Scope: Routine / Stock Limit Phases 1-7 Final Freeze
 Status: Official Canonical promotion record
 
 Code Freeze:
-  f9666069940d6b45b147f3273eee2d813010056e
+  24d8d6691e25323ef142682f5a71783613a3f592
 
 Docs parent baseline:
   d04741a83b0abeb2505ef2d6eae55e5ca0d6d9f0
@@ -66,8 +66,11 @@ Post-Freeze Semantic Correction
   same-event escalation, and Buffer > Routine > Stock priority.
 - Protected existing durable EARLY commands, including legacy
   environment-policy writes, from rewrite or reissue.
-- Aligned Routine Limit routine-close `조기마감` and `구간마감` UI actions to
-  red `#DC2626` without changing environment-dependent blue EARLY_CLOSE,
-  Stock Limit, Buffer, or context-menu contracts.
+- Aligned only Routine Limit routine-close `조기마감` actions to red
+  `#DC2626`. Corrected the upper `구간마감` mode and `즉시청산` to the neutral
+  `#374151` action color while preserving one badge structure across cycling.
+- Froze the three Context colors: manual stock context-menu green `#15803D`,
+  environment-dependent general EARLY_CLOSE blue `#2563EB`, and Routine Limit
+  routine-close `조기마감` red `#DC2626`.
 - No schema migration, new persistent Source of Truth, direct SendOrder, or
   direct SELL Queue path was introduced.

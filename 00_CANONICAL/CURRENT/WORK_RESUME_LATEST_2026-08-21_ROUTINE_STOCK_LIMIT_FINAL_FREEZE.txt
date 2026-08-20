@@ -14,7 +14,7 @@ Remote:
 Branch:
   feat/restore-auto-trade-setting-ui
 Final Code Freeze:
-  f9666069940d6b45b147f3273eee2d813010056e
+  24d8d6691e25323ef142682f5a71783613a3f592
 
 Docs repository:
   C:\Users\JIN KWANG CHUL\Documents\docs
@@ -73,6 +73,7 @@ Results:
 - Buffer/Routine/Stock/close core regression: 174/174 PASS
 - OperationCommand/Recovery regression: 180/180 PASS
 - context-menu non-target color checks: 3/3 PASS
+- final early-close color/action-badge and Runtime regression: 52/52 PASS
 - Phase 7 focused: 77/77 PASS
 - Phase 1-6 focused: 115/115 PASS
 - Shared Core broad isolated modules: 615/615 PASS
@@ -102,8 +103,13 @@ Residual:
   intent with `POLICY_ROUTINE_CLOSE`; Immediate semantics remain unchanged.
 - Existing durable EARLY commands are not rewritten or reissued by the
   semantic correction.
-- Routine Limit routine-close actions are red `#DC2626`; environment-dependent
-  general EARLY_CLOSE outside Routine Limit remains blue `#2563EB`.
+- Manual stock context-menu EARLY_CLOSE, including `조기마감 > 루틴마감`, is
+  green `#15803D` because the UI Context is one-shot manual execution.
+- Environment-dependent general EARLY_CLOSE based on
+  `operation_policy.early_close` is blue `#2563EB`.
+- Routine Limit `조기마감` is red `#DC2626` because it uses
+  `POLICY_ROUTINE_CLOSE`; upper `구간마감` mode and `즉시청산` are neutral
+  `#374151` and retain the same action-badge geometry/style structure.
 - Stock Limit, Buffer response, and context-menu early-close contracts remain
   unchanged.
 - only same RoutineLimit event may promote EARLY to IMMEDIATE.

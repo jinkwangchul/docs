@@ -5,7 +5,7 @@ Status: Latest Official Supplemental Canonical
 
 Code repository: jinkwangchul/kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
-Code Freeze: f9666069940d6b45b147f3273eee2d813010056e
+Code Freeze: 24d8d6691e25323ef142682f5a71783613a3f592
 
 Documentation repository: jinkwangchul/docs
 Docs branch: agent/project-prompt-standard
@@ -87,12 +87,23 @@ extra policy. This includes UNIFIED `조기마감`, SEGMENTED profit/loss
 depend on `operation_policy.early_close`. Legacy `루틴` evidence remains
 accepted as an alias where routine-close evidence is read.
 
-Routine Limit UI color follows execution meaning. `조기마감` and `구간마감`
-actions using routine-close semantics are red `#DC2626`, including the lower
-Segment EARLY `조기마감` display. This does not change the existing blue
-`#2563EB` contract for environment-dependent general EARLY_CLOSE outside
-Routine Limit. Stock Limit, Buffer response, and stock context-menu colors and
-semantics are unchanged.
+EARLY_CLOSE UI color is Context-specific and must not be inferred from action
+text alone:
+
+- A one-shot stock context-menu EARLY_CLOSE is green `#15803D`. For example,
+  `조기마감 > 루틴마감` remains green because it is a manual context-menu
+  action even though its selected method is routine close. The parent and the
+  `루틴마감`, `시장가`, `현재가`, `손/익절`, and `이월` choices share green.
+- An environment-dependent general EARLY_CLOSE based on
+  `operation_policy.early_close` is blue `#2563EB`.
+- A Routine Limit `조기마감` is red `#DC2626` because it executes
+  `POLICY_ROUTINE_CLOSE`. UNIFIED, SEGMENTED profit/loss, and the lower Segment
+  EARLY `조기마감` display all use this red.
+
+The upper `구간마감` response-mode badge is not itself routine close; it and
+`즉시청산` use the neutral action color `#374151`. All action modes retain the
+same badge component, geometry, border, radius, padding, alignment, and font
+weight while cycling. Stock Limit and Buffer response contracts are unchanged.
 
 Routine segment boundaries are:
 
@@ -213,6 +224,7 @@ Verified on 32-bit Python with PyQt5 5.15.11 and Qt 5.15.2:
 - Post-Freeze Buffer/Routine/Stock/close core regression: 174/174 PASS
 - Post-Freeze OperationCommand/Recovery regression: 180/180 PASS
 - stock/group/routine context-menu early-close color checks: 3/3 PASS
+- final color/action-badge and Runtime regression: 52/52 PASS
 - changed-module py_compile and git diff --check: PASS
 
 - Phase 7 focused: 77/77 PASS
@@ -239,7 +251,8 @@ regression observed.
 
 Routine / Stock Limit Phases 1 through 7 remain COMPLETE / FROZEN. The
 Post-Freeze Routine Limit EARLY semantic correction is COMPLETE at Code Freeze
-f9666069940d6b45b147f3273eee2d813010056e.
+24d8d6691e25323ef142682f5a71783613a3f592, including the final Context-specific
+color and action-badge state correction.
 
 Protected Runtime, stocks, Queue, routine_instances, operation_policy, logs,
 artifacts, and unrelated dirty/untracked files are not part of this Freeze.
