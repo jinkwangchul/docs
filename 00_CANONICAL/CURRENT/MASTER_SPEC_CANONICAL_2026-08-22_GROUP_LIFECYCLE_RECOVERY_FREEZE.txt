@@ -1,0 +1,174 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-22
+Scope: Group Lifecycle / Recovery final implementation Freeze
+Status: Latest Official Supplemental Canonical
+
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code Freeze: cba06c7c2c7cd526f384d8e27962cd4c10fab0e6
+
+Documentation repository: jinkwangchul/docs
+Docs branch: agent/project-prompt-standard
+Docs parent baseline before this Freeze:
+b6d69206de2e53b8454421f4596cd600f27520a2
+
+==================================================
+1. Authority And Scope
+==================================================
+
+This Supplemental Canonical is the first technical Source of Truth for Group
+registration, backup, loss recovery, manual recovery fallback, and complete
+deletion. It supplements rather than replaces the independent Current
+Canonicals for Routine/Stock limits, execution, orders, Review, Broker/Market
+Data, and other UI contracts.
+
+==================================================
+2. Group Registration And Backup
+==================================================
+
+A project-root `_Group` directory containing `budget.json` is the Group
+registration discovery boundary. Immediately after a normal Group is
+discovered, the application creates or updates its full recovery snapshot
+under `group_recovery/`.
+
+Recovery sync occurs at Group discovery/scan boundaries. It must not run from
+the one-second PnL refresh path. An unchanged Group does not cause a recovery
+rewrite. Snapshot replacement uses a validated temporary copy so an existing
+valid recovery point is preserved if a write fails.
+
+`group_recovery/` is not itself a Group discovery target.
+
+==================================================
+3. Group To RoutineInstance Source Of Truth
+==================================================
+
+The durable Group-to-RoutineInstance ownership Source of Truth is:
+
+`routine_instances/<UUID>/instance.json.group_id`
+
+This field permits a zero-stock RoutineInstance to remain attributable to its
+Group across reload and restart. Existing Instances without an explicit
+`group_id` continue to use the established Stock evidence fallback based on
+`stock.routines + assigned_routine_instance_id`.
+
+Recovery manifests and snapshots are Group-folder backups only. They do not
+own an Instance list, do not replace `instance.json.group_id`, and are not a
+Group-to-Instance mapping Source of Truth.
+
+==================================================
+4. Accidental Group Loss And Automatic Recovery
+==================================================
+
+Deletion or loss of an actual `_Group` folder outside the program is an
+accident, not an intentional deletion. When a valid Recovery exists, Group
+discovery validates the manifest and snapshot, restores the complete snapshot
+through a temporary path, verifies it, and safely promotes it to the exact
+project-root Group path.
+
+The restored Group participates in the same discovery scan. No transient
+missing/error Group is exposed to operation or trading Projection.
+
+Successful recovery emits exactly one non-blocking Toast:
+
+`<그룹명> 그룹을 복구하였습니다.`
+
+Repeated refresh after that recovery must not repeat the restore or Toast.
+Recovery failure leaves no partial normal Group, preserves the existing
+snapshot, logs the cause, and remains retryable at a later normal scan.
+
+==================================================
+5. Manual Recovery Fallback
+==================================================
+
+If automatic recovery fails while a valid Recovery remains, Main retains a
+Recovery control-only Group row using the normal display name and no error
+badge. This row is not a normal GroupRecord, does not participate in operation
+or trading Projection, and is excluded from operational Summary counts.
+
+For a Recovery control row:
+
+- `루틴등록`: disabled
+- `그룹복구`: enabled unless deletion is pending
+- `그룹삭제`: enabled
+- `조기마감`: disabled
+- `즉시청산`: disabled
+
+Manual `그룹복구` reuses the validated restore path. On success it immediately
+replaces the control row with the discovered normal Group, refreshes Main and
+an already-open AutoTrade view, and emits the same single recovery Toast.
+Failure preserves the control row and Recovery and leaves Instance/Stock data
+unchanged.
+
+==================================================
+6. Intentional Complete Deletion
+==================================================
+
+Only the Main Group context-menu action `그룹삭제` is recognized as an
+intentional permanent Group deletion. Its confirmation text is:
+
+`<그룹명> 그룹을 완전삭제 하겠습니까?`
+
+Cancellation changes no data. After safety preflight succeeds, complete
+deletion removes only the selected Group's:
+
+- actual `_Group` folder
+- RoutineInstance directories whose `instance.json.group_id` matches the Group
+- Group/Instance attribution remaining in affected Stock records
+- Recovery manifest and snapshot
+- UI Projection relationships
+
+Stock records themselves, Routine Definitions, and Event/Audit records are
+preserved. Stock assignments are not silently transferred to another Group or
+Instance. Main and any already-open AutoTrade view refresh immediately after
+success, and the deleted Group must not be recreated by later scan or restart.
+
+The success Toast is:
+
+`<그룹명> 그룹을 완전삭제 하였습니다.`
+
+==================================================
+7. deletion_pending Transaction Boundary
+==================================================
+
+Complete deletion durably records `deletion_pending=true` before destructive
+steps begin. While this marker exists, automatic recovery, manual recovery,
+and recovery snapshot sync are suppressed for the Group.
+
+Transaction outcomes are fixed as follows:
+
+- deletion success: remove the Group Recovery, including the marker
+- deletion failure plus complete rollback success: clear `deletion_pending`
+  and return to the normal state
+- deletion failure plus incomplete or uncertain rollback: retain
+  `deletion_pending`, suppress sync and restore, and remain fail-closed
+
+A preflight block occurs before the marker and changes no data.
+
+==================================================
+8. Canonical Lifecycle
+==================================================
+
+Normal loss-and-recovery path:
+
+REGISTERED
+-> BACKED_UP
+-> MISSING/RESTORING
+-> RESTORED
+
+Intentional deletion path:
+
+REGISTERED
+-> BACKED_UP
+-> COMPLETE_DELETED
+
+Recovery remains a backup throughout restore. It never becomes the
+Group-to-Instance ownership Source of Truth.
+
+==================================================
+9. Verification Freeze
+==================================================
+
+- Group Recovery / lifecycle focused tests: 110 PASS
+- 32-bit Python py_compile: PASS
+- git diff --cached --check: PASS
+- staged runtime/stocks/routine_instances/group_recovery user data: none
