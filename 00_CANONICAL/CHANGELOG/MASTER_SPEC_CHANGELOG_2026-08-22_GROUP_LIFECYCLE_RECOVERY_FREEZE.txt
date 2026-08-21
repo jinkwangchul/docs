@@ -9,6 +9,9 @@ Code Freeze:
 Docs parent baseline:
   b6d69206de2e53b8454421f4596cd600f27520a2
 
+Docs Freeze:
+  87399966a995f1cfe53144c595ebd6c1ea916945
+
 ==================================================
 Promoted Contracts
 ==================================================
@@ -16,12 +19,14 @@ Promoted Contracts
 - project-root `_Group` plus `budget.json` as the Group registration boundary
 - immediate full Group snapshot sync under `group_recovery/`
 - `instance.json.group_id` as the explicit Group-to-Instance Source of Truth
+- Stock evidence fallback cannot override a conflicting explicit `group_id`
 - Recovery as Group-folder backup, never an Instance mapping Source of Truth
 - accidental external Group loss followed by validated automatic restore
 - recovery success Toast: `<그룹명> 그룹을 복구하였습니다.`
 - Recovery control-only Main row after automatic restore failure
 - no error badge and no operational Summary/Projection participation for that row
 - manual `그룹복구` fallback through the same validated restore path
+- fixed Main Group menu order with two separators and normal/Recovery enablement
 - `그룹삭제` as the only intentional permanent deletion boundary
 - complete deletion of Group, explicit Group Instances, Stock attribution, and Recovery
 - preservation of Stock records, Routine Definitions, and Event/Audit records
@@ -38,3 +43,4 @@ Verification Promoted
 - 32-bit Python py_compile: PASS
 - git diff --cached --check: PASS
 - no runtime, Stock, RoutineInstance, or generated Recovery user data staged
+- Group Lifecycle / Recovery feature Freeze: COMPLETE

@@ -29,7 +29,7 @@ Data, and other UI contracts.
 A project-root `_Group` directory containing `budget.json` is the Group
 registration discovery boundary. Immediately after a normal Group is
 discovered, the application creates or updates its full recovery snapshot
-under `group_recovery/`.
+under the project-root `group_recovery/` repository.
 
 Recovery sync occurs at Group discovery/scan boundaries. It must not run from
 the one-second PnL refresh path. An unchanged Group does not cause a recovery
@@ -49,7 +49,9 @@ The durable Group-to-RoutineInstance ownership Source of Truth is:
 This field permits a zero-stock RoutineInstance to remain attributable to its
 Group across reload and restart. Existing Instances without an explicit
 `group_id` continue to use the established Stock evidence fallback based on
-`stock.routines + assigned_routine_instance_id`.
+`stock.routines + assigned_routine_instance_id`. This fallback is a backward-
+compatibility path only and must not override a conflicting explicit
+`instance.json.group_id`.
 
 Recovery manifests and snapshots are Group-folder backups only. They do not
 own an Instance list, do not replace `instance.json.group_id`, and are not a
@@ -73,6 +75,7 @@ Successful recovery emits exactly one non-blocking Toast:
 `<그룹명> 그룹을 복구하였습니다.`
 
 Repeated refresh after that recovery must not repeat the restore or Toast.
+Successful automatic recovery does not display an error badge.
 Recovery failure leaves no partial normal Group, preserves the existing
 snapshot, logs the cause, and remains retryable at a later normal scan.
 
@@ -93,6 +96,19 @@ For a Recovery control row:
 - `조기마감`: disabled
 - `즉시청산`: disabled
 
+The Main Group context-menu order and separators are fixed as follows:
+
+`루틴등록`
+separator
+`그룹복구`
+`그룹삭제`
+separator
+`조기마감`
+`즉시청산`
+
+For a normal Group, `그룹복구` is disabled and `그룹삭제` is enabled. The
+Recovery control-row enablement remains as specified above.
+
 Manual `그룹복구` reuses the validated restore path. On success it immediately
 replaces the control row with the discovered normal Group, refreshes Main and
 an already-open AutoTrade view, and emits the same single recovery Toast.
@@ -112,7 +128,8 @@ Cancellation changes no data. After safety preflight succeeds, complete
 deletion removes only the selected Group's:
 
 - actual `_Group` folder
-- RoutineInstance directories whose `instance.json.group_id` matches the Group
+- RoutineInstance directories whose `instance.json.group_id` matches the Group,
+  including their `instance.json` and `rules.json`
 - Group/Instance attribution remaining in affected Stock records
 - Recovery manifest and snapshot
 - UI Projection relationships
@@ -142,7 +159,8 @@ Transaction outcomes are fixed as follows:
 - deletion failure plus incomplete or uncertain rollback: retain
   `deletion_pending`, suppress sync and restore, and remain fail-closed
 
-A preflight block occurs before the marker and changes no data.
+A preflight block occurs before the marker, creates no marker, and changes no
+data.
 
 ==================================================
 8. Canonical Lifecycle
@@ -172,3 +190,6 @@ Group-to-Instance ownership Source of Truth.
 - 32-bit Python py_compile: PASS
 - git diff --cached --check: PASS
 - staged runtime/stocks/routine_instances/group_recovery user data: none
+- Code Freeze: cba06c7c2c7cd526f384d8e27962cd4c10fab0e6
+- Docs Freeze: 87399966a995f1cfe53144c595ebd6c1ea916945
+- Group Lifecycle / Recovery feature Freeze: COMPLETE
