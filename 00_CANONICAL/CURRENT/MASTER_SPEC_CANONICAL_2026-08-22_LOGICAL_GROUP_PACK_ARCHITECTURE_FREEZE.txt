@@ -1,0 +1,194 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-22
+Scope: Logical Group Pack Architecture Final Freeze
+Status: Latest Official Supplemental Canonical
+
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code Freeze: 8febe31f908ea15ed91f858c0c469165931d8b9a
+
+Documentation repository: jinkwangchul/docs
+Docs branch: agent/project-prompt-standard
+Docs parent baseline: a454afe5e6b0113e70855bd1e295b6cdac163972
+
+==================================================
+1. Authority And Supersession
+==================================================
+
+This Supplemental Canonical is the technical Source of Truth for Production
+Group identity, registration, packing, projection, and complete deletion. It
+supersedes the Group discovery, Recovery, and menu contracts in
+`MASTER_SPEC_CANONICAL_2026-08-22_GROUP_LIFECYCLE_RECOVERY_FREEZE.txt`.
+That earlier document remains historical evidence only. Independent Current
+Canonicals for execution, orders, Review, Broker/Market Data, Routine/Stock
+limits, and other UI contracts remain unchanged.
+
+==================================================
+2. Production Group Source And Identity
+==================================================
+
+Production discovers Groups only through:
+
+- `groups/registry.json`
+- `groups/<GROUP_UUID>/group.json`
+
+`group_id` is a stable UUID. Physical paths, Group display names,
+`stock.routines`, and project-root `_Group` folder names are not Group identity
+or membership Sources of Truth.
+
+Each logical Group records its `definition_id`, fixed developer-defined
+`base_name`, system-generated `display_name`, and numeric `slot`. Users cannot
+rename a Group. User naming and rename authority applies only to subordinate
+RoutineInstances.
+
+==================================================
+3. Group Naming And Slot Allocation
+==================================================
+
+Repeated registration of the same Group Pack is allowed. Names are generated
+from the fixed `base_name`:
+
+`지표추종매매`
+`지표추종매매_1`
+`지표추종매매_2`
+
+Slot 0 uses the base name without a suffix. Later Groups use
+`<base_name>_<slot>`. Allocation always chooses the lowest available slot, so
+a deleted slot is reused before a higher slot is allocated. UUIDs remain
+unique even when a display-name slot is reused.
+
+==================================================
+4. Relationship Sources Of Truth
+==================================================
+
+The durable relationship contracts are:
+
+- Group to RoutineInstance: `routine_instances/<UUID>/instance.json.group_id`
+- RoutineInstance to Stock: `assigned_routine_instance_id`
+
+Main and AutoTrade Projection, Summary, selection scope, operation scope, and
+complete deletion use these identities. Group names and `stock.routines`
+strings are not authoritative Group membership evidence. A zero-stock
+RoutineInstance remains attributable through its explicit UUID `group_id`.
+
+==================================================
+5. Group Pack Registration
+==================================================
+
+Main displays the top-right actions in this order:
+
+`[그룹등록] [조기마감]`
+
+`그룹등록` accepts a `.group.zip`, validates the shared manifest and SHA-256
+payload hashes, installs missing strategy files, validates Routine Definition
+discovery, and atomically creates a Logical Group. No Group-name input is
+shown. Existing identical strategy files are reused without rewrite. If an
+existing file differs, registration is blocked without overwrite or update.
+
+Group Packs have no version, update, or patch lifecycle. Registration is an
+additive Group operation only.
+
+==================================================
+6. Developer Group Packing
+==================================================
+
+`그룹패킹` is available only when
+`KIWOOM_AUTO_DISTRIBUTION_PROFILE=developer`. The action is not created for
+`beta`, `production`, an unset value, or an invalid value. Unset and invalid
+profiles fail closed as `production`.
+
+Packing uses the selected Group's `definition_id` and a developer-authored
+pack specification. The Pack contains only declared strategy Definition,
+Engine, rules, and strategy-specific UI/helper files. It excludes Group UUID,
+slot, display-name suffix, RoutineInstances, Stocks, Runtime, logs, account,
+order, execution, and performance data. The generated Pack uses the exact
+registration manifest schema and is reopened and hash-verified before atomic
+promotion.
+
+==================================================
+7. Logical Group Complete Deletion
+==================================================
+
+`그룹삭제` removes the selected Logical Group, all RoutineInstances whose
+explicit `group_id` matches it, and only the related Stock attribution. Stock
+records themselves and the shared Routine Definition/Engine are preserved.
+The Group UUID is removed from `groups/registry.json` atomically.
+
+Deletion preserves the established safety boundary:
+
+- preflight failure creates no marker and changes no data
+- a durable delete transaction marker is written before destructive steps
+- complete rollback clears the marker
+- incomplete or uncertain rollback retains the marker and remains fail-closed
+- success removes the Group and clears the marker after read-back validation
+
+==================================================
+8. Removed Legacy Architecture
+==================================================
+
+The following are removed from Production:
+
+- project-root `_Group` discovery
+- `_Group/budget.json` as a Group marker
+- path-based `group_id`
+- `group_recovery/` snapshot storage
+- automatic and manual Group recovery
+- Recovery control rows and Recovery Toast queues
+- the `그룹복구` menu and callback
+- Group-name and `stock.routines` membership fallback
+
+Transaction temp paths, validation, atomic promotion, durable markers,
+rollback, and read-back verification remain active safety techniques. They are
+not Group Recovery.
+
+==================================================
+9. User-facing Group Menus
+==================================================
+
+Production and Beta Group context menu:
+
+`루틴등록`
+separator
+`그룹삭제`
+separator
+`조기마감`
+
+Developer Group context menu:
+
+`루틴등록`
+separator
+`그룹삭제`
+separator
+`그룹패킹`
+separator
+`조기마감`
+
+There is no `그룹복구` action. No new `즉시청산` Group action is introduced.
+
+==================================================
+10. Canonical Lifecycle
+==================================================
+
+PACKED
+-> VALIDATED
+-> REGISTERED
+-> INSTANCE_REGISTERED
+-> STOCK_ASSIGNED
+-> PROJECTED
+-> COMPLETE_DELETED
+-> SLOT_REUSED
+
+==================================================
+11. Closeout Evidence
+==================================================
+
+- Group Architecture focused tests: 110 PASS
+- Packing to Registration real Pack E2E: PASS
+- repeated registration and lowest-free slot reuse: PASS
+- RoutineInstance registration, Stock assignment, Projection, and deletion: PASS
+- distribution profile contract: PASS
+- 32-bit Python py_compile: PASS
+- git diff --check: PASS
+- preserved actual state: Logical Group 2 / UUID Instance 6 / orphan 1 / Stock 17
+- staged runtime, stocks, routine_instances, generated groups, and Pack data: none
+- Logical Group Pack Architecture Freeze: COMPLETE

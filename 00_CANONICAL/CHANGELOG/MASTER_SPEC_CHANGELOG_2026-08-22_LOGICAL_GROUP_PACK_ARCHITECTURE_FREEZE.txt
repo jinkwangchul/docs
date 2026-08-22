@@ -1,0 +1,48 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-22
+Scope: Logical Group Pack Architecture Final Freeze
+Status: Official Canonical promotion record
+
+Code Freeze:
+  8febe31f908ea15ed91f858c0c469165931d8b9a
+
+Docs parent baseline:
+  a454afe5e6b0113e70855bd1e295b6cdac163972
+
+==================================================
+Promoted Contracts
+==================================================
+
+- `groups/registry.json` plus `groups/<UUID>/group.json` as the only Production Group source
+- stable UUID `group_id` separated from physical storage paths and display names
+- fixed developer base names with repeated registration and lowest-free slot reuse
+- user rename authority limited to subordinate RoutineInstances
+- `instance.json.group_id` as Group-to-Instance Source of Truth
+- `assigned_routine_instance_id` as Instance-to-Stock Source of Truth
+- Group names and `stock.routines` excluded from authoritative Group membership
+- Main `[그룹등록] [조기마감]` action order and `.group.zip` registration
+- validated strategy-file installation with identical-file reuse and mismatch blocking
+- no Group Pack version, update, overwrite, or patch lifecycle
+- developer-only `그룹패킹` with beta/production/unset/invalid fail-closed exclusion
+- strategy-only Pack payload and complete exclusion of user and trading data
+- Logical Group complete deletion with Stock and shared Definition/Engine preservation
+- durable delete marker, rollback, read-back, and fail-closed safety contract
+- removal of root `_Group`, `budget.json` Group marker, path identity, Group Recovery, Recovery rows, and `그룹복구`
+- fixed Production/Beta and Developer Group context menus without a new `즉시청산` action
+- PACKED -> VALIDATED -> REGISTERED -> INSTANCE_REGISTERED -> STOCK_ASSIGNED -> PROJECTED -> COMPLETE_DELETED -> SLOT_REUSED lifecycle
+
+==================================================
+Verification Promoted
+==================================================
+
+- Group Architecture focused tests: 110 PASS
+- Packing to Registration real Pack E2E: PASS
+- duplicate registration and lowest-free slot reuse: PASS
+- RoutineInstance registration and Stock Projection: PASS
+- Logical Group deletion and rollback fixtures: PASS
+- distribution profile matrix: PASS
+- 32-bit Python py_compile: PASS
+- git diff --check: PASS
+- actual Logical Group 2 / UUID Instance 6 / orphan 1 / Stock 17 preserved
+- no runtime, Stock, RoutineInstance, generated Group, or generated Pack data staged
+- Logical Group Pack Architecture Freeze: COMPLETE
