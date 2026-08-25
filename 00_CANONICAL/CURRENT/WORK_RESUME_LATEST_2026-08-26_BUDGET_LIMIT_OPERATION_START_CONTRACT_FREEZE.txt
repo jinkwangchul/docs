@@ -1,0 +1,201 @@
+WORK RESUME LATEST
+Date: 2026-08-26
+Scope: Budget / Limit / Operation Start Contract Freeze
+Status: Code commit/push complete; docs freeze update pending
+
+==================================================
+1. Repository Baseline
+==================================================
+
+Code repository:
+  C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Code branch:
+  feat/restore-auto-trade-setting-ui
+
+Code HEAD:
+  74d6cf389961e2acbb3eee0b6ae5999f7bac2308
+
+Docs repository:
+  C:\Users\JIN KWANG CHUL\Documents\docs
+
+Docs branch:
+  agent/project-prompt-standard
+
+Docs HEAD before this documentation step:
+  cac988db3dfd96c4583adff86973862c3bcafd82
+
+Both repositories contain pre-existing dirty/untracked work. Preserve it. Do
+not reset, restore, stash, clean, delete, move, rename, or bulk-stage unrelated
+files or user data.
+
+==================================================
+2. Completed Contract State
+==================================================
+
+Completed:
+
+- Starting Budget AMOUNT default contract
+- Starting Budget one-time resolution contract
+- AMOUNT invalid recovery contract
+- Recommended/minimum limit basis contract
+- `자리맞춤 ON/OFF` final meaning
+- Limit invalid recovery contract
+- Limit single/double-click interaction contract
+- Operation Start reason precedence
+- Structural target / operation-time / Recovery provenance
+- unauthenticated and authenticated outside-time Production GUI smoke
+- GUI verification workflow reference update
+
+Created:
+
+- `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+- `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+- `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+
+Updated:
+
+- `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
+- `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`
+
+Final code commit SHA:
+
+- `74d6cf389961e2acbb3eee0b6ae5999f7bac2308`
+
+==================================================
+3. Current Contract Summary
+==================================================
+
+Starting Budget:
+
+- AMOUNT default = Fresh Current Price *
+  `starting_budget_defaults.amount_multiplier`
+- Last Known is display evidence, not default calculation source.
+- Ordinary realtime Tick does not continuously rewrite a resolved starting
+  budget.
+- Invalid AMOUNT editor input is discarded; a still-valid previous explicit
+  value is preserved; otherwise the explicit override is cleared to
+  `buy_amount=0` and the default path resumes.
+
+Limit:
+
+- Recommended/minimum raw basis = effective/resolved starting budget *
+  environment multiplier.
+- Current multipliers 100 and 25 are multipliers, not percentages.
+- `자리맞춤 ON` uses `round_money_to_two_significant_digits()`.
+- `자리맞춤 OFF` preserves raw amount.
+- Invalid limit input restores previous valid CONFIGURED state when one exists;
+  otherwise returns to UNSET.
+
+Operation Start:
+
+- Precedence:
+  lifecycle guard -> GLOBAL prerequisite -> Structural Target -> Operation Time
+  -> Per-target Recovery -> Validation -> Start.
+- GLOBAL login/account readiness is evaluated before operation time.
+- Structural target provenance is preserved before operation-time split.
+- Only time-eligible targets proceed to Recovery/validation.
+
+==================================================
+4. Verification
+==================================================
+
+Executed in current local Working Tree with 32-bit Python:
+
+- `tests.test_phase12v_start_guard_precedence`
+- `tests.test_phase12u_operation_start_reason`
+- `tests.test_auto_trade_global_operation_button`
+- `tests.test_auto_trade_start_contract`
+
+Result:
+
+- 105 tests run
+- 105 PASS
+
+Budget / Limit validation:
+
+- full `tests.test_operation_budget_defaults`
+- Starting Budget focused subset
+- Limit recommendation / digit alignment focused subset
+
+Result:
+
+- 61 / 61 PASS for full `tests.test_operation_budget_defaults`
+- 8 / 8 PASS for Starting Budget focused subset
+- 17 / 17 PASS for Limit recommendation / digit alignment focused subset
+
+Related Production py_compile:
+
+- `gui_operation_environment.py`
+- `gui_windows.py`
+- `gui_main_budget_panel.py`
+- `gui_main_table_loader.py`
+- `gui_auto_trade_run_control.py`
+- `gui_main_stock_context_menu.py`
+
+Result:
+
+- PASS
+
+Related code `git diff --check`:
+
+- PASS
+- line-ending warnings only
+
+Residual audit result:
+
+- Previous failures:
+  - `test_limit_waits_then_uses_first_current_price_without_fluctuation`
+  - `test_main_limit_suggestion_prefers_current_session_snapshot`
+  - `test_main_limit_suggestion_uses_quantity_starting_budget_without_writing`
+- Classification: STALE_TEST fixture leakage from persisted
+  `ui/stock_limit_digit_alignment`.
+- Production calculation was unchanged.
+- The tests now pin the intended ON alignment path without mutating user
+  settings.
+
+==================================================
+5. Safety
+==================================================
+
+This documentation freeze does not change Production code, tests, Runtime,
+rules, state, Queue, Execution, Broker, or SendOrder data.
+
+Confirmed safety boundary from the contract:
+
+- SendOrder direct path changes: 0
+- Queue semantics changes: 0
+- Broker order path changes: 0
+- invalid UI input does not trigger order execution
+- outside-time operation start remains blocked
+- unauthenticated operation start remains blocked
+
+==================================================
+6. Current Dirty State
+==================================================
+
+Pre-existing dirty/untracked files remain in both repositories. The closing
+candidate files for this documentation step are limited to:
+
+- `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+- `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+- `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+- `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
+- `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`
+
+Do not stage unrelated dirty or untracked files.
+
+==================================================
+7. Next Work
+==================================================
+
+No Routine development is automatically authorized by this Resume.
+
+The current document baseline leaves the possible future Main Engine sequence
+as a separately authorized task:
+
+High-Resolution Market State -> Routine time axis / progress bar -> realtime
+Indicator State -> time-based Signal Confirmation Contract.
+
+The next task must be explicitly instructed by the user. Do not infer Routine
+development as the next task from this documentation freeze.

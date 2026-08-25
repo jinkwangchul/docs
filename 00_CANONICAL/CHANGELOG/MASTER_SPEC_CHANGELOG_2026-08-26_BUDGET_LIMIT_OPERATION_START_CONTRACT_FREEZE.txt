@@ -1,0 +1,132 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-26
+Scope: Budget / Limit / Operation Start Contract Freeze
+
+==================================================
+1. Purpose
+==================================================
+
+This Changelog records the current-documentation freeze for the confirmed
+Budget / Limit / Operation Start contracts in the local Working Tree.
+
+No Production code, test, Runtime, state, rules, Queue, or Broker data is
+changed by this documentation step.
+
+==================================================
+2. Canonical Added
+==================================================
+
+Created:
+
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+
+The new Canonical supplements, without rewriting, the earlier 2026-08-11,
+2026-08-14, 2026-08-21, and 2026-08-24 Freeze documents.
+
+==================================================
+3. Contracts Frozen
+==================================================
+
+Starting Budget:
+
+- AMOUNT default uses Fresh Current Price multiplied by
+  `starting_budget_defaults.amount_multiplier`.
+- The current 1.5 value is a persisted setting value, not a hard-coded
+  Canonical ratio.
+- Last Known price is not a new-default calculation source.
+- Resolved starting budget is not recalculated on every ordinary realtime Tick.
+- AMOUNT invalid input is discarded with Toast and editor close, preserving a
+  still-valid previous explicit value or returning to the default path when the
+  previous explicit value is also invalid.
+
+Limit:
+
+- Recommended and minimum limits use effective/resolved starting budget
+  multiplied by environment multipliers.
+- Current recommended/minimum values 100 and 25 are multipliers, not
+  percentages.
+- `자리맞춤 ON` uses `round_money_to_two_significant_digits()`.
+- `자리맞춤 OFF` uses the raw amount.
+- Minimum does not use a separate ceiling rule, and leading-place ceiling is
+  not the current Stock limit alignment contract.
+- Invalid limit input restores a previous valid CONFIGURED state when one
+  exists; otherwise it returns to UNSET.
+- CONFIGURED single click edits; CONFIGURED double click unsets; UNSET single
+  click is no-op; UNSET double click activates through the existing
+  recommendation/guard contract.
+
+Operation Start:
+
+- Main global `▶ 운영시작` failure reason precedence is:
+  lifecycle guard -> GLOBAL prerequisite -> Structural Target -> Operation Time
+  -> Per-target Recovery -> Validation -> Start.
+- GLOBAL login/account prerequisite is evaluated before operation time.
+- Structural target provenance is preserved before operation-time split.
+- Only time-eligible targets proceed to per-target Recovery and validation.
+- Recovery-before-time provenance loss and generic no-target fallback are
+  explicitly superseded.
+
+==================================================
+4. GUI Smoke Evidence
+==================================================
+
+Production GUI smoke confirmed:
+
+- unauthenticated + outside operation time:
+  `키움 서버에 로그인되어 있지 않습니다.`
+- authenticated + outside operation time:
+  `현재는 매매 운영 시간이 아닙니다.`
+
+Both paths preserved STOPPED and produced zero SendOrder, Queue, Execution, and
+user-setting mutation.
+
+==================================================
+5. Safety Boundary
+==================================================
+
+The freeze changes documentation of confirmed behavior only.
+
+Preserved:
+
+- SendOrder direct path changes: 0
+- Queue semantics changes: 0
+- Broker order path changes: 0
+- invalid UI input cannot trigger order execution
+- outside-time start remains blocked
+- unauthenticated start remains blocked
+
+==================================================
+6. Validation Summary
+==================================================
+
+Current local Working Tree validation:
+
+- Operation Start precedence / global operation focused regression:
+  105 PASS
+- Full `tests.test_operation_budget_defaults`:
+  61 PASS
+- Starting Budget focused subset:
+  8 PASS
+- Limit recommendation / digit alignment focused subset:
+  17 PASS
+- related Production py_compile:
+  PASS
+- related code `git diff --check`:
+  PASS, line-ending warnings only
+
+Code commit validated:
+
+- `74d6cf389961e2acbb3eee0b6ae5999f7bac2308`
+
+Residual audit:
+
+- Previous 3 failures were classified as STALE_TEST fixture leakage from
+  persisted `ui/stock_limit_digit_alignment`.
+- Production calculation was not changed.
+- Tests now isolate the intended ON alignment path.
+
+==================================================
+7. Git State
+==================================================
+
+This step does not stage, commit, or push.

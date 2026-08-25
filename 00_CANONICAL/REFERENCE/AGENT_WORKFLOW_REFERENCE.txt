@@ -759,6 +759,28 @@ GUI execution-path rule:
 - When the same feature name exists in multiple windows, tables, or context menus, trace the actual visible widget signal, slot, condition branch, and final menu/action list before changing code.
 - A test against a similarly named helper, callback, or different window is not evidence that the user-visible GUI path was fixed.
 
+GUI verification workflow:
+- Do not hand GUI verification to the user merely because one automation path is
+  unavailable or incomplete.
+- Combine the available safe tools according to the evidence needed:
+  Shell/Python for process, persisted state, Runtime, hash, and internal helper
+  checks; Win32/HWND, UIA, pywinauto, Computer Use, screenshot, or visual
+  inspection for actual visible-window interaction and message evidence; then
+  Shell/Python again for persisted-result and mutation-boundary checks.
+- If UIA or another automation layer does not expose a Qt child control, inspect
+  alternative safe evidence such as window geometry, widget rectangles,
+  screenshots, accessibility text, runtime state, or process/window identity
+  before asking the user to perform a simple GUI action.
+- Codex should perform ordinary safe GUI actions such as button clicks, Toast
+  checks, and settings-window navigation when the requested action is in scope,
+  the target control is identified, and the operation cannot trigger an
+  unauthorized Broker/order side effect.
+- User direct action is limited to boundaries that only the user should cross:
+  login, certificate or password entry, security input, account authentication,
+  real order approval, or a GUI action whose automation target cannot be made
+  safe. Do not automate those boundaries without explicit approval for the
+  current task.
+
 If evidence is missing, report "not confirmed".
 
 Report order for bug/feature work:

@@ -3,10 +3,10 @@
 Reference Edition
 
 - Reference Base Canonical: MASTER_SPEC_CANONICAL_2026-07-09_RUNTIME_APPLY_PREVIEW_EXECUTION_PREVIEW_ORCHESTRATOR.txt
-- Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-08-22_GROUP_LIFECYCLE_RECOVERY_FREEZE.txt
-- Latest Operational Work Resume: WORK_RESUME_LATEST_2026-08-21_ROUTINE_ENGINE_HANDOFF.txt
+- Latest Official Canonical: MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt
+- Latest Operational Work Resume: WORK_RESUME_LATEST_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt
 - Cleanup Completion Baseline Work Resume: WORK_RESUME_LATEST_2026-08-05_CLEANUP_COMPLETION_BASELINE.txt
-- Latest Changelog: MASTER_SPEC_CHANGELOG_2026-08-22_GROUP_LIFECYCLE_RECOVERY_FREEZE.txt
+- Latest Changelog: MASTER_SPEC_CHANGELOG_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt
 - Latest Readable Changelog: MASTER_SPEC_READABLE_CHANGELOG_2026-08-05_CLEANUP_COMPLETION_BASELINE.txt
 
 
@@ -28,6 +28,12 @@ Archive and Legacy files are historical evidence only for these areas. If they
 conflict with Current Canonical, Current Canonical wins. If UI terminology and
 document terminology conflict, the confirmed UI term wins.
 
+For individual-liquidation time boundaries, conditional Liquidation Policy
+transitions, final operator-intent precedence, and per-stock long-term holding
+Review classification, use
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_INDIVIDUAL_LIQUIDATION_TIME_AND_LONG_HOLD_CONTRACT.txt`
+before the 2026-07-27 transition contract.
+
 For BrokerSession, connection_epoch, TR provenance/Governor, screen allocation,
 market-data authority, Execution Universe, stock registration/roster, and
 restart/reconnect architecture, use
@@ -36,10 +42,31 @@ This supplemental Canonical does not supersede the independent Current
 Canonical contracts for Global Diagnostic Observer, Budget/Buffer,
 Close/Liquidation, Review/Emergency, Main monitoring UI, or charts.
 
+For the process-local High-Resolution Tick state, Price Signal observation
+gate, Realtime/TR monitoring UI, and live mini-chart endpoint, use
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-24_HIGH_RESOLUTION_PRICE_SIGNAL_FOUNDATION_FREEZE.txt`.
+It supplements and does not replace the Broker / Market Data Architecture,
+canonical candle, Routine, or order-safety contracts.
+
+For AMOUNT starting-budget defaults and recovery, Stock limit recommendation,
+digit alignment, invalid limit recovery, and Main global operation-start
+failure reason precedence, use
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`.
+It supplements and does not replace the independent Budget semantic,
+Routine/Stock Limit, Main/Settings shared operation, Broker, Recovery, or
+order-safety contracts.
+
 This Reference Index is an index. It is not an AI operating policy document.
 
 ## Current Policy References
 
+- Budget / Limit / Operation Start Contract Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+- Budget / Limit / Operation Start Contract Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+- Budget / Limit / Operation Start Contract Freeze Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+- High Resolution Price Signal Foundation Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-24_HIGH_RESOLUTION_PRICE_SIGNAL_FOUNDATION_FREEZE.txt`
+- High Resolution Price Signal Foundation Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-24_HIGH_RESOLUTION_PRICE_SIGNAL_FOUNDATION_FREEZE.txt`
+- High Resolution Price Signal Foundation Freeze Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-24_HIGH_RESOLUTION_PRICE_SIGNAL_FOUNDATION_FREEZE.txt`
+- Current Window Reset, Stock Registration, And Monitoring UI Finalization: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-24_CURRENT_WINDOW_RESET_STOCK_UI_FINALIZATION.txt`
 - Group Lifecycle / Recovery Final Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-22_GROUP_LIFECYCLE_RECOVERY_FREEZE.txt`
 - Group Lifecycle / Recovery Final Freeze Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-22_GROUP_LIFECYCLE_RECOVERY_FREEZE.txt`
 - Agent workflow and operation rules: `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
@@ -52,6 +79,7 @@ This Reference Index is an index. It is not an AI operating policy document.
 - Broker / Market Data Architecture Final Freeze Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt`
 - Kiwoom Broker Integration Phase 0 Official Contract Audit: `30_REPORTS/KIWOOM_BROKER_INTEGRATION_PHASE0_OFFICIAL_CONTRACT_AUDIT_2026-08-19.txt`
 - Kiwoom Broker Integration Phase 12 Load/Reconnect Simulation Validation: `30_REPORTS/KIWOOM_BROKER_INTEGRATION_PHASE12_LOAD_RECONNECT_SIMULATION_VALIDATION_2026-08-20.txt`
+- Individual Liquidation Time and Long-term Holding Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_INDIVIDUAL_LIQUIDATION_TIME_AND_LONG_HOLD_CONTRACT.txt`
 - Global Diagnostic Observer Final Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt`
 - Global Diagnostic Observer Final Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_FINAL_FREEZE.txt`
 - Global Diagnostic Observer Phase 2 Contract Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_GLOBAL_DIAGNOSTIC_OBSERVER_PHASE2_CONTRACT_FREEZE.txt`

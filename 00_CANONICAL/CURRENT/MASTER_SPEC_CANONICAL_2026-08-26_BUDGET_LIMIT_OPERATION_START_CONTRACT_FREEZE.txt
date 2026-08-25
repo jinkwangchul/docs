@@ -1,0 +1,357 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-26
+Scope: Budget / Limit / Operation Start Contract Freeze
+Status: Current Supplemental Canonical
+
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Implementation evidence: current local Working Tree; no commit or push is implied
+
+Documentation repository: jinkwangchul/docs
+Docs branch: agent/project-prompt-standard
+Docs parent baseline before this Freeze:
+cac988db3dfd96c4583adff86973862c3bcafd82
+
+==================================================
+1. Authority And Scope
+==================================================
+
+This Supplemental Canonical records the confirmed current Production contract
+for AMOUNT starting-budget defaults, Stock limit recommendation and invalid
+recovery, and operation-start failure reason precedence.
+
+It supplements the earlier Current Canonicals for:
+
+- 2026-08-11 Main/Settings shared operation
+- 2026-08-14 Budget semantic clarification
+- 2026-08-21 Routine/Stock limit final freeze
+- 2026-08-24 High-Resolution Price Signal foundation
+
+Those earlier Freeze documents remain historical contracts for their own
+baselines. This document records the later current contract where the current
+Working Tree extends or clarifies them.
+
+==================================================
+2. Starting Budget AMOUNT Default
+==================================================
+
+For AMOUNT mode, the default starting budget is:
+
+  Fresh Current Price * starting_budget_defaults.amount_multiplier
+
+The source path is:
+
+  operation_policy.json -> starting_budget_defaults -> amount_multiplier
+
+The currently persisted multiplier value may be 1.5, but 1.5 is not a fixed
+Canonical minimum ratio. If the environment setting changes, new default
+calculation uses the changed multiplier.
+
+Fresh Current Price is the calculation source for a new default. Last Known
+price is display evidence and must not be used as the source for a new AMOUNT
+default calculation.
+
+==================================================
+3. Starting Budget One-Time Resolution
+==================================================
+
+Starting budget is not recalculated on every ordinary realtime Tick after it is
+resolved.
+
+Re-evaluation is allowed only at the established resolution boundaries:
+
+- initial resolution
+- operator setting change
+- the first Fresh Current Price needed in a new authenticated session
+
+Ordinary realtime Tick movement must not rewrite or continuously change an
+already resolved starting budget.
+
+Display-oriented Last Known price and calculation-oriented Fresh Session Price
+remain separate concepts.
+
+==================================================
+4. Starting Budget Invalid Recovery
+==================================================
+
+This section applies to AMOUNT mode only. Quantity mode is outside this
+invalid-recovery contract.
+
+When the AMOUNT editor receives invalid input, including number parse failure,
+zero or negative value, value below the current default, or another existing
+validation failure:
+
+  invalid -> Toast -> editor close -> discard invalid input
+
+If the previous explicit amount remains valid under the current default:
+
+- keep the previous explicit value
+- do not rewrite the same value through the writer
+- restore the Table projection to the previous value
+
+If the previous explicit amount is also below the current default:
+
+- treat the previous explicit override as invalid under the current condition
+- clear the explicit override
+- return to the Canonical default calculation path
+
+The current Production representation for that default path is:
+
+  buy_amount = 0
+
+This means "use the default calculation path." It does not mean storing the
+calculated default as a new manual explicit amount.
+
+If no Fresh price is available and an explicit amount exists, the explicit
+amount must not be deleted merely because the current default cannot be
+computed. If no Fresh price is available and no explicit amount exists, the
+existing `금액 대기` contract applies.
+
+==================================================
+5. Recommended / Minimum Limit Basis
+==================================================
+
+The raw basis for recommended and minimum Stock limits is:
+
+  effective/resolved starting budget * environment multiplier
+
+The currently persisted multipliers are:
+
+- recommended: 100
+- minimum: 25
+
+These values are multipliers, not percentages. The multiplier values themselves
+are the current operational-buffer policy. Do not reinterpret them as 100% and
+25%.
+
+==================================================
+6. Limit Digit Alignment
+==================================================
+
+The environment setting display is:
+
+- `자리맞춤 ON`
+- `자리맞춤 OFF`
+
+The persisted key is:
+
+  ui/stock_limit_digit_alignment
+
+The default is ON. Recommended and minimum limits use the same setting.
+
+ON:
+
+  Raw -> round_money_to_two_significant_digits()
+
+This is the same upper-two-significant-digits rounding rule used by the
+existing total-budget display calculation.
+
+OFF:
+
+  Raw amount unchanged
+
+Example:
+
+- Raw: 12,500,000
+- ON: 13,000,000
+- OFF: 12,500,000
+
+Superseded interpretations:
+
+- OFF is not floor/down-rounding.
+- Minimum limit does not use a separate ceiling rule.
+- The prior leading-place ceiling helper is not the current Stock limit
+  alignment contract.
+- Recommended and minimum limits do not use different rounding rules.
+
+==================================================
+7. Limit State And Invalid Recovery
+==================================================
+
+Existing limit provenance values are preserved, including UNSET, RECOMMENDED,
+MANUAL, UNKNOWN, and WAITING.
+
+Invalid limit editor input includes at least:
+
+- below minimum limit
+- above system total budget
+
+Common invalid flow:
+
+  invalid -> Toast -> editor close -> discard invalid input -> restore normal
+  Table projection
+
+If a previous valid CONFIGURED state exists:
+
+- MANUAL restores the previous enabled / amount / source
+- RECOMMENDED restores the previous enabled / amount / source
+- the invalid input must not cause the same state to be rewritten by the writer
+
+If no previous valid CONFIGURED state exists and the row was UNSET:
+
+- return to UNSET
+- enabled=false
+- amount=null
+- source=null
+
+The rule is:
+
+  restore previous valid CONFIGURED state when one exists; otherwise return to
+  UNSET.
+
+==================================================
+8. Limit Interaction
+==================================================
+
+CONFIGURED limit:
+
+- single click opens the inline editor
+- double click transitions to UNSET
+
+UNSET limit:
+
+- single click is a no-op
+- double click activates according to the existing recommendation and guard
+  contract
+
+Single-click and double-click suppression timing is an implementation detail,
+not a core Canonical contract.
+
+==================================================
+9. Operation Start Guard Precedence
+==================================================
+
+Main global `▶ 운영시작` failure reasons are not collapsed into one generic
+target-empty result.
+
+The current conceptual order is:
+
+  existing top lifecycle guard
+  -> GLOBAL prerequisite
+  -> Structural Target
+  -> Operation Time
+  -> Per-target Recovery
+  -> Validation
+  -> Start
+
+Existing top lifecycle guards such as NORMAL_ENDED and GLOBAL_EMERGENCY_STOP
+retain their established meaning.
+
+GLOBAL prerequisite uses the actual Production global readiness projection,
+including Kiwoom server login, account/auth readiness, and the minimum global
+session readiness needed to evaluate operation start. Do not create a fake
+login/account guard separate from the Production projection.
+
+==================================================
+10. Structural Target / Time / Recovery Provenance
+==================================================
+
+Structural target provenance must be preserved before operation-time
+classification.
+
+Correct flow:
+
+  structural target -> operation-time split -> time-eligible / time-blocked
+  -> per-target Recovery and validation only for time-eligible targets
+
+Incorrect flow:
+
+  structural target -> per-target Recovery first -> eligible 0 -> target
+  provenance lost -> generic no-target message
+
+GLOBAL login/account prerequisite is evaluated before the operation-time split.
+GLOBAL prerequisite and per-target Recovery are different layers and must not be
+collapsed into one ordering rule.
+
+If every structural target is outside operation time after GLOBAL prerequisite
+passes, the operation-time message is shown. If at least one target is
+time-eligible, that target continues to Recovery/validation and the global
+outside-time message must not overwrite the downstream result.
+
+==================================================
+11. Failure Message Semantics
+==================================================
+
+Current failure-message semantics:
+
+- unauthenticated / global prerequisite not ready:
+  `키움 서버에 로그인되어 있지 않습니다.`
+- authenticated, structural target exists, and every target is outside
+  operation time:
+  `현재는 매매 운영 시간이 아닙니다.`
+- no structural target:
+  existing generic settings/review message
+- time-eligible target exists and Recovery fails:
+  specific Recovery reason
+- Recovery passes and validation fails:
+  specific validation reason
+- NORMAL_ENDED:
+  existing normal-ended message
+- GLOBAL_EMERGENCY_STOP:
+  existing emergency-stop message
+
+Production GUI smoke confirmed the two precedence anchors:
+
+- unauthenticated + outside operation time -> login prerequisite message
+- authenticated + outside operation time -> operation-time message
+
+Both smoke paths preserved STOPPED state and produced zero SendOrder, Queue,
+Execution, and user-setting mutation.
+
+==================================================
+12. Safety Boundary
+==================================================
+
+This contract normalizes message precedence, validation, and operation-target
+classification. It does not change the order safety boundary.
+
+Preserved:
+
+- SendOrder direct connection changes: 0
+- Queue semantics changes: 0
+- Broker order path changes: 0
+- invalid UI input cannot trigger order execution
+- outside-time operation start remains blocked
+- unauthenticated operation start remains blocked
+
+==================================================
+13. Verification Evidence
+==================================================
+
+Current local Working Tree evidence:
+
+- Operation Start precedence / global operation focused regression:
+  105 tests PASS
+- Full `tests.test_operation_budget_defaults`:
+  61 tests PASS
+- Starting Budget focused subset:
+  8 tests PASS
+- Limit recommendation / digit alignment focused subset:
+  17 tests PASS
+- related Production py_compile:
+  PASS
+- related code `git diff --check`:
+  PASS, with line-ending warnings only
+
+Validated code commit:
+
+- `74d6cf389961e2acbb3eee0b6ae5999f7bac2308`
+
+Residual audit result:
+
+- The previous 3 limit-recommendation failures were classified as STALE_TEST
+  fixture leakage from persisted `ui/stock_limit_digit_alignment`.
+- Production calculation remained consistent with the current contract.
+- The affected tests now pin the intended ON alignment path without mutating
+  user settings.
+
+==================================================
+14. Freeze State
+==================================================
+
+Budget / Limit / Operation Start Contract Freeze is documented at the current
+local Working Tree state. No commit or push is implied by this document.
+
+No Routine development next step is authorized by this Canonical. Routine time
+axis / progress-bar / realtime indicator-state work remains subject to a
+separate explicit user instruction.
