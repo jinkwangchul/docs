@@ -1,0 +1,384 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-24
+Scope: Current Window Factory Reset, Stock Registration, And Monitoring UI Finalization
+Status: Current Supplemental Canonical
+
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Implementation evidence: current local Working Tree; no commit or push is implied
+
+Documentation repository: jinkwangchul/docs
+Docs branch: agent/project-prompt-standard
+
+==================================================
+1. Authority And Scope
+==================================================
+
+This Supplemental Canonical records only the Production contracts verified in
+the 2026-08-24 current-window finalization. Existing Current Canonicals remain
+authoritative for Logical Group identity, Review/Emergency, Broker execution,
+Performance/Assignment Episode, and monitoring layout except where this file
+states a narrower, later UI or safety contract.
+
+An existing Canonical or confirmed UI element must not be deleted, hidden,
+replaced, or repurposed unless the user explicitly requests that change. A new
+UI element must not occupy or replace an existing element's role. In
+particular, the Stock-row signal light and the Tooltip bullet are independent.
+
+==================================================
+2. Group And RoutineInstance Deletion Safety
+==================================================
+
+Group and RoutineInstance complete deletion use the shared read-only
+`preview_delete_scope()` policy before mutation.
+
+- A Stock in the current-session running set blocks deletion.
+- A Stock that is not running, has `holding_qty > 0`, and is not protected by
+  Review blocks deletion as a long-term holding.
+- A Review-protected Stock with holdings does not trigger the long-term-holding
+  blocker. This permits the approved Group/Instance deletion path; it does not
+  release Review or issue a Broker command.
+- A missing `state.json` file fails closed. The current shared JSON reader
+  normalizes malformed/non-dict content to an empty dictionary, so malformed
+  state content is not separately blocked by this deletion preview.
+- Successful deletion clears only the affected Stock assignment to
+  `UNASSIGNED`; the central Stock record is preserved.
+- Group deletion retains its durable marker, atomic registry update,
+  read-back, and rollback contract. RoutineInstance deletion stages the
+  instance directory and restores Stock/Episode evidence on failure.
+
+Relationship Sources of Truth remain:
+
+- Group to RoutineInstance: `instance.json.group_id`
+- RoutineInstance to Stock: `assigned_routine_instance_id`
+- assignment history: canonical Assignment Episode records
+
+==================================================
+3. Complete Program Factory Reset
+==================================================
+
+Complete program initialization is a local filesystem transaction, not an
+order, liquidation, cancellation, correction, or Broker operation.
+
+- Operation, holding, Review, authentication, account, and Broker connection
+  state do not block the reset safety check.
+- The GUI requires the exact confirmation text `전체초기화`.
+- Before filesystem staging, the GUI quiesces owned timers/hosts. A failed
+  reset resumes the prior runtime only after complete rollback.
+- The service writes and verifies a transaction marker, stages all targets,
+  creates pristine local runtime state, performs read-back validation, and
+  removes the transaction only after success.
+- Failure performs rollback. Incomplete rollback remains fail-closed with
+  transaction residue.
+- Removed program/user operation data includes Logical Groups,
+  RoutineInstances, registered Stocks, archived Stocks, Assignment Episodes,
+  Performance Ledger, migration manifests, artifacts, reports, logs, and
+  non-preserved Runtime data.
+- Preserved product/static data includes Routine Definitions, Engines,
+  `runtime/stock_library.json`, `runtime/stock_library_meta.json`, the bundled
+  Stock Library, screen registry, base-stock source, and project changelog.
+- Routine-local derived approval/report artifacts are removed without deleting
+  the Routine Definition package.
+- `broker_orders_called` is invariantly `0`. The reset path does not call
+  `CommConnect`, TR, `SendOrder`, cancellation, correction, or liquidation.
+
+The current-window Production GUI reset was exercised successfully. Current
+read-only post-reset evidence shows no `.factory_reset_transactions` residue,
+preserved Routine/Engine and Stock Library files, and subsequently recreated
+Logical Group/Instance/Stock user data. This is filesystem evidence only; it
+does not convert a Broker-side assumption into execution evidence.
+
+==================================================
+4. Registration And Login Safety
+==================================================
+
+- Registering a Stock already assigned to the same RoutineInstance is an
+  idempotent no-op.
+- A Stock with a CURRENT assignment to another RoutineInstance is blocked from
+  duplicate registration.
+- Successful assignment writes the canonical assignment relationship and
+  Assignment Episode transition; it does not rewrite historical ownership.
+- The Stock registration dialog has one process-wide instance per target
+  RoutineInstance. Reopening reuses, reparents, raises, and activates it.
+- `KiwoomApi.login()` is single-flight. While `_login_requested` is true,
+  another request returns `login_in_progress` and does not call `CommConnect`
+  again.
+
+==================================================
+5. Stock Library And Broker-call Boundary
+==================================================
+
+The connected-session Stock Library sync reads master data through the
+existing Kiwoom ActiveX master functions:
+
+- KOSPI: `GetCodeListByMarket("0")`
+- KOSDAQ: `GetCodeListByMarket("10")`
+- NXT eligibility: `GetCodeListByMarket("NXT")`
+- Stock name: the existing master-name function
+
+The canonical local search record stores `code`, full `name`, `market`,
+`nxt_available`, raw `master_stock_state`, raw `master_construction`, raw
+`master_stock_info`, `master_stock_market_kind`, derived `status`, and derived
+`classification`. Status and classification are metadata on the existing Stock
+Library record, not a parallel Source of Truth. If master evidence is missing,
+the UI preserves the unknown value rather than inferring a normal state.
+The Stock registration search reads only the local Stock Library snapshot.
+Searching causes zero additional TR or master calls.
+
+==================================================
+6. Stock Registration Dialog Contract
+==================================================
+
+The current result structure is fixed:
+
+`종목코드 | 종목명 | 시장 | 등록상태 | 분류 | 비고 | 현재주가 | 등락률 | 체결강도 | 전일대비 | 거래대금 | 거래량 | 시총 | 상태`
+
+- All data columns use `QHeaderView.Fixed`; user resize, stretch, and
+  ResizeToContents are not used.
+- Dialog width is fixed from row-number header, all fixed data columns,
+  vertical scrollbar, frame, and layout margins. The horizontal scrollbar is
+  disabled and the vertical scrollbar is always reserved.
+- Row numbers reserve a centered three-digit `999` width.
+- Stock name reserves the current-font Korean 14-character width. A fitting
+  name is centered. An overflowing full name is left-aligned and clipped at the
+  cell boundary without ellipsis; only a clipped name receives its full-name
+  persistent Tooltip.
+- Market identity comes from the Stock Library. The current UI renders KOSPI
+  as `KOSPI` in navy and KOSDAQ as `코스닥` in brown. Selection preserves
+  readable text.
+- `비고` displays `NXT` only when `nxt_available is True`; false or unknown is
+  blank.
+- `분류` is projected from official Master evidence only. The canonical value
+  `일반종목` is rendered as `일반` in the cell; ETF, ETN, SPAC, REIT, 기타, and
+  `-` retain their canonical display values. The `[일반종목]` badge is a local
+  filter: OFF shows the complete current result, ON shows only canonical
+  `classification == "일반종목"`, and toggling does not re-search or issue a
+  TR.
+- `상태` is built from `GetMasterConstruction` and `GetMasterStockState` raw
+  evidence. A long or multi-value cell may be elided with `...`, but its
+  persistent Tooltip contains the complete original text. Missing evidence is
+  displayed as `-` with no status Tooltip.
+- The market snapshot columns are transient UI data. `현재주가`, `등락률`,
+  `체결강도`, `전일대비`, `거래대금`, `거래량`, and `시총` are filled from the
+  existing one-shot snapshot path; `전일대비` means current cumulative volume
+  divided by previous total cumulative volume multiplied by 100, not a
+  same-time comparison.
+- Current table styling uses a white background, `#EBEBEB` separators/border,
+  and a distinct blue selection background. Alternating row colors are not
+  enabled in the current implementation.
+- Typing, deleting, `textChanged`, `textEdited`, and `editingFinished` do not
+  search. Enter and the `검색` button call the same search path exactly once.
+- Search, double-click registration, explicit registration, duplicate guards,
+  CURRENT/UNASSIGNED classification, and Stock Library validation retain their
+  existing behavior.
+
+==================================================
+7. Main Monitoring Stock Signal Light
+==================================================
+
+The Stock-row signal light is an existing canonical monitoring element and
+must remain visible before the Stock code/name text.
+
+- Geometry: 18 px signal box followed by the existing 4 px gap.
+- Source: `routine_profit_signal()` projected through
+  `ROUTINE_STOCK_PROFIT_LED_ROLE`.
+- Colors: loss red, cost-not-recovered yellow, net-profit green, and neutral
+  gray, using the existing delegate color values.
+- Disabled visual rows retain the existing reduced-opacity behavior.
+
+The signal light is not Tooltip content. The `▪` at the beginning of each
+Tooltip line is text only and must never replace, hide, or consume the signal
+light geometry.
+
+==================================================
+8. Main Monitoring Stock Quick-info Tooltip
+==================================================
+
+The quick-info UI uses the persistent hover Tooltip path. Click, press-and-hold,
+custom frame, and `Qt.Popup` implementations are not part of this contract.
+
+- The hit area is only the Stock code and full-name region, not the whole row
+  or metric/status cells.
+- Hover displays the Tooltip; staying on the same source cell prevents the Qt
+  default expiration; leaving the region hides it; moving to another accepted
+  Stock updates it immediately.
+- The displayed font derives from the monitoring Stock font rather than a
+  separate fixed application-wide size.
+- Tooltip generation causes zero additional TR calls.
+
+The exact three-line structure is:
+
+`▪  종목코드 종목명  |  KOSPI/KOSDAQ  |  상태 상태값  |  NXT`
+`▪  현재가 값  |  시가 값  |  고가 값  |  저가 값`
+`▪  등락률 값  |  전일대비 값  |  체결강도 값`
+
+NXT is omitted when false or unknown. Prices use thousands separators.
+Percentages retain an explicit sign. A missing realtime/Master/Library value is
+shown as `-`; Tooltip display must not invent a value or issue a lookup.
+
+==================================================
+9. Preserved Contracts And Regression Boundary
+==================================================
+
+The work above does not alter Group/Instance/Stock row identity,
+current/historical projection, selection, disclosure, context menus,
+click/double-click/right-click behavior, Performance allocation, Assignment
+Episode ownership, canonical metrics, or the Broker order safety chain.
+
+The preservation rule is prospective and mandatory: an Agent adding a badge,
+Tooltip, icon, delegate, or popup must first identify existing visual and event
+roles. A new element may coexist with them but may not silently remove, hide,
+replace, or broaden their hit area.
+
+==================================================
+10. Verification Evidence
+==================================================
+
+- 32-bit focused deletion, factory-reset, Stock Library, Tooltip, monitoring,
+  Assignment Episode, and Performance tests: 133 PASS
+- Group deletion marker/rollback and Main interaction subset: 16 PASS
+- core service/UI/Performance subset: 117 PASS
+- 32-bit py_compile: PASS
+- Code and Docs `git diff --check`: PASS
+- staged files, commit, and push: none for this finalization task
+
+==================================================
+11. Market Snapshot, Ranking, And Code Identity
+==================================================
+
+The current Working Tree contains two existing read paths for the registration
+dialog:
+
+- `request_initial_market_snapshot()` uses the governed `OPTKWFID` path in
+  batches of at most 100 Stock codes and updates transient market cells.
+- `request_stock_ranking_snapshot()` uses the existing governed ranking TR,
+  screen allocator, Broker-session identity, and `_read_tr_rows()` path. It
+  returns at most 100 rows for each `[거래량]`, `[거래대금]`, `[급상승]`, and
+  `[급하락]` badge, then hydrates those rows through the same market snapshot
+  path. Header sorting is local and does not re-request data.
+
+These paths add no `SetRealReg` call and do not alter participant,
+Execution-Universe, Queue, Chejan, or SendOrder state. Ranking is
+`IMPLEMENTED` in the current code path; a live ranking result is separate
+evidence and must not be inferred from the presence of the buttons alone.
+
+Stock codes are opaque canonical strings. Numeric and alphanumeric values such
+as `005930`, `0134X0`, `0164H0`, and `0165X0` must retain leading zeroes and
+letters through library, snapshot, and dialog paths. Integer conversion,
+numeric-only validation, and name-based instrument inference are prohibited.
+
+The current classification implementation uses official
+`GetMasterStockInfo` evidence and the existing per-stock
+`GetStockMarketKind` fallback. The current code does not contain a
+`GetCodeListByMarket("60")` ETN membership call; therefore ETN production
+persistence through that specific membership path is `PENDING`, not a completed
+live contract. No GUI heuristic or separate ETN lookup table is authorized.
+
+==================================================
+12. Initial Performance Display
+==================================================
+
+The empty initial performance projection retains the established zero display:
+
+- `기간`: `0`
+- `수익`: `0 / 0.00%`
+- `평균`: `0 / 0.00%`
+- `효율`: `0.0`
+
+This is a display of a valid empty performance state, not a new metric
+calculation. Malformed, incomplete, or unavailable performance evidence keeps
+the existing `-` display. The performance calculation, ledger, Runtime, and
+Broker boundaries are unchanged.
+
+==================================================
+13. AutoTradeSetting Right Population And Count
+==================================================
+
+The right registered-Stock table has two explicit population modes.
+
+`FLAT_FILTER_SCOPE` applies while the left view represents a flat filtered
+population, including `[유효] + [종목] + [전체/현재/과거]`. The whole filtered
+population owns the right scope. Clicking one Stock row does not narrow the
+right table to its parent Routine Instance.
+
+`HIERARCHICAL_SELECTION_SCOPE` applies when the left hierarchy is exposed.
+Group selection resolves all Instance Stocks in that Group, Routine Instance
+selection resolves that Instance, Stock selection resolves the Stock row's
+parent Instance, and Root/all selection resolves all registered Stocks.
+
+Therefore left display intent has precedence over row selection in flat mode,
+while canonical selected identity owns scope in hierarchical mode. The same
+Stock click may intentionally produce different scopes in the two modes.
+
+The right `운영/대기/제외/검토` filters operate only inside the already-resolved
+right population. They must not reintroduce out-of-scope Stocks. Aggregate
+badges and filtered rows use the same canonical Stock-code classification and
+deduplication.
+
+`종목(N)` follows the current display mode. In operation/waiting display it is
+the unique operation/waiting population count; in all-Stock display it is the
+unique registered population count. It is neither an always-registered count
+nor an always-operation/waiting count.
+
+==================================================
+14. AutoTradeSetting Badge Visual Contract
+==================================================
+
+The default badge text color is `#4B5563`. The outline remains `#111827`.
+Existing green, blue, purple, orange, warning/error, and disabled semantic
+colors remain authoritative. This change does not alter badge size, spacing,
+font, layout, hit area, checked state, or filter behavior.
+
+==================================================
+15. Context Menu And Routine Clone Status
+==================================================
+
+Main Monitoring and AutoTradeSetting Stock context menus use the shared Stock
+context-menu builder. Their common candidate actions are Operation Start,
+Review Stop, select all, clear selection, operation exclusion, real-order
+permission toggle, Early Close, individual liquidation, ATS settings, time
+change, reset, Stock registration, unregister, and mini chart. Action presence
+and enabled state remain fail-closed by canonical row identity, current
+selection, and callback availability; a context without required evidence does
+not invent an enabled action.
+
+AutoTradeSetting Routine Instance context menus include `루틴복제` between
+settings and deletion. AutoTradeSetting and Main reuse the same canonical
+snapshot clone helper and repository writer. Early Close and immediate
+liquidation are not added to the AutoTradeSetting Routine Instance menu.
+
+==================================================
+16. Monitoring-only Meaning
+==================================================
+
+The current `감시전용 전환` implementation is
+`MONITORING_ONLY_EXECUTION_SUPPRESSION`, not simulation or paper trading.
+It uses `real_trade_enabled` to keep MarketData and Routine evaluation active,
+so BUY/SELL signals and Candidate/Approval/Policy-Gate evaluation may still
+occur. It fail-closes before `REAL_READY`, final `ORDER_QUEUED`, and SendOrder.
+
+The context-menu/manual writer is a current Working-Tree feature extension,
+classified as `DEVELOPMENT_SEMANTIC_EXPANSION_RESIDUE`. It is not designated
+for deletion, but it must not be described as a virtual account, virtual fill,
+simulated position, or PAPER execution domain.
+
+==================================================
+17. Current Verification And Limitation
+==================================================
+
+Current 32-bit focused evidence for this closing checkpoint includes:
+
+- Operation, budget, dispatch, projection, and lifecycle: 118 PASS.
+- Stock Library and registration metadata: 80 PASS.
+- realtime monitoring, chart observation, registration, and safety: 93 PASS.
+- right scope/count/filter and Routine clone: 11 PASS.
+- shared Main/AutoTradeSetting Stock context-menu paths: 8 PASS.
+
+The QWidget geometry-heavy badge test exits the current 32-bit Qt process
+before unittest completion. Constants and lightweight stylesheet contracts are
+verified, but this checkpoint does not claim a new live-GUI verification for
+that geometry test.
+
+Running Base Budget restart/recovery exact-session preservation remains the
+`PENDING / KNOWN LIMITATION` recorded in
+`00_CANONICAL/REFERENCE/RUNNING_BASE_BUDGET_ADJUSTMENT_REFERENCE.md`.

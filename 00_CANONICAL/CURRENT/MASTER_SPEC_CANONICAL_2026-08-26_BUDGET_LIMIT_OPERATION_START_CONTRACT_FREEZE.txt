@@ -1,6 +1,6 @@
 MASTER SPEC CANONICAL
 Date: 2026-08-26
-Scope: Budget / Limit / Operation Start Contract Freeze
+Scope: Budget / Limit / Current Operation / ATS / Long-Hold Contract Freeze
 Status: Current Supplemental Canonical
 
 Code repository: jinkwangchul/kiwoom_auto
@@ -18,7 +18,19 @@ cac988db3dfd96c4583adff86973862c3bcafd82
 
 This Supplemental Canonical records the confirmed current Production contract
 for AMOUNT starting-budget defaults, Stock limit recommendation and invalid
-recovery, and operation-start failure reason precedence.
+recovery, Operation Start admission, time projection, ATS execution, participant
+membership, long-term holding, and immediate Review classification.
+
+Current technical-contract resolution order is:
+
+  latest explicit user-confirmed contract
+  > verified current Production implementation
+  > current Canonical / Reference
+  > Historical / Archive contract
+
+Historical text remains evidence of its former baseline. It must not override a
+later current contract. A historical contract marked SUPERSEDED in this file is
+DO NOT USE FOR CURRENT IMPLEMENTATION.
 
 It supplements the earlier Current Canonicals for:
 
@@ -26,6 +38,8 @@ It supplements the earlier Current Canonicals for:
 - 2026-08-14 Budget semantic clarification
 - 2026-08-21 Routine/Stock limit final freeze
 - 2026-08-24 High-Resolution Price Signal foundation
+- 2026-08-16 Individual liquidation time and long-term holding
+- 2026-08-20 Broker / Market Data architecture
 
 Those earlier Freeze documents remain historical contracts for their own
 baselines. This document records the later current contract where the current
@@ -218,140 +232,581 @@ Single-click and double-click suppression timing is an implementation detail,
 not a core Canonical contract.
 
 ==================================================
-9. Operation Start Guard Precedence
+9. Operation Start Admission And Order Permission
 ==================================================
 
-Main global `▶ 운영시작` failure reasons are not collapsed into one generic
-target-empty result.
+Operation Start admission is not Order permission.
 
-The current conceptual order is:
+Operation Start may succeed when the current time is outside an actual trading
+session, including:
 
-  existing top lifecycle guard
-  -> GLOBAL prerequisite
-  -> Structural Target
-  -> Operation Time
-  -> Per-target Recovery
-  -> Validation
-  -> Start
+- before 09:00 in CONTINUOUS / manual operation
+- before the configured SCHEDULED operation boundary
+- before a selected pre-market ATS session
+- after pre-market ATS and before the regular session
+- after the regular session and before a selected post-market ATS session
+- any non-trading gap between selected future sessions on the same day
 
-Existing top lifecycle guards such as NORMAL_ENDED and GLOBAL_EMERGENCY_STOP
-retain their established meaning.
+A successful start uses the existing common Operation Start backend:
 
-GLOBAL prerequisite uses the actual Production global readiness projection,
-including Kiwoom server login, account/auth readiness, and the minimum global
-session readiness needed to evaluate operation start. Do not create a fake
-login/account guard separate from the Production projection.
+  existing lifecycle and global prerequisites
+  -> structural target
+  -> per-target Recovery and validation
+  -> explicit current-session participant registration
+  -> stale-signal cutoff
+  -> current time projection
 
-==================================================
-10. Structural Target / Time / Recovery Provenance
-==================================================
+The registered participant enters the operation bucket even when the resulting
+projection is `감시/대기` and current order permission is false.
 
-Structural target provenance must be preserved before operation-time
-classification.
+Time outside an actual trading session is not an Operation Start admission
+blocker. Existing login, account, authentication, Recovery, validation, Review,
+Emergency, and structural-target guards remain fail-closed.
 
-Correct flow:
+Actual order permission remains independently fail-closed:
 
-  structural target -> operation-time split -> time-eligible / time-blocked
-  -> per-target Recovery and validation only for time-eligible targets
+  no active actual order-permitted session -> OUTSIDE_OPERATION_TIME
 
-Incorrect flow:
-
-  structural target -> per-target Recovery first -> eligible 0 -> target
-  provenance lost -> generic no-target message
-
-GLOBAL login/account prerequisite is evaluated before the operation-time split.
-GLOBAL prerequisite and per-target Recovery are different layers and must not be
-collapsed into one ordering rule.
-
-If every structural target is outside operation time after GLOBAL prerequisite
-passes, the operation-time message is shown. If at least one target is
-time-eligible, that target continues to Recovery/validation and the global
-outside-time message must not overwrite the downstream result.
+Operation Start success and current order prohibition may therefore be true at
+the same time. This contract does not permit pre-09:00 regular-market orders or
+relax `routine_order_permission`.
 
 ==================================================
-11. Failure Message Semantics
+10. Current Time Projection
 ==================================================
 
-Current failure-message semantics:
+One time boolean must not determine status, method activity, liquidation
+activity, participant membership, and order permission together.
 
-- unauthenticated / global prerequisite not ready:
-  `키움 서버에 로그인되어 있지 않습니다.`
-- authenticated, structural target exists, and every target is outside
-  operation time:
-  `현재는 매매 운영 시간이 아닙니다.`
-- no structural target:
-  existing generic settings/review message
-- time-eligible target exists and Recovery fails:
-  specific Recovery reason
-- Recovery passes and validation fails:
-  specific validation reason
-- NORMAL_ENDED:
-  existing normal-ended message
-- GLOBAL_EMERGENCY_STOP:
-  existing emergency-stop message
+PRE_OPERATION_BOUNDARY:
 
-Production GUI smoke confirmed the two precedence anchors:
+- status: `감시/대기`
+- method: Routine canonical value, inactive
+- liquidation: canonical liquidation value, inactive
+- participant: true
+- when manual liquidation policy is OFF, liquidation text is `-`
 
-- unauthenticated + outside operation time -> login prerequisite message
-- authenticated + outside operation time -> operation-time message
+OPERATION_BOUNDARY_REACHED:
 
-Both smoke paths preserved STOPPED state and produced zero SendOrder, Queue,
-Execution, and user-setting mutation.
+- the operation-method boundary has been reached
+- the stock trading-setting start has not yet been reached
+- status: `감시/대기`
+- method: Routine canonical value, active
+- liquidation: canonical liquidation value, active
+- participant: true
+
+ACTIVE_TRADING_WINDOW:
+
+- status: `매수/매도`
+- method: Routine canonical value, active
+- liquidation: canonical liquidation value, active
+- participant: true
+- actual order permission still applies every final safety gate
+
+Operation-method boundaries are:
+
+- CONTINUOUS / 수동: 09:00
+- SCHEDULED / 시간운영: configured environment operation start time
+
+These boundaries activate the regular Routine and regular liquidation
+projection. They do not by themselves begin stock BUY/SELL. The per-stock
+trading-setting start remains the separate `감시/대기 -> 매수/매도` boundary.
+Therefore, reaching 09:00 does not unconditionally mean `매수/매도`.
+
+All session windows are interpreted as `[start, end)` unless a more specific
+current contract explicitly states otherwise.
 
 ==================================================
-12. Safety Boundary
+11. ATS Session Contract
 ==================================================
 
-This contract normalizes message precedence, validation, and operation-target
-classification. It does not change the order safety boundary.
+ATS is not an independent operation mode. ATS is a selected additional actual
+trading session. Pre-market and post-market ATS are symmetric under this rule.
+
+During an active selected ATS session:
+
+- status: `매수/매도`
+- method: persisted ATS `execution_method`, active
+- liquidation: `-`
+- participant remains true
+
+ATS has no automatic close, early close, separate liquidation policy,
+automatic-close-plus-liquidation, or early-close-plus-liquidation route.
+
+The ATS Source of Truth is:
+
+  stocks/<stock>/state.json
+  manual_ats_selection.selected_sessions
+  manual_ats_selection.execution_method
+
+Allowed execution methods are:
+
+- ROUTINE
+- MARKET
+- CURRENT_PRICE
+
+Missing legacy `execution_method` is read-only ROUTINE. Reading legacy data must
+not mutate the file. An invalid value produces
+`INVALID_ATS_EXECUTION_METHOD` and execution fails closed. The only canonical
+writer is `write_manual_ats_runtime_selection()`; no parallel writer is
+authorized.
+
+`execution_method` controls how an existing Routine-generated BUY/SELL signal
+is mapped at execution. It does not generate a signal, bypass Approval or the
+Policy Gate, or define liquidation:
+
+- ROUTINE: preserve the existing execution method
+- MARKET: map BUY/SELL to MARKET with price 0
+- CURRENT_PRICE: read fresh `MarketDataHost` `last_price` and map to LIMIT
+- unavailable or invalid CURRENT_PRICE evidence:
+  `ATS_CURRENT_PRICE_UNAVAILABLE`, no fallback
+
+`manual_ats_selection.execution_method` is separate from an operator ATS normal
+termination action. `execution_method == MARKET` or `CURRENT_PRICE` is not
+termination evidence. A termination route requires its own request, command,
+Queue, and completion evidence.
+
+==================================================
+12. Pre-Market Timeline And Non-Trading Gaps
+==================================================
+
+Canonical example:
+
+  Operation Start: 07:50
+  ATS: 08:00-08:50
+  CONTINUOUS operation boundary: 09:00
+  per-stock regular trading start: 09:30
+
+Projection:
+
+- 07:50-07:59:59: `감시/대기` | Routine inactive | liquidation inactive
+- 08:00-08:49:59: `매수/매도` | ATS method active | `-`
+- 08:50-08:59:59: `감시/대기` | Routine inactive | liquidation inactive
+- 09:00-09:29:59: `감시/대기` | Routine active | regular liquidation active
+- 09:30 and later in the regular window:
+  `매수/매도` | Routine active | regular liquidation active
+
+NON_TRADING_GAP is the canonical common projection when:
+
+- current-session participant is true
+- no actual trading session is active now
+- a future selected session remains today
+
+Its result is:
+
+- status: `감시/대기`
+- method: underlying Routine value, inactive
+- liquidation: underlying canonical liquidation value, inactive
+- participant retained
+- retirement prohibited
+- orders blocked with `OUTSIDE_OPERATION_TIME`
+
+The same rule applies before pre-market ATS, from pre-market ATS to regular
+operation, from regular operation to post-market ATS, between multiple ATS
+sessions, and in other same-day future-session gaps.
+
+The old `BETWEEN -> 매수/매도 inactive` projection is SUPERSEDED and DO NOT USE
+FOR CURRENT IMPLEMENTATION.
+
+A simple ATS session end is not operation end, participant retirement,
+automatic liquidation, or Review entry. If a future session exists, participant
+and holding remain.
+
+At the final ATS session end, ROUTINE execution context with no actual
+MARKET/CURRENT_PRICE termination execution has carryover-equivalent effect. It
+is not a liquidation failure.
+
+==================================================
+13. Long-Term Holding And Immediate Review
+==================================================
+
+Long-term holding supports holding across days or weeks beyond one daily or
+single-operation scope. Long-term holding ON does not mean every residual
+holding is normal.
+
+Source and reader:
+
+  operation_policy.json
+  review_policy.long_term_holding_enabled
+  gui_operation_environment.read_review_policy()
+
+Route truth table:
+
+| Route evidence | Long-Term policy | Residual evidence | Result |
+| --- | --- | --- | --- |
+| manual + regular close/liquidation route | ON or OFF | holding remains | immediate REVIEW |
+| manual + no regular close route | ON | holding-only | normal long-term holding |
+| SCHEDULED + CARRYOVER | ON | holding-only | normal long-term holding |
+| ATS ROUTINE final end + no actual termination | ON | holding-only | carryover-equivalent normal long-term holding |
+| MARKET/CURRENT_PRICE cleanup route performed | ON or OFF | holding remains | immediate REVIEW |
+
+Long-Term ON never exempts pending order, pending unknown, Runtime/account
+mismatch, Broker/internal mismatch, integrity error, reconciliation failure,
+Recovery failure, Emergency abnormality, corruption, or another independent
+safety issue.
+
+Normal end classification is immediate:
+
+  end route completion
+  -> fresh residual / pending / integrity inspection
+  -> route-disallowed residual
+  -> immediate REVIEW
+
+The canonical Review mutation boundary remains
+`runtime_stock_state_mutation.mutate_runtime_stock_state()`. Startup integrity
+is a SECONDARY RECOVERY SAFETY NET for crash, abnormal termination, missed end
+writer, prior-session residue, or external Broker/internal inconsistency. It is
+not the first owner of a normal operation-end residual decision.
+
+The historical `normal end -> next program restart -> integrity -> REVIEW`
+first-classification route is SUPERSEDED and DO NOT USE FOR CURRENT
+IMPLEMENTATION.
+
+==================================================
+14. Participant, Retirement, And Stale Signal
+==================================================
+
+Canonical active membership is:
+
+  _current_session_operation_participant_stock_codes
+
+It is process-local and non-persistent. Only a successful explicit Operation
+Start adds a current participant. Persisted
+`runtime/operation_state.json.operation_participant_stock_codes` is a day
+ledger, not active-membership Source of Truth. Startup Recovery must not restore
+that ledger automatically into process-local participant membership.
+
+Final retirement order is:
+
+  route / residual decision
+  -> REVIEW write and read-back when required
+  -> retirement decision
+
+Retiring first, projecting WAITING, and inspecting residual later is forbidden.
+Retirement is also forbidden in a NON_TRADING_GAP with a future session.
+
+After same-day normal completion, a stock may rejoin through the existing stock
+context-menu `운영시작` only when the existing eligibility conditions pass.
+
+A successful Operation Start uses the existing `ignore_signals_before` cutoff
+so prior-session signals cannot re-enter the new operation. Do not solve stale
+signals by cleaning or mutating the signal file.
+
+==================================================
+15. Bottom Button, Registration, And Shared Projection
+==================================================
+
+Main bottom operation button contract:
+
+- `■ 운영시작`: current-running = 0 and no today-start evidence; enabled
+- `▶ 운영중`: current-running >= 1; disabled and display-only
+- `● 운영정지`: today-start evidence and current-running = 0; disabled and
+  display-only
+
+`● 운영정지` is not a general stop command. On the next day the display returns
+to `■ 운영시작` when the normal eligibility contract is satisfied.
+
+Stock registration remains allowed while the program has running participants.
+Registration placement Source of Truth is
+`operation_policy.json.stock_registration.default_location`:
+
+- `대기` -> WAITING
+- `제외` -> EXCLUDED
+
+Registration alone must not add a current-session participant, add the stock to
+the Execution Universe, or change the existing participant set.
+
+Main and AutoTradeSetting must use one canonical projection for:
+
+- situation
+- status text and active/inactive state
+- method text and active/inactive state
+- liquidation text and active/inactive state
+
+Neither window may define a separate meaning for the same cell.
+
+==================================================
+16. Superseded Historical Contamination
+==================================================
+
+Historical and Archive originals remain unchanged as historical evidence. The
+following interpretations are SUPERSEDED and DO NOT USE FOR CURRENT
+IMPLEMENTATION:
+
+- post-market ATS -> early-close / liquidation-policy inspection
+- post-market ATS + early-close or liquidation policy -> `감시/대기`
+- `장후 ATS -> 조기마감/청산 정책 검사`
+- `장후 ATS + 조기마감 또는 청산정책 -> 감시/대기`
+- restart integrity as the first classifier for a normal end residual
+- `BETWEEN -> 매수/매도 inactive`
+- SCHEDULED / 시간운영 final-end 이후에도 Operation Start를 허용하는 해석
+- CONTINUOUS / 수동운영의 final-end를 시간과 무관한 Start 허용으로 해석하는 규칙
+- SCHEDULED / 시간운영의 종료 판단에 ATS를 결합하는 규칙
+- timer만 종료되면 participant, Execution Universe, realtime target까지
+  정리된다고 보는 해석
+- `participant == current-running` 또는 persisted participant ledger를
+  현재 세션 active membership으로 보는 해석
+- `AUTO_CLOSE`라는 raw status만으로 항상 retirement를 차단하는 규칙
+- Main이 Routine cycle, 회차, holding, 또는 SELL 의미를 해석하는 규칙
+- `holding == 0`만으로 NEXT_CYCLE 예산 조정을 활성화하는 규칙
+- 운영중 예산 조정이 permanent `config.json`을 덮어쓴다고 보는 해석
+- 이전 base/effective/pending 예산값을 최신 사용자 표시값으로 재노출하는 규칙
+
+The historical asymmetry that treated pre-market ATS as actual BUY/SELL while
+routing post-market ATS through early-close/liquidation must not be combined
+with the current symmetric ATS session contract.
+
+==================================================
+17. Safety Boundary
+==================================================
+
+This contract changes documentation authority and the separation of admission,
+projection, and order permission. It does not create a lifecycle, Source of
+Truth, writer, Queue path, general stop, ATS liquidation route, or SendOrder
+path.
 
 Preserved:
 
-- SendOrder direct connection changes: 0
-- Queue semantics changes: 0
-- Broker order path changes: 0
-- invalid UI input cannot trigger order execution
-- outside-time operation start remains blocked
-- unauthenticated operation start remains blocked
+- unauthenticated or invalid Operation Start remains blocked
+- actual order permission outside an active permitted session remains blocked
+- Recovery, validation, Approval, Policy Gate, Queue, and final dispatch safety
+  remain fail-closed
+- Operation Start participant registration is explicit, never automatic
+- actual SendOrder is not authorized by this documentation task
 
 ==================================================
-13. Verification Evidence
+18. Verification Evidence
 ==================================================
 
-Current local Working Tree evidence:
+Current contract evidence is recorded separately from the contract itself.
 
-- Operation Start precedence / global operation focused regression:
-  105 tests PASS
-- Full `tests.test_operation_budget_defaults`:
-  61 tests PASS
-- Starting Budget focused subset:
-  8 tests PASS
-- Limit recommendation / digit alignment focused subset:
-  17 tests PASS
-- related Production py_compile:
-  PASS
-- related code `git diff --check`:
-  PASS, with line-ending warnings only
+Automated verification evidence:
 
-Validated code commit:
+- ATS execution-method focused/regression: PASS
+- Long-Term route classification: PASS
+- Immediate Review: PASS
+- Operation-time projection: PASS
+- Operation Start pre-session admission: PASS
+- Order-time fail-closed: PASS
+- Main/AutoTradeSetting projection tests: PASS
+- actual SendOrder: 0
+- Production Runtime mutation: 0
 
-- `74d6cf389961e2acbb3eee0b6ae5999f7bac2308`
+Production GUI smoke evidence:
 
-Residual audit result:
+- pre-09:00 Operation Start succeeded
+- participant entered the operation bucket
+- PRE_OPERATION_BOUNDARY projected `감시/대기` with inactive values
+- active pre-market ATS projected `매수/매도` with the ATS method
+- participant remained after ATS ended
 
-- The previous 3 limit-recommendation failures were classified as STALE_TEST
-  fixture leakage from persisted `ui/stock_limit_digit_alignment`.
-- Production calculation remained consistent with the current contract.
-- The affected tests now pin the intended ON alignment path without mutating
-  user settings.
+GUI projection evidence does not prove the final order-permission gate. The
+`OUTSIDE_OPERATION_TIME` order contract is supported by automated test evidence,
+not inferred from a screen alone.
+
+Earlier Budget / Limit evidence retained for its own scope:
+
+- Operation Start precedence / global operation focused regression: 105 PASS
+- full `tests.test_operation_budget_defaults`: 61 PASS
+- Starting Budget focused subset: 8 PASS
+- Limit recommendation / digit alignment focused subset: 17 PASS
+- related Production py_compile: PASS
+- related code `git diff --check`: PASS with line-ending warnings only
+- validated code commit: `74d6cf389961e2acbb3eee0b6ae5999f7bac2308`
 
 ==================================================
-14. Freeze State
+19. Freeze State
 ==================================================
 
-Budget / Limit / Operation Start Contract Freeze is documented at the current
-local Working Tree state. No commit or push is implied by this document.
+Budget / Limit / Current Operation / ATS / Long-Hold contracts are documented
+at the current local Working Tree state. No commit or push is implied.
 
-No Routine development next step is authorized by this Canonical. Routine time
-axis / progress-bar / realtime indicator-state work remains subject to a
-separate explicit user instruction.
+The visible GUI discrepancy supplied with the documentation request is outside
+this documentation-only scope and remains for a separate UI task.
+
+==================================================
+20. Running Base Budget Adjustment
+==================================================
+
+Starting-budget editing has two distinct contracts.
+
+When the stock is not current-running, the existing direct config edit remains
+available, including mode changes between QUANTITY and AMOUNT.
+
+When the stock is current-running:
+
+- direct mutation of `trade_amount_type`, `buy_qty`, and `buy_amount` remains
+  blocked
+- the `기본예산변경` dialog may create a current-operation Runtime adjustment
+- the current mode is immutable; only its value may change
+- the persisted base `config.json` is not overwritten by the Runtime adjustment
+- candidates, approvals, Queue rows, and orders created before confirmation are
+  never rewritten retrospectively
+
+The existing per-stock `state.json` is the persistence owner. The existing
+canonical Runtime stock-state mutation writer remains the only writer. No
+parallel JSON, Source of Truth, or lifecycle is created.
+
+The adjustment is bound to the current operation by `trade_started_at`.
+Pending state may therefore survive process restart and normal Recovery for the
+same operation. It is ignored when `trade_enabled` is false or when a later
+operation has a different `trade_started_at`. A Runtime adjustment never
+silently becomes the non-running permanent base config.
+
+==================================================
+21. Immediate And Next-Cycle Signal Contract
+==================================================
+
+The generic state machine observes only newly queued standard BUY and SELL
+signals.
+
+Immediate apply:
+
+  WAIT_FIRST_BUY -> BUY -> APPLIED
+
+The first BUY generated after confirmation receives the adjusted base-budget
+input. SELL signals before that BUY do not alter the rule. Later BUY signals in
+the same operation continue to receive the adjusted input.
+
+Next-cycle apply:
+
+  WAIT_SELL -> SELL -> WAIT_FIRST_BUY -> BUY -> APPLIED
+
+BUY signals before the first post-confirmation SELL continue to receive the old
+base-budget input. After one or more SELL signals, the first subsequent BUY and
+later BUY signals receive the adjusted input.
+
+A duplicate or non-queued signal does not advance the adjustment state.
+
+==================================================
+22. Main / Routine Independence
+==================================================
+
+Main does not interpret a Routine's strategy, name, cycle, round, averaging
+stage, holding quantity, or internal state machine for budget adjustment.
+
+Permitted inputs are limited to:
+
+- a standard BUY signal
+- a standard SELL signal
+- the operator-confirmed Runtime adjustment state
+
+SELL is not assumed to mean a full sale or cycle completion. Holding or position
+quantity is not consulted. A zero holding without a SELL signal cannot activate
+a next-cycle adjustment, and a remaining holding cannot prevent SELL followed
+by BUY from activating it.
+
+Main supplies only the effective base-budget input. Each Routine retains
+authority over its own BUY calculation and resulting execution intent. Adding
+or renaming a Routine must not require a Main budget-adjustment branch.
+
+==================================================
+23. Running Limit Option
+==================================================
+
+When `한도금액에 새 설정값 적용` is selected, the current-operation projection
+uses the existing resolved-starting-budget basis, recommended-limit multiplier,
+and digit-alignment rule. The permanent Stock limit config remains unchanged.
+If fresh price evidence required by QUANTITY mode, system-budget evidence, or a
+valid recommended-limit result is unavailable, confirmation fails closed.
+
+==================================================
+24. Running Adjustment Verification Evidence
+==================================================
+
+Local 32-bit verification at the current Working Tree:
+
+- running-adjustment and dialog focused: 26 PASS, 20 subtests PASS
+- adjacent signal/probe, execution bridge, Operation Start, and budget: 116 PASS,
+  20 subtests PASS
+- related Production py_compile: PASS
+- actual SendOrder: 0
+- no Production Runtime was used by the tests
+
+No commit or push is implied by this supplemental implementation evidence.
+
+==================================================
+25. Operation Start Final-Session Pre-Admission
+==================================================
+
+The Operation Start time contract has two distinct operation-mode branches.
+
+SCHEDULED / 시간운영 uses the configured operation start and end boundary
+only. ATS sessions are not combined with this branch:
+
+- before the configured start: Operation Start is allowed and projects
+  `감시/대기`
+- inside the configured window: Operation Start is allowed
+- at or after the configured end: `FINAL_SESSION_ENDED` and pre-admission block
+
+CONTINUOUS / 수동운영 uses the regular session together with the actually
+selected ATS sessions for that Stock. ATS is considered only in this branch:
+
+- an active regular or selected ATS session allows Operation Start
+- an inactive session with a future same-day session produces
+  `BETWEEN_SESSIONS` / `NON_TRADING_GAP`, allows Operation Start, and keeps
+  watch/wait projection with order permission `OUTSIDE_OPERATION_TIME`
+- when the regular session and every selected ATS session have ended and no
+  future session remains, `FINAL_SESSION_ENDED` blocks Operation Start
+
+`FINAL_SESSION_ENDED` is evaluated before state write, current-session
+participant registration, OperationHost start, Execution Universe admission,
+or Routine input. A final-end block therefore has participant mutation `0`.
+The current time gate for actual order permission remains a separate
+fail-closed boundary.
+
+==================================================
+26. Operation Start Result Projection
+==================================================
+
+The multi-target result uses the existing Toast framework. The retired result
+Modal is not part of the current contract. The first line is always one fixed
+line, including zero values and in this order:
+
+`대상종목 N | 기운영중 N | 운영시작 N | 운영불가 N`
+
+The fields mean requested target count, already current-running target count,
+newly started target count, and targets not started because of an existing
+admission blocker. When needed, canonical blocker reasons may be summarized on
+a second line; the first line is not replaced by a generic settings/review
+message. An all-running request therefore still produces a result Toast with
+`운영시작 0`.
+
+==================================================
+27. Running Budget Display And Recovery State
+==================================================
+
+The operator-facing Main starting-budget value and the double-click editor
+initial value use the same latest user-visible projection. The current Working
+Tree supplies Main's `ROUTINE_STOCK_INITIAL_BUY_ROLE`; the editor consumes that
+projection first and uses the existing running-adjustment projection as its
+fallback. The old permanent base value is not shown while a confirmed current
+operation adjustment is active.
+
+The persistence owner remains `state.json.running_budget_adjustment`, written
+only through `runtime_stock_state_mutation.mutate_runtime_stock_state()`.
+The adjustment reader requires exact equality between
+`operation_session_started_at` and the current `trade_started_at`. Operation
+Start creates a new `trade_started_at`, so restart/recovery preservation across
+that boundary is a KNOWN LIMITATION / PENDING verification item unless exact
+session identity is retained. It must not be documented as a completed live
+Recovery guarantee.
+
+==================================================
+28. Current-Tree Implementation Status
+==================================================
+
+The following status labels distinguish code-path presence from live evidence:
+
+- Main/AutoTradeSetting shared operation projection: IMPLEMENTED in the current
+  Working Tree; live evidence belongs to the separate GUI smoke record.
+- Fixed four-field Operation Start Toast: IMPLEMENTED in the current code path;
+  zero-value and all-running cases remain focused regression evidence.
+- Running budget display/edit hydration: IMPLEMENTED in the current code path;
+  cross-restart exact-session recovery: PENDING / KNOWN LIMITATION above.
+- Stock master status, classification, and ranking UI: documented by the Stock
+  Registration Current Canonical; production persistence or broker-session
+  evidence must not be inferred from helper tests alone.
+
+No item in this documentation addendum creates a Source of Truth, writer,
+Queue path, lifecycle, or Broker order path.

@@ -1,0 +1,34 @@
+MASTER_SPEC_CHANGELOG_2026-08-26_OPERATION_STOP_INTERPRETATION_CLARIFICATION
+
+Scope:
+- Reference-only clarification for operation termination terminology and AI
+  interpretation.
+
+Changed:
+- Added a General Operation Stop Interpretation Rule to
+  `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`.
+- Added operation termination interpretation priority guidance to
+  `00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md`.
+- Added operation termination terminology entries to
+  `00_CANONICAL/REFERENCE/ARCHITECTURE_GLOSSARY.md`.
+
+Clarified:
+- The project has no current Production command category named general
+  operation stop, monitoring-only stop, safe stop, graceful stop, drain request,
+  participant-removal stop, or global STOP writer.
+- `STOPPED` is a lifecycle or projection state, not a user command or command
+  entry point.
+- `RUNNING`, current-session participation, realtime registration, and live-test
+  cleanup needs do not authorize creation of a new operation-stop service.
+- Emergency Stop remains the forced interruption family.
+- Close, early close, automatic close, liquidation, and completion policies
+  remain the normal completion families.
+
+Not Changed:
+- No Production code was changed.
+- No Runtime, operation_state, participant, Queue, Execution, fills, positions,
+  order, or user configuration data was read for mutation or changed.
+- No tests requiring Production runtime were executed.
+- Existing Canonical, Archive, Legacy, and historical changelog files were not
+  deleted or overwritten.
+- No commit or push is part of this documentation clarification.

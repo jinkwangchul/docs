@@ -1,0 +1,120 @@
+# Work Resume - Current Conversation Finalization - 2026-08-29
+
+==================================================
+1. Repository Checkpoints
+==================================================
+
+Code:
+
+- repository: `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`
+- branch: `feat/restore-auto-trade-setting-ui`
+- commit: `43f0c8878c1d23f5d50c5bb036a8f6ceac1da972`
+- push: PASS
+- `HEAD == origin/feat/restore-auto-trade-setting-ui`: PASS
+
+Docs:
+
+- repository: `C:\Users\JIN KWANG CHUL\Documents\docs`
+- branch: `agent/project-prompt-standard`
+- closure checkpoint: the commit containing this Resume
+- authoritative SHA: repository `HEAD` after the closure push
+- push verification: required before final user report
+
+==================================================
+2. Implemented
+==================================================
+
+- Running Base Budget display/edit hydration and current-operation adjustment
+  state machine, with AMOUNT/QUANTITY parity and permanent-config isolation.
+- final BUY/SELL fresh preflight and existing Queue/dispatch safety boundary.
+- Operation Start precedence, pre-session admission, fixed summary projection,
+  additional waiting-target start, and current-session participant semantics.
+- SCHEDULED and CONTINUOUS/ATS boundary projection, time-end participant
+  retirement, and final ATS-end waiting display normalization.
+- immediate realtime target synchronization without running a full operation
+  cycle, monitoring universe, Price Signal observation, and chart live-state
+  plumbing.
+- Stock Library master metadata, status/classification transport, registration
+  snapshot/ranking UI, alphanumeric Stock-code identity, and Tooltip paths.
+- AutoTradeSetting display-mode Stock count, aggregate/filter parity,
+  `FLAT_FILTER_SCOPE`, and `HIERARCHICAL_SELECTION_SCOPE`.
+- shared Main/AutoTradeSetting Stock context-menu builder and canonical Routine
+  Instance clone reuse.
+- default badge text color `#4B5563` with semantic colors/layout preserved.
+- monitoring-only meaning documented as execution suppression, not simulation.
+
+==================================================
+3. Known Limitations
+==================================================
+
+Running Base Budget restart/recovery exact-session preservation is not proven.
+Operation Start may write a new `trade_started_at`, while the current adjustment
+reader requires an exact `operation_session_started_at` match. Status remains
+`PENDING / KNOWN LIMITATION`.
+
+The QWidget geometry-heavy badge test exits the current 32-bit Qt process before
+unittest reports completion. Lightweight style constants and focused behavior
+tests pass, but this closure does not claim a new live GUI verification after
+the final code checkpoint.
+
+The current code does not contain the proposed `GetCodeListByMarket("60")` ETN
+membership path. ETN live production persistence through that specific source
+remains pending; no name/code heuristic is authorized.
+
+==================================================
+4. Pending
+==================================================
+
+First next work item:
+
+`PAPER Trading Architecture / Boundary Design Audit`
+
+PAPER implementation has not started. The approved direction requires an
+isolated Execution Domain, persistence, Performance, Event Journal, Recovery,
+and UI space, with no SendOrder path and zero cross-write into REAL state.
+
+==================================================
+5. Validation
+==================================================
+
+Executed with 32-bit Python in the final Code Working Tree:
+
+- operation/budget/dispatch/projection/lifecycle focused: 118 PASS
+- Operation Start global/precedence adjacent: 118 PASS
+- Stock Library/registration metadata: 80 PASS
+- realtime monitoring/chart/registration safety: 93 PASS
+- AutoTradeSetting scope/count/filter/clone: 11 PASS
+- shared Main/AutoTradeSetting Stock context-menu paths: 8 PASS
+- changed/new Python files: 123 py_compile PASS
+- Code cached `git diff --check`: PASS
+- Docs closing files whitespace/diff check: PASS
+
+Live GUI:
+
+- prior Production sessions supplied realtime, price-signal, operation-start,
+  and SendOrder-zero evidence during the conversation.
+- no new live GUI session was launched after the final closing repair.
+
+==================================================
+6. Safety And Preserved Dirty State
+==================================================
+
+- Runtime manual mutation by closing work: 0
+- actual SendOrder by closing work: 0
+- Queue/Execution mutation by closing work: 0
+- reset/restore/stash/clean: 0
+- force push: 0
+
+Pre-existing and generated dirty/untracked files remain protected, including
+Runtime, Stock/Group/RoutineInstance data, user policy/schedule files, event
+logs, screenshots, diagnostics, and archival Docs contamination. They were not
+staged, reverted, deleted, or normalized.
+
+==================================================
+7. Next-session Prompt
+==================================================
+
+`NOT WRITTEN YET`
+
+The user must review the final closing report before any next-session prompt is
+written.

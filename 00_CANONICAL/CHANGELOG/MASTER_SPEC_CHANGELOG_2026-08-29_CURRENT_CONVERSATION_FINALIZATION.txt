@@ -1,0 +1,43 @@
+# Current Conversation Finalization Changelog - 2026-08-29
+
+Code checkpoint: `43f0c8878c1d23f5d50c5bb036a8f6ceac1da972`
+
+## Current Product Contracts Recorded
+
+- AutoTradeSetting right population now documents distinct
+  `FLAT_FILTER_SCOPE` and `HIERARCHICAL_SELECTION_SCOPE` semantics.
+- Right status filters and aggregate badges are constrained to the resolved
+  right population.
+- `종목(N)` follows operation/waiting versus all-Stock display mode.
+- Default badge text uses `#4B5563`; existing semantic colors and layout remain.
+- Main and AutoTradeSetting reuse the shared Stock context-menu builder.
+- AutoTradeSetting Routine Instance clone reuses the canonical Main clone
+  backend.
+- Monitoring-only is documented as REAL execution suppression, not simulation.
+
+## Production Closing Repair
+
+- The final ATS session boundary now projects `감시/대기` instead of retaining
+  stale `매수/매도` display text.
+- Focused test harnesses were aligned with current canonical accessors; no new
+  Production lifecycle or writer was introduced by those test changes.
+
+## Known Limitation
+
+Running Base Budget restart/recovery exact-session preservation remains
+pending because a new Operation Start may establish a different
+`trade_started_at` identity.
+
+## Future Architecture
+
+PAPER Trading is recorded as `PENDING IMPLEMENTATION / ARCHITECTURE DIRECTION
+APPROVED`. PAPER requires an isolated execution and persistence domain with no
+SendOrder path and zero cross-write into REAL Queue, Fill, Position,
+Performance, Event Journal, or Recovery state.
+
+## Safety
+
+- Runtime manual mutation: 0
+- actual SendOrder invoked by this closing work: 0
+- Archive/Legacy source edits by this closing work: 0
+- next-session prompt: not written

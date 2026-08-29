@@ -25,6 +25,17 @@ Rules:
 - If implementation and contract conflict, fix the implementation. Do not rewrite the contract to fit AI interpretation.
 - User-unapproved contract change is project contamination.
 
+Current Technical Contract Resolution Rule:
+- For technical-contract truth, apply this order:
+  latest explicit user-confirmed contract > verified current Production
+  implementation > current Canonical / Reference > Historical / Archive.
+- This technical resolution order does not replace the procedural authority of
+  this Agent Workflow Reference. It prevents an older document from overriding
+  a later user-confirmed and Production-verified contract.
+- Historical text may be retained as evidence, but any interpretation marked
+  SUPERSEDED or DO NOT USE FOR CURRENT IMPLEMENTATION must not guide current
+  implementation, testing, or UI projection.
+
 Close Process Reference Rule:
 - For 조기마감, 자동마감, 청산정책, 마감정책, and 즉시청산, use
   `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-01_CLOSE_PROCESS_OPERATION_CONTRACT.txt`
@@ -35,6 +46,29 @@ Close Process Reference Rule:
   Canonical wins.
 - If UI terminology and document terminology conflict, the confirmed UI term
   wins.
+
+General Operation Stop Interpretation Rule:
+- The project has no current Production command category named general operation
+  stop, general safe stop, monitoring-only stop, graceful stop, drain request,
+  participant-removal stop, or global STOP writer.
+- `STOPPED` is a lifecycle or projection state. It is not a user command,
+  command entry point, or proof that a symmetric `RUNNING -> STOPPED` operation
+  service exists.
+- `RUNNING`, current-session participation, realtime registration, test cleanup
+  needs, or stale Runtime evidence must not be used to infer a new general stop
+  command.
+- Historical wording such as `운영정지`, `운영중지`, `stop request`, or
+  `safe stop` is historical or screen-specific evidence only unless the latest
+  Current Canonical explicitly defines it as a Production command.
+- Immediate forced interruption uses Emergency Stop. Normal completion uses the
+  current close, early-close, automatic-close, liquidation, and completion
+  contracts.
+- AI must not create participant removal APIs, global stop writers, timer-stop
+  services, realtime-removal commands, or UI stop actions merely to make a live
+  verification session easier to clean up.
+- If a live test leaves RUNNING evidence, investigate existing Recovery,
+  Emergency Stop, close, liquidation, and projection contracts. Do not invent or
+  implement a general operation-stop contract without explicit user approval.
 
 GUI State And Context Menu Reference Rule:
 - For REVIEW_REQUIRED, data inconsistency, protected-row display, situation
@@ -47,6 +81,33 @@ GUI State And Context Menu Reference Rule:
   with the same label is not a valid implementation.
 - Tests must target the actual visible GUI handler for the requested screen,
   not only a similarly named helper or another window's context menu.
+
+Current Operation / ATS / Long-Hold Reference Rule:
+- For Operation Start admission, order-time permission, operation-time
+  projection, ATS sessions and execution method, non-trading gaps, participant
+  membership and retirement, long-term holding, immediate Review, the bottom
+  operation button, registration while operating, and Main/AutoTradeSetting
+  projection, use
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+  as the first current technical Source of Truth.
+- Audit Operation Start admission separately from order permission. Time outside
+  an actual trading session does not by itself reject start; the final order
+  gate remains fail-closed with `OUTSIDE_OPERATION_TIME`.
+- Determine projection in this order: explicit participant membership, current
+  actual ATS/regular session, operation-method boundary, per-stock trading
+  boundary, then method/liquidation activity. Do not collapse these into one
+  time boolean.
+- Treat pre-market and post-market ATS symmetrically as additional actual
+  trading sessions. ATS `execution_method` maps existing Routine BUY/SELL orders
+  and never proves liquidation or termination.
+- In a same-day NON_TRADING_GAP with a future session, retain the participant,
+  project `감시/대기` with inactive method/liquidation, and keep orders blocked.
+- At final end, classify route/residual and perform required Review write/read-
+  back before participant retirement. Startup integrity is a secondary recovery
+  safety net, not the normal end classifier.
+- Historical post-market ATS liquidation, restart-first residual Review, and
+  `BETWEEN -> 매수/매도 inactive` interpretations are SUPERSEDED and must not be
+  restored.
 
 ## 2. Project Identity
 
@@ -692,8 +753,13 @@ Document roles:
 - Historical / Archive: evidence only
 
 Rules:
-- Do not modify old Canonical, old Changelog, or old Work Resume.
-- New confirmed contract goes into a new Canonical.
+- Do not modify old Canonical, old Changelog, or old Work Resume unless the
+  latest explicit user instruction requires an in-place correction of the
+  current authoritative document.
+- New confirmed contract normally goes into a new Canonical. When the latest
+  explicit user instruction requires consolidation into the current Canonical,
+  update that current authoritative document and do not create a parallel
+  Source of Truth.
 - Canonical only records confirmed implementation or confirmed policy.
 - Work Resume records recovery state, current baseline, next start point, and unresolved blockers.
 - Changelog records what changed in a Canonical update.

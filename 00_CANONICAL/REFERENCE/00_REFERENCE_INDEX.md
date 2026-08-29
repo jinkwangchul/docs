@@ -49,24 +49,76 @@ It supplements and does not replace the Broker / Market Data Architecture,
 canonical candle, Routine, or order-safety contracts.
 
 For AMOUNT starting-budget defaults and recovery, Stock limit recommendation,
-digit alignment, invalid limit recovery, and Main global operation-start
-failure reason precedence, use
+digit alignment, invalid limit recovery, Operation Start admission versus order
+permission, operation-time projection, ATS sessions and execution method,
+NON_TRADING_GAP, participant membership and retirement, long-term holding,
+immediate Review, bottom operation-button state, registration while operating,
+and Main/AutoTradeSetting shared projection, use
 `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`.
 It supplements and does not replace the independent Budget semantic,
 Routine/Stock Limit, Main/Settings shared operation, Broker, Recovery, or
 order-safety contracts.
 
+For current-running base-budget adjustment, Immediate first-BUY application,
+Next-Cycle SELL-then-BUY application, holding independence, and Main/Routine
+independence, use
+`00_CANONICAL/REFERENCE/RUNNING_BASE_BUDGET_ADJUSTMENT_REFERENCE.md` together
+with sections 20-24 of
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`.
+
+For Stock registration search, local Stock Library metadata, the 14-column
+registration table, status/classification evidence, one-shot market snapshot,
+TOP100 ranking, alphanumeric Stock codes, and the local `일반종목` filter, use
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-24_CURRENT_WINDOW_RESET_STOCK_UI_FINALIZATION.txt`.
+That document records current-tree implementation status separately from live
+Broker evidence; the ETN `GetCodeListByMarket("60")` membership path remains
+pending when it is not present in the current code.
+
+That Current owner also defines AutoTradeSetting right-population scope,
+display-mode-aware `종목(N)`, right aggregate/filter parity, badge colors,
+shared Stock context menus, Routine Instance clone reuse, and the exact
+monitoring-only execution-suppression meaning.
+
+For future PAPER Trading architecture, use
+`00_CANONICAL/REFERENCE/PAPER_TRADING_ISOLATED_EXECUTION_DOMAIN_REFERENCE.md`.
+It is `PENDING IMPLEMENTATION / ARCHITECTURE DIRECTION APPROVED`; it must not be
+read as a completed Production contract or as an alias of monitoring-only.
+
+For these current Operation / ATS / Long-Hold topics, historical post-market
+ATS liquidation, restart-first residual Review, and
+`BETWEEN -> 매수/매도 inactive` interpretations are SUPERSEDED and DO NOT USE
+FOR CURRENT IMPLEMENTATION.
+
+For operation termination interpretation, distinguish state projection from
+command authority. Use these contracts in order:
+
+1. `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
+2. `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-12_GUI_CHART_OPERATION_STATE_FREEZE.txt`
+3. `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-01_CLOSE_PROCESS_OPERATION_CONTRACT.txt`
+4. `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-02_REVIEW_MANAGEMENT_EMERGENCY_LIFECYCLE.txt`
+5. `10_UPDATE/MERGED/UPDATE_20260812_GUI_CHART_OPERATION_STATE_AND_STOP_CONTRACT.txt`
+
+`STOPPED`, `RUNNING`, `운영정지`, and `운영중지` do not by themselves define a
+general operation-stop command. Archive and Legacy wording remains historical
+evidence only. The current contracts preserve Emergency Stop for forced
+interruption and close/liquidation policies for normal completion.
+
 This Reference Index is an index. It is not an AI operating policy document.
 
 ## Current Policy References
 
-- Budget / Limit / Operation Start Contract Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+- Budget / Limit / Current Operation / ATS / Long-Hold Contract Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
+- Running Base Budget Adjustment Reference: `00_CANONICAL/REFERENCE/RUNNING_BASE_BUDGET_ADJUSTMENT_REFERENCE.md`
+- PAPER Trading Isolated Execution Domain Reference: `00_CANONICAL/REFERENCE/PAPER_TRADING_ISOLATED_EXECUTION_DOMAIN_REFERENCE.md`
+- Current Conversation Finalization Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-29_CURRENT_CONVERSATION_FINALIZATION.txt`
+- Current Conversation Finalization Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-29_CURRENT_CONVERSATION_FINALIZATION.txt`
+- Operation Stop Interpretation Clarification Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-26_OPERATION_STOP_INTERPRETATION_CLARIFICATION.txt`
 - Budget / Limit / Operation Start Contract Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
 - Budget / Limit / Operation Start Contract Freeze Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
 - High Resolution Price Signal Foundation Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-24_HIGH_RESOLUTION_PRICE_SIGNAL_FOUNDATION_FREEZE.txt`
 - High Resolution Price Signal Foundation Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-24_HIGH_RESOLUTION_PRICE_SIGNAL_FOUNDATION_FREEZE.txt`
 - High Resolution Price Signal Foundation Freeze Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-24_HIGH_RESOLUTION_PRICE_SIGNAL_FOUNDATION_FREEZE.txt`
-- Current Window Reset, Stock Registration, And Monitoring UI Finalization: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-24_CURRENT_WINDOW_RESET_STOCK_UI_FINALIZATION.txt`
+- Current Window Reset, Stock Registration, Instrument Metadata, Market Snapshot, And Monitoring UI Finalization: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-24_CURRENT_WINDOW_RESET_STOCK_UI_FINALIZATION.txt`
 - Group Lifecycle / Recovery Final Freeze Canonical: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-22_GROUP_LIFECYCLE_RECOVERY_FREEZE.txt`
 - Group Lifecycle / Recovery Final Freeze Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-22_GROUP_LIFECYCLE_RECOVERY_FREEZE.txt`
 - Agent workflow and operation rules: `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
@@ -116,6 +168,7 @@ This Reference Index is an index. It is not an AI operating policy document.
 - GUI Chart And Operation-State Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-12_GUI_CHART_OPERATION_STATE_FREEZE.txt`
 - GUI Chart And Operation-State Freeze Changelog: `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-12_GUI_CHART_OPERATION_STATE_FREEZE.txt`
 - GUI Chart And Operation-State Update: `10_UPDATE/MERGED/UPDATE_20260812_GUI_CHART_OPERATION_STATE_AND_STOP_CONTRACT.txt`
+- Operation termination interpretation rule: `00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt`
 - Monitoring Review Recovery Freeze Work Resume: `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-18_MONITORING_REVIEW_RECOVERY_FREEZE.txt`
 - Stock Management Review Protection Update: `10_UPDATE/MERGED/UPDATE_20260803_STOCK_MANAGEMENT_REVIEW_PROTECTION_ROUTINE_ASSIGN_REMOVAL.txt`
 - AI Architecture Contamination Policy: `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-07-15_AI_ARCHITECTURE_CONTAMINATION_POLICY.txt`

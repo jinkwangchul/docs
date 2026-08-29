@@ -138,6 +138,37 @@ Recovery:
 - Bring the system back to an operational state after interruption.
 - May include rollback, journal use, and verification.
 
+## Operation Termination Terms
+
+General Operation Stop:
+- Not a current Production command category.
+- Not equivalent to `STOPPED`.
+- Must not be inferred from `RUNNING`, `STOPPED`, `운영정지`, `운영중지`,
+  participant evidence, realtime registration, or test cleanup needs.
+- Related invented names such as monitoring-only stop, safe stop, graceful stop,
+  drain request, participant removal stop, and global STOP writer require
+  explicit user-approved Canonical before implementation.
+
+STOPPED:
+- A lifecycle or projection state.
+- Not a user command, command entry point, service name, or proof of a symmetric
+  `RUNNING -> STOPPED` operation path.
+
+Emergency Stop / 긴급정지:
+- The forced interruption family.
+- Not normal completion and not a general operation-stop substitute.
+
+Close / 마감:
+- The normal completion family governed by the current Close Process Operation
+  Canonical.
+- Includes automatic close and operator-started early close only as the current
+  Canonical defines them.
+
+Liquidation / 청산:
+- A holding or position removal process governed by the current close and
+  liquidation contracts.
+- Not a generic operation-stop command.
+
 ## Runtime, Lifecycle, Execution
 
 Lifecycle:
@@ -163,4 +194,6 @@ Execution Runtime Commit:
 - Do not use Validation and Verification interchangeably.
 - Do not use Rollback and Lock Release interchangeably.
 - Do not mix Stage and State in the same field.
+- Do not convert `STOPPED`, `RUNNING`, or operation display wording into a new
+  command family without explicit user-approved Canonical.
 - Do not change existing code names only because the glossary uses cleaner terminology.
