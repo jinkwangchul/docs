@@ -1,0 +1,38 @@
+MASTER_SPEC_CHANGELOG_2026-07-28_PR_HISTORY_EXCLUSION_POLICY
+
+Purpose:
+- Prevent Pull Request and merge history from being used as a Session Startup
+  or post-Freeze restoration baseline.
+
+Modified operating reference:
+- 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+
+Policy added:
+- Pull Request lists, merged or closed Pull Requests, merge history, recent
+  merge commits, old feature branches, review records, and default-branch
+  progress are not Startup Sources.
+- These records may be inspected only when explicitly requested by the user
+  and remain reference material only.
+- Startup restoration now follows the explicit priority:
+  latest user instruction, AGENT workflow rules, Latest Official Canonical,
+  Latest Work Resume, user-specified branch, user-specified commit, and
+  available actual Git state.
+- A user-specified branch and commit cannot be replaced or inferred from Pull
+  Requests, merge history, or the default branch.
+- If the specified branch or commit cannot be confirmed, the agent must report
+  the missing verification and stop.
+- When the Latest Work Resume states that no next implementation item is
+  authorized, the agent must wait for a new user instruction and must not infer
+  a Production Gap from repository history.
+
+Canonical impact:
+- No project technical Canonical was created or changed.
+- This change affects AI operating and restoration rules only.
+
+Verification:
+- Confirmed the no-authorized-next-task scenario stops at branch and commit
+  verification.
+- Confirmed a missing specified remote branch does not trigger Pull Request,
+  merge-history, or default-branch inference.
+- Confirmed internal repository history cannot select the next implementation
+  item.

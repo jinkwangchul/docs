@@ -85,41 +85,27 @@ Display-oriented Last Known price and calculation-oriented Fresh Session Price
 remain separate concepts.
 
 ==================================================
-4. Starting Budget Invalid Recovery
+4. Starting Budget AMOUNT Validation
 ==================================================
 
-This section applies to AMOUNT mode only. Quantity mode is outside this
-invalid-recovery contract.
+This section applies to AMOUNT mode value confirmation. QUANTITY retains its
+existing value rules, while both modes share the fresh-price admission contract
+in section 27.
 
-When the AMOUNT editor receives invalid input, including number parse failure,
-zero or negative value, value below the current default, or another existing
-validation failure:
+The AMOUNT minimum reuses the existing environment-setting Source of Truth and
+calculator. A parse failure, zero or negative value, below-minimum value, or
+another existing validation failure blocks Confirm and leaves the prior durable
+value unchanged.
 
-  invalid -> Toast -> editor close -> discard invalid input
+For a below-minimum value, the unified dialog reuses its existing centered red
+validation label and displays the actual computed threshold. A valid value hides
+that label immediately. The dialog does not create a second label, hardcode a
+threshold, or close merely because the user temporarily entered an invalid
+value.
 
-If the previous explicit amount remains valid under the current default:
-
-- keep the previous explicit value
-- do not rewrite the same value through the writer
-- restore the Table projection to the previous value
-
-If the previous explicit amount is also below the current default:
-
-- treat the previous explicit override as invalid under the current condition
-- clear the explicit override
-- return to the Canonical default calculation path
-
-The current Production representation for that default path is:
-
-  buy_amount = 0
-
-This means "use the default calculation path." It does not mean storing the
-calculated default as a new manual explicit amount.
-
-If no Fresh price is available and an explicit amount exists, the explicit
-amount must not be deleted merely because the current default cannot be
-computed. If no Fresh price is available and no explicit amount exists, the
-existing `금액 대기` contract applies.
+If no fresh current-session price is available, the dialog is not opened. An
+existing explicit amount or valid persistent limit must not be deleted merely
+because a new default or recommendation cannot currently be computed.
 
 ==================================================
 5. Recommended / Minimum Limit Basis
@@ -625,40 +611,48 @@ The visible GUI discrepancy supplied with the documentation request is outside
 this documentation-only scope and remains for a separate UI task.
 
 ==================================================
-20. Running Base Budget Adjustment
+20. Unified Base Budget Change And Persistence
 ==================================================
 
-Starting-budget editing has two distinct contracts.
+Starting-budget value editing uses the same `기본예산변경` dialog whether the
+Stock is current-running or not. A separate non-running dialog and direct value-
+cell editor are not part of the current contract.
 
-When the stock is not current-running, the existing direct config edit remains
-available, including mode changes between QUANTITY and AMOUNT.
+When the Stock is not current-running, `즉시적용` and `다음회차적용` remain
+visible and disabled. Confirm does not depend on either disabled control: it
+writes the new pre-operation value through the canonical Stock/config writer.
 
-When the stock is current-running:
+When the Stock is current-running, the two timing controls remain enabled and
+the existing Runtime timing contract applies. Confirm also writes the new base
+value through the canonical Stock/config writer. Therefore current-cycle apply
+timing and permanent base-config persistence are separate concepts.
 
-- direct mutation of `trade_amount_type`, `buy_qty`, and `buy_amount` remains
-  blocked
-- the `기본예산변경` dialog may create a current-operation Runtime adjustment
-- the current mode is immutable; only its value may change
-- the persisted base `config.json` is not overwritten by the Runtime adjustment
-- candidates, approvals, Queue rows, and orders created before confirmation are
-  never rewritten retrospectively
+The durable outcomes are:
 
-The existing per-stock `state.json` is the persistence owner. The existing
-canonical Runtime stock-state mutation writer remains the only writer. No
-parallel JSON, Source of Truth, or lifecycle is created.
+- non-running Confirm: `Stock config.json = new value`
+- running Immediate: current Running value becomes the new value and
+  `Stock config.json = new value`
+- running Next Cycle: current Running projection keeps the old value, Pending
+  Next Cycle records the new value, and `Stock config.json = new value`
 
-The adjustment is bound to the current operation by `trade_started_at`.
-Pending state may therefore survive process restart and normal Recovery for the
-same operation. It is ignored when `trade_enabled` is false or when a later
-operation has a different `trade_started_at`. A Runtime adjustment never
-silently becomes the non-running permanent base config.
+BUY, SELL, Queue, SendOrder, Chejan, and Fill are not persistence triggers. A
+confirmed base value survives operation stop and process restart even when no
+trade occurs. Current-operation timing evidence may continue to use the
+existing `state.json.running_budget_adjustment` owner and canonical Runtime
+writer; it is not a replacement Source of Truth for the durable base value.
+
+An older full-settings window snapshot must not overwrite a newer value saved
+through `기본예산변경`. The full-config write boundary must preserve or rehydrate
+the latest canonical `trade_amount_type`, `buy_qty`, and `buy_amount` fields
+before committing stale UI state.
 
 ==================================================
 21. Immediate And Next-Cycle Signal Contract
 ==================================================
 
 The generic state machine observes only newly queued standard BUY and SELL
-signals.
+signals. It controls the current-operation projection, not whether the newly
+confirmed base config is durable.
 
 Immediate apply:
 
@@ -701,29 +695,35 @@ authority over its own BUY calculation and resulting execution intent. Adding
 or renaming a Routine must not require a Main budget-adjustment branch.
 
 ==================================================
-23. Running Limit Option
+23. Limit Option And Incomplete-Source Protection
 ==================================================
 
-When `한도금액에 새 설정값 적용` is selected, the current-operation projection
-uses the existing resolved-starting-budget basis, recommended-limit multiplier,
-and digit-alignment rule. The permanent Stock limit config remains unchanged.
-If fresh price evidence required by QUANTITY mode, system-budget evidence, or a
-valid recommended-limit result is unavailable, confirmation fails closed.
+`한도금액에 새 설정값 적용` is available in the unified dialog for running and
+non-running Stocks.
+
+- unchecked: preserve the existing persistent limit
+- checked: reuse the existing resolved-starting-budget basis,
+  recommended-limit multiplier, and digit-alignment rule
+- successful calculation: update through the existing limit writer
+- missing or incomplete source: fail closed and preserve an existing valid
+  persistent `RECOMMENDED` limit
+
+An incomplete source must not replace a valid persistent limit with `None`,
+`대기`, an empty value, or another incomplete projection. This contract does
+not change the limit formula.
 
 ==================================================
-24. Running Adjustment Verification Evidence
+24. Unified Budget Verification Boundary
 ==================================================
 
-Local 32-bit verification at the current Working Tree:
+Focused verification must cover non-running persistence, running Immediate and
+Next-Cycle timing, process restart without a trade, stale full-settings overwrite
+protection, AMOUNT/QUANTITY fresh-price admission, AMOUNT minimum validation,
+and checked/unchecked limit behavior. No validation may require an actual
+SendOrder or Production Runtime mutation.
 
-- running-adjustment and dialog focused: 26 PASS, 20 subtests PASS
-- adjacent signal/probe, execution bridge, Operation Start, and budget: 116 PASS,
-  20 subtests PASS
-- related Production py_compile: PASS
-- actual SendOrder: 0
-- no Production Runtime was used by the tests
-
-No commit or push is implied by this supplemental implementation evidence.
+Detailed dialog and writer-boundary rules are owned by
+`00_CANONICAL/REFERENCE/RUNNING_BASE_BUDGET_ADJUSTMENT_REFERENCE.md`.
 
 ==================================================
 25. Operation Start Final-Session Pre-Admission
@@ -773,24 +773,39 @@ message. An all-running request therefore still produces a result Toast with
 `운영시작 0`.
 
 ==================================================
-27. Running Budget Display And Recovery State
+27. Budget Edit Admission And Display Transition
 ==================================================
 
-The operator-facing Main starting-budget value and the double-click editor
-initial value use the same latest user-visible projection. The current Working
-Tree supplies Main's `ROUTINE_STOCK_INITIAL_BUY_ROLE`; the editor consumes that
-projection first and uses the existing running-adjustment projection as its
-fallback. The old permanent base value is not shown while a confirmed current
-operation adjustment is active.
+AMOUNT and QUANTITY value editing both require fresh canonical current-session
+price evidence before `기본예산변경` opens. `None`, zero, invalid, stale,
+previous-session, or UI-string-only price evidence is not sufficient. Failure
+uses the existing Toast path and prevents dialog/input/Confirm entry.
 
-The persistence owner remains `state.json.running_budget_adjustment`, written
-only through `runtime_stock_state_mutation.mutate_runtime_stock_state()`.
-The adjustment reader requires exact equality between
-`operation_session_started_at` and the current `trade_started_at`. Operation
-Start creates a new `trade_started_at`, so restart/recovery preservation across
-that boundary is a KNOWN LIMITATION / PENDING verification item unless exact
-session identity is retained. It must not be documented as a completed live
-Recovery guarantee.
+For AMOUNT mode, minimum validation reuses the existing environment-setting
+Source of Truth and calculator: fresh current price multiplied by the configured
+formula value. It is not a new one-share rule or a dialog constant. The existing
+centered red validation label is shown only for a below-minimum value and embeds
+the actual calculated amount, for example
+`※ 입력 불가. 최소값은 13,305원 이상입니다.` A valid value hides the label and
+permits Confirm. Missing current price is handled before dialog entry.
+
+The budget-mode cell and starting-budget value cell remain separate actions.
+Double-clicking `주수` / `금액` invokes the existing mode-change workflow;
+double-clicking the value performs fresh-price admission and opens the unified
+dialog.
+
+Starting-budget and limit display share this transition:
+
+- before login: use the existing persistent display; do not force `대기`
+- login succeeded and server authentication pending: both display `대기`
+- authentication complete without a fresh current-session price: both continue
+  to display `대기`
+- authentication complete plus the first fresh current-session price: both
+  return to normal persistent/resolved values
+
+The `대기` end boundary is
+`SERVER_AUTH_COMPLETE + FRESH_CURRENT_PRICE_AVAILABLE`. The text
+`한도(확인 필요)` is not part of the current contract.
 
 ==================================================
 28. Current-Tree Implementation Status
@@ -802,8 +817,11 @@ The following status labels distinguish code-path presence from live evidence:
   Working Tree; live evidence belongs to the separate GUI smoke record.
 - Fixed four-field Operation Start Toast: IMPLEMENTED in the current code path;
   zero-value and all-running cases remain focused regression evidence.
-- Running budget display/edit hydration: IMPLEMENTED in the current code path;
-  cross-restart exact-session recovery: PENDING / KNOWN LIMITATION above.
+- Unified running/non-running budget dialog, permanent base-config persistence,
+  current-operation timing separation, stale-settings protection, fresh-price
+  admission, and incomplete-limit preservation: IMPLEMENTED in the current
+  Working Tree. A new live-GUI session is still required for final visual smoke
+  evidence.
 - Stock master status, classification, and ranking UI: documented by the Stock
   Registration Current Canonical; production persistence or broker-session
   evidence must not be inferred from helper tests alone.

@@ -1,3 +1,0 @@
-routine_condition_engine.py: syntax=OK, HOLD occurrences=0, RoutineSignal_HOLD=0
-gui_routine_condition_engine.py: syntax=OK, HOLD occurrences=0, RoutineSignal_HOLD=0
-create_test_candles_step5.py: syntax=OK, HOLD occurrences=0, RoutineSignal_HOLD=0

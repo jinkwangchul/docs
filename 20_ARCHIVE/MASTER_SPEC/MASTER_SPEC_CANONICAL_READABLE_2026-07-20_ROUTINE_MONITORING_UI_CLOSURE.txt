@@ -1,0 +1,36 @@
+MASTER_SPEC_CANONICAL_READABLE_2026-07-20_ROUTINE_MONITORING_UI_CLOSURE
+
+This readable Canonical records the current routine monitoring UI baseline.
+
+2026-08-01 update: AutoTradeSettingWindow routine-tree stock-row `종목등록`
+entry behavior and actual GUI event-path requirements are now governed by
+`20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`.
+
+The routine tree now treats the parent row as the Routine Type category and the
+child row as the actual Routine Instance. Stocks and operation commands are
+based on Routine Instance identity, not the parent type name.
+
+The routine tree keeps the existing hierarchy and checkbox model. Parent rows
+show aggregated registration/running/stopped/error values. Child rows show one
+line of operation information: status, registered, running, stopped, error, buy
+limit, consumed amount, and profit.
+
+The child status stamp displays only the status name, for example [기본운영].
+The internal circular icon was removed because the profit/loss LED before the
+instance name is now the only circular signal in the row.
+
+The child profit/loss LED currently defaults to gray. It is a UI entry point for
+future fee/tax-aware profit classification. This update does not implement
+actual fee, tax, or net-profit calculation.
+
+Routine operation commands are exposed through context menus. Parent commands
+target checked child Routine Instances that have assigned stocks. Child commands
+target that child Routine Instance. Empty-target menu items are disabled in the
+GUI, while backend validation remains in place.
+
+Early Close and Immediate Liquidation reuse OperationCommandService. Immediate
+Liquidation records REQUESTED only and is not order queue creation, broker
+receipt, fill, or completed liquidation.
+
+This update does not modify Queue, Final Send Gate, SendOrder, Chejan, runtime
+order files, broker execution, or completion algorithms.

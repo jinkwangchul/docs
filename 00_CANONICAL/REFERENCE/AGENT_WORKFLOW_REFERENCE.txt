@@ -74,7 +74,7 @@ GUI State And Context Menu Reference Rule:
 - For REVIEW_REQUIRED, data inconsistency, protected-row display, situation
   signal color, status/situation sorting, and AutoTradeSettingWindow
   routine-tree `종목등록` context-menu behavior, use
-  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`
+  `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`
   as the first technical Source of Truth.
 - When the same action label appears in multiple GUI screens, first trace the
   actual visible event path and handler used by the user. Fixing another screen

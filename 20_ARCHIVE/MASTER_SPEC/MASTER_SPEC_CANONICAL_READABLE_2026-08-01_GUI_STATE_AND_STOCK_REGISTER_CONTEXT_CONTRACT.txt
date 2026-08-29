@@ -1,0 +1,35 @@
+MASTER SPEC CANONICAL READABLE
+Date: 2026-08-01
+Scope: GUI state display and stock-register context contract
+
+This readable Canonical summarizes the current GUI contract confirmed in the
+AutoTradeSettingWindow work.
+
+REVIEW_REQUIRED is an independent protected state. It is not a subtype of
+normal operation, emergency stop, or operation exclusion. When data
+inconsistency requires operator review, the protected stock state is
+REVIEW_REQUIRED. REVIEW_REQUIRED does not automatically return to operation
+without the approved review-management release flow.
+
+Row color and situation signal color are separate. REVIEW_REQUIRED rows use
+orange row text, while the situation signal for REVIEW_REQUIRED is red. Emergency
+stop and data inconsistency also use a red situation signal. Monitoring/waiting
+uses gray. Normal operable/running states keep the current implementation's
+green signal contract.
+
+The `현황` and `상태` columns share one status-sort priority. A situation signal
+color is not an independent sorting source. Sorting either column must produce
+the same status-group order, and REVIEW_REQUIRED must not be mixed with
+emergency stop.
+
+In the AutoTradeSettingWindow left performance/routine tree, stock-row
+`종목등록` is only an entry point into the owning routine's general stock
+registration dialog. It does not register the right-clicked stock and does not
+pass stock code, stock name, stock path, or stock status to the dialog. The stock
+row provides only the `instance_id`; the code resolves the routine instance and
+routine definition, rebuilds routine-instance metadata, and opens the same
+general registration dialog used by routine-row `종목등록`.
+
+When a feature label exists in several screens, the actual user event path must
+be traced first. Fixing a different screen with the same label is not a valid
+implementation for the requested GUI.

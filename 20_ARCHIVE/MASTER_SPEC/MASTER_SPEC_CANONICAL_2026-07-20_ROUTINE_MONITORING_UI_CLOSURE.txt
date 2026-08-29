@@ -1,0 +1,127 @@
+MASTER_SPEC_CANONICAL_2026-07-20_ROUTINE_MONITORING_UI_CLOSURE
+
+Status:
+- This document preserves the 2026-07-19 Routine Instance Operation Contract and
+  records the implemented routine monitoring UI baseline completed on
+  2026-07-20.
+- Existing Canonical files are preserved. This file is a new Canonical snapshot.
+- This update records confirmed UI and caller boundaries only. It does not
+  redefine Queue, Final Send Gate, SendOrder, Chejan, runtime order files, or
+  broker execution contracts.
+
+2026-08-01 supersession note:
+
+- AutoTradeSettingWindow routine-tree stock-row `종목등록` entry behavior and
+  actual GUI event-path requirements are governed by
+  `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`.
+- This document remains the routine monitoring UI baseline where it does not
+  conflict with that later Current Canonical.
+
+Baseline:
+- docs repository branch at creation time: agent/project-prompt-standard
+- docs repository pre-update HEAD: d2714c2eb2cb0209c4b32f05a78802ca6f921068
+- kiwoom_auto repository branch at code commit: feat/restore-auto-trade-setting-ui
+- kiwoom_auto code commit: df671dc7215cb87a090301ae7d26bd5fc5362c6e
+
+1. Routine Type and Routine Instance Contract
+
+- Routine Type remains the parent category and template.
+- Routine Instance remains the actual settings, operation, and stock-assignment
+  unit.
+- Stock monitoring, child aggregation, and routine operation targets must use
+  actual Routine Instance identity rather than parent Routine Type display name.
+- Parent aggregation is derived from child Routine Instance aggregates.
+
+2. Routine Monitoring Tree UI Baseline
+
+- The routine monitoring area keeps its existing parent/child hierarchy.
+- Parent rows represent Routine Type categories.
+- Child rows represent Routine Instances.
+- Parent rows keep the confirmed aggregate display format:
+  등록(n) | 실행(n) | 정지(n) | 오류(n)
+- Parent aggregate display remains visible when collapsed, hidden by default
+  when expanded, and temporarily visible on parent-name hover.
+- The top column header remains hidden in the routine monitoring tree.
+
+3. Checkbox and Expansion Contract
+
+- Parent checkbox controls routine group active/inactive visual and child
+  checkbox enabled/disabled state.
+- Child checkbox state is preserved when parent state changes.
+- Child checkbox state does not change parent checkbox state.
+- Parent checkbox on/off may trigger automatic expand/collapse, while manual
+  arrow expand/collapse remains a navigation action and must not change checkbox
+  state.
+- Runtime, Service, Queue, SendOrder, Broker API, and Chejan are not invoked by
+  checkbox-only UI changes.
+
+4. Routine Instance Display Contract
+
+- Child Routine Instance rows display operation information in a single line.
+- The display order is:
+  status, registered, running, stopped, error, buy limit, consumed amount, profit.
+- Status stamp text uses the status name only, for example [기본운영].
+- The status stamp no longer contains an internal circular icon.
+- The profit/loss signal indicator before the instance name is the only circular
+  LED-like symbol in the child row.
+- The profit/loss signal indicator currently defaults to gray until fee/tax-aware
+  profit classification is connected.
+- Status stamp, aggregate, limit, consumed, and profit display are UI display
+  contracts and do not create order execution.
+
+5. Routine Instance Inline Editing Contract
+
+- Child Routine Instance name edit is entered only from the instance-name text
+  hit area.
+- Child double-click no longer opens the settings dialog.
+- Child settings dialog entry is available through the child context menu item
+  "설정변경".
+- Parent double-click keeps the existing registration/settings entry behavior.
+- Parent name is not renameable from the monitoring UI.
+- Buy-limit inline editing is limited to the existing buy-limit value slot and
+  must not replace the surrounding display structure.
+
+6. Routine Operation Context Menu Contract
+
+- Parent and child routine operation commands use context menus rather than
+  always-visible row buttons.
+- Available operation commands are 조기마감 and 즉시청산.
+- Parent commands apply to checked child Routine Instances that have assigned
+  stocks.
+- Child commands apply to the selected Routine Instance if it has assigned
+  stocks.
+- Menu items are disabled when there is no valid assigned-stock target.
+- Disabled menu items do not invoke warning dialogs by click; backend target
+  validation remains as a safety boundary.
+- Confirmation dialogs use concise project wording:
+  조기마감 -> 조기마감을 적용합니다.
+  즉시청산 -> 즉시청산을 적용합니다.
+  Buttons -> 진행 / 취소
+
+7. Backend Boundary
+
+- Routine monitoring UI operation commands reuse OperationCommandService.
+- 조기마감 uses the existing Early Close OperationCommandService path.
+- 즉시청산 uses the existing Immediate Liquidation OperationCommandService path
+  and records REQUESTED only.
+- 즉시청산 REQUESTED is not Queue creation, broker receipt, fill, or liquidation
+  completion.
+- Queue, Final Send Gate, SendOrder, Chejan, and real order execution remain
+  outside this UI baseline.
+
+8. Completion Display Boundary
+
+- 매매완료 and 일부완료 are display states to be driven by authoritative
+  backend/order/Chejan evidence in later work.
+- This Canonical does not define a new completion algorithm.
+- Data inconsistency remains a review-management concern and must not be hidden
+  as completion.
+
+9. Safety Boundary
+
+- GUI must not duplicate operation business logic.
+- GUI must not write runtime/order state directly for operation commands.
+- Existing OperationCommandService, runtime writer contracts, and order safety
+  gates remain authoritative.
+- Runtime JSON, stock data, rules.json, order queue, SendOrder, Broker API, and
+  Chejan structures are not changed by this Canonical update.

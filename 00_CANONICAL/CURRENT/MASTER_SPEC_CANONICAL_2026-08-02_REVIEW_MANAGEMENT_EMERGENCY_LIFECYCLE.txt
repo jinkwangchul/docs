@@ -114,7 +114,7 @@ Confirmed Review entry points:
 
 - Operating data mismatch while already running.
 - Pre-start data mismatch during operation start.
-- Stock right-click emergency stop.
+- Stock right-click `검토정지`.
 
 `GLOBAL_EMERGENCY_STOP`:
 
@@ -125,12 +125,17 @@ Confirmed Review entry points:
 - Does not create new Review metadata and does not increase the Review count.
 - Existing Review metadata is not re-entered or assigned a new transition time.
 
-`SELECTED_STOCK_EMERGENCY_STOP`:
+`SELECTED_STOCK_EMERGENCY_STOP` (operator-facing action `검토정지`):
 
 - Stops only the explicitly selected single or multiple stocks.
 - Does not activate the global emergency latch.
-- Creates Review metadata immediately with status display `긴급정지` and
-  detection point `종목 긴급정지`.
+- Immediately isolates the target in Review with `trade_enabled=False`,
+  `review_required=True`, and `review_status=PENDING`.
+- Records `emergency_scope=SELECTED` only as durable operator provenance.
+- Uses `사용자 검토정지` / `종목 검토정지` for new entries; historical
+  emergency wording is not migrated.
+- Reuses safe Review preparation and current return-availability projection.
+  The Review status is `해결` for ALLOWED evidence and `미해결` for BLOCKED.
 
 `GLOBAL_EMERGENCY_RELEASE_FAILURE`:
 
@@ -141,15 +146,16 @@ Confirmed Review entry points:
 - Only a target whose guard fails enters Review, using the official reason for
   the actual failure and detection point `긴급정지 해제`.
 
-On selected-stock emergency stop:
+On selected-stock `검토정지`:
 
-1. Only the target stock is emergency-stopped.
-2. The canonical emergency state is active.
+1. Only the explicitly selected target stock is isolated in Review.
+2. `emergency_scope=SELECTED` records provenance but is not an active-emergency
+   return blocker by itself.
 3. `trade_enabled=False`.
-4. Routine BUY and SELL permission is blocked by the canonical emergency and
-   review state through `canonical_routine_order_permission()`.
+4. Routine BUY and SELL permission is blocked by the canonical Review state
+   through `canonical_routine_order_permission()`.
 5. Review classification is recorded.
-6. Review status is displayed as `긴급정지`.
+6. Review status is projected as `해결` or `미해결` from current evidence.
 7. Review reason, detection point, and first transition time are saved through
    the existing review metadata contract.
 
@@ -253,7 +259,10 @@ Normal REVIEW_REQUIRED rows:
   Review entry caused by a failed emergency release uses that failure as its
   official cause.
 - Opening or refreshing the Review Management window must not create, change,
-  or overwrite the detection point.
+  or overwrite the detection point. It may run the separate safe
+  reconciliation preparation defined below; that boundary never changes Review
+  cause, detection point, entered-at metadata, emergency ownership, or return
+  destination.
 
 8. Review Status Source of Truth
 
@@ -290,7 +299,8 @@ screen value never bypasses the latest safety check. Missing/corrupt virtual
 rows are always `미해결/BLOCKED`, and collection must not create or repair a
 state file.
 
-Emergency release and Review return remain separate transitions:
+GLOBAL emergency release and Review return remain separate transitions.
+SELECTED `검토정지` has no operator-facing release transition:
 
 - emergency release does not auto-start operation,
 - a pre-existing Review row remains in Review after successful emergency
@@ -298,6 +308,8 @@ Emergency release and Review return remain separate transitions:
 - explicit Review return must pass the latest availability check and ends at
   `STOPPED` with `trade_enabled=False`,
 - Review return is never an operation-start command.
+- an ALLOWED SELECTED Review ends only through explicit `복귀` or `미지정`,
+- no selected release menu or prerequisite release action is exposed.
 
 9. Count Synchronization
 
@@ -411,8 +423,9 @@ ends at `STOPPED` and does not start automatic operation.
 The guidance projection is not a Gate or a new Review SoT. `복귀` and `미지정`
 continue to rerun the canonical `review_return_availability()` contract at the
 moment of mutation. `강제초기화` remains a separate dangerous operation and is
-not suggested as the normal resolution path. No automatic normalization,
-Recovery execution, queue mutation, order request, or SendOrder is introduced.
+not suggested as the normal resolution path. No automatic Review return,
+unassignment, Recovery execution, queue mutation, order request, or SendOrder
+is introduced.
 
 16. Resolved Return GUI Roundtrip
 
@@ -450,3 +463,104 @@ Current Production code must not write or enter `PAUSED`, and the retired
 Legacy persisted `PAUSED` input may be recognized only for fail-closed display
 compatibility as `검토종목`. It must never be promoted into a current operation
 path, restored as a runnable state, or used to create a parallel Review SoT.
+
+18. Emergency Scope and Release Lifecycle
+
+New emergency-stop mutations persist ownership in the existing stock state:
+
+- `emergency_scope=GLOBAL` belongs to the control-window global latch.
+- `emergency_scope=SELECTED` belongs to an explicit stock selection.
+- a missing or unsupported scope is `UNKNOWN` and is never auto-migrated.
+
+GLOBAL activation sets the account latch first, preserves existing Review rows,
+and writes only non-Review stocks as `EMERGENCY_STOPPED/GLOBAL` with
+`trade_enabled=False`. GLOBAL activation itself creates no Review entry.
+
+GLOBAL release performs the existing Recovery and Queue readiness checks as a
+read-only common preflight. Preflight failure mutates no stock and leaves the
+global latch active. After preflight, only `EMERGENCY_STOPPED/GLOBAL` stocks are
+processed. A normal stock becomes `STOPPED`; a stock-specific safety problem
+releases GLOBAL emergency ownership and becomes `REVIEW_REQUIRED/PENDING` with
+the internal evidence retained in Review detail. The latch may be cleared only
+after read-back confirms that no GLOBAL-owned emergency remains and no state
+write failed. A remaining SELECTED emergency does not retain the GLOBAL latch.
+
+SELECTED `검토정지` immediately enters Review and records
+`emergency_scope=SELECTED` as provenance. It does not create a separate active
+emergency status or require an operator-facing release. Main Monitoring and
+AutoTradeSetting expose no selected-release QAction or callback; the existing
+backend is retained only for legacy/internal compatibility. Review availability
+ignores SELECTED provenance itself and evaluates actual Recovery, holding,
+pending/Queue, active close/liquidation, and integrity evidence. The GLOBAL
+latch remains an unconditional Review-return blocker. An ALLOWED row may leave
+Review only through explicit `복귀` or `미지정`, ending at `STOPPED` with
+`trade_enabled=False`; no path automatically starts operation.
+
+19. Canonical Review Position Reconciliation Boundary
+
+A complete immutable `BrokerAccountSnapshot` from the same completed
+`RecoverySessionIdentity` may be authoritative evidence for reconciling a
+Review stock's canonical position fields. The boundary may change only
+`holding_qty` and `avg_price`; when the complete Broker snapshot has no row for
+the stock, both become zero. An already-present `holding_amount` may also be
+zeroed only in that absent-row case, and no new position alias is introduced.
+
+Account, trading-day, login-session, recovery-session, HOLDINGS completion,
+OPEN_ORDERS completion, stock identity, unresolved order/Queue evidence, and
+the expected state-file SHA-256 must all match. Any uncertain or stale evidence
+blocks the write. A successful position reconciliation preserves Review,
+Emergency, close/liquidation, routine, operation, and trading-permission state;
+it never resolves Review, returns the stock, or starts operation automatically.
+
+20. Safe Review Reconciliation Preparation
+
+Review Management is destination-decision UI: the persistent operator actions
+are `복귀` and `미지정`, with `강제초기화` remaining separate. It does not expose
+`보유정보정합`, `조기마감정합`, or selected-emergency release as ordinary lower
+actions. On window open and explicit `상태재판정`, a preparation boundary may
+reuse the canonical reconciliation services before the Collector's read-only
+query.
+
+LOCAL_SAFE handling is limited to existing local canonical terminal evidence;
+it never guesses a Broker value and therefore remains safe while disconnected.
+BROKER_SAFE position reconciliation requires the exact process-local completed
+Recovery handoff for the current account, login session, trading day, and
+Recovery session, with every existing service gate including state SHA and
+Queue/open-order evidence intact. Eligible legacy EARLY_CLOSE no-target residue
+uses its own existing evidence gates. Actual emergency ownership, active
+order/cancel/close/liquidation evidence, command intent, and uncertain evidence
+are not auto-mutated.
+
+Preparation never returns or unassigns Review, releases emergency, starts
+operation, creates Queue work, or calls SendOrder. The Collector itself remains
+writer-free; automatic reconciliation is a separate pre-query step.
+
+21. Legacy EARLY_CLOSE No-Target Reconciliation Boundary
+
+A stale legacy `operation_command_mode=EARLY_CLOSE` residue may be reconciled
+only for a Review stock when one complete immutable Broker snapshot from the
+same completed Recovery identity proves zero Broker/local position, zero
+pending BUY/SELL, zero active Queue/cancel work, and zero unresolved Broker
+order. The expected state-file SHA-256 must still match at the atomic write
+boundary. Any identity mismatch, incomplete or uncertain evidence, or real
+active close/liquidation/final-sell evidence blocks reconciliation.
+
+The mode remains `EARLY_CLOSE` as historical intent. Reconciliation writes only
+the existing `EARLY_CLOSE_NO_TARGET` operation notice, its reason and timestamp,
+plus `updated_at`. It never
+manufactures liquidation/order/fill or close-completion evidence and never
+changes Review, Emergency, position, command history, routine assignment, or
+trading permission. It does not release Emergency, resolve/return Review, or
+start operation automatically.
+
+An explicit Review return or unassignment must preserve the canonical terminal
+tuple `operation_command_mode=EARLY_CLOSE` and
+`operation_notice=EARLY_CLOSE_NO_TARGET`, including the existing notice reason
+and timestamp. Clearing that tuple would reactivate historical EARLY_CLOSE
+intent. Other nonterminal operation notices retain the existing clear behavior.
+
+The safe preparation boundary may invoke this existing service only before the
+Review window's read-only collection when the current process has the exact
+completed Recovery handoff. It captures current state SHA and fails closed on
+stale state or account/session/day identity mismatch. Collector paths remain
+read-only and never invoke reconciliation themselves.

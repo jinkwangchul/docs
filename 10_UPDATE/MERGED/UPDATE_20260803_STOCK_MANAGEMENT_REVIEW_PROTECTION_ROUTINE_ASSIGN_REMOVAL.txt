@@ -78,3 +78,61 @@ Reference code commit:
 
 - Next investigation target: classify junk/dead code in major code files.
 - gui_schedule_window.py cleanup must be handled in a separate commit if still required.
+
+8. Stock Management Server/Local Integrity Projection
+
+- The top `서버/로컬 상태 : <상태내용>` area in the Stock Management window is
+  an operator-facing Projection of integrity between server information and
+  local project information.
+- Its Source is the integrity result `server_status`. It is not a summary of
+  individual stock operation problems or Review Management targets.
+- The existing `SERVER_NOT_CHECKED` display text is `서버 정합성 미확인`.
+  The current display is therefore
+  `서버/로컬 상태 : 서버 정합성 미확인`.
+- Review targets, emergency-stopped stocks, missing operation data, holding or
+  unresolved-order issues, per-stock integrity issues, and blocked return,
+  unassignment, or emergency-release reasons must not change this top message.
+  Those cases remain in Review Management, with concrete causes shown in its
+  reason/detail information.
+- The top message must not vary by individual-stock cause. It projects only the
+  mapped `server_status` value and reuses the existing project status-dot style.
+- Consistent with the existing unresolved server-consistency boundary,
+  server-normal and server-mismatch status values and their display text are
+  not confirmed. This document does not define `SERVER_OK`,
+  `SERVER_MISMATCH`, replacement names, or their future display strings.
+
+9. Review Management Resolution Actions
+
+Review Management exposes three distinct operator actions. They must not be
+treated as equivalent delete or release operations.
+
+- `복귀` preserves the stock's project data and restores or retains its existing
+  routine relationship after the review cause is resolved and the integrity
+  gate passes.
+- `미지정` preserves the stock's project data but removes its routine
+  relationship after the review cause is resolved and the integrity gate
+  passes. The stock remains registered in Stock Management as unassigned.
+- `강제초기화` is the manual final-disposal path for a Review Management stock
+  that cannot be normalized through `복귀` or `미지정`. It permanently removes
+  the central `stocks/<stock>` project data, registration, routine relationship,
+  and Review Management entry. The result is an unregistered stock and is not
+  recoverable from the project.
+
+The normal Stock Management `종목초기화` path and Review Management
+`강제초기화` may have the same final local-data removal result, but their entry
+policy differs. Normal reset remains subject to its existing protected-state
+eligibility and blocks Review Management stocks. Forced reset is available only
+as an explicit operator action for a Review Management target and is not blocked
+merely because the target is in Review Management.
+
+Forced reset discards local project data only. It does not clear real broker
+holdings, cancel unresolved broker orders, change broker order state, or
+normalize the actual account. Available holding or unresolved-order information
+may be shown as a warning, but those broker realities are not processed by the
+forced reset itself.
+
+The system must not introduce or infer an automatic `UNRECOVERABLE` or disposal
+state. Forced reset remains an explicit operator decision. Target identity and
+path safety must be verified, deletion must not reach another stock or a project
+root, and failed deletion or failed post-delete verification must not be
+reported as success.

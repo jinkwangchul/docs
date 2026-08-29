@@ -1,0 +1,186 @@
+MASTER_SPEC_CANONICAL_2026-07-22_MAIN_MONITORING_STRATEGY_WORKSPACE_ARCHITECTURE
+
+Status:
+- This document records the confirmed role separation contract for the main
+  monitoring window and the auto-trade setting window.
+- Existing Canonical files are preserved. This file is a new Canonical snapshot.
+- This update defines product and UI placement responsibility only. It does not
+  change Runtime, Queue, OperationCommandService, SendOrder, Chejan, broker
+  execution, stock state, config storage, or trading calculation contracts.
+
+Baseline:
+- docs repository branch at creation time: agent/project-prompt-standard
+- docs repository pre-update HEAD: 160d6b99a869b90ea720e6ea89ba1a0d34704a8a
+
+30.x Main Monitoring & Strategy Workspace Architecture
+
+30.x.1 Design Purpose
+
+- The main monitoring window and the auto-trade setting window may display some
+  of the same source data.
+- This overlap is not, by itself, a defect.
+- The two windows have different roles:
+  - Main monitoring window: current operation and control.
+  - Auto-trade setting window: strategy asset management and analysis.
+- Future UI placement decisions must use role responsibility, not data
+  duplication alone, as the deciding standard.
+
+30.x.2 Main Monitoring Window Role
+
+Keywords:
+- Current
+- Operation
+- Control
+- Monitoring
+
+Primary responsibilities:
+- Current account and capital state.
+- Current orders.
+- Current holdings.
+- Current abnormal states.
+- Emergency action.
+- Real-time operation and immediate control.
+- Runtime-facing visibility for live trading.
+
+Placement rule:
+- Features whose primary purpose is live operation, immediate response, current
+  risk, urgent stop, current order control, or real-time status belong in the
+  main monitoring window.
+
+30.x.3 Auto-Trade Setting Window Role
+
+Keywords:
+- Past
+- Design
+- Strategy
+- Analysis
+
+Primary responsibilities:
+- Routine design.
+- Routine instance management.
+- Stock composition and assignment management.
+- Historical performance review.
+- Strategy improvement.
+- Watchlist management.
+- Strategy asset management.
+
+Placement rule:
+- Features whose primary purpose is strategy design, historical review,
+  performance analysis, stock universe management, routine instance
+  configuration, or long-term strategy improvement belong in the auto-trade
+  setting window.
+
+30.x.4 Auto-Trade Setting Window Screen Structure
+
+- The auto-trade setting window uses a routine-oriented workspace structure.
+- The upper area shows a two-level routine tree:
+  - parent routine definition
+  - child routine instance
+- Stock rows are not inserted into the upper routine tree.
+- Selection result is shown in the lower area.
+- Parent routine definition selection is view-oriented:
+  - show all child instances' stocks
+  - aggregate stock counts
+  - show current state for those child stocks
+- Instance selection is target-oriented:
+  - show only stocks assigned to that instance
+  - allow instance-specific operations where the operation contract permits it
+- The lower stock list is the working surface for stock-level inspection and
+  stock-level actions.
+
+30.x.5 Stock Management Philosophy
+
+- A stock is an independent object.
+- A stock can have:
+  - whole-stock trading history
+  - instance-specific trading history
+  - routine-specific aggregation through its assigned instance/routine
+- Stock history must not be treated as a disposable row inside a single routine
+  table.
+- The system should support reviewing a stock's total behavior first, and then
+  drilling down by instance or routine when needed.
+
+30.x.6 Watchlist Policy
+
+- The watchlist model is intentionally simple.
+- A stock has watchlist state:
+  - ON
+  - OFF
+- No complex watchlist grading system is part of this contract.
+- No automatic protection rule is created by watchlist state alone.
+- The operator marks and unmarks watchlist status directly.
+
+30.x.7 Performance Record Contract
+
+- When a trade lifecycle completes, the system must preserve at least:
+  - stock
+  - routine instance
+  - routine definition
+  - trade result
+  - realized profit/loss
+- Performance records must not be overwritten as a shortcut for updating
+  summaries.
+- Historical facts are append/preserve oriented.
+- Later correction or reconciliation, if required, must be represented as an
+  explicit correction path rather than silent overwrite.
+- Trade performance belongs to the routine definition and routine instance that
+  existed at trade time.
+- If the stock is later moved to another instance, assigned to another routine,
+  or unregistered, the attribution of the historical trade record does not
+  change.
+- Historical trades are always interpreted by the structure that was active
+  when the trade occurred.
+
+30.x.8 Aggregation Contract
+
+- All performance aggregation uses the same trade source-of-truth records.
+- The main monitoring window, auto-trade setting window, statistics views, and
+  future reports must not store separate performance facts for the same trade.
+- Each surface queries the required scope from the same source-of-truth and
+  calculates the view-specific result.
+- Aggregation is calculated when queried unless a later Canonical explicitly
+  defines a durable aggregate cache.
+- Default aggregation direction:
+  - whole stock
+  - by instance
+  - by routine definition
+- The system should calculate only the requested scope.
+- Real-time storage should not be expanded only to preserve derived summaries
+  unless a specific durability requirement is approved.
+
+30.x.9 Window Separation Principle
+
+- Main monitoring window:
+  - current operation
+  - current control
+  - current risk response
+- Auto-trade setting window:
+  - strategy asset management
+  - routine and instance design
+  - historical analysis
+  - stock composition and watchlist management
+- Showing similar data in both windows is acceptable when it supports each
+  window's role.
+- Deep settings, historical data analysis, and strategy refinement belong in the
+  auto-trade setting window.
+- Live state, immediate action, and urgent response belong in the main
+  monitoring window.
+
+30.x.10 Placement Decision Rule
+
+- If a feature answers "What is happening now, and what must I do immediately?",
+  it belongs in the main monitoring window.
+- If a feature answers "How should this strategy, instance, or stock universe be
+  designed, reviewed, and improved?", it belongs in the auto-trade setting
+  window.
+- If both windows need access to the same source data, the display may be shared
+  in principle, but the action depth and mutation authority must follow each
+  window's role.
+
+Safety Boundary:
+- This document does not authorize new storage fields.
+- This document does not authorize Runtime mutation.
+- This document does not authorize Queue, SendOrder, Chejan, fill, position, or
+  broker behavior changes.
+- This document does not replace the existing routine-instance operation
+  contract or the main metric layout contract.

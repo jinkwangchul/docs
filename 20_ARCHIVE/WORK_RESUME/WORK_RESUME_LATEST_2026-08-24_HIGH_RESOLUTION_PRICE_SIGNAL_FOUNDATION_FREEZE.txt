@@ -1,0 +1,180 @@
+WORK RESUME LATEST
+Date: 2026-08-24
+Scope: High Resolution Price Signal Foundation Freeze
+Status: Project Freeze baseline
+
+==================================================
+1. Repository Baseline
+==================================================
+
+Code repository:
+  C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Branch:
+  feat/restore-auto-trade-setting-ui
+Code HEAD / Freeze:
+  8261b16a42800b5c549756a72c837679fee80375
+
+Docs repository:
+  C:\Users\JIN KWANG CHUL\Documents\docs
+Branch:
+  agent/project-prompt-standard
+Docs parent baseline before Phase 9:
+  cac988db3dfd96c4583adff86973862c3bcafd82
+
+Both repositories contain pre-existing dirty/untracked work. Preserve it. Do
+not reset, restore, stash, clean, delete, move, rename, or bulk-stage unrelated
+files or user data.
+
+==================================================
+2. Completion State
+==================================================
+
+High Resolution Price Signal Foundation Phases 1 through 8 are COMPLETE.
+Phase 9 is Documentation Freeze only and changes no Production Code, tests,
+runtime, or user data.
+
+Latest Official Supplemental Canonical:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-24_HIGH_RESOLUTION_PRICE_SIGNAL_FOUNDATION_FREEZE.txt
+
+Matching Changelog:
+  00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-24_HIGH_RESOLUTION_PRICE_SIGNAL_FOUNDATION_FREEZE.txt
+
+==================================================
+3. Frozen Call Graph
+==================================================
+
+MainWindow
+-> AutoTradeOperationHost
+-> MarketDataHost
+-> shared KiwoomApi
+-> one KHOPENAPI QAxWidget
+-> SetRealReg / OnReceiveRealData / GetCommRealData(20,10,13,15)
+-> normalized RealtimeShadowTick
+-> process-local bounded High-Resolution Market State
+
+The existing Realtime Shadow, REALTIME_PRIMARY, reconciliation, canonical
+candle, BAR_COMMITTED, Routine execution, and order paths remain separate and
+unchanged.
+
+==================================================
+4. Frozen UI State
+==================================================
+
+Main right-side header order:
+
+가격신호 -> 모니터링 -> 그룹등록 -> 조기마감
+
+- 가격신호 defaults OFF and is process-local.
+- 모니터링 is read-only and refreshes every 750 ms.
+- Mini-chart live projection refreshes every 333 ms while enabled.
+- Existing 그룹등록 and 조기마감 behavior is unchanged.
+
+==================================================
+5. Price Signal Gate
+==================================================
+
+OFF:
+
+- realtime registration and Tick reception continue
+- High-Resolution Market State continues
+- Realtime Shadow, REALTIME_PRIMARY, reconciliation, and canonical candle
+  processing continue
+- High-Resolution observation emission and live chart projection are blocked
+
+ON:
+
+- valid current-session High-Resolution observation is enabled
+- the completed canonical chart remains and receives a separate live endpoint
+- no Routine signal or order execution is triggered
+
+==================================================
+6. Monitoring And Chart State
+==================================================
+
+Monitoring reports process-local Realtime/Tick state and TR Governor metrics.
+Opening or refreshing it causes zero CommRqData, SetRealReg, and SetRealRemove
+calls.
+
+The live chart endpoint is not a canonical candle, completed candle,
+BAR_COMMITTED evidence, or Routine signal evidence. Historical chart views do
+not show it.
+
+==================================================
+7. Routine And Order Boundary
+==================================================
+
+Production connections added by this Foundation:
+
+- RSI/MACD/MA/Bollinger: 0
+- 진행 기준봉/progress bar: 0
+- High-Resolution Routine signal: 0
+- Queue/SendOrder/Chejan/Execution Pipeline: 0
+
+The 0봉/1봉/2봉 meaning is unchanged.
+
+==================================================
+8. Verification Baseline
+==================================================
+
+- Phase 8 Production modifications: 0
+- unique validations: 422
+- PASS: 421
+- existing baseline error: 1
+- Phase 2-7 core: 132 PASS
+- Realtime / Authority / Reconciliation: 80 PASS
+- AutoTradeOperationHost: 26 PASS
+- order boundary: 75 PASS
+- existing chart / projection: 108 PASS
+- 32-bit pycompile: PASS
+- git diff --check: PASS
+- staged: 0
+
+Existing baseline residual:
+
+`test_stock_instance_chart_auto_refresh` patches the nonexistent
+`gui_auto_trade_timer.refresh_operation_candles` symbol. It is not a Phase 2-8
+regression and the result is not 422/422 PASS.
+
+==================================================
+9. Simulation Baseline
+==================================================
+
+[SIMULATION_VERIFIED]
+
+- Tick prices 10000, 10120, 10020, 10150, 10080 retained reception order.
+- 513 Tick run: received 513, queue HWM 512, overflow 1, processed 512,
+  quality UNCERTAIN.
+- Late Session A Tick did not overwrite current Session B state.
+- 100 state updates produced one explicit chart repaint.
+- chart cadence: 333 ms
+- monitoring cadence: 750 ms
+
+These are deterministic simulation facts, not live-market performance claims.
+
+==================================================
+10. UNVERIFIED_EXTERNAL
+==================================================
+
+- actual intraday Tick/sec
+- surge-stock burst behavior
+- COM/Qt scheduling pressure
+- Broker/network Tick loss
+- actual same-second execution delivery completeness
+- reconnect real-server timing
+- FID 15 trade-volume sums versus actual TR candle Volume
+
+==================================================
+11. Next Start Point
+==================================================
+
+No next implementation is automatically authorized.
+
+Only after a separate explicit user instruction, the possible sequence is:
+
+High-Resolution Market State
+-> Routine time axis / progress bar
+-> realtime Indicator State
+-> time-based Signal Confirmation Contract
+
+This Work Resume does not declare 0봉/1봉/2봉 modification as the current next
+task. Their current meaning remains frozen and unchanged.

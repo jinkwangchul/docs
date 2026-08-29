@@ -1,0 +1,123 @@
+MASTER SPEC CANONICAL
+Date: 2026-07-31
+Scope: Registered stock status views and exclusion controls
+
+Reference code baseline:
+
+- Code repository: jinkwangchul/kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Freeze base commit: 24bf1010e1f9325dddd5af973366f893fd59dc76
+- Cleanup commit: 5f60409fe882d8e91a29e9edfbe274d062c36266
+- Final remote baseline: 5f60409fe882d8e91a29e9edfbe274d062c36266
+- Freeze base commit message: feat: restore registered stock status views and exclusion controls
+- Cleanup commit message: fix: remove unrelated changes from registered stock status freeze
+
+Baseline correction note:
+
+- Final Freeze verification found that the initial Freeze commit included unrelated hunks outside the approved scope.
+- The already-pushed history was not rewritten.
+- The Cleanup commit removed only the unrelated changes and approved-scope test adjustments.
+- The final Canonical recovery SHA is the Cleanup commit result, `5f60409fe882d8e91a29e9edfbe274d062c36266`.
+- This correction does not change the registered-stock-status functional contract recorded below.
+
+2026-08-01 supersession note:
+
+- REVIEW_REQUIRED independence, data inconsistency -> REVIEW_REQUIRED,
+  protected row color, situation signal color, and shared `현황`/`상태` sort
+  priority are governed by
+  `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`.
+- The registered-stock-status view/filter contract below remains valid where it
+  does not conflict with that later Current Canonical.
+
+Cleanup removed the following unrelated changes from the Freeze baseline:
+
+- Emergency stop / stop-release context-menu wiring.
+- Stock-registration context-menu and registration-window wiring.
+- Performance color helper.
+- Operation-mode double-click conversion.
+- Menu-label changes outside the approved registered-stock-status scope.
+
+1. Registered Stock Status Counts
+
+- `종목` is the total number of currently registered stocks in the current display scope.
+- `운영` or `정지` is one normal trading-target group. The label follows the current global operation state.
+- `운영` and `정지` are display labels for the same normal registered-stock group; they are not separate count groups.
+- Normal trading-target count excludes `제외` and `검토` stocks.
+- `제외` is a stock that remains registered but is excluded from the current auto-trade session.
+- `검토` is a REVIEW_REQUIRED stock.
+- The count equation is:
+
+  종목 = 운영/정지 + 제외 + 검토
+
+2. Status Views
+
+- The default registered-stock-status view is the normal `운영/정지` view.
+- The `운영/정지` view shows only normal registered stocks.
+- The `운영/정지` view does not show excluded stocks or REVIEW_REQUIRED stocks.
+- The `제외` view shows only currently excluded registered stocks.
+- The `검토` view shows only REVIEW_REQUIRED stocks.
+- Switching views does not mutate registration state.
+
+3. Exclusion And Exclusion Release
+
+- A normal `운영/정지` stock can be changed to `제외` by double-click or by the context-menu `제외지정` action.
+- An excluded stock can be changed back to the normal `운영/정지` group by double-click or by the context-menu `제외해제` action.
+- Both UI paths reuse the existing backend state-change path.
+- The UI does not create a separate writer, storage file, or UI-only state.
+- Exclusion is not registration removal.
+- `제외지정` preserves registration information.
+- After a state change, the current view and the top counts refresh from canonical state.
+
+4. REVIEW_REQUIRED Protection
+
+- REVIEW_REQUIRED stocks are managed through review management.
+- REVIEW_REQUIRED stocks are shown in the `검토` view.
+- `제외지정` and `제외해제` do not clear, bypass, or resolve REVIEW_REQUIRED.
+- Review-management release and review handling remain governed by the existing review-management contract.
+
+5. Registered Stock Status Table UI
+
+- The registered-stock-status table keeps horizontal scrolling available at the bottom of the table area.
+- The row-number area is center aligned.
+- Header, row-number, corner, and grid handling for this table are opt-in to the registered-stock-status table.
+- The opt-in header/grid handling does not globally change other tables.
+- Body data display, selection, hover behavior, sorting, and context-menu behavior are not redefined by this Canonical.
+
+6. Implementation Boundary
+
+The implementation baseline contains the following committed files:
+
+- gui_auto_trade_context_menu.py
+- gui_auto_trade_display.py
+- gui_auto_trade_setting_window.py
+- gui_auto_trade_status_ops.py
+- gui_auto_trade_table_loader.py
+- gui_styles.py
+- tests/test_auto_trade_setting_routine_tree.py
+
+This Canonical does not record or approve uncommitted changes outside that commit.
+
+Explicitly not included:
+
+- gui_windows.py recovery-related unstaged changes
+- recovery lifecycle changes
+- main monitoring changes
+- operation display sync / CONTINUOUS-related future work
+- runtime, stock, and routine-instance dirty local data
+- archived, artifact, and runtime archive local files
+- any untracked service or test files outside the committed baseline
+
+7. Verification Boundary
+
+Verified for the code baseline:
+
+- 32-bit Python py_compile passed for the committed Python files.
+- Registered-stock-status cleanup focused routine/status tests: 15 passed.
+- tests.test_auto_trade_gui_e2e_sync: 6 passed.
+- git diff --check passed.
+
+Known limitation:
+
+- The full tests.test_auto_trade_setting_routine_tree module still has failures.
+- The whole project is not recorded as green.
+- This Canonical must not be used as evidence that unrelated dirty or untracked work is complete.

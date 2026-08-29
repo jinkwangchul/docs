@@ -1,0 +1,54 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-01
+Scope: GUI state display and stock-register context contract
+
+New Canonical:
+
+- `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`
+- `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_READABLE_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`
+
+Changed:
+
+- Clarified REVIEW_REQUIRED as an independent non-operable protection state.
+- Clarified that data inconsistency requiring operator review transitions the
+  stock protection state to REVIEW_REQUIRED.
+- Recorded the row text color contract:
+  - REVIEW_REQUIRED rows use orange row text.
+  - Operation-excluded rows keep the disabled/gray contract unless overridden by
+    higher-priority REVIEW_REQUIRED styling.
+  - Emergency-stop display keeps the existing contract.
+- Recorded the situation signal contract:
+  - REVIEW_REQUIRED -> red.
+  - Emergency stop -> red.
+  - Data inconsistency -> red.
+  - Monitoring/waiting -> gray.
+  - Normal operable/running state keeps the current green implementation
+    contract.
+- Recorded that `현황` and `상태` sorting share the same status-rank Source of
+  Truth.
+- Recorded that AutoTradeSettingWindow left performance/routine tree stock rows
+  expose `종목등록`.
+- Clarified that stock-row `종목등록` does not register the clicked stock and
+  must open the owning routine's general stock-registration dialog.
+- Clarified that stock-row `종목등록` uses only `instance_id`; stock code, stock
+  name, stock path, stock status, and other stock row metadata must not be
+  passed into the registration dialog.
+- Added the GUI actual-event-path rule: when the same feature name exists in
+  several screens, the actual visible GUI event handler must be traced and
+  tested before implementation is considered valid.
+
+Preserved:
+
+- Runtime/config/stocks storage.
+- State writers.
+- Registration backend.
+- Unregister, convert, and hide-display behavior.
+- Early close, auto close, immediate liquidation, SendOrder, Chejan, and broker
+  execution contracts.
+- Existing dirty and untracked local data.
+
+Validation:
+
+- Documentation update only.
+- No code or test files were changed by this documentation step.
+- Stage, commit, and push were not performed by this documentation step.

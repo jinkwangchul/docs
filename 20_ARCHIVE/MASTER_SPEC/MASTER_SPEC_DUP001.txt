@@ -1,3 +1,0 @@
-# MASTER_SPEC.txt
-
-MASTER_SPEC_v1.1_윈도우창버전_키움자동매매.txt 파일을 이 폴더에 복사한 뒤 MASTER_SPEC.txt로 저장하는 것을 권장한다.

@@ -1,0 +1,59 @@
+MASTER SPEC CHANGELOG
+Date: 2026-08-24
+Scope: High Resolution Price Signal Foundation Freeze
+Status: Official Supplemental Canonical promotion record
+
+Code Freeze:
+  8261b16a42800b5c549756a72c837679fee80375
+
+Docs parent baseline:
+  cac988db3dfd96c4583adff86973862c3bcafd82
+
+==================================================
+Promoted Contract
+==================================================
+
+The High Resolution Price Signal Foundation is added as a Supplemental Current
+Canonical. It freezes:
+
+- realtime FIDs 20/10/13/15 on the existing single registration path
+- normalized Tick and process-local bounded High-Resolution Market State
+- process-local Price Signal observation gate, default OFF
+- Main header order: 가격신호, 모니터링, 그룹등록, 조기마감
+- read-only Realtime/Tick and TR Governor monitoring
+- separate 333 ms live current-price mini-chart projection
+- explicit Routine and order disconnection boundaries
+
+==================================================
+Compatibility Boundary
+==================================================
+
+This Supplemental Canonical complements and does not replace the Broker /
+Market Data Architecture Final Freeze.
+
+Changed by this Freeze:
+
+- existing canonical candle contract: 0
+- Realtime Shadow / REALTIME_PRIMARY / reconciliation meaning: 0
+- Routine signal and 0봉/1봉/2봉 meaning: 0
+- Queue / SendOrder / Chejan / Execution Pipeline: 0
+
+==================================================
+Verification Promoted
+==================================================
+
+- unique validations: 422
+- PASS: 421
+- existing baseline error: 1
+- 32-bit pycompile: PASS
+- git diff --check: PASS
+- Phase 8 Production modifications: 0
+
+The baseline error patches the nonexistent
+`gui_auto_trade_timer.refresh_operation_candles` symbol and is not promoted as
+a High Resolution Price Signal regression.
+
+Live-market throughput, burst, packet completeness, reconnect timing, and FID
+15 versus TR Volume equivalence remain UNVERIFIED_EXTERNAL.
+
+Phase 9 changes Documentation only and authorizes no automatic next feature.

@@ -1,0 +1,68 @@
+MASTER SPEC CANONICAL
+Date: 2026-07-31
+Scope: Review isolation and auto-trade performance UI contract
+
+2026-08-01 supersession note:
+
+- REVIEW_REQUIRED display, row color, situation signal, and protected-state
+  sorting are now governed by
+  `20_ARCHIVE/MASTER_SPEC/MASTER_SPEC_CANONICAL_2026-08-01_GUI_STATE_AND_STOCK_REGISTER_CONTEXT_CONTRACT.txt`.
+- This document's isolation rule remains valid for normal-operation execution
+  paths, but the later Current Canonical is authoritative for the updated GUI
+  display and sorting contract.
+
+1. Review management is an execution isolation state.
+
+- A stock in review management must not be treated as a normal auto-trade row.
+- The internal review state remains durable and must continue to support review management, execution blocking, and return approval.
+- The review state is not a normal operation display label.
+
+2. Normal operation lists exclude review-managed stocks before row creation.
+
+- Auto-trade setting lower stock table must skip review-managed stocks before creating table items.
+- General operation/monitoring lists must keep the existing exclusion contract.
+- Operation start targets must not include review-managed stocks.
+- General operation UI must not render a normal row with a "검토종목" label.
+
+3. Review management does not hide performance records.
+
+- Performance records are historical/analytical data.
+- Review management is an execution state.
+- Auto-trade performance trees must keep stock and routine records regardless of review-management state.
+- Current and historical performance visibility follow performance data contracts, not review isolation.
+
+4. Period scope filter enablement follows visible stock rows.
+
+- The 전체/현재/과거 scope controls are enabled when the current tree display has visible stock rows.
+- Stock display level enables the scope controls.
+- Routine/group display levels also enable the scope controls when expanded rows expose visible stock rows.
+- When collapsing hides all visible stock rows, the scope controls become disabled.
+- Badge state must be refreshed immediately after collapse/expand and routine tree visibility refresh.
+
+5. Verified code baseline.
+
+- Code repository: kiwoom_auto
+- Branch: feat/restore-auto-trade-setting-ui
+- Commit: 298e1c9334021766658f2a2db957a831fc831005
+- Focused test: python -m unittest tests.test_auto_trade_setting_routine_tree
+- Result: 80 tests passed
+- 32-bit py_compile: passed for gui_auto_trade_table_loader.py, gui_auto_trade_setting_window.py, tests/test_auto_trade_setting_routine_tree.py
+- git diff --check: passed
+
+6. PAUSED legacy residue retirement.
+
+- PAUSED/포즈 is not a current operation or Review state and must not be produced by new Production writers.
+- pause_signal_check_status, paused_at, missed_buy_signal_count, and missed_sell_signal_count are legacy input keys; Production decision and Review projection ignore them.
+- PAUSED itself and pause-period signal metadata must not create a Review reason.
+- A legacy persisted PAUSED input may be projected fail-closed as 검토종목 until a separate migration, but it must not be displayed or interpreted as a current pause feature.
+
+7. Review Entry metadata normalization.
+
+- `review_reason` is the short operator-facing cause tag; internal issue/reason codes remain diagnostic evidence and are not displayed directly in the Review reason column.
+- `review_location` identifies the actual Production detection point. Review-window refresh must not replace it with a UI refresh location.
+- Existing `state.json` Review metadata and existing Mutation Boundary writers remain canonical; no parallel Review SoT or writer is introduced.
+- Missing/corrupt `state.json` rows remain read-only virtual rows: `운영 데이터 없음` or `운영 데이터 읽기 오류`, detected at `종목관리`.
+- Pending/order integrity uses one operator reason, `미체결 데이터 오류`, while the actual location remains distinct (`종목 등록`, `종목 해제`, `루틴 등록`, `루틴 해제`).
+- Integrity Checker promotes only existing `requires_review` issues. CHECK_ERROR and read-only integrity issues do not become Review entries.
+- `review_entered_at` remains the first Review-entry time and is not rewritten by normalization or refresh.
+- PAUSED and its retired metadata are not Review Entry reasons.

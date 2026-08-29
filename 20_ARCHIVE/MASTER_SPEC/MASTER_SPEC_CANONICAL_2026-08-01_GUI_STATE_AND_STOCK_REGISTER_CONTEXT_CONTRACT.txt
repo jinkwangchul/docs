@@ -1,0 +1,144 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-01
+Scope: GUI state display, status sorting, and routine-tree stock-register context contract
+
+Document role:
+
+- This Current Canonical records the GUI and state contracts confirmed in the
+  2026-08-01 AutoTradeSettingWindow work.
+- It supersedes older Archive or Legacy interpretations for the subjects below.
+- It does not change runtime/config/stocks storage structure, state writers,
+  registration backend, unregister backend, close process, SendOrder, Chejan, or
+  broker execution contracts.
+
+1. REVIEW_REQUIRED Contract
+
+- REVIEW_REQUIRED, displayed as `검토종목` or managed through `검토관리`, is an
+  independent non-operable protection state.
+- REVIEW_REQUIRED is not a child state of normal operation, emergency stop, or
+  operation exclusion.
+- REVIEW_REQUIRED must not auto-transition back into an operable state without
+  the approved review-management release flow.
+- REVIEW_REQUIRED remains protected across operation start, operation stop,
+  unregister, early close, auto close, and status display paths.
+
+2. Data Inconsistency Contract
+
+- Runtime or integrity data inconsistency that requires operator review must
+  transition the stock's final protection state to REVIEW_REQUIRED.
+- Data inconsistency must not be documented or implemented as a separate
+  operable stock status.
+- Data inconsistency may be shown as a red situation signal, but the protected
+  stock state remains REVIEW_REQUIRED when review is required.
+
+3. Row Color Contract
+
+- Row text color and situation signal color are separate contracts.
+- REVIEW_REQUIRED rows use orange row text in every stock list that applies the
+  shared protection row style.
+- Operation-excluded rows keep the existing disabled/gray row style unless a
+  higher-priority REVIEW_REQUIRED row style applies.
+- Emergency-stop rows keep the existing emergency display contract.
+- Row color must not overwrite the situation signal foreground.
+
+4. Situation Signal Contract
+
+- The situation signal expresses whether the stock is operable.
+- REVIEW_REQUIRED -> red.
+- Emergency stop -> red.
+- Data inconsistency -> red.
+- Monitoring/waiting -> gray.
+- Normal operable/running state -> keep the existing current implementation
+  contract. At the time of this Canonical, the implementation uses the existing
+  green contract for normal operation.
+- The old orange signal path is not a current contract unless a later Current
+  Canonical explicitly reintroduces it.
+
+5. Status And Situation Sorting Contract
+
+- The `현황` column and the `상태` column must use the same status priority
+  Source of Truth for sorting.
+- The situation signal color rank must not become an independent sort key.
+- Sorting by `현황` and sorting by `상태` must produce the same status-group
+  order in both ascending and descending directions.
+- REVIEW_REQUIRED and emergency-stop statuses must have distinct status ranks
+  and must not be mixed into the same sort group.
+
+6. AutoTradeSettingWindow Routine-Tree Stock Register Entry
+
+- The AutoTradeSettingWindow left performance/routine tree exposes `종목등록`
+  from routine-instance rows and from stock rows that belong to a routine
+  instance.
+- The actual user-facing event path for this screen is:
+
+  AutoTradeSettingWindow._connect_events()
+  -> routine_table.customContextMenuRequested
+  -> AutoTradeSettingWindow.on_routine_table_context_menu()
+  -> row_kind-specific QMenu
+  -> QMenu.exec_()
+
+- The MainWindow monitoring context menu is a different screen and must not be
+  treated as the implementation path for AutoTradeSettingWindow routine-tree
+  context menus.
+
+7. Stock-Row `종목등록` Meaning
+
+- `종목등록` on a stock row does not register the right-clicked stock.
+- The right-clicked stock row is only a location from which to identify the
+  owning routine instance.
+- The stock row must use only its `instance_id` to identify the target routine.
+- The final opened UI must be the same general stock-registration dialog used
+  by routine-instance row `종목등록`.
+
+8. Stock-Row `종목등록` Metadata Contract
+
+- A stock row must not pass stock metadata directly to the registration dialog.
+- The following stock-specific fields must not be passed into the final
+  registration-dialog metadata:
+  - stock code
+  - stock name
+  - stock path
+  - stock status
+  - historical/current display status
+  - other stock row metadata
+- The implementation must:
+  1. Read `instance_id` from the right-clicked stock row metadata.
+  2. Resolve the routine instance through the official routine-instance lookup.
+  3. Resolve the routine definition through the official routine-definition
+     lookup.
+  4. Rebuild routine-instance metadata with `row_kind="instance"`.
+  5. Call the existing routine-instance stock-registration function.
+- The current official lookup functions are:
+  - `routine_instance_by_id(instance_id)`
+  - `routine_definition_by_id(definition_id)`
+- If `instance_id`, routine instance, or routine definition cannot be resolved,
+  the registration dialog must not open for another routine by fallback.
+
+9. Context Menu Preservation
+
+- Stock-row context menu order in AutoTradeSettingWindow is:
+  - `종목등록`
+  - `등록해제`
+  - `등록전환`
+  - `표시삭제`
+- Adding `종목등록` must not change unregister, convert, or hide-display
+  backend behavior.
+- Routine-row `종목등록` must keep using the existing routine-instance metadata
+  contract.
+- Current, historical, and all-display scopes must not change the target
+  instance identity; the right-clicked row metadata is the source.
+
+10. GUI Execution Path Rule
+
+- When the same feature name appears in multiple screens, implementation and
+  verification must first identify the actual user event path.
+- Fixing another screen with the same action label is not a valid fix for the
+  requested screen.
+- Tests must cover the actual event handler used by the visible GUI, not only a
+  similarly named helper or another window's context menu.
+
+11. Verification Boundary
+
+- This Canonical records the current contract, not a full-project green state.
+- Runtime/config/stocks data mutation is outside this documentation update.
+- Stage, commit, and push status are not implied by this document.

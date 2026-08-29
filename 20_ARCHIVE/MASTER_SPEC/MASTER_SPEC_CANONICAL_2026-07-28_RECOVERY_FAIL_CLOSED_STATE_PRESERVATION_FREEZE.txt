@@ -1,0 +1,111 @@
+MASTER_SPEC_CANONICAL_2026-07-28_RECOVERY_FAIL_CLOSED_STATE_PRESERVATION_FREEZE
+
+Status:
+- This is the latest supplemental Canonical for the confirmed Production
+  Recovery fail-closed state-preservation contract.
+- It records only implemented and verified behavior.
+- It extends the existing Recovery, close/liquidation transition, and
+  operation-command contracts without rewriting older Canonical files.
+
+Baseline:
+- kiwoom_auto repository branch: feat/restore-auto-trade-setting-ui
+- kiwoom_auto pushed closure commit:
+  358262b941921357c51111968c4869390fa1f0cf
+- docs repository branch: agent/project-prompt-standard
+- docs repository baseline before this closure:
+  3eb2cd0d0ae6f796863b92953e784cf388fc2c6c
+
+1. Recovery Prerequisite Boundary
+
+- Missing global Production Recovery context is a request-level precondition
+  failure.
+- Expected global prerequisite failures do not create or update a stock-level
+  REVIEW_REQUIRED state.
+- The expected prerequisite set includes no login session, no selected
+  account, Recovery not started, and Recovery still in progress.
+- These conditions remain fail-closed: the requested operation does not run.
+- A stock-level REVIEW_REQUIRED transition remains reserved for an existing
+  official writer path with stock-specific evidence that requires operator
+  review.
+
+2. State Preservation On Fail Closed
+
+When Production Recovery blocks early close, immediate liquidation,
+individual liquidation, or time-policy automatic close:
+
+- the stock Runtime state is not changed
+- the stock status is not changed to REVIEW_REQUIRED solely because the
+  global Recovery prerequisite is missing
+- no operation mutation is committed
+- no operation command is created by the blocked request
+- no execution queue item is created
+- SendOrder and Chejan paths are not entered
+
+The Recovery Gate remains before mutation and execution boundaries.
+
+3. Expected And Investigative Diagnostics
+
+- Expected prerequisite blocks are presented to the operator through the
+  existing user-facing Toast path.
+- Expected prerequisite blocks do not emit warning diagnostics to the console
+  or logger.
+- Unknown reason codes, Registry read errors, and Recovery Gate exceptions
+  remain investigative conditions and retain diagnostic logging.
+- Internal reason codes remain diagnostic data and are not used as the
+  user-facing explanation when an official user message is available.
+
+4. Immediate Liquidation Command Boundary
+
+- Immediate liquidation remains a one-shot command request.
+- The persisted command meaning stops at REQUESTED until the existing command
+  lifecycle advances it.
+- An immediate liquidation request does not create a persistent operation
+  mode.
+- A duplicate request with the same command identity remains idempotent.
+- The request contract does not add Queue, SendOrder, or Chejan fields and
+  does not bypass their existing production gates.
+
+5. Verification Evidence
+
+The staged clean snapshot at code commit
+`358262b941921357c51111968c4869390fa1f0cf` passed:
+
+- 264 focused unit and GUI-contract tests
+- 32-bit Python 3.11 / PyQt5 GUI imports
+- py_compile for the committed production modules
+- git diff --cached --check
+
+6. Explicitly Not Changed
+
+- Production Recovery admission policy
+- REVIEW_REQUIRED resolution policy
+- Queue schema or Queue consumer contract
+- SendOrder or Chejan contract
+- Broker-side execution behavior
+- Runtime JSON data
+- stock configuration or state data
+- operation_policy.json
+- any unapproved next feature
+
+7. Durable Snapshot Failure Evidence
+
+- A failed broker snapshot keeps the normalized CommRqData result code in the
+  existing `production_recovery_reviews[].broker_evidence.result` field.
+- A repeated OPEN record with the same Recovery dedupe identity may enrich its
+  existing broker/runtime evidence without adding another history row.
+- Later RESOLVED processing preserves the original failure evidence, including
+  the broker result code; resolution adds success evidence without deleting the
+  failed history.
+
+8. Completed Snapshot Process-Local Handoff
+
+- Only a complete immutable `BrokerAccountSnapshot` whose account, trading
+  day, login session, Recovery session, and final account status all match a
+  `COMPLETED` Recovery may be retained as a process-local MainWindow handoff.
+- The handoff is not a persistent SoT and is cleared by a new/failed Recovery,
+  account or login lifecycle change, trading-day change, disconnect, or
+  MainWindow shutdown.
+- Recovery completion never repairs stock position state automatically. The
+  handoff is read only by the explicit Review Management position
+  reconciliation action, whose service boundary repeats all identity and
+  stale-state checks fail-closed.

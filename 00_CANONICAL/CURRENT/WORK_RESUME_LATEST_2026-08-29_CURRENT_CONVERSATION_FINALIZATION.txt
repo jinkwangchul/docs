@@ -16,16 +16,24 @@ Docs:
 
 - repository: `C:\Users\JIN KWANG CHUL\Documents\docs`
 - branch: `agent/project-prompt-standard`
-- closure checkpoint: the commit containing this Resume
-- authoritative SHA: repository `HEAD` after the closure push
-- push verification: required before final user report
+- current documentation pass: Working Tree only
+- commit by this documentation pass: 0
+- push by this documentation pass: 0
+- Docs consolidation: CURRENT 68 -> 21; 47 historical documents moved to
+  Archive; 839 manifest-approved files and 87 empty directories removed
+- cleanup manifest:
+  `30_REPORTS/DOCS_REPOSITORY_CONSOLIDATION_MANIFEST_2026-08-29.md`
+- pre-existing dirty/untracked documentation state remains preserved except
+  where the cleanup Manifest explicitly adjudicates a move or deletion
 
 ==================================================
 2. Implemented
 ==================================================
 
-- Running Base Budget display/edit hydration and current-operation adjustment
-  state machine, with AMOUNT/QUANTITY parity and permanent-config isolation.
+- unified running/non-running `기본예산변경` dialog, permanent base-config
+  persistence, Immediate/Next-Cycle timing separation, stale full-settings
+  overwrite protection, AMOUNT/QUANTITY fresh-price admission, AMOUNT
+  environment-formula validation, and incomplete-limit preservation.
 - final BUY/SELL fresh preflight and existing Queue/dispatch safety boundary.
 - Operation Start precedence, pre-session admission, fixed summary projection,
   additional waiting-target start, and current-session participant semantics.
@@ -40,6 +48,15 @@ Docs:
   `FLAT_FILTER_SCOPE`, and `HIERARCHICAL_SELECTION_SCOPE`.
 - shared Main/AutoTradeSetting Stock context-menu builder and canonical Routine
   Instance clone reuse.
+- current-running operation-exclusion common mutation guard and state-aware
+  visible-but-disabled context-menu actions with muted disabled visuals.
+- one Review Management entry/count source, with green state owned by the
+  actual Review Management window lifetime.
+- Main Footer common operator projection: 185 raw Production messages reduced
+  to 30 canonical operator messages while Event/Log evidence remains intact;
+  raw English and internal execution-stage footer exposure are both zero.
+- one-row Main footer with left operator message, five right-side buttons, and
+  white default button backgrounds including Operation Start/Stop.
 - default badge text color `#4B5563` with semantic colors/layout preserved.
 - monitoring-only meaning documented as execution suppression, not simulation.
 
@@ -47,15 +64,16 @@ Docs:
 3. Known Limitations
 ==================================================
 
-Running Base Budget restart/recovery exact-session preservation is not proven.
-Operation Start may write a new `trade_started_at`, while the current adjustment
-reader requires an exact `operation_session_started_at` match. Status remains
-`PENDING / KNOWN LIMITATION`.
-
 The QWidget geometry-heavy badge test exits the current 32-bit Qt process before
 unittest reports completion. Lightweight style constants and focused behavior
 tests pass, but this closure does not claim a new live GUI verification after
 the final code checkpoint.
+
+The broader unittest discovery still has unrelated existing failures in
+`test_gui_main_column_sort_badges`, `test_gui_main_routine_monitoring`,
+`test_gui_main_routine_summary`, and `test_gui_main_stock_context_menu`.
+`test_gui_main_account_memo` also exits the 32-bit process natively. These are
+not reclassified as regressions from this documentation-only pass.
 
 The current code does not contain the proposed `GetCodeListByMarket("60")` ETN
 membership path. ETN live production persistence through that specific source
@@ -65,13 +83,11 @@ remains pending; no name/code heuristic is authorized.
 4. Pending
 ==================================================
 
-First next work item:
-
-`PAPER Trading Architecture / Boundary Design Audit`
-
 PAPER implementation has not started. The approved direction requires an
 isolated Execution Domain, persistence, Performance, Event Journal, Recovery,
 and UI space, with no SendOrder path and zero cross-write into REAL state.
+It is a deferred architecture direction, not an automatic next work item. Any
+PAPER implementation requires a separate explicit user instruction.
 
 ==================================================
 5. Validation
@@ -85,15 +101,25 @@ Executed with 32-bit Python in the final Code Working Tree:
 - realtime monitoring/chart/registration safety: 93 PASS
 - AutoTradeSetting scope/count/filter/clone: 11 PASS
 - shared Main/AutoTradeSetting Stock context-menu paths: 8 PASS
+- recent Footer/operator UI focused runs: 172 PASS, 93 PASS, and 85 PASS in
+  their respective task scopes
 - changed/new Python files: 123 py_compile PASS
 - Code cached `git diff --check`: PASS
 - Docs closing files whitespace/diff check: PASS
+- Docs repository final inventory: 4,440 files, 260 directories, 21 CURRENT,
+  6 REFERENCE, and 31 CHANGELOG files
+- manifest Keep Set versus actual CURRENT: 21/21, missing 0, extra 0
+- moved old-path references: 0
+- deleted-file live dangling links: 0
 
 Live GUI:
 
 - prior Production sessions supplied realtime, price-signal, operation-start,
   and SendOrder-zero evidence during the conversation.
 - no new live GUI session was launched after the final closing repair.
+- the unified budget persistence, Review entry active color, context-menu
+  disabled visuals, and final footer spacing still require a consolidated Live
+  GUI smoke pass before any `LIVE_VERIFIED` claim.
 
 ==================================================
 6. Safety And Preserved Dirty State
@@ -102,13 +128,16 @@ Live GUI:
 - Runtime manual mutation by closing work: 0
 - actual SendOrder by closing work: 0
 - Queue/Execution mutation by closing work: 0
+- Production code/test modification by this documentation pass: 0
 - reset/restore/stash/clean: 0
 - force push: 0
 
-Pre-existing and generated dirty/untracked files remain protected, including
-Runtime, Stock/Group/RoutineInstance data, user policy/schedule files, event
-logs, screenshots, diagnostics, and archival Docs contamination. They were not
-staged, reverted, deleted, or normalized.
+Pre-existing and generated dirty/untracked files remain protected unless they
+were individually classified in the cleanup Manifest. Manifest-approved dirty
+CURRENT files were moved with content preserved; dirty duplicate copies and all
+unrelated Runtime, Stock/Group/RoutineInstance data, policy/schedule files,
+logs, screenshots, diagnostics, `.kilo`, and `90_TEMP` data were not reverted,
+deleted, or normalized.
 
 ==================================================
 7. Next-session Prompt

@@ -1,0 +1,67 @@
+MASTER_SPEC_CHANGELOG_2026-07-22_MAIN_MONITORING_STRATEGY_WORKSPACE_ARCHITECTURE
+
+Purpose:
+- Record the confirmed role separation contract for the main monitoring window
+  and the auto-trade setting window.
+- Preserve previous Canonical files and add a new Canonical snapshot.
+
+Baseline Canonical:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-21_MAIN_MONITORING_METRIC_LAYOUT_CLOSURE.txt
+
+New documents:
+- 00_CANONICAL/CURRENT/
+  MASTER_SPEC_CANONICAL_2026-07-22_MAIN_MONITORING_STRATEGY_WORKSPACE_ARCHITECTURE.txt
+- 00_CANONICAL/CHANGELOG/
+  MASTER_SPEC_CHANGELOG_2026-07-22_MAIN_MONITORING_STRATEGY_WORKSPACE_ARCHITECTURE.txt
+
+Contract recorded:
+- Main monitoring window and auto-trade setting window may display overlapping
+  source data, but their responsibilities are different.
+- Main monitoring window is responsible for current operation, control,
+  monitoring, current orders, current holdings, abnormal states, emergency
+  action, and real-time operation.
+- Auto-trade setting window is responsible for strategy design, routine
+  instance management, stock composition, historical performance, strategy
+  improvement, watchlist management, and strategy asset management.
+- Auto-trade setting window uses a routine definition -> routine instance
+  upper tree and a lower selected-target stock list.
+- Parent routine definition selection is view-oriented and may show all child
+  instances' stocks.
+- Instance selection is target-oriented and may support instance-specific
+  operations where the existing operation contract permits it.
+- Stocks are independent objects with whole-stock, instance-specific, and
+  routine-specific review paths.
+- Watchlist state is ON/OFF only. No grading system or automatic protection is
+  created by watchlist status alone.
+- Trade completion records preserve at least stock, instance, routine, trade
+  result, and realized profit/loss.
+- Trade performance remains attributed to the routine and instance that existed
+  at trade time, even if the stock is later moved, reassigned, or unregistered.
+- Performance records are preserve-oriented and must not be silently
+  overwritten.
+- All performance aggregation uses the same trade source-of-truth records.
+  Separate windows, statistics, and future reports do not store separate
+  performance facts for the same trade.
+- Aggregation is calculated on query by stock, instance, or routine scope unless
+  a later Canonical approves a durable aggregate cache.
+- Feature placement rule:
+  - current operation and immediate response -> main monitoring window
+  - strategy design, analysis, and asset management -> auto-trade setting window
+
+Not changed:
+- Runtime
+- Queue
+- OperationCommandService
+- SendOrder
+- Chejan
+- Broker API
+- stock config/state storage contract
+- trading calculation semantics
+- main metric layout contract
+- routine-instance operation contract
+
+Runtime impact:
+- No Runtime data contract is changed by this document update.
+- This documentation task does not stage or commit protected runtime, stock, or
+  routine instance data.

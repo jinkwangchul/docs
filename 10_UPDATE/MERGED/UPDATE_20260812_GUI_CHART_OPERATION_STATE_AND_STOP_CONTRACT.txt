@@ -10,7 +10,7 @@ This document records implementation and contract updates completed after the
 The following Freeze remains valid and is not replaced or rewritten:
 
 - 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-11_MAIN_SETTINGS_SHARED_OPERATION_FREEZE.txt
-- 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-11_MAIN_SETTINGS_SHARED_OPERATION_FREEZE.txt
+- 20_ARCHIVE/WORK_RESUME/WORK_RESUME_LATEST_2026-08-11_MAIN_SETTINGS_SHARED_OPERATION_FREEZE.txt
 
 This update does not declare a new Freeze and does not establish a new Git
 baseline. Its implementation evidence is the current local working tree.

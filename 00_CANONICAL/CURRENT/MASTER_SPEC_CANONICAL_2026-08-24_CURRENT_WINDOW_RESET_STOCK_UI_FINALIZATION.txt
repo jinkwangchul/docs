@@ -342,6 +342,21 @@ and enabled state remain fail-closed by canonical row identity, current
 selection, and callback availability; a context without required evidence does
 not invent an enabled action.
 
+A current-running Stock cannot be moved directly to operation exclusion. The
+same authoritative guard applies to double-click, context-menu, and any other
+mutation caller. Context-menu disabling is an operator affordance, not the sole
+safety boundary; direct callback invocation must also fail closed. After the
+Stock is no longer current-running, the existing non-running exclusion contract
+applies.
+
+State-specific menus preserve their existing action composition, ordering, and
+separators. Disallowed actions remain visible and are disabled rather than
+deleted or hidden. A disabled parent action blocks access to its submenu, and a
+backend callback cannot bypass the same state guard. Disabled actions use one
+muted gray foreground instead of semantic active colors; in particular, a
+disabled Early Close action must not remain green. Enabled actions retain their
+existing semantic colors.
+
 AutoTradeSetting Routine Instance context menus include `루틴복제` between
 settings and deletion. AutoTradeSetting and Main reuse the same canonical
 snapshot clone helper and repository writer. Early Close and immediate
@@ -379,6 +394,68 @@ before unittest completion. Constants and lightweight stylesheet contracts are
 verified, but this checkpoint does not claim a new live-GUI verification for
 that geometry test.
 
-Running Base Budget restart/recovery exact-session preservation remains the
-`PENDING / KNOWN LIMITATION` recorded in
+Unified Base Budget persistence and current-operation timing are now separate
+contracts. The durable confirmed value is owned by the Stock config writer;
+Runtime timing evidence does not own or limit restart persistence. Detailed
+rules are recorded in
 `00_CANONICAL/REFERENCE/RUNNING_BASE_BUDGET_ADJUSTMENT_REFERENCE.md`.
+
+==================================================
+18. Review Management Entry Contract
+==================================================
+
+Main Monitoring has one Review-management entry and one Review count source.
+The former top `검토 N` table filter and bottom `검토관리(N)` button are not part
+of the current layout. The top Review position opens the existing Review
+Management window; Review Stocks are managed in that dedicated window rather
+than through a separate Main-table Review filter.
+
+The top entry is green only while the actual Review Management window is open.
+A nonzero Review count does not activate the color. Normal close and X-button
+close immediately restore the default color, and the existing single-window
+ownership contract prevents duplicate windows.
+
+==================================================
+19. Main Footer Operator Projection
+==================================================
+
+The Main footer is an operator status surface, not a detailed execution log.
+The current projection path is:
+
+```text
+existing Production caller / raw showMessage
+  -> common Operator Footer Projection
+  -> canonical short message + icon + color
+  -> footer QLabel
+```
+
+The 185 audited raw Production messages remain valid caller and Event/Log
+evidence. The footer projects them to 30 canonical operator messages. Existing
+Event Journal, logger, Runtime, and Execution evidence are preserved; footer
+removal means only that the detailed text is not displayed in this surface.
+
+Internal execution stages and identifiers do not appear in the footer,
+including `REAL_READY`, Approval, Policy Gate, Execution Preview,
+`ORDER_QUEUED`, Runtime Commit, Dispatch, Manual Queue, Manual SendOrder, and
+internal IDs, hashes, or revisions. Those details remain in Event/Log evidence.
+
+The projected footer has zero raw English messages and zero internal-execution-
+stage messages. Detailed icon/color meanings, overwrite protection, canonical
+message examples, context-menu tables, layout behavior, and links to all 185
+dispositions are owned by
+`00_CANONICAL/REFERENCE/MAIN_OPERATOR_UI_REFERENCE.md`.
+
+==================================================
+20. Main Footer Layout
+==================================================
+
+The operator message and the five bottom buttons share one horizontal row.
+There is no second footer row dedicated to status text. The message is left
+aligned and the button group is on the right. All five buttons, including the
+Operation Start/Stop button, have a white default background; operation state is
+communicated through text/icon semantics rather than a different base
+background.
+
+The message area, button group, inter-button spacing, and window boundaries
+retain visible breathing room through the Qt layout. Exact pixel widths and
+margins are implementation detail, not Canonical behavior.

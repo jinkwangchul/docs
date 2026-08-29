@@ -1,0 +1,369 @@
+MASTER SPEC CANONICAL
+Date: 2026-08-24
+Scope: High Resolution Price Signal Foundation Freeze
+Status: Latest Official Supplemental Canonical
+
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code Freeze: 8261b16a42800b5c549756a72c837679fee80375
+
+Documentation repository: jinkwangchul/docs
+Docs branch: agent/project-prompt-standard
+Docs parent baseline before Phase 9:
+cac988db3dfd96c4583adff86973862c3bcafd82
+
+==================================================
+1. Authority And Purpose
+==================================================
+
+This Supplemental Canonical freezes the Production foundation implemented and
+verified in High Resolution Price Signal Phases 2 through 8. Its purpose is to
+receive normal automatic-trading market information at realtime Tick
+resolution without adding TR polling, while keeping market-data reception
+resolution separate from the Routine canonical-bar time axis.
+
+This Freeze covers the Signal Foundation only. It does not declare a new
+Routine signal semantic, indicator calculation, progress-bar semantic,
+canonical candle definition, or order path.
+
+It supplements and does not replace the 2026-08-20 Broker / Market Data
+Architecture Final Freeze. Existing Current Canonicals remain authoritative
+for canonical candle ownership, REALTIME_PRIMARY, reconciliation, Routine
+execution, and order safety except for the narrower observation/UI contracts
+recorded here.
+
+Evidence classifications:
+
+- IMPLEMENTED_AND_CODE_VERIFIED: present in the frozen Production baseline and
+  covered by focused tests or static contract checks.
+- SIMULATION_VERIFIED: verified by deterministic fake/mock or 32-bit Qt
+  simulation; not a live-market guarantee.
+- UNVERIFIED_EXTERNAL: not asserted as PASS or defect without live external
+  evidence.
+
+==================================================
+2. Frozen Production Topology
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+MainWindow
+  `- AutoTradeOperationHost
+       `- MarketDataHost
+            `- shared KiwoomApi
+                 `- one KHOPENAPI QAxWidget
+
+The frozen ownership topology is unchanged:
+
+- one KiwoomApi
+- one KHOPENAPI QAxWidget
+- one AutoTradeOperationHost
+- one MarketDataHost
+- no second broker object or realtime transport
+- no High-Resolution TR polling path
+
+==================================================
+3. Realtime FID And Tick Reception Contract
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+The single existing SetRealReg registration path uses the final CORE FIDs for
+the official `주식체결` realtime type:
+
+- FID 20: 체결시간
+- FID 10: 현재가
+- FID 13: 누적거래량, retained as validation/support evidence
+- FID 15: 체결량
+
+Reception call graph:
+
+SetRealReg
+-> OnReceiveRealData
+-> GetCommRealData for FIDs 20/10/13/15
+-> normalize_realtime_shadow_tick()
+-> realtime_shadow_tick_received
+-> MarketDataHost process-local High-Resolution Market State
+
+CommRqData is not used to receive realtime Tick data.
+
+==================================================
+4. Normalized Tick Contract
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+The normalized Tick contains at least:
+
+- stock_code
+- real_type
+- execution_time_raw
+- current_price
+- cumulative_volume
+- trade_volume_raw
+- trade_volume_abs
+- received_at
+- received_monotonic
+- receive_sequence
+- market_datetime
+- minute_key
+- connection_epoch
+- login_session_id
+
+`receive_sequence` is the callback reception order assigned by this process.
+It is not a Broker sequence number, exchange execution sequence, or proof of
+complete same-second market delivery.
+
+==================================================
+5. High-Resolution Market State
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+MarketDataHost owns the High-Resolution Market State process-locally.
+
+- raw Tick queue: bounded FIFO, maximum depth 512
+- Tick coalescing: none
+- broker session validation: connection_epoch + login_session_id
+- per-stock receive_sequence regression/replay rejection
+- explicit queue overflow count and affected-stock uncertainty evidence
+- data_quality: NORMAL or UNCERTAIN
+- persistent storage: none
+
+The newest event is rejected when the FIFO is full so the already queued FIFO
+order remains intact. Overflow is visible evidence and changes affected state
+quality to UNCERTAIN; it is not silently treated as complete market data.
+
+A Tick from a stale session cannot overwrite the state established by the
+current broker session.
+
+==================================================
+6. Price Signal Observation Gate
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+The gate is process-local and defaults to OFF.
+
+OFF preserves:
+
+- realtime registration
+- raw Tick reception
+- High-Resolution Market State updates
+- Realtime Shadow
+- REALTIME_PRIMARY
+- reconciliation
+- canonical candle processing
+
+OFF blocks only:
+
+- the `high_resolution_price_observed` observation boundary
+- live current-price chart projection
+
+ON enables High-Resolution observation for valid current-session Tick state.
+It does not connect the Tick to Routine signals, Queue, SendOrder, Chejan, or
+the Execution Pipeline.
+
+Changing the gate does not call SetRealReg, SetRealRemove, or CommRqData.
+
+==================================================
+7. Main Monitoring Header Contract
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+The final right-side action order is:
+
+가격신호 -> 모니터링 -> 그룹등록 -> 조기마감
+
+- 가격신호 is the process-local OFF/ON observation toggle.
+- 모니터링 opens the read-only Realtime / TR diagnostics window.
+- Existing 그룹등록 and 조기마감 handlers and behavior are unchanged.
+
+==================================================
+8. Monitoring Window Contract
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+The read-only Realtime/Tick section displays:
+
+- Price Signal gate state
+- Broker connection and session identity
+- realtime registration and target count
+- received and processed Tick counts
+- observed Tick/sec
+- queue depth and high-watermark
+- overflow count
+- receive and process sequence
+- recent and maximum internal processing latency
+- data_quality
+
+The read-only TR Governor section displays:
+
+- total enqueue and dispatch
+- current queue depth
+- recent rqname and trcode
+- rolling 60-second dispatch count
+- recent and maximum queue wait
+- timeout, stale, and error evidence
+
+Monitoring refresh cadence is 750 ms. Monitoring itself performs:
+
+- CommRqData: 0
+- SetRealReg: 0
+- SetRealRemove: 0
+
+==================================================
+9. Mini Chart Contract
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+With 가격신호 OFF, the mini chart keeps the existing canonical/Routine
+completed-timeframe display path.
+
+With 가격신호 ON, the chart retains the completed canonical line and adds a
+separate live current-price endpoint. The live endpoint is explicitly not:
+
+- a canonical candle
+- a completed candle
+- BAR_COMMITTED
+- Routine signal evidence
+
+The live UI refresh cadence is 333 ms. Tick state updates and chart repaint are
+decoupled. Historical charts do not display the live overlay.
+
+==================================================
+10. Existing Canonical Candle Protection
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+The existing canonical path remains unchanged:
+
+RealtimeShadowBarBuilder
+-> MarketDataAuthority
+-> REALTIME_PRIMARY or reconciliation
+-> canonical candle
+-> BAR_COMMITTED
+
+High-Resolution Market State is observational state and does not become a
+canonical candle writer or bypass authority/reconciliation rules.
+
+==================================================
+11. Routine Boundary
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+The Foundation is not connected in Production to:
+
+- RSI
+- MACD
+- moving averages
+- Bollinger Bands
+- 진행 기준봉/progress bars
+- High-Resolution Routine signal evaluation
+
+The meaning of 0봉, 1봉, and 2봉 is unchanged. A future time-axis, live
+indicator-state, or time-based signal-confirmation contract is unimplemented
+and requires a separate explicit user instruction.
+
+==================================================
+12. Order Boundary
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+The High-Resolution feature does not directly call or bypass:
+
+- durable Queue
+- SendOrder
+- Chejan
+- the existing Execution Pipeline
+
+The existing order safety chain and Broker mutation boundary changed by this
+Foundation: 0.
+
+==================================================
+13. Phase 8 Verification Evidence
+==================================================
+
+[IMPLEMENTED_AND_CODE_VERIFIED]
+
+- Phase 8 Production modifications: 0
+- unique validations: 422
+- PASS: 421
+- existing baseline error: 1
+- Phase 2-7 core: 132 PASS
+- Realtime / Authority / Reconciliation: 80 PASS
+- AutoTradeOperationHost: 26 PASS
+- order boundary: 75 PASS
+- existing chart / projection: 108 PASS
+- 32-bit py_compile: PASS
+- git diff --check: PASS
+- staged: 0
+
+The one baseline residual is
+`test_stock_instance_chart_auto_refresh`, which patches the nonexistent symbol
+`gui_auto_trade_timer.refresh_operation_candles`. It is not a regression
+introduced by High Resolution Price Signal Phases 2 through 8. The result must
+not be represented as 422/422 PASS.
+
+==================================================
+14. Simulation Evidence
+==================================================
+
+[SIMULATION_VERIFIED]
+
+Tick order:
+
+- prices 10000, 10120, 10020, 10150, 10080
+- all observations preserved callback reception order
+
+Queue overflow:
+
+- received: 513
+- queue high-watermark: 512
+- overflow: 1
+- processed: 512
+- data_quality: UNCERTAIN
+
+Session isolation:
+
+- current Session B state was not overwritten by a late Session A Tick
+
+GUI decoupling:
+
+- 100 state updates caused one explicit chart refresh repaint
+- chart cadence: 333 ms
+- monitoring cadence: 750 ms
+
+These deterministic results are not claims about live intraday throughput,
+latency, packet completeness, or actual market-burst capacity.
+
+==================================================
+15. UNVERIFIED_EXTERNAL
+==================================================
+
+The following remain explicitly UNVERIFIED_EXTERNAL. They are neither PASS
+claims nor defects without live external evidence:
+
+- actual intraday Tick/sec
+- surge-stock burst behavior
+- COM/Qt scheduling pressure under live load
+- Broker/network Tick loss
+- actual same-second execution delivery completeness
+- reconnect timing on the real server
+- FID 15 trade-volume sums versus actual TR candle Volume
+
+==================================================
+16. Finality
+==================================================
+
+High Resolution Price Signal Foundation Phases 2 through 8 are documented and
+frozen at the stated Code baseline. Phase 9 changes Documentation only.
+
+No next implementation is automatically authorized. Further work may begin
+only with a separate explicit user instruction.

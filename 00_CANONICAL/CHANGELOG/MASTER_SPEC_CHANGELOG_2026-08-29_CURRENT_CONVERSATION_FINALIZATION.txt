@@ -22,18 +22,35 @@ Code checkpoint: `43f0c8878c1d23f5d50c5bb036a8f6ceac1da972`
 - Focused test harnesses were aligned with current canonical accessors; no new
   Production lifecycle or writer was introduced by those test changes.
 
-## Known Limitation
+## Resolved Budget Persistence Contract
 
-Running Base Budget restart/recovery exact-session preservation remains
-pending because a new Operation Start may establish a different
-`trade_started_at` identity.
+Running Base Budget persistence is independent of current-operation timing.
+Every confirmed value is written to the canonical base config, while
+`trade_started_at` and `state.json.running_budget_adjustment` govern only the
+Immediate/Next-Cycle projection for the current operation. A later Operation
+Start may establish a new operation identity without discarding the confirmed
+base value.
 
 ## Future Architecture
 
 PAPER Trading is recorded as `PENDING IMPLEMENTATION / ARCHITECTURE DIRECTION
 APPROVED`. PAPER requires an isolated execution and persistence domain with no
 SendOrder path and zero cross-write into REAL Queue, Fill, Position,
-Performance, Event Journal, or Recovery state.
+Performance, Event Journal, or Recovery state. It is deferred and is not an
+automatic next work item.
+
+## Docs Repository Consolidation
+
+- CURRENT was reduced from 68 mixed current/history files to 21 current owners.
+- 47 superseded or supporting snapshots were moved to `20_ARCHIVE` with content
+  preserved.
+- 818 SHA-256-identical clean text `_DUP###` copies, 12 identical ZIP copies,
+  and 9 obsolete report/readable files were removed under the Manifest.
+- 87 non-structural empty directories were removed. `.agents`,
+  `00_CANONICAL/OPEN_ISSUES`, `10_UPDATE/INBOX`, `.kilo`, and `90_TEMP` remain.
+- The Reference Index now presents one primary owner per functional area before
+  supporting and historical evidence.
+- Moved old-path references and deleted-file live dangling links are zero.
 
 ## Safety
 
