@@ -1,6 +1,6 @@
 # MASTER_SPEC Reference Index
 
-Reference Edition - consolidated 2026-08-29
+Reference Edition - consolidated 2026-09-01
 
 This file is an index, not an operating-policy document. User instructions,
 actual code/evidence, and the named current owners remain authoritative in that
@@ -11,6 +11,7 @@ CURRENT.
 
 | Function | Primary owner | Supporting detail |
 |---|---|---|
+| Structure completion and Stock Library diagnostics lifecycle | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-01_STRUCTURE_AND_STOCK_LIBRARY_DIAGNOSTICS_FINAL_FREEZE.txt` | Main Structure completion and I5/I6/I7 diagnostics contracts |
 | Budget, Starting Budget, Stock Limit, Operation Start | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt` | `00_CANONICAL/REFERENCE/RUNNING_BASE_BUDGET_ADJUSTMENT_REFERENCE.md`, `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-21_ROUTINE_STOCK_LIMIT_FINAL_FREEZE.txt` |
 | BrokerSession, MarketData, TR provenance, Execution Universe | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-20_BROKER_MARKET_DATA_ARCHITECTURE_FINAL_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-24_HIGH_RESOLUTION_PRICE_SIGNAL_FOUNDATION_FREEZE.txt` |
 | Review Management and Emergency lifecycle | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-02_REVIEW_MANAGEMENT_EMERGENCY_LIFECYCLE.txt` | `00_CANONICAL/REFERENCE/MAIN_OPERATOR_UI_REFERENCE.md` |
@@ -48,9 +49,9 @@ does not supersede them.
 ## Current Resume And Changelog
 
 - Latest Work Resume:
-  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-08-29_CURRENT_CONVERSATION_FINALIZATION.txt`
+  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-01_STRUCTURE_AND_DIAGNOSTICS_COMPLETION.txt`
 - Latest Changelog:
-  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-08-29_CURRENT_CONVERSATION_FINALIZATION.txt`
+  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-01_STRUCTURE_AND_STOCK_LIBRARY_DIAGNOSTICS_FREEZE.txt`
 
 Older Work Resumes, Readable variants, Freeze snapshots, and Changelogs are
 historical records. They may explain a past decision but must not be used as a

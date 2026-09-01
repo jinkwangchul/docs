@@ -1,0 +1,186 @@
+# Official Canonical - Structure Completion And Stock Library Diagnostics - 2026-09-01
+
+Status: LATEST OFFICIAL PROJECT FREEZE
+
+==================================================
+1. Git Baseline
+==================================================
+
+Code repository:
+- branch: `feat/restore-auto-trade-setting-ui`
+- commit: `fce533dce174a552aa9d044535de1027c3d79679`
+- remote: `origin`
+- local/remote match at freeze: PASS
+
+Documentation repository:
+- branch: `agent/project-prompt-standard`
+- pre-freeze commit: `87dc2d4b0892f5602fc5c46af0fa0a9faff48985`
+- final documentation baseline: the commit containing this Canonical
+
+==================================================
+2. Main Structure Improvement Final State
+==================================================
+
+`MAIN_STRUCTURE_IMPROVEMENT_COMPLETE` is the final structure-improvement
+verdict.
+
+The confirmed Production structure has:
+- 466 Production Python modules
+- 1,214 Production import edges
+- 0 strongly connected import components
+- Policy -> UI reverse dependencies: 0
+- Repository -> GUI reverse dependencies: 0
+- StockRepository -> Assignment Transaction reverse dependencies: 0
+- `AutoTradeOperationHost` as the single participant storage owner
+- `StockReviewInspection` as the canonical Review inspection owner
+- `assignment_episode_linkage` as the assignment transaction owner
+- canonical Writer, Recovery, Runtime, Queue, Dispatch, and Execution
+  boundaries preserved
+- CURRENT_PRICE T1/T3 and pre-hash revalidation boundaries preserved
+- Qt lifecycle, filesystem isolation, and stale fixture cleanup completed
+- clarity/dead UI cleanup completed without reopening structure expansion
+
+Structure improvement is closed. It is not an automatic source of more
+refactoring work. The project moves to actual-use stabilization or separately
+authorized feature work.
+
+==================================================
+3. Stock Library Diagnostic Persistence
+==================================================
+
+The Production diagnostic contract is incident-only.
+
+Normal Stock Library sync:
+- creates no file under `runtime/diagnostics`
+- persists no full Master projection diagnostic snapshot
+- records the compact sync outcome through the existing Event Journal
+
+Incident Stock Library sync:
+- writes a compact `stock_library_invalid_codes_*.json` diagnostic only when
+  `invalid_count > 0`
+- keeps at most one incident diagnostic file for the same login session
+- records compact counts, reason evidence, session identity, and the generated
+  diagnostic filename
+- does not promote the diagnostic file into a runtime Source of Truth
+
+The former normal full-snapshot persistence contract is retired.
+
+==================================================
+4. Event Journal Role
+==================================================
+
+The Event Journal is append-only Audit Evidence and Operator History. Stock
+Library sync and diagnostics retention reuse its existing Production writer.
+
+The Event Journal records compact success/failure and issue-presence evidence.
+It is not the Source of Truth for:
+- Recovery
+- Trading state
+- Assignment
+- Queue or execution state
+- Broker acceptance
+
+Event Journal evidence must not be used to reconstruct or silently mutate any
+of those owners.
+
+==================================================
+5. Seven-day Incident Retention
+==================================================
+
+`I5_SEVEN_DAY_RETENTION_POLICY_COMPLETE` is authoritative.
+
+- Retention is age-only; session-count retention has no authority.
+- Incident age `> 7 days` is eligible for `ROTATE_CANDIDATE`.
+- Incident age exactly `7 days` is `KEEP`.
+- Recent incidents are `KEEP`.
+- The current login session is `PROTECTED`.
+- Temporary, partial, active, malformed, unknown, or unstable files are never
+  automatic delete candidates.
+
+The prior permanent incident-protection interpretation is superseded by this
+seven-day contract.
+
+==================================================
+6. Automatic Retention Trigger
+==================================================
+
+`I7_AUTOMATIC_SEVEN_DAY_INCIDENT_RETENTION_COMPLETE` is authoritative.
+
+Automatic retention runs only after a new authenticated login identity is
+established. The one-shot key is the canonical diagnostics root plus connection
+epoch plus login session id.
+
+For one authenticated session:
+- automatic retention is attempted at most once
+- zero candidates is a no-op
+- candidates use the canonical planner, plan-bound automatic authority, and
+  canonical executor
+- a retention failure is recorded compactly and does not block login or Stock
+  Library operation
+
+There is no retention timer, scheduler, daemon, background worker, writer-inline
+cleanup, Recovery cleanup, or startup cleanup.
+
+==================================================
+7. Delete Safety Boundary
+==================================================
+
+The executor is not a second planning authority. It executes only a validated
+canonical plan and revalidates each candidate before mutation.
+
+Required protections:
+- canonical diagnostics-root containment
+- canonical filename, payload type, and schema
+- size, `mtime_ns`, and SHA-256 signature stability
+- current-session and active-target reprotection
+- malformed/unknown fail-closed behavior
+- partial I/O failure isolation; remaining candidates continue
+- one-shot manual or automatic authorization bound to the exact plan
+
+The only retention mutation primitive is
+`stock_library_diagnostics_retention._unlink_file()` calling `Path.unlink()`
+for one file. Recursive delete, directory removal, rename, move, replace,
+archive, and compression are not retention operations.
+
+==================================================
+8. Completed Existing-data Cleanup
+==================================================
+
+`I6_INCIDENT_ONLY_DIAGNOSTICS_AND_EVENT_RECORDING_COMPLETE` includes the
+controlled removal of 106 recognized normal diagnostics totaling 247,137,810
+bytes. Current Stock Library diagnostics at this freeze are 0 files / 0 bytes.
+
+That controlled purge does not authorize unrelated diagnostics deletion and
+does not alter the Event Journal.
+
+==================================================
+9. Final Evidence
+==================================================
+
+- Main Structure QAPPLICATION: 80 files / 1,682 methods / 1,677 PASS / 5 SKIP
+  / 0 FAIL / 0 ERROR / native exit 0 / timeout 0
+- I7 final aggregate: 401 tests / 399 PASS / 2 Windows symlink privilege SKIP
+- Freeze focused I5-I7 rerun: 105 tests / 103 PASS / 2 Windows symlink
+  privilege SKIP / 0 FAIL / 0 ERROR
+- Production read-only compile: 466/466 PASS
+- Tests read-only compile: 552/552 PASS
+- forward/reverse import smoke: PASS
+- Production modules / edges / SCC: 466 / 1,214 / 0
+- actual diagnostics: 0 files / 0 bytes
+- actual SendOrder by the verified work and this freeze: 0
+- actual Broker call by I7 and this freeze: 0
+
+The two skips require Windows symlink privilege and do not hide active
+Production behavior.
+
+==================================================
+10. Current Stop Point
+==================================================
+
+Structure improvement and Stock Library diagnostics operational cleanup are
+complete. No next Big Feature is authorized by this Canonical.
+
+The next work starts from a new explicit user instruction or from a concrete
+problem found during actual-use stabilization. Deferred items such as PAPER,
+packaging, live market-day verification, or unrelated diagnostics policy do not
+become automatic next tasks.

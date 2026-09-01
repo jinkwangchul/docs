@@ -1,0 +1,69 @@
+# Structure And Stock Library Diagnostics Freeze Changelog - 2026-09-01
+
+Code baseline: `fce533dce174a552aa9d044535de1027c3d79679`
+
+## Main Structure Completion
+
+- Recorded `MAIN_STRUCTURE_IMPROVEMENT_COMPLETE` as the final architecture
+  verdict.
+- Recorded 466 Production modules, 1,214 import edges, and SCC 0.
+- Recorded canonical participant, Review, Assignment, Writer, Recovery,
+  Runtime, and Execution ownership boundaries.
+- Recorded Qt lifecycle, filesystem isolation, stale fixture, clarity, and dead
+  UI cleanup completion.
+- Closed automatic structure expansion; future work requires actual-use evidence
+  or a separate user instruction.
+
+## I5 - Seven-day Retention Policy
+
+- Removed session-count retention authority.
+- Established age-only retention for Stock Library incident diagnostics.
+- Kept the exact seven-day boundary and selected only age greater than seven
+  days as a rotation candidate.
+- Preserved planner/executor separation and manual authorization safety.
+
+## I6 - Incident-only Diagnostics And Event Recording
+
+- Retired normal full Master projection diagnostic persistence.
+- Normal Stock Library sync now creates zero diagnostic files.
+- Incident sync writes a compact diagnostic only when invalid evidence exists,
+  with at most one file for the same login session.
+- Reused the Event Journal for compact normal/incident outcome evidence without
+  promoting it to a Recovery, Trading, Assignment, Queue, or Execution SoT.
+- Completed the controlled purge of 106 recognized normal diagnostic files,
+  reclaiming 247,137,810 bytes.
+- Recorded current Stock Library diagnostics as 0 files / 0 bytes.
+
+## I7 - Automatic Seven-day Incident Cleanup
+
+- Removed permanent protection for closed incidents older than seven days.
+- Added one automatic retention attempt after each new authenticated login
+  identity, keyed by diagnostics root, connection epoch, and session id.
+- Kept current-session, temporary/partial, active, malformed/unknown, and
+  changed targets protected.
+- Reused the canonical planner, plan-bound authority, signature-revalidating
+  executor, and one-file `_unlink_file()` / `Path.unlink()` boundary.
+- Added compact retention completed/failed Event Journal records.
+- Kept retention failure nonblocking for login and Stock Library operation.
+- Added no timer, scheduler, daemon, background worker, startup, Recovery, or
+  writer-inline cleanup.
+
+## Final Verification
+
+- Main Structure QAPPLICATION: 1,677 PASS / 5 SKIP / 0 FAIL / 0 ERROR.
+- Freeze I5-I7 focused rerun: 103 PASS / 2 expected Windows symlink privilege
+  SKIP / 0 FAIL / 0 ERROR.
+- Production compile: 466/466 PASS.
+- Tests compile: 552/552 PASS.
+- import graph: 466 modules / 1,214 edges / SCC 0.
+- forward/reverse import smoke: PASS.
+- actual Broker by I7/freeze: 0.
+- actual SendOrder by freeze: 0.
+
+## Safety
+
+- Actual runtime, stocks, routines, Event Journal, and diagnostics were not
+  mutated by this freeze.
+- Existing dirty/untracked user data and unrelated Docs changes remain
+  protected.
+- No next-session startup prompt was created.

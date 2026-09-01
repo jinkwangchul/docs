@@ -1,0 +1,129 @@
+# Work Resume - Structure And Diagnostics Completion - 2026-09-01
+
+==================================================
+1. Repository Checkpoints
+==================================================
+
+Code:
+- repository: `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`
+- GitHub: `https://github.com/jinkwangchul/kiwoom_auto`
+- remote: `origin`
+- branch: `feat/restore-auto-trade-setting-ui`
+- commit: `fce533dce174a552aa9d044535de1027c3d79679`
+- push: PASS
+- local/remote match: PASS
+
+Docs:
+- repository: `C:\Users\JIN KWANG CHUL\Documents\docs`
+- GitHub: `https://github.com/jinkwangchul/docs`
+- remote: `origin`
+- branch: `agent/project-prompt-standard`
+- pre-freeze commit: `87dc2d4b0892f5602fc5c46af0fa0a9faff48985`
+- final commit: the commit containing this Work Resume; resolve with
+  `git log -1 --format=%H -- 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-01_STRUCTURE_AND_DIAGNOSTICS_COMPLETION.txt`
+
+==================================================
+2. Big Feature State
+==================================================
+
+Current state:
+- Main Structure Improvement: COMPLETE
+- Code clarity / simplification cleanup: COMPLETE
+- Stock Library diagnostics operational lifecycle: COMPLETE
+- I5: `I5_SEVEN_DAY_RETENTION_POLICY_COMPLETE`
+- I6: `I6_INCIDENT_ONLY_DIAGNOSTICS_AND_EVENT_RECORDING_COMPLETE`
+- I7: `I7_AUTOMATIC_SEVEN_DAY_INCIDENT_RETENTION_COMPLETE`
+
+The structure-improvement program must not be extended automatically. The
+project is ready for actual-use stabilization or a separately authorized
+feature.
+
+==================================================
+3. Current Production Contract
+==================================================
+
+- Normal Stock Library sync writes zero diagnostic files.
+- A compact incident diagnostic is written only when `invalid_count > 0`.
+- The same login session owns at most one incident diagnostic file.
+- Full normal Master projection persistence is retired.
+- Sync and retention outcomes reuse the Event Journal as Audit Evidence and
+  Operator History.
+- Event Journal is not Recovery, Trading, Assignment, Queue, or Execution SoT.
+- Incident diagnostics use age-only seven-day retention; exactly seven days is
+  KEEP and older than seven days is a candidate.
+- A new authenticated login identity triggers at most one automatic retention
+  attempt per root/epoch/session.
+- No retention timer, scheduler, daemon, startup, Recovery, or writer-inline
+  cleanup exists.
+- Delete execution is plan-bound, signature-revalidated, current-session-safe,
+  fail-closed for uncertain targets, and limited to one-file `Path.unlink()`.
+- Retention failure is fail-open for login and Stock Library operation.
+
+==================================================
+4. Verification Baseline
+==================================================
+
+- QAPPLICATION: 80 files / 1,682 methods / 1,677 PASS / 5 SKIP / 0 FAIL /
+  0 ERROR / native exit 0 / timeout 0
+- I7 final aggregate: 401 tests / 399 PASS / 2 Windows symlink privilege SKIP
+- freeze focused I5-I7: 105 tests / 103 PASS / 2 Windows symlink privilege
+  SKIP / 0 FAIL / 0 ERROR
+- Production compile: 466/466 PASS
+- Tests compile: 552/552 PASS
+- import smoke forward/reverse: PASS
+- Production modules / import edges / SCC: 466 / 1,214 / 0
+- Stock Library diagnostics: 0 files / 0 bytes
+- actual Broker by I7 and freeze: 0
+- actual SendOrder by freeze: 0
+
+==================================================
+5. Runtime And Evidence Baseline
+==================================================
+
+The following local data remain outside the Code commit and are protected:
+- runtime excluding Event Journal/diagnostics: 18 files / 2,251,309 bytes
+- stocks: 90 files / 263,655 bytes
+- routines: 16 files / 564,311 bytes
+- Event Journal: 2 files / 2,166 lines / 1,416,378 bytes
+- Stock Library diagnostics: 0 files / 0 bytes
+
+The Event Journal includes the previously audited 12 synthetic PARTIAL_FILL
+records in the 2026-08 tail and legitimate later Production app-session
+records. This freeze does not delete or rewrite either evidence set.
+
+==================================================
+6. Protected Dirty State
+==================================================
+
+Code repository after the Code commit intentionally preserves 168 status
+entries:
+- runtime: 18
+- stocks: 112
+- assignment episodes: 15
+- routine instances: 8
+- groups: 2
+- user settings/history (`global_schedule.json`, `operation_policy.json`,
+  `PROJECT_CHANGELOG.txt`): 3
+- screenshots: 6
+- existing reports: 4
+
+These are actual user/runtime evidence, user configuration, screenshots, or
+pre-existing reports. They were not staged, reverted, deleted, or normalized.
+
+Docs repository had 127 pre-existing status entries before this freeze:
+- modified: 119
+- deleted: 2
+- untracked: 6
+
+Only the new Canonical, Work Resume, Changelog, and Reference Index pointer
+change belong to this freeze. All other Docs changes remain protected.
+
+==================================================
+7. Actual Next Start
+==================================================
+
+Structure improvement and diagnostics operations are complete. Start from the
+next explicit user instruction or a concrete issue found through actual use.
+No next Big Feature is selected here.
+
+Next-session startup prompt: NOT WRITTEN BY THIS CODEX CLOSE-OUT.
