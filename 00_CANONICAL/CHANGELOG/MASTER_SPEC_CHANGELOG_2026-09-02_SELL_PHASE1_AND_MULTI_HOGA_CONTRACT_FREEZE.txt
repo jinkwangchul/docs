@@ -1,0 +1,61 @@
+# Indicator Follow SELL Phase 1 And MULTI_HOGA Contract Changelog - 2026-09-02
+
+Code baseline: `f65223e4f4cbcac47c89d776d0485b8878da1648`
+
+## SELL Phase 1
+
+- Made SELL preset A/B/C selection mutually exclusive while preserving all
+  three stored preset bodies.
+- Added fail-closed Mapper/Validator enforcement for zero or multiple selected
+  presets.
+- Added the Routine-owned single-order SELL intent builder.
+- Connected resolved SELL signals to the Routine-owned builder in `routine.py`.
+- Used confirmed cycle holding quantity and required resolved cycle, positive
+  quantity, Routine Instance identity, and source Signal identity.
+- Supported single-hoga LIMIT/order-price and MARKET policies.
+- Reused generic Candidate, Approval, Operation Policy, Execution Boundary,
+  and Final Safety flows.
+- Kept MULTI_HOGA and other composite SELL behavior fail closed.
+
+## MULTI_HOGA Contract
+
+- Confirmed one Signal -> one Execution Process -> N Child Orders.
+- Fixed shared Signal/Process identity and unique child execution/order
+  identities.
+- Prohibited source-Signal mutation as a duplicate-detection workaround.
+- Fixed even split, basis-first remainder allocation, and basis/near/far send
+  order.
+- Fixed the low-quantity fallback as one basis-price LIMIT SELL.
+- Fixed child-failure continuation, latest-state refresh, state-based
+  replanning, and uncertainty isolation without a new fixed retry count.
+- Recorded that existing provenance supports multi-child structure but current
+  Production candidate creation remains single-child.
+- Deferred the unresolved valid tick-price authority/connection to a Targeted
+  Contract Audit.
+
+## Deferred Decisions
+
+- No BUY MULTI_HOGA insufficient-budget policy was approved or added.
+- No monitoring-signal-light conclusion was promoted to Canonical because the
+  previously traced widget was not the user-identified visible red light.
+
+## Package And Safety Preservation
+
+- Added the Routine-owned SELL builder to the existing Group Pack file list.
+- Preserved Group Pack schema/version, hash checks, capability resolution, and
+  rollback.
+- Changed no Broker, Queue, Runtime, persistence, Chejan, execution schema,
+  Operation Policy, or Final Safety contract.
+
+## Verification
+
+- focused SELL Phase 1: 13 PASS
+- broader SELL regression: 988 PASS plus 10 subtests
+- indicator-follow regression: 252 PASS plus 37 subtests
+- candidate/provenance/approval/final-preflight/Group Pack: 68 PASS plus 6
+  subtests
+- closing focused selection: 304 PASS
+- corrected candidate/approval/final-preflight/Group Pack selection: 54 PASS
+- Python compile: PASS
+- `git diff --check`: PASS
+- Broker/SendOrder during validation: 0

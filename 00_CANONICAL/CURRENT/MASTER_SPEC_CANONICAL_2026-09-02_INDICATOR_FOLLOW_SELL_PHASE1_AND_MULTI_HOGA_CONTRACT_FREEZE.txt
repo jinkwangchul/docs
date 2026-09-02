@@ -1,0 +1,208 @@
+# Official Canonical - Indicator Follow SELL Phase 1 And MULTI_HOGA Contract Freeze - 2026-09-02
+
+Status: LATEST OFFICIAL INDICATOR-FOLLOW SELL EXECUTION CONTRACT
+
+==================================================
+1. Baseline And Authority
+==================================================
+
+Code repository:
+- repository: `jinkwangchul/kiwoom_auto`
+- branch: `feat/restore-auto-trade-setting-ui`
+- previous freeze: `2f452bc67670b2c7d9819c2d9fddd5a953af1d08`
+- this freeze: `f65223e4f4cbcac47c89d776d0485b8878da1648`
+- local/remote match: PASS
+
+Documentation repository:
+- repository: `jinkwangchul/docs`
+- branch: `agent/project-prompt-standard`
+- pre-freeze commit: `7a8bcf03c88680cbf0b0efff71c600dcb3eddefc`
+- final documentation baseline: the commit containing this Canonical
+
+This Canonical owns the indicator-follow SELL Phase 1 Production connection
+and the confirmed future SELL MULTI_HOGA behavior. The Routine boundary,
+generic Candidate, Queue, Broker, Runtime, Final Safety, Group Pack, and
+assignment contracts remain owned by their independent Current Canonicals.
+
+==================================================
+2. SELL Preset Selection Contract
+==================================================
+
+SELL settings A, B, and C are three stored execution presets. They are not
+three parts of one composite execution plan.
+
+- Exactly one preset is selected at a time.
+- Selecting A clears B and C; selecting B clears A and C; selecting C clears A
+  and B.
+- The final selected preset cannot be unchecked to leave zero selections.
+- The two unselected presets retain their saved settings for fast switching.
+- One SELL signal uses only Perform 1 of the one selected preset.
+- A persisted or effective state with zero or multiple selected presets is
+  invalid and fails closed.
+- Invalid persisted/effective selection is not silently repaired by choosing a
+  first or default preset.
+
+The existing checkbox visual form may remain, but its behavior is mutually
+exclusive. The Routine-owned Mapper and Commit Validator preserve the
+exactly-one invariant through Effective Rules.
+
+==================================================
+3. SELL Phase 1 Production Connection
+==================================================
+
+The verified Production path is:
+
+SELL condition
+-> SELL Signal
+-> selected preset Perform 1
+-> Routine-owned SELL execution intent
+-> generic order Candidate
+-> Order Approval
+-> Operation Policy Gate
+-> existing Execution Boundary
+-> existing Routine Final Safety
+
+The Phase 1 Routine-owned builder requires:
+- a resolved current cycle
+- confirmed `holding_qty > 0`
+- a Routine Instance identity
+- a source Signal identity before the generic Candidate becomes ready
+- exactly one selected SELL preset
+
+SELL quantity is the resolved cycle's confirmed holding quantity. Main does
+not calculate indicator-follow SELL quantity.
+
+Supported Perform 1 policies:
+- single hoga plus order price -> one LIMIT SELL intent
+- single hoga plus market price -> one MARKET SELL intent
+
+One SELL signal produces one execution intent and one Candidate in Phase 1.
+MULTI_HOGA, MULTI_TIME, MULTI_RATIO, timeout/cancel, price-change reset,
+follow-up repetition, repeated-exit execution, final residual market SELL, and
+multiple simultaneous child orders are not implemented by Phase 1 and fail
+closed where encountered.
+
+The implementation reuses generic Candidate, Approval, Operation Policy,
+Execution Boundary, and Final Safety paths. It adds no indicator-follow SELL
+strategy branch to Main/common Production and changes no Broker, Queue,
+Runtime, persistence, or execution schema.
+
+==================================================
+4. SELL MULTI_HOGA Confirmed Future Contract
+==================================================
+
+SELL MULTI_HOGA is not complete in Production. Its confirmed implementation
+contract is nevertheless fixed as follows.
+
+Identity and hierarchy:
+- One SELL Signal creates one Execution Process with N Child Orders.
+- Every child retains the same `source_signal_id` and
+  `execution_process_id`.
+- Every child has a unique `execution_id` and `order_id`.
+- `source_signal_id` must never be changed, suffixed, or otherwise fabricated
+  to evade duplicate detection.
+
+Quantity and order sequence:
+- Planned quantity is split as evenly as possible across child orders.
+- Remainder shares are assigned first to the basis order price, then in order
+  of hoga distance from that basis price.
+- Actual child submission order is basis order price, then nearer hoga, then
+  farther hoga.
+- If current sellable remainder is smaller than the planned child count, it is
+  not forcibly fragmented. All remaining quantity becomes one basis-price
+  LIMIT SELL.
+
+Child failure and automatic-trading continuity:
+- Failure of one child does not stop attempts for the other planned children.
+- After the first complete batch attempt, the latest Broker, Queue, Chejan,
+  Position, and identity evidence is refreshed.
+- Missing planned attempts are replanned from that latest state.
+- No new fixed-N retry policy is introduced.
+- Normal quantity reduction and partial Fill are recalculated and may continue.
+- A clearly transient SendOrder/API failure may be replenished after current
+  state is known.
+- If order existence, Queue/Chejan/Position state, or identity consistency is
+  uncertain, resending the same order is forbidden because it could duplicate
+  an order. Existing Review/reconciliation isolation is used instead.
+- One error must not unnecessarily stop unrelated automatic-trading continuity.
+
+==================================================
+5. Existing 1:N Foundation And Current Gap
+==================================================
+
+Local Production evidence already provides a 1:N provenance foundation:
+- `HOGA_LEVEL` is an allowed child kind.
+- Child contracts carry `child_sequence_index` and
+  `child_sequence_total`.
+- Child-set validation requires one shared process identity, a total matching
+  the child count, and contiguous unique indexes.
+- `child_plan` can preserve hoga-specific planning evidence such as
+  `hoga_offset_ticks`.
+- Process and execution read models already group child evidence below one
+  `execution_process_id`.
+
+This foundation is not a completed MULTI_HOGA Production connection. The
+current execution-candidate service still calls `build_single_child()` and
+creates child index/total `1/1`. The current indicator-follow SELL builder also
+blocks MULTI_HOGA explicitly.
+
+The final authority and Production connection for converting a hoga offset
+into an actually valid exchange tick price were not established in this
+conversation. That point requires a Targeted Contract Audit before MULTI_HOGA
+implementation.
+
+==================================================
+6. BUY MULTI_HOGA Insufficient-Budget Status
+==================================================
+
+No new BUY MULTI_HOGA insufficient-budget distribution policy was approved in
+this conversation. It may interact with the existing Main budget, buffer,
+early-close, and immediate-liquidation contracts.
+
+Therefore:
+- no inferred distribution policy is Canonical
+- no arbitrary fallback may be implemented
+- the subject remains deferred until a separate contract decision
+
+==================================================
+7. Preserved Safety And Package Contracts
+==================================================
+
+- Routine-owned admission and final safety stay fail closed.
+- Final Safety false still blocks real execution.
+- Order Approval and Operation Policy remain unchanged.
+- Broker/SendOrder was not invoked during validation.
+- Queue, Runtime, persistence, Chejan, and execution schemas are unchanged.
+- BUY Phase 1 behavior remains unchanged.
+- The new Routine-owned SELL file is included in
+  `group_pack_spec.files` without a Group Pack schema/version change.
+- Pack creation, inspection, registration, Registry rediscovery, locator
+  resolution, capability validation, hash verification, and rollback remain
+  in force.
+
+==================================================
+8. Verification Evidence
+==================================================
+
+- focused SELL Phase 1 connection: 13 PASS
+- broader SELL-related regression: 988 PASS plus 10 subtests
+- indicator-follow regression: 252 PASS plus 37 subtests
+- candidate/provenance/approval/final-preflight/Group Pack: 68 PASS plus 6
+  subtests
+- closing focused selection: 304 PASS
+- corrected candidate/approval/final-preflight/Group Pack selection: 54 PASS
+- Python compile: PASS
+- `git diff --check`: PASS
+- Broker/SendOrder calls during validation: 0
+- Runtime/Queue/Persistence schema changes: 0
+
+==================================================
+9. Final Status
+==================================================
+
+`PASS — SELL SINGLE-ORDER PRODUCTION PATH COMPLETE`
+
+`SELL MULTI_HOGA — CONTRACT CONFIRMED, PRODUCTION CONNECTION NOT COMPLETE`
+
+Future MULTI_HOGA work must begin with the unresolved tick-price authority and
+connection audit and must preserve one Signal/one Process/N Child identity.

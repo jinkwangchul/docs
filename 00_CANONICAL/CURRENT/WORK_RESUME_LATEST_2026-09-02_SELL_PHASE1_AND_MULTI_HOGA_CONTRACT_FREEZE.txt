@@ -1,0 +1,155 @@
+# Work Resume - SELL Phase 1 And MULTI_HOGA Contract Freeze - 2026-09-02
+
+==================================================
+1. Repository Checkpoints
+==================================================
+
+Code:
+- repository: `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`
+- GitHub: `https://github.com/jinkwangchul/kiwoom_auto`
+- remote: `origin`
+- branch: `feat/restore-auto-trade-setting-ui`
+- previous commit: `2f452bc67670b2c7d9819c2d9fddd5a953af1d08`
+- freeze commit: `f65223e4f4cbcac47c89d776d0485b8878da1648`
+- push: PASS
+- local/remote match: PASS
+
+Docs:
+- repository: `C:\Users\JIN KWANG CHUL\Documents\docs`
+- GitHub: `https://github.com/jinkwangchul/docs`
+- remote: `origin`
+- branch: `agent/project-prompt-standard`
+- pre-freeze commit: `7a8bcf03c88680cbf0b0efff71c600dcb3eddefc`
+- final commit: the commit containing this Work Resume; resolve with
+  `git log -1 --format=%H -- 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-02_SELL_PHASE1_AND_MULTI_HOGA_CONTRACT_FREEZE.txt`
+
+==================================================
+2. Completed Work State
+==================================================
+
+Indicator-follow SELL Phase 1 is complete for one order per SELL signal.
+
+Verified path:
+SELL Signal
+-> exactly one selected A/B/C preset
+-> Routine-owned single-order SELL intent
+-> generic Candidate
+-> Order Approval
+-> Operation Policy
+-> existing Execution Boundary
+-> existing Routine Final Safety
+
+Implemented scope:
+- mutually exclusive A/B/C checkbox behavior
+- exactly-one Effective Rules validation, fail closed without auto-repair
+- resolved cycle and positive confirmed holding-quantity guards
+- one LIMIT/order-price or MARKET SELL intent
+- generic `CANDIDATE_READY` connection
+- MULTI_HOGA explicit block
+- Group Pack inclusion and round-trip preservation
+
+No actual Broker SendOrder was performed during validation.
+
+==================================================
+3. Confirmed But Not Implemented MULTI_HOGA Contract
+==================================================
+
+- one SELL Signal -> one Execution Process -> N Child Orders
+- shared `source_signal_id` and `execution_process_id`
+- unique child `execution_id` and `order_id`
+- no Signal-ID suffix or mutation to bypass dedupe
+- even split with basis-first, then nearest-hoga remainder assignment
+- actual submission basis first, then near, then far
+- if sellable remainder is below child count, one basis-price LIMIT SELL
+- one child failure does not stop remaining planned children
+- refresh latest Broker/Queue/Chejan/Position/identity after the initial batch
+- replan missing count from current state, without a new fixed retry count
+- do not resend when order existence or identity consistency is uncertain;
+  use existing Review/reconciliation isolation
+
+Production MULTI_HOGA remains incomplete. The current candidate service creates
+one child with sequence `1/1`, and the current Routine SELL builder blocks
+MULTI_HOGA.
+
+==================================================
+4. Verification Baseline
+==================================================
+
+- focused SELL Phase 1: 13 PASS
+- broader SELL regression: 988 PASS plus 10 subtests
+- indicator-follow regression: 252 PASS plus 37 subtests
+- candidate/provenance/approval/final-preflight/Group Pack: 68 PASS plus 6
+  subtests
+- closing focused selection: 304 PASS
+- corrected candidate/approval/final-preflight/Group Pack selection: 54 PASS
+- Python compile: PASS
+- `git diff --check`: PASS
+- Group Pack schema/version changes: 0
+- Broker/SendOrder calls during validation: 0
+- Runtime/Queue/Persistence schema changes: 0
+
+One closing command named a nonexistent `tests.test_order_candidate_engine`
+module and therefore produced one test-loader error after 304 real tests ran.
+The correct candidate module and the related approval/final-preflight/Group
+Pack selection were then run successfully (54 PASS). This was a command target
+selection error, not a Production or test assertion failure.
+
+==================================================
+5. Protected Local State
+==================================================
+
+After the Code Freeze commit, 116 pre-existing Code status entries remain
+protected and outside the commit:
+- staged: 0
+- unstaged tracked: 74
+- untracked: 42
+
+These include live/user Runtime, Stocks, Routine Instances, assignment/group
+evidence, reports, screenshots, and other pre-existing work.
+
+Before this Docs Freeze, the Docs repository had 124 pre-existing protected
+status entries:
+- staged: 0
+- unstaged tracked: 121
+- untracked: 3
+
+Only the new Canonical, Changelog, Work Resume, and Reference Index pointer
+update belong to this Docs Freeze.
+
+==================================================
+6. Unresolved Targeted Audits
+==================================================
+
+1. SELL MULTI_HOGA valid tick-price authority and Production connection
+
+Existing provenance supports `HOGA_LEVEL`, child sequence/total, shared process
+identity, and hoga offset planning evidence. The authoritative primitive that
+turns an offset into an actually valid hoga price, and its correct connection
+to multi-child Candidate/Queue execution, are not yet established. Audit this
+before implementation.
+
+2. Main monitoring visible red signal light
+
+The user confirms that the Main monitoring window has two kinds of signal
+lights. The prior investigation traced a different LED/status display. The
+actual visible widget, handler, condition, and Production connection between
+the red status and `SERVER_DISCONNECTED` remain unresolved. Start the next
+audit from the exact user-visible path. Do not treat the prior wrong-widget
+trace as a technical contract.
+
+3. BUY MULTI_HOGA insufficient budget
+
+No new allocation/fallback policy was approved. Do not invent one or alter the
+existing Main budget, buffer, early-close, or immediate-liquidation contracts
+without a separate decision.
+
+==================================================
+7. Mandatory Resume Rule
+==================================================
+
+Do not begin implementation from an unresolved item immediately. First run the
+Targeted Contract Audit required by `AGENT_WORKFLOW_REFERENCE.txt`, compare
+CURRENT/REFERENCE/PRE/Freeze/Current evidence, and issue the required verdict.
+
+This Work Resume records state only. It is not a Next Session Startup Prompt,
+and no startup prompt was created during this closing.
