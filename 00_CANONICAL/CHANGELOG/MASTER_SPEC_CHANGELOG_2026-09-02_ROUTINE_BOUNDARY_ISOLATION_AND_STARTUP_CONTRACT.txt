@@ -1,0 +1,74 @@
+# Routine Boundary Isolation And Startup Contract Changelog - 2026-09-02
+
+Code baseline: `2f452bc67670b2c7d9819c2d9fddd5a953af1d08`
+
+## Routine/Main Boundary Isolation
+
+- Established Main as the generic platform and Routine packages as owners of
+  strategy meaning.
+- Added metadata locators for Evaluation, Settings, Rule Mapper, Rule Commit
+  Validator, Execution Admission, and Final Real-Order Safety.
+- Removed fixed `routine.py`, indicator-follow Settings Dialog, and first-mapper
+  resolution assumptions from common paths.
+- Moved strategy schema validation from common Rule Commit into the
+  Routine-owned validator.
+- Moved `principle.execution_enabled` interpretation into Routine admission.
+- Moved `safety.real_order_allowed` interpretation into Routine final safety.
+- Preserved current-rules identity/hash revalidation at the final real-order
+  boundary and fail-closed callback behavior.
+- Made Candidate accept generic BUY/SELL execution intent without a Routine
+  type branch.
+- Removed Routine cycle/round calculation from Queue.
+- Made Decision Trace engine/exclusion evidence metadata-driven.
+
+## Assignment Contract
+
+- Confirmed `ONE STOCK = ONE ASSIGNED ROUTINE INSTANCE`.
+- Preserved scalar `assigned_routine_instance_id` as assignment Source of
+  Truth.
+- Added no plural/list assignment schema.
+
+## Group Pack Compatibility
+
+- Preserved `GROUP_PACK_SCHEMA_VERSION = 1.0` and existing manifest/spec fields.
+- Required Pack specs to include all Routine locator target files.
+- Added pre-pack and post-registration generic capability validation.
+- Preserved hash checks, Registry rediscovery, identity checks, atomic
+  registration, and rollback.
+- Recorded root `gui_indicator_follow_*.py` placement and missing uninstall
+  cleanup as known deployment debt, not an implemented feature.
+
+## Phase 1 Preservation
+
+- Preserved Pending, Approval, Dry Run, Commit, Effective Rules, Read-Back, and
+  Engine Reload flow.
+- Preserved 5-minute settings, `buy.execution`, stale-hash, Writer-conflict,
+  instance-enabled, Routine-admission, Final-Safety, and independent Order
+  Approval behavior.
+
+## AI Workflow
+
+- Added the Mandatory Pre-Work Contract Audit Gate to the single AI operating
+  rule Source of Truth.
+- Required a targeted CURRENT/REFERENCE/PRE/Freeze/Current audit and an explicit
+  `IMPLEMENTATION_ALLOWED`, `USER_DECISION_REQUIRED`, or
+  `DOCUMENT_CONFLICT_STOP` verdict before implementation.
+- Updated Session Startup so a Work Resume next item cannot bypass the targeted
+  contract gate.
+- Preserved the prohibition on unnecessary broad startup audits.
+
+## Verification
+
+- core and related regression: 553 PASS
+- locator/diagnostic focused: 25 PASS
+- Group Pack focused: 17 PASS
+- Production AST: 19 files PASS
+- common strategy-string findings: 0
+- `git diff --check`: PASS
+- Runtime/Queue/Persistence schema changes: 0
+- Broker/SendOrder/Chejan contract changes: 0
+
+The full Repository suite is not declared clean. Its initial result was 8,745
+tests with 15 failures and 6 errors; five Boundary-related findings were fixed
+and passed focused regression, while the remaining outside-scope findings stay
+recorded as known test debt.

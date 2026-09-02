@@ -1,0 +1,146 @@
+# Work Resume - Routine Boundary And Startup Contract Freeze - 2026-09-02
+
+==================================================
+1. Repository Checkpoints
+==================================================
+
+Code:
+- repository: `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`
+- GitHub: `https://github.com/jinkwangchul/kiwoom_auto`
+- remote: `origin`
+- branch: `feat/restore-auto-trade-setting-ui`
+- previous commit: `7e63d56d65ce253b0e048a6b199c82f12710999b`
+- freeze commit: `2f452bc67670b2c7d9819c2d9fddd5a953af1d08`
+- push: PASS
+- local/remote match: PASS
+
+Docs:
+- repository: `C:\Users\JIN KWANG CHUL\Documents\docs`
+- GitHub: `https://github.com/jinkwangchul/docs`
+- remote: `origin`
+- branch: `agent/project-prompt-standard`
+- pre-freeze commit: `ae993dfa17cd694681965b15f138e81e82ad77f5`
+- final commit: the commit containing this Work Resume; resolve with
+  `git log -1 --format=%H -- 00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-02_ROUTINE_BOUNDARY_AND_STARTUP_CONTRACT_FREEZE.txt`
+
+==================================================
+2. Current Big Feature
+==================================================
+
+Current Big Feature: indicator-follow automatic-trading Routine completion.
+
+Recently completed:
+- Phase 1 Effective Rule Activation
+- Routine/Main Boundary Isolation
+- generic Routine capability locator and callbacks
+- Group Pack round-trip and capability validation
+- one-Stock/one-Routine-Instance contract confirmation
+
+Current architecture:
+- Main/common Production is the generic platform.
+- Routine packages own strategy settings, mapping, validation, evaluation,
+  admission, and final real-order safety meaning.
+- New Routine packages must not require strategy dispatch in Main/common code.
+
+==================================================
+3. Completed Contract
+==================================================
+
+- `routine.json` owns Evaluation, Settings, Mapper, Commit Validator,
+  Admission, and Final Safety locators.
+- Signal Probe and Settings use metadata resolution.
+- Common Rule Commit owns approval/hash/write/read-back/rollback; the Routine
+  validator owns strategy schema meaning.
+- Admission and Final Safety use current Routine/rules identity and fail closed.
+- Candidate accepts generic BUY/SELL execution intent.
+- Queue does not calculate Routine cycle or round.
+- Decision Trace uses Routine metadata for engine and excluded UI evidence.
+- `assigned_routine_instance_id` remains the scalar assignment SoT.
+- Group Pack schema stays 1.0 and capability locators remain in `routine.json`.
+
+==================================================
+4. Verification Baseline
+==================================================
+
+- core and related regression: 553 PASS
+- Routine locator/diagnostic focused: 25 PASS
+- Group Pack focused: 17 PASS
+- Production AST: 19 files PASS
+- common-file strategy-specific string findings: 0
+- `git diff --check`: PASS
+- Runtime/Queue/Persistence schema changes: 0
+- Broker/SendOrder/Chejan contract changes: 0
+
+The initial full suite result was 8,745 tests with 15 failures and 6 errors.
+Five Boundary-related findings were corrected and passed focused regression.
+Remaining outside-scope findings include older Recovery/user-language
+expectations, liquidation expectation conflicts, and outdated Runtime fixtures.
+Do not report the entire Repository suite as 100% clean.
+
+==================================================
+5. Protected Local State
+==================================================
+
+After the Code Freeze commit, 116 Code repository status entries remain
+protected and outside the commit:
+- unstaged tracked: 74
+- untracked: 42
+- Runtime/Stocks/Assignment Episodes/Groups/Routine Instances: live or user
+  evidence
+- screenshots and generated visual artifacts
+- user configuration/history and pre-existing reports
+
+Before this Docs Freeze, the Docs repository had 124 pre-existing status
+entries:
+- unstaged tracked: 121
+- untracked: 3
+
+Only the new Canonical, Changelog, Work Resume, Workflow rule update, and
+Reference Index pointer update belong to this Docs Freeze. All other Docs
+changes remain protected.
+
+==================================================
+6. Mandatory Next-session Startup Rule
+==================================================
+
+Do not begin any project implementation immediately.
+
+For the fixed next task:
+1. locate the related CURRENT and REFERENCE contracts
+2. report whether they exist and summarize the related contract
+3. compare PRE / Freeze / Current implementation
+4. report differences, conflicts, gaps, and Source of Truth/Writer/schema impact
+5. issue exactly one verdict:
+   `IMPLEMENTATION_ALLOWED`, `USER_DECISION_REQUIRED`, or
+   `DOCUMENT_CONFLICT_STOP`
+6. modify Production or Tests only after `IMPLEMENTATION_ALLOWED`
+
+This is a Targeted Contract Audit, not a broad repository-document review.
+
+==================================================
+7. Next Actual Work Position
+==================================================
+
+The Big Feature remains indicator-follow Routine completion. Remaining
+Routine-owned candidates include:
+- actual SELL execution semantics
+- MULTI_TIME execution
+- MULTI_HOGA execution
+- active buying
+- unfilled-order timeout/cancel behavior
+- partial/full SELL policy
+- reconnect signal idempotency
+
+Do not select or implement an item from this list solely because it appears
+here. The next session's first action is a Targeted Contract Audit. Current
+evidence suggests SELL execution as the first audit candidate, but the audit
+must confirm the actual priority and authority.
+
+The completed Main/Routine boundary is a default invariant. Common/Main changes
+require proof of a genuine shared-platform blocker.
+
+Known deployment debt:
+- root `gui_indicator_follow_*.py` Pack files have no uninstall/cleanup lifecycle
+
+Known test debt:
+- outside-scope full-suite failures/errors described in Section 4

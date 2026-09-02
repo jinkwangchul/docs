@@ -1,0 +1,328 @@
+# Official Canonical - Routine Boundary Isolation And Package Contract Freeze - 2026-09-02
+
+Status: LATEST OFFICIAL ROUTINE PACKAGE CONTRACT
+
+==================================================
+1. Baseline And Authority
+==================================================
+
+Code repository:
+- repository: `jinkwangchul/kiwoom_auto`
+- branch: `feat/restore-auto-trade-setting-ui`
+- previous freeze: `7e63d56d65ce253b0e048a6b199c82f12710999b`
+- this freeze: `2f452bc67670b2c7d9819c2d9fddd5a953af1d08`
+- local/remote match: PASS
+
+Documentation repository:
+- repository: `jinkwangchul/docs`
+- branch: `agent/project-prompt-standard`
+- pre-freeze commit: `ae993dfa17cd694681965b15f138e81e82ad77f5`
+- final documentation baseline: the commit containing this Canonical
+
+This Canonical is the current technical Source of Truth for the Main/Routine
+responsibility boundary, Routine package capability locators, Routine-owned
+execution admission and final-safety callbacks, and the Group Pack capability
+validation extension. Independent Current Canonicals retain ownership of
+Group identity, assignment, operation, Broker, Queue schema, Runtime, Chejan,
+and UI contracts not changed here.
+
+The 2026-07-02 Rule Mapper documents remain Historical evidence. Their
+Preview-only and future-commit limitation is superseded by the verified Phase 1
+Effective Rule Activation flow recorded here. Historical MACD key and alias
+compatibility restrictions remain evidence for Routine-owned code.
+
+==================================================
+2. Main And Routine Responsibility
+==================================================
+
+Main is a generic platform. A Routine is a replaceable independent strategy
+package.
+
+Main and common Production must not directly interpret Routine strategy
+meaning such as:
+- RSI or MACD policy
+- BUY phase, round, or cycle
+- SELL method or strategy signal structure
+- `indicator_follow_ui_state`
+- `principle.execution_enabled`
+- `safety.real_order_allowed`
+
+Routine packages interpret their own rules and return generic results or
+generic execution intent. Shared platform responsibilities remain market data,
+account facts, common budget and policy gates, Queue, Broker boundary, Fill,
+Position, Recovery, and evidence persistence.
+
+Adding a new conforming Routine package must not require a strategy-specific
+branch in Main or the common signal, candidate, Queue, approval, commit, or
+execution-boundary files.
+
+==================================================
+3. Routine Package Locator Contract
+==================================================
+
+`routine.json` owns capability locator metadata under `locators`. The current
+indicator-follow package declares these exact locators:
+
+- Evaluation:
+  `locators.evaluation.file = routine.py`
+  `locators.evaluation.callable = evaluate`
+- Settings:
+  `locators.settings.project_file = gui_indicator_follow_routine_settings_dialog.py`
+  `locators.settings.callable = IndicatorFollowRoutineSettingsDialog`
+  `locators.settings.registration_callable = register_routine_instance_snapshot`
+- Rule Mapper:
+  `locators.rule_mapper.file = routine_rule_mapper.py`
+- Rule Commit Validator:
+  `locators.rule_commit_validator.file = routine_rule_commit_validator.py`
+  `locators.rule_commit_validator.callable = validate_committed_rules`
+- Execution Admission:
+  `locators.execution_admission.file = routine.py`
+  `locators.execution_admission.callable = evaluate_execution_admission`
+- Final Real-Order Safety:
+  `locators.final_safety.file = routine.py`
+  `locators.final_safety.callable = evaluate_final_real_order_safety`
+
+The locator describes ownership and resolution only. It does not promote
+strategy fields, indicators, rounds, cycles, or SELL methods into a common
+schema. No plugin framework, DI container, strategy bus, or second Registry is
+created.
+
+==================================================
+4. Evaluation And Settings Resolution
+==================================================
+
+Signal Probe resolves Evaluation through Routine metadata. `routine.py` is not
+a mandatory common filename. The existing indicator-follow package continues
+to use `routine.py` only because its metadata names that file.
+
+Settings open and Routine snapshot registration resolve through the Settings
+locator. Common/Main code does not import or dispatch on
+`IndicatorFollowRoutineSettingsDialog`, `settings_ui == indicator_follow`, or
+a Routine type name.
+
+Missing packages or invalid locators produce an unavailable/invalid Routine
+result. They must not cause Main import failure.
+
+==================================================
+5. Rule Mapper, Approval, And Commit Boundary
+==================================================
+
+Rule Approval and Dry Run resolve the mapper from the selected Routine
+definition identity. Selecting the first `*/routine_rule_mapper.py` is not an
+allowed resolution rule.
+
+Routine-owned Mapper/Validator responsibilities:
+- strategy schema and field meaning
+- RSI/MACD validation
+- BUY execution structure
+- SELL signals and method
+- strategy-specific invariants
+
+Common Rule Commit responsibilities:
+- approval evidence
+- target Routine Instance and path identity
+- base, stable, and file hash checks
+- stale and concurrent-writer rejection
+- atomic write
+- post-write hash and read-back
+- rollback and restore safety
+
+Rule Approval and Order Approval remain separate operator decisions.
+
+==================================================
+6. Execution Admission
+==================================================
+
+Candidate admission remains at the existing pre-candidate safety point.
+Signals remain observable even when execution admission blocks candidate
+creation.
+
+Routine-owned admission interprets rules such as
+`principle.execution_enabled`. Common Signal Consumer consumes only a generic
+result containing:
+- `allowed`
+- `reason` / `reasons`
+- Routine identity
+- effective-rules identity/hash
+
+Missing locator, missing callable, import failure, callback exception, invalid
+result, Routine identity mismatch, rules identity mismatch, or stale hash is
+fail-closed.
+
+==================================================
+7. Final Real-Order Safety And Freshness
+==================================================
+
+Routine-owned final safety interprets rules such as
+`safety.real_order_allowed`. Common Execution Boundary consumes only the
+generic ALLOW/BLOCK result.
+
+An earlier admission ALLOW is never reused as final-send authority. Immediately
+before the real-order boundary, the current Routine Instance and current
+effective rules are read again. The callback result is verified against the
+current Routine identity and stable rules hash.
+
+Missing resolution, callback failure, invalid result, stale result, Routine
+identity mismatch, or rules identity/hash mismatch blocks the real order.
+
+Existing common Final Send Gate, dispatch claim, SendOrder callable, Queue
+snapshot, account, Broker-session, price, exposure, and other safety contracts
+remain unchanged.
+
+==================================================
+8. Candidate And Queue
+==================================================
+
+Candidate accepts generic BUY and SELL execution intent. It validates common
+order facts and does not require an `INDICATOR_FOLLOW` Routine type. Opaque
+Routine provenance or option values may be carried forward without Main
+calculating or interpreting their strategy meaning.
+
+Queue does not calculate Routine cycle, round, bought quantity, or strategy
+phase. Duplicate detection uses existing common execution identity,
+source-signal identity, and the established legacy common fallback. No Queue
+schema is added or changed.
+
+Accepting a generic SELL shape does not declare the indicator-follow Routine's
+remaining Production SELL strategy complete. SELL semantics remain
+Routine-owned future work.
+
+==================================================
+9. Decision Trace
+==================================================
+
+Decision Trace resolves Routine-owned engine evidence and excluded UI metadata
+from `routine.json.decision_trace`.
+
+The current indicator-follow package declares:
+- `engine_files = [routine.py, routine_macd_engine.py]`
+- `rules_excluded_keys = [indicator_follow_ui_state]`
+
+Common Decision Trace does not hardcode this package's engine bundle or UI
+namespace. Existing trace identity, chart provenance, Process Rail evidence,
+and opaque Routine provenance remain intact.
+
+==================================================
+10. One Stock / One Routine Instance
+==================================================
+
+The product assignment contract is:
+
+`ONE STOCK = ONE ASSIGNED ROUTINE INSTANCE`
+
+`stocks/<Stock>/config.json.assigned_routine_instance_id` remains the scalar
+assignment Source of Truth. No plural/list assignment field or schema exists.
+
+Multiple Routine types and instances may operate concurrently only across
+different stocks, for example:
+- Stock A -> Routine Instance A
+- Stock B -> Routine Instance B
+
+Assigning Routine Instance A and B simultaneously to the same Stock is not
+supported.
+
+==================================================
+11. Group Pack Compatibility
+==================================================
+
+`GROUP_PACK_SCHEMA_VERSION` remains `1.0`.
+
+The registration manifest remains exactly:
+- `schema_version`
+- `definition_id`
+- `base_name`
+- `files`
+
+The developer-authored `group_pack_spec.json` remains exactly:
+- `definition_id`
+- `base_name`
+- `files`
+
+Routine capability locator schema is not copied into either Group Pack schema.
+It remains owned by packaged `routine.json`.
+
+Packing requires every Routine-owned locator target file to appear in
+`group_pack_spec.files` and validates the required capabilities before Pack
+creation. Registration preserves manifest and SHA-256 validation, installs or
+reuses files, rediscovers the Routine Definition, resolves Evaluation,
+Settings, Rule Mapper, Execution Admission, and Final Safety, and validates
+definition/base-name identity before Logical Group creation succeeds.
+
+A missing locator target or unresolved capability fails closed. Existing
+atomic registration and rollback remove newly installed partial state and do
+not leave a partially created Logical Group.
+
+==================================================
+12. Known Group Pack Deployment Debt
+==================================================
+
+The existing official Pack spec includes Routine-owned
+`gui_indicator_follow_*.py` files at project root. This placement is preserved
+and was not relocated in this Freeze.
+
+Current assessment:
+- it is part of the existing Pack contract
+- it is not a current pluggability blocker
+- an existing different destination file blocks registration by hash mismatch
+- Routine-specific unique filenames are still required to avoid collision
+- there is no automatic package uninstall or root-GUI cleanup lifecycle
+- Routine removal may leave installed root GUI files
+
+This is known deployment debt for a future package lifecycle/uninstall task. It
+is not recorded as an implemented cleanup feature.
+
+==================================================
+13. Phase 1 Effective Rule Activation Preservation
+==================================================
+
+Boundary isolation preserves this verified flow:
+
+UI
+-> Pending
+-> Rule Approval
+-> Dry Run
+-> Commit
+-> Effective Rules
+-> Read-Back
+-> Engine Reload
+
+Verified preserved outcomes:
+- 5-minute-bar settings become effective
+- `buy.execution` is created and read back
+- stale approval and stale hash fail closed
+- concurrent Writer conflict fails closed
+- `instance.enabled` blocks through the common instance lifecycle
+- Routine admission blocks when its strategy rule disallows execution
+- Final Safety blocks when its current strategy rule disallows a real order
+- Rule Approval and Order Approval remain independent
+
+==================================================
+14. Verification Evidence And Limits
+==================================================
+
+- core and related regression: 553 PASS
+- Routine locator/diagnostic focused: 25 PASS
+- Group Pack focused: 17 PASS
+- Production read-only AST: 19 files PASS
+- common-file strategy-specific string inspection: 0 findings
+- `git diff --check`: PASS
+- Runtime/Queue/Persistence schema changes: 0
+- Broker/SendOrder/Chejan contract changes: 0
+
+The Repository full suite is not recorded as clean. The initial 8,745-test run
+reported 15 failures and 6 errors. Five findings related to this Boundary work
+were corrected and their focused regressions passed. Remaining findings were
+classified outside this Freeze scope, including older Recovery/user-language
+expectations, liquidation expectation conflicts, and outdated Runtime
+fixtures. They remain known repository test debt until separately audited.
+
+==================================================
+15. Final Contract
+==================================================
+
+`PASS — ROUTINE BOUNDARY ISOLATION COMPLETE`
+
+Future indicator-follow work belongs inside the Routine package unless a
+Targeted Contract Audit proves a genuine shared-platform blocker. Adding a
+new Routine must not reintroduce strategy-specific dispatch or field meaning
+into Main/common Production.
