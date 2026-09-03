@@ -1,0 +1,73 @@
+# Master Spec Changelog - Mock Validation Implementation Freeze - 2026-09-03
+
+## Freeze Point
+
+- code branch: `feat/restore-auto-trade-setting-ui`
+- Production base: `7a401938fd8a339ad4ac11a92ae8f8da44f20766`
+- Mock Validation freeze: `87522a2d1c6525648e22023415db81c655bc3649`
+- result: `100% IMPLEMENTED / LIVE OBSERVATION PENDING`
+
+## Phase 0-8C Summary
+
+- Phase 0: Production read-only dependency and mutation-boundary audit.
+- Phase 1: isolated Session/SoT/Writer/Order/Fill/Position/PnL/Event/Review foundation.
+- Phase 2: ten-level realtime orderbook and trade snapshot stream; repeated TR zero.
+- Phase 3: virtual MARKET/LIMIT matching, partial Fill, queue-ahead, Position/PnL.
+- Phase 4: Indicator Follow Mock execution adapter and decision idempotency.
+- Phase 5: timeout/cancel/reset/repeat/exit continuation and uncertainty isolation.
+- Phase 6: stock-level operation lifecycle, closing, carryover, recovery, Return Saga.
+- Phase 7: Main `[모의 n]`, Host, context menu, Event/Review/Reset/Return UI.
+- Phase 8A: Production global/selective start coexistence gap closed at backend boundary.
+- Phase 8B: baseline regression debt verified with full fresh-process sharding.
+- Phase 8C: final static/isolation/mutation checks, documentation, commit, and push.
+
+## Mock-Owned Files
+
+- 13 `mock_validation_*.py` modules
+- 11 `tests/test_mock*.py` test modules
+
+## Approved Production Touch
+
+- `kiwoom_realtime_fids.py`
+- `kiwoom_api.py`
+- `gui_windows.py`
+- `gui_main_table_loader.py`
+- `gui_main_stock_context_menu.py`
+- `gui_auto_trade_context_menu.py`
+- `gui_auto_trade_run_control.py`
+- `gui_auto_trade_setting_window.py`
+
+No Production Routine, Queue, Runtime, Event, Review, Position/PnL, Chejan, or
+SendOrder owner was changed.
+
+## Isolation And Safety Evidence
+
+- AST dependency guard: 13 modules, zero violations.
+- SendOrder dependency/call from Mock: zero.
+- Production mutable-tree hash before/after Mock suite: unchanged.
+- Main and Settings Production operation-start exclusion: focused PASS.
+- current Mock membership read failure: fail-closed.
+- Mock suite: 196 passed.
+- Phase 8 focused coexistence/Host/Review/lifecycle tests: 76 passed.
+- Phase 8 coexistence + Host direct recheck: 30 passed.
+
+## Regression Evidence
+
+- files: 578/578
+- tests: 9,204
+- passed methods: 9,180
+- verified baseline failed methods: 16
+- verified baseline failure records: 17
+- skipped: 8
+- Mock-introduced regression: 0
+
+Single-process `0xC0000409` is shared by base/current. Fresh subprocess execution
+finishes all files without an isolated-process native crash.
+
+## Known Debt And Limitations
+
+- Verified baseline stale expectations remain intentionally unchanged.
+- SELL MULTI_HOGA low-quantity behavior differs: Production single LIMIT fallback versus
+  Mock fail-closed; close safety fixtures remain PASS.
+- Live Kiwoom observation was not forced without a running login/session and is PENDING.
+- Reserved Indicator Follow BUY UI recovery remains deferred and code-unchanged.

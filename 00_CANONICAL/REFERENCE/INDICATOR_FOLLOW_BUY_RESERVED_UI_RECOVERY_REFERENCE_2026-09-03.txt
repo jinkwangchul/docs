@@ -1,0 +1,73 @@
+# Indicator Follow BUY Reserved UI Recovery Reference - 2026-09-03
+
+Status: DEFERRED / DOCUMENTED / CODE UNCHANGED
+
+==================================================
+1. Purpose
+==================================================
+
+This reference prevents the current safety hard-disable from being misread as a
+permanent product decision. It does not enable or implement any BUY feature.
+
+==================================================
+2. Current Hard-Disabled Areas
+==================================================
+
+- 추가기능설정
+- 마지막+1 회차
+- 순환설정
+- 평단/능동 관련 영역
+
+Current status means the execution layer does not yet support the complete contract.
+It is a safety lock, not a deletion decision.
+
+==================================================
+3. Historical Contract Evidence To Preserve
+==================================================
+
+1. 추가기능설정 included:
+   - 직전회차주문가 대비 현재주문가
+   - 마지막+1 회차
+
+2. 마지막+1 회차 had historical implementation/recovery evidence for conditional
+   activation and active-buy detail settings.
+
+3. Historical audit records contain an explicit basis that 마지막+1 회차 must not be
+   deleted or permanently disabled without a new user decision.
+
+4. 순환설정 was not a permanently disabled section. It dynamically controlled exit
+   time-limit fields according to selections such as MULTI_TIME and unfilled-order policy.
+
+5. UI collect/apply/save/load work had been completed while the remaining boundary was
+   UI -> Engine Rule -> Production execution.
+
+6. The present hard-disable is interpreted as a safety lock for unsupported execution,
+   not as permanent retirement of the original user-facing contract.
+
+7. No permanent removal or permanent disable decision is established by the current code.
+
+8. After Mock Validation Freeze, this scope must reopen as a separate Production audit
+   and recovery task.
+
+==================================================
+4. Required Recovery Audit
+==================================================
+
+Compare end-to-end:
+
+`historical contract -> current controls -> collect/apply/save/load -> Rule Mapper -> effective rules -> execution -> tests`
+
+Unsupported paths must remain fail-closed until this audit establishes their complete
+Production ownership and safety boundaries.
+
+==================================================
+5. Non-Authorization
+==================================================
+
+This document does not authorize:
+
+- immediate UI enablement
+- Production execution changes
+- Rule schema changes
+- silent downgrade into supported BUY modes
+- changes to Mock Validation

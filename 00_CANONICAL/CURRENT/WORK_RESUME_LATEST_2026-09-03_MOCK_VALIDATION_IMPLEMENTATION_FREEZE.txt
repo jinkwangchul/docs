@@ -1,0 +1,94 @@
+# Work Resume - Mock Validation Implementation Freeze - 2026-09-03
+
+==================================================
+1. Repository Checkpoints
+==================================================
+
+Code:
+- repository: `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`
+- branch: `feat/restore-auto-trade-setting-ui`
+- Production base: `7a401938fd8a339ad4ac11a92ae8f8da44f20766`
+- Mock Validation freeze: `87522a2d1c6525648e22023415db81c655bc3649`
+- remote: `origin/feat/restore-auto-trade-setting-ui`
+
+Docs:
+- repository: `C:\Users\JIN KWANG CHUL\Documents\docs`
+- branch: `agent/project-prompt-standard`
+- remote: `origin/agent/project-prompt-standard`
+
+==================================================
+2. Current Status
+==================================================
+
+Mock Validation Big Feature is implementation-complete and frozen.
+
+- implementation rate: 100%
+- live status: LIVE OBSERVATION PENDING
+- Mock-introduced Production regression: 0
+- SendOrder from Mock: 0
+- Production mutable-state contamination: 0
+
+==================================================
+3. Completed Scope
+==================================================
+
+- isolated Mock Session/Runtime/ledger/Event/Review/Reset/history
+- realtime trade and ten-level orderbook adapter
+- virtual Order/Fill/Position/PnL
+- Indicator Follow Routine adapter and continuation policies
+- close/carryover/restart/recovery/Return Saga
+- Main Host/UI, `[모의 n]`, stock-level operations
+- Production global/selective start coexistence backend exclusion
+- multi-Instance shared market evidence and independent execution state
+- full static/isolation and fresh-process regression verification
+
+==================================================
+4. Regression Baseline
+==================================================
+
+- 578/578 test files
+- 9,204 tests run
+- 9,180 passed methods
+- 16 verified baseline failed methods / 17 failure records
+- 8 skipped
+- 0 Mock-introduced regression
+
+Do not repair these baseline failures as part of Mock Validation maintenance without
+a separately scoped task.
+
+==================================================
+5. Known Debt
+==================================================
+
+- Live Kiwoom observation pending; implementation and synthetic integration are complete.
+- single-process Windows/PyQt `0xC0000409` process-lifetime debt; sharded execution passes.
+- SELL MULTI_HOGA low-quantity Production/Mock divergence remains documented.
+- existing unrelated code/docs dirty state remains protected.
+
+==================================================
+6. NEXT AFTER MOCK FREEZE
+==================================================
+
+`Indicator Follow Reserved BUY UI Recovery / Production Connection Audit`
+
+Audit and restore as a separate Production scope:
+
+1. 추가기능설정
+2. 마지막+1 회차
+3. 순환설정
+4. 평단/능동 영역
+
+Required comparison:
+
+`past user contract -> current UI -> Rule Mapper -> Production execution -> tests`
+
+Do not mix this work with Mock Validation changes.
+
+==================================================
+7. Start Position For Next Session
+==================================================
+
+1. Verify both repositories' branch/HEAD/status.
+2. Read the Mock implementation Canonical and Reserved BUY UI Recovery Reference.
+3. Audit only; do not assume hard-disable means permanent feature deletion.
+4. Preserve unrelated dirty/untracked state.

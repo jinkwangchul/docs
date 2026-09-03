@@ -1,0 +1,321 @@
+# Official Canonical - Mock Validation Implementation Freeze - 2026-09-03
+
+Status: IMPLEMENTATION COMPLETE / BIG FEATURE FROZEN
+Live status: LIVE OBSERVATION PENDING
+
+==================================================
+1. Authority And Freeze Point
+==================================================
+
+Code repository: `jinkwangchul/kiwoom_auto`
+
+- branch: `feat/restore-auto-trade-setting-ui`
+- Production base: `7a401938fd8a339ad4ac11a92ae8f8da44f20766`
+- Mock Validation freeze commit: `87522a2d1c6525648e22023415db81c655bc3649`
+- code commit message: `Complete isolated mock validation workflow`
+- concept owner: `MASTER_SPEC_CANONICAL_2026-09-03_MOCK_VALIDATION_CONCEPT_CONTRACT.txt`
+
+This document records implementation completion. It does not merge Mock state with
+Production state and does not authorize real Broker orders.
+
+==================================================
+2. Purpose And Final Boundary
+==================================================
+
+Mock Validation is an isolated execution domain used to validate Routine behavior
+against realtime market evidence without creating Production orders, fills,
+positions, PnL, Events, Reviews, or operation state.
+
+Fixed boundary:
+
+`Production market read evidence -> immutable Mock market input -> Mock-only execution state`
+
+The reverse direction is forbidden. Mock execution cannot be promoted into the
+Production Queue, Runtime, Chejan, Position, PnL, Event, Review, or SendOrder path.
+
+==================================================
+3. Phase 0 - Production Read-Only Audit
+==================================================
+
+- Production mutation owners and Broker boundaries were identified before implementation.
+- Existing Production Runtime/Queue/Event/Review writers were rejected as Mock storage.
+- `kiwoom_realtime_fids.py` and `kiwoom_api.py` were pre-reported as minimal additive
+  market-subscription touch points.
+- Main/UI touch points were deferred until the isolated domain was complete.
+
+==================================================
+4. Phase 1 - Isolated Foundation
+==================================================
+
+Implemented Mock-only contracts for:
+
+- Validation Session identity and stock-level lifecycle
+- atomic repository/writer and path guard
+- Order, Fill, Position, PnL, Event, Review, and Reset state
+- immutable Routine/Stock reference snapshots
+- current session versus immutable history separation
+- multi-Instance state isolation
+- Production dependency/mutation AST guard
+
+Mock mutable storage is rooted under `mock_validation/` only. Reset clears current
+execution state and preserves Event history. A new registration creates a new
+Validation Session identity and does not inherit the previous Position or PnL.
+
+==================================================
+5. Phase 2 - Market Data
+==================================================
+
+- Existing `주식체결` Production handling remains unchanged.
+- `주식호가잔량` is normalized into a Mock-only immutable ten-level orderbook stream.
+- ask/bid price and quantity levels, receive sequence, connection epoch, login session,
+  and snapshot identity are preserved.
+- registration is stock-based, not Routine Instance-based.
+- several Instances of one stock share one Broker registration and one market snapshot.
+- stale or previous-session evidence is fail-closed.
+- Virtual Fill polling TR consumption is zero.
+
+==================================================
+6. Phase 3 - Virtual Order And Fill
+==================================================
+
+Implemented Mock-only virtual execution for supported MARKET/LIMIT behavior, including:
+
+- orderbook sweep and partial fill
+- resting LIMIT progression and queue-ahead evidence
+- immutable market snapshot attribution
+- idempotent virtual Order/Fill identity
+- Instance-local Position and PnL updates
+- Mock tax policy (default enabled, configurable 0.20% initial value)
+
+Broker Order/Chejan identifiers are not required and SendOrder is unreachable.
+
+==================================================
+7. Phase 4 - Indicator Follow Adapter
+==================================================
+
+- Indicator Follow reference rules are evaluated through a Mock-owned adapter.
+- Production Routine files and canonical writers are read-only references.
+- decision identity prevents duplicate evaluation/order creation.
+- supported BUY/SELL execution plans are translated into Mock execution requests.
+- unsupported/reserved strategies fail closed rather than silently downgrading.
+
+==================================================
+8. Phase 5 - Continuation And Safety
+==================================================
+
+Mock continuation supports the implemented Routine policies for timeout/cancel,
+reset, repeat, exit, and final residual progression. Existing ordering/precedence is
+preserved. Durable decision evidence prevents duplicate progress after operation-cycle
+replay or restart. Structural uncertainty stops the stock Session for Mock Review;
+it does not stop another stock or create a Production Review.
+
+==================================================
+9. Phase 6 - Operation Lifecycle
+==================================================
+
+Stock-level operations are implemented for start, close, immediate liquidation,
+Review Stop, reset, resume, and return eligibility.
+
+Operation Session completion is distinct from Trading Cycle completion:
+
+- liquidation with holding/pending quantity zero -> DONE
+- approved long-hold carryover -> Operation Session ended while Position/average price
+  and Trading Cycle continue
+- unresolved close residual -> Mock Review, never automatic carryover
+
+Restart recovery distinguishes WAITING, RUNNING, CLOSING, REVIEW_STOPPED,
+CANCEL_PENDING, Carryover, and immediate-liquidation REQUESTED without duplicate
+virtual Orders or Fills.
+
+==================================================
+10. Phase 7 - Host And UI
+==================================================
+
+The Main UI provides:
+
+- `[모의 n]` unique-stock badge and Mock scope projection
+- stock context-menu entry and Routine Instance selection
+- stock-level Mock operation submenu
+- Mock tax, Event, Review, Reset, Close, Immediate Liquidation, and Return UI
+- Production bottom-command disabling while the Mock scope is visible
+
+Market evidence is buffered by the Mock Host. The one-second UI timer advances the
+host cycle but is not the market-evidence sampling boundary.
+
+==================================================
+11. Phase 8 - Coexistence Correction
+==================================================
+
+UI hiding alone was rejected as insufficient. A generic optional read-only operation
+start exclusion callback was added at the common Production pre-mutation boundary.
+
+For a current Mock stock:
+
+- Main global/selective Production start excludes the stock
+- AutoTradeSettingWindow global/selected/selected-row start excludes the stock
+- mixed targets start normal Production stocks only
+- all-Mock targets create no Production operation mutation/Event
+- membership read failure is fail-closed
+- after Mock archive, the underlying unchanged Production eligibility is visible again
+
+Production assignment/status is not changed to implement this exclusion.
+
+==================================================
+12. Multi-Instance Contract
+==================================================
+
+For one stock with Instances A/B/C:
+
+Shared:
+- realtime trade/orderbook evidence
+- immutable market snapshot identity
+
+Independent per Instance:
+- virtual Order/Fill and queue-ahead
+- Position, average price, and PnL
+- cycle, BUY round, generation, continuation, and liquidation state
+
+One Instance Fill does not consume another Instance's virtual liquidity.
+
+Control remains stock-level; root-cause attribution remains Instance-level. No public
+Instance start/reset/resume operation is exposed.
+
+==================================================
+13. Event, Review, And Reset
+==================================================
+
+Mock Event and Mock Review have their own identities and writers. An Instance error
+may stop the stock Session while retaining `source_routine_instance_id`. Production
+Review uses its independent global collector and remains visible even when the Main
+table projects a current Mock stock separately.
+
+==================================================
+14. Return Saga
+==================================================
+
+Fixed order:
+
+`eligibility -> Production preflight -> user choice -> RETURN_REQUESTED -> Production command -> success -> Mock archive -> RETURN_COMPLETED`
+
+If the Production command fails, the current Mock Session remains. Archive-before-command
+is forbidden. `delete_stock_project_data()` is unreachable from the Mock return path.
+
+==================================================
+15. Identity Isolation
+==================================================
+
+- Validation Session: `MV-*`
+- Virtual Order: `MO-*`
+- Virtual Fill: `MF-*`
+- Mock Event: `ME-*`
+- Mock Start: `MS-*`
+- Mock Command: `MC-*`
+
+These namespaces are never promoted into Production identity fields.
+
+==================================================
+16. Approved Existing Production Touch
+==================================================
+
+Phase 2 market subscription:
+- `kiwoom_realtime_fids.py`
+- `kiwoom_api.py`
+
+Phase 7 Host/UI:
+- `gui_windows.py`
+- `gui_main_table_loader.py`
+- `gui_main_stock_context_menu.py`
+- `gui_auto_trade_context_menu.py`
+
+Phase 8 coexistence boundary:
+- `gui_auto_trade_run_control.py`
+- `gui_auto_trade_setting_window.py`
+
+All other implementation files are Mock-owned modules/tests. No Production Queue,
+Runtime, Event, Review, Position, PnL, Routine, or SendOrder owner was modified.
+
+==================================================
+17. Production Isolation Evidence
+==================================================
+
+- Mock AST forbidden Production dependency: PASS (13 modules, 0 violations)
+- direct SendOrder/Kiwoom executor dependency: 0
+- destructive Production delete reachability: 0
+- Production mutable-tree hash before/after 196 Mock tests: identical
+- actual Broker SendOrder during validation: 0
+- Mock Event/Review/Position/PnL remain separate
+- Production global-operation coexistence tests: PASS
+
+==================================================
+18. Regression Baseline
+==================================================
+
+Fresh-subprocess full coverage:
+
+- test files covered: 578/578
+- tests run: 9,204
+- passed test methods: 9,180
+- verified baseline failed test methods: 16
+- verified baseline failure records: 17
+- skipped: 8
+- Mock-introduced regression: 0
+- isolated-process native crash: 0
+
+The 16/17 failures reproduce at both Production base SHA and current implementation.
+They include stale Recovery wording expectations, a stale Indicator Follow fixture,
+a stale P2 explicit-AMOUNT expectation, close/recovery expectation conflicts, and
+additional stale contract/schema records found by sharding.
+
+Single-process Windows/PyQt discovery exits with `0xC0000409` at both base and current.
+All files finish in fresh subprocess shards; this is test-harness/process-lifetime debt,
+not a Mock implementation regression.
+
+==================================================
+19. Known Contract Divergence
+==================================================
+
+SELL MULTI_HOGA low quantity:
+
+- Production may fall back to one basis-price LIMIT child when quantity is lower than
+  planned child count.
+- Mock Routine remains fail-closed.
+
+Phase 6 fixtures prove this does not produce false DONE, false Carryover, quantity loss,
+or duplicate liquidation. The divergence is retained and is not changed by this Freeze.
+
+==================================================
+20. Live Observation
+==================================================
+
+Status: `LIVE OBSERVATION PENDING`
+
+At Freeze time no targetable Kiwoom/login Main process was running. A login or real-account
+process was not forced solely for verification. Signal wiring, registration/reconnect,
+evidence buffer, synthetic realtime integration, Host/UI wiring, Virtual execution,
+SendOrder isolation, and full regression are verified.
+
+Implementation completion is independent from this pending operational observation.
+
+==================================================
+21. Reserved BUY UI Debt
+==================================================
+
+Reserved Indicator Follow BUY UI areas remain code-unchanged and deferred:
+
+- 추가기능설정
+- 마지막+1 회차
+- 순환설정
+- 평단/능동 관련 hard-disable
+
+The hard-disable is an execution-layer safety lock, not a permanent feature deletion.
+See `INDICATOR_FOLLOW_BUY_RESERVED_UI_RECOVERY_REFERENCE_2026-09-03.txt`.
+
+==================================================
+22. Final Judgment
+==================================================
+
+`MOCK VALIDATION BIG FEATURE FROZEN - 100% IMPLEMENTED`
+
+Operational observation status remains separately recorded as:
+
+`LIVE OBSERVATION PENDING`
