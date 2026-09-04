@@ -1,0 +1,97 @@
+# Work Resume - Indicator Follow Routine Settings Git Closure - 2026-09-04
+
+Status:
+`PRODUCTION BIG FEATURE FROZEN - 100% / GIT CLOSURE COMPLETE`.
+
+Mock parity:
+`DEFERRED - FAIL-CLOSED`.
+
+==================================================
+1. Final Repository Baseline
+==================================================
+
+Code repository:
+- path: `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`;
+- branch: `feat/restore-auto-trade-setting-ui`;
+- local SHA: `c8ed1d061ce2c0b78824d36abce6c450786b4efa`;
+- origin SHA: `c8ed1d061ce2c0b78824d36abce6c450786b4efa`;
+- ahead/behind: 0/0;
+- commit: `Complete indicator-follow routine settings execution`.
+
+Docs repository:
+- path: `C:\Users\JIN KWANG CHUL\Documents\docs`;
+- branch: `agent/project-prompt-standard`;
+- pre-closure feature-doc SHA: `838d2343b167d4baa9cf5d8b0ccae0d6d0813cde`;
+- final Docs closure SHA: the commit containing this document;
+- final origin SHA: verified equal to that containing commit after push;
+- exact final SHA: recorded in the Conversation Closing result.
+
+==================================================
+2. Feature State
+==================================================
+
+Connected Production scope remains complete:
+- Previous-Round Price Skip;
+- Last+1 MARKET/CURRENT_PRICE/ACTIVE;
+- Multi-Point Last-Round Active Buy;
+- supported signal-scoped Cycle.
+
+Reserved scope remains fail closed:
+- Repeat ACTIVE_BUY;
+- Cycle PRICE_COMPARE + CANCEL_BATCH.
+
+User-adjustable values remain independent parameters. No numeric example is a
+fixed feature semantic.
+
+==================================================
+3. Mock State
+==================================================
+
+Mock Validation remains frozen and unchanged. Parity enhancement for the
+documented price/average evidence gaps is deferred and fail closed. This Git
+closure does not reopen Mock source, tests, Runtime, or policy.
+
+==================================================
+4. Working Tree State
+==================================================
+
+Both repositories intentionally retain unrelated dirty and untracked content.
+At Conversation Closing entry:
+- Code: staged 0, tracked-status paths 87, content-diff paths 86, untracked 121;
+- Docs: staged 0, tracked-status paths 122, content-diff paths 122, untracked 10.
+
+The exact final counts are re-measured after this document's commit because the
+three new closure documents cease to be untracked and the selected Reference
+Index hunk becomes committed. All unrelated path sets and hunks remain
+protected.
+
+Protected separate work includes:
+- Early Close Zero-Holding;
+- Persistent Context Menu;
+- existing local operational/runtime/user data;
+- other pre-existing tracked and untracked work.
+
+None was staged, committed, cleaned, reset, restored, or deleted by this
+closure.
+
+==================================================
+5. Current Authorities
+==================================================
+
+Feature contract:
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_INDICATOR_FOLLOW_ROUTINE_SETTINGS_COMPLETION_FREEZE.txt`.
+
+Git closure resync:
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_INDICATOR_FOLLOW_ROUTINE_SETTINGS_GIT_CLOSURE_RESYNC.txt`.
+
+Closure changelog:
+`00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-04_INDICATOR_FOLLOW_ROUTINE_SETTINGS_GIT_CLOSURE.txt`.
+
+==================================================
+6. Conversation Closing Rule
+==================================================
+
+Git Closure is complete. No new Big Feature is selected by this document. The
+next work, if any, must start from the current protected Local Working Tree and
+its explicit user instruction. Do not reset, restore, stash, clean, or broadly
+stage the repositories.

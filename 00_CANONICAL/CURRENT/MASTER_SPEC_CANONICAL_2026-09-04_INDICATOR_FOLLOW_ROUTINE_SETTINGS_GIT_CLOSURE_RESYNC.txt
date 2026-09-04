@@ -1,0 +1,118 @@
+# Master Spec Canonical - Indicator Follow Routine Settings Git Closure Resync - 2026-09-04
+
+==================================================
+1. Role And Authority
+==================================================
+
+This document is an additive post-Git-closure baseline resynchronization for:
+
+`Indicator Follow Routine Settings Missing Implementation Completion`.
+
+The feature contract remains owned by:
+
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_INDICATOR_FOLLOW_ROUTINE_SETTINGS_COMPLETION_FREEZE.txt`.
+
+This document changes no feature, policy, state, Writer, Runtime, Queue, Broker,
+or Mock contract. It supersedes only the pre-closure Git baseline statements in
+the Freeze-era documents.
+
+==================================================
+2. Final Feature Status
+==================================================
+
+Production:
+`INDICATOR FOLLOW ROUTINE SETTINGS MISSING IMPLEMENTATION PRODUCTION BIG FEATURE FROZEN - 100%`.
+
+Mock parity:
+`DEFERRED - FAIL-CLOSED`.
+
+Reserved Production policies remain reserved. No Mock Freeze is reopened.
+
+==================================================
+3. Code Git Closure
+==================================================
+
+Repository:
+`C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`.
+
+Remote:
+`https://github.com/jinkwangchul/kiwoom_auto.git`.
+
+Branch:
+`feat/restore-auto-trade-setting-ui`.
+
+Final feature commit:
+`c8ed1d061ce2c0b78824d36abce6c450786b4efa`.
+
+Commit message:
+`Complete indicator-follow routine settings execution`.
+
+Verification on 2026-09-04:
+- local branch HEAD equals the commit above;
+- origin branch HEAD equals the commit above;
+- ahead/behind is 0/0;
+- the feature's exact 13-path Production/test closure is committed and pushed.
+
+The prior Code restore point remains:
+`fb2e5713f9f756bbe9a1a8c325f1c6dab1f5ec70`.
+
+==================================================
+4. Docs Git Closure Baseline
+==================================================
+
+Repository:
+`C:\Users\JIN KWANG CHUL\Documents\docs`.
+
+Remote:
+`https://github.com/jinkwangchul/docs.git`.
+
+Branch:
+`agent/project-prompt-standard`.
+
+Pre-resync Docs HEAD, already committed and pushed:
+`838d2343b167d4baa9cf5d8b0ccae0d6d0813cde`.
+
+Commit message:
+`Freeze indicator-follow routine settings completion`.
+
+The final Docs closure SHA is the commit containing this resync document. Its
+exact SHA is verified against origin after push and recorded in the Conversation
+Closing result. A Git commit cannot embed its own final object ID without
+changing that object.
+
+==================================================
+5. Point-In-Time Reconciliation
+==================================================
+
+The Completion Freeze Canonical, P5 Work Resume, and P5 Changelog accurately
+recorded their authoring-time state:
+- Code feature changes were then uncommitted;
+- Docs P5 documents were then uncommitted;
+- Git Closure was then pending.
+
+Those statements are immutable historical evidence, not current Git status.
+The later commits `c8ed1d...` and `838d234...` completed that closure. This
+resync replaces only the obsolete Git-baseline interpretation. Every functional
+contract, regression result, safety boundary, supported scope, and reserved
+scope in the original Freeze Canonical remains unchanged.
+
+==================================================
+6. Protected Local Work
+==================================================
+
+Unrelated tracked and untracked Local Working Tree changes remain intentionally
+protected. They include separate Early Close Zero-Holding, Persistent Context
+Menu, operational/local data, and other pre-existing work. They are not part of
+this feature closure and are not evidence of an incomplete Freeze.
+
+==================================================
+7. Final Judgment
+==================================================
+
+`FEATURE CONTRACT: UNCHANGED`.
+
+`CODE GIT CLOSURE: COMPLETE AND REMOTE-SYNCHRONIZED`.
+
+`DOCS FEATURE FREEZE: COMMITTED AND REMOTE-SYNCHRONIZED`.
+
+`POST-CLOSURE BASELINE: RESYNCHRONIZED BY THIS ADDITIVE DOCUMENT`.
