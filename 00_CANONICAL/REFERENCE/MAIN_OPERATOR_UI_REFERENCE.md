@@ -4,8 +4,10 @@
 
 This reference owns detailed Main operator-UI behavior for Review Management,
 state-aware Stock context menus, footer projection, footer icon/color semantics,
-and footer layout. High-level authority remains in
-`MASTER_SPEC_CANONICAL_2026-08-24_CURRENT_WINDOW_RESET_STOCK_UI_FINALIZATION.txt`.
+and footer layout. High-level authority remains in the 2026-08-24 Window/Stock
+UI contract except that the monitoring/operating permission switch is
+superseded by
+`MASTER_SPEC_CANONICAL_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT.txt`.
 
 It does not define Runtime, participant, Queue, Execution, Broker, or SendOrder
 semantics.
@@ -31,6 +33,10 @@ Menu composition, order, separators, and state-specific branches remain intact.
 An action that is disallowed for the current state remains visible and is set
 disabled; it is not deleted or hidden.
 
+The retired monitoring/operating permission QAction is an explicit exception:
+it is ABSENT in every Main and Settings context, including Review. There is no
+visible-disabled placeholder for the retired action.
+
 UI disabling is not the mutation boundary. The same authoritative state guard
 must reject direct callback or alternate-caller execution. A disabled parent
 menu disables access to every child action.
@@ -54,7 +60,6 @@ The following remain visible and disabled:
 
 - `운영시작`
 - `운영제외`
-- `감시전용 전환`
 - `조기마감`
 - `개별청산`
 - `종목등록`
@@ -77,7 +82,6 @@ The following remain visible and disabled:
 
 - `운영시작`
 - `운영제외`
-- `감시전용 전환`
 - `조기마감`
 - `개별청산`
 - `종목등록`
@@ -108,23 +112,26 @@ Production caller / raw status
   -> footer QLabel
 ```
 
-The raw Production inventory contains 185 messages. The footer exposes 30
+The raw Production inventory remains historical audit evidence. The current
+footer exposes 29
 canonical operator messages:
 
-- `CONVERTED`: 19
-- `MERGED`: 112
-- `FOOTER_REMOVED`: 54
+- success: 8
+- failure: 11
+- progress: 7
+- state: 2
+- warning: 1
 
 `FOOTER_REMOVED` suppresses only footer projection. Existing caller behavior,
 Event Journal, logger, Runtime, and Execution evidence remains available.
 
-The detailed raw inventory, caller paths, 30-message table, and all 185
-dispositions are authoritative in the code repository:
+The detailed raw inventory, caller paths, former 30-message table, and all 185
+dispositions remain historical audit evidence in the code repository:
 
 - `reports/MAIN_FOOTER_STATUS_MESSAGE_AUDIT.md`
 - `reports/MAIN_FOOTER_STATUS_MESSAGE_EXHAUSTIVE_LIST.md`
 
-This reference does not duplicate those tables.
+They do not override the current 29-message implementation-owned tuple.
 
 ## Footer Inclusion And Exclusion
 
@@ -154,10 +161,10 @@ stage messages.
 | `✓` | success / completion | green | 8 |
 | `✕` | failure / fault | red | 11 |
 | `▷` | progress / wait | orange | 7 |
-| `●` | current state / mode | dark gray | 3 |
+| `●` | current state / mode | dark gray | 2 |
 | `※` | warning / operator attention | orange family | 1 |
 
-Total: 30. `▶`, `!!`, and arbitrary new icons are not used. Failure and warning
+Total: 29. `▶`, `!!`, and arbitrary new icons are not used. Failure and warning
 messages retain the current 2.5-second protection from lower-priority overwrite.
 
 Representative canonical messages include:
@@ -171,10 +178,11 @@ Representative canonical messages include:
 - market data: `▷ 시장데이터 수신 대기`, `✓ 시장데이터 수신 정상`,
   `✕ 시장데이터 수신 중단`
 - operation: `▷ 운영 시작 대기`, `✓ 운영 시작`, `✓ 운영 정지`,
-  `✕ 운영 시작 실패`, `✕ 운영 정지 실패`, `● 감시전용 운영`
+  `✕ 운영 시작 실패`, `✕ 운영 정지 실패`
 - safety: `✕ 긴급정지`, `✓ 긴급정지 해제`
 
-The exhaustive report remains the owner of the complete 30-message list.
+The implementation-owned canonical tuple is the authority for the complete
+29-message list. Older exhaustive inventory counts remain historical evidence.
 
 ## Footer Layout And Button Style
 

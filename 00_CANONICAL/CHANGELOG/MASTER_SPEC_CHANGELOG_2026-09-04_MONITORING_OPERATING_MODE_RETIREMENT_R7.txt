@@ -1,0 +1,49 @@
+# Master Spec Changelog - Monitoring / Operating Mode Retirement R7 - 2026-09-04
+
+## Decision
+
+The user retired the Production monitoring/operating permission switch. There
+is no current `real_trade_enabled` permission layer and no replacement
+live/watch boolean.
+
+## R2-R7 Summary
+
+- migrated approved False legacy Stock data without mapping it to exclusion,
+  assignment, Mock, or another permission state;
+- removed Backend readers and permission-derived status/order behavior;
+- removed Main/Settings QAction, callback, writer, DTO field, tooltip, footer
+  state, and new toggle Event creation;
+- removed all active True/False/timestamp/state legacy fields;
+- added fail-closed `CURRENT_SCHEMA` / `MIGRATION_REQUIRED` / `DATA_INVALID`
+  compatibility inspection before Production start/recovery/order progression;
+- normalized current tests to absent-field single-Production fixtures;
+- retained explicit legacy migration, malformed-data, idempotency, and
+  no-False-to-True tests;
+- superseded old active monitoring-only documentation while preserving all
+  historical documents and Event evidence.
+
+## Unaffected Contracts
+
+- `operation_excluded`, Routine Instance enabled, Assignment, participant,
+  Review, Emergency, Recovery, Approval, Execution Enable, REAL_READY, Queue,
+  Runtime, Lock, freshness, Dispatch, Final Send, SendOrder validation, and
+  Chejan reconciliation remain independent safety gates.
+- `signal_probe_only`, time-policy MONITORING, ATS/operation_mode, Early Close,
+  Persistent Context Menu, and Mock Validation remain.
+- Mock Validation is not redefined as a monitoring mode.
+
+## Current Data
+
+- active Stock configs: retired permission key present 0; timestamp present 0
+- active Stock states: retired permission key present 0
+- no immediate permission expansion from cleanup
+
+## Test Evidence
+
+R7 affected regression retains only verified baseline debt. New retirement test
+regressions are zero. R8 full regression and final freeze remain pending.
+
+## Historical Policy
+
+Past `TRADE_PERMISSION_TOGGLE` records and monitoring-only design documents are
+retained as historical evidence. `READ OLD` is supported; `WRITE NEW` is not.

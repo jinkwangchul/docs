@@ -1,6 +1,6 @@
 # MASTER_SPEC Reference Index
 
-Reference Edition - consolidated 2026-09-02
+Reference Edition - consolidated 2026-09-04
 
 This file is an index, not an operating-policy document. User instructions,
 actual code/evidence, and the named current owners remain authoritative in that
@@ -17,6 +17,7 @@ CURRENT.
 | Review Management and Emergency lifecycle | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-02_REVIEW_MANAGEMENT_EMERGENCY_LIFECYCLE.txt` | `00_CANONICAL/REFERENCE/MAIN_OPERATOR_UI_REFERENCE.md` |
 | Close and Liquidation | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-15_CLOSE_ACTION_AND_BUFFER_RESPONSE_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-01_CLOSE_PROCESS_OPERATION_CONTRACT.txt`, `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-16_INDIVIDUAL_LIQUIDATION_TIME_AND_LONG_HOLD_CONTRACT.txt` |
 | Main monitoring, Stock registration, Context Menu, Footer | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-24_CURRENT_WINDOW_RESET_STOCK_UI_FINALIZATION.txt` | `00_CANONICAL/REFERENCE/MAIN_OPERATOR_UI_REFERENCE.md`, `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-18_MAIN_MONITORING_SELECTION_AND_HEIGHT_FREEZE.txt` |
+| Production monitoring/operating permission retirement | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT_FREEZE.txt` | Final R0-R8 authority; supersedes the R7 pre-Freeze owner and only the retired switch wording in older Routine/Window/UI contracts |
 | Indicator-follow SELL execution and MULTI_HOGA contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_INDICATOR_FOLLOW_SELL_PHASE1_AND_MULTI_HOGA_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` |
 | Routine package boundary and capability contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt` |
 | Logical Group and Group Pack identity/lifecycle | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-22_LOGICAL_GROUP_PACK_ARCHITECTURE_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt`, `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-22_GROUP_LIFECYCLE_RECOVERY_FREEZE.txt`, `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-22_AUTO_TRADE_SETTING_STRATEGY_WORKSPACE_UI_CLOSURE.txt` |
@@ -51,12 +52,15 @@ does not supersede them.
 - Indicator Follow reserved BUY UI recovery evidence and deferred scope:
   `00_CANONICAL/REFERENCE/INDICATOR_FOLLOW_BUY_RESERVED_UI_RECOVERY_REFERENCE_2026-09-03.txt`
 
+- Production monitoring/operating permission retirement:
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT_FREEZE.txt`
+
 ## Current Resume And Changelog
 
 - Latest Work Resume:
-  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-03_MOCK_VALIDATION_IMPLEMENTATION_FREEZE.txt`
+  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT_FREEZE.txt`
 - Latest Changelog:
-  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-03_MOCK_VALIDATION_IMPLEMENTATION_FREEZE.txt`
+  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT_R8.txt`
 
 Older Work Resumes, Readable variants, Freeze snapshots, and Changelogs are
 historical records. They may explain a past decision but must not be used as a
@@ -76,7 +80,9 @@ current owner when a primary owner above covers the same function.
 
 - Current owner beats Archive/Legacy wording on conflict.
 - Similar names do not merge budget, Runtime, persistence, or lifecycle owners.
-- Monitoring-only means REAL execution suppression; it is not PAPER simulation.
+- Monitoring-only REAL execution suppression is retired from Production. PAPER
+  and Mock remain separate isolated-domain concepts and are not replacements for
+  the retired permission switch.
 - PAPER is `PENDING IMPLEMENTATION / ARCHITECTURE DIRECTION APPROVED`, not a
   completed Production contract and not an automatic next work item.
 - Internal execution stages such as REAL_READY, Queue, Dispatch, and SendOrder

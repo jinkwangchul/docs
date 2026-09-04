@@ -1,0 +1,51 @@
+# Master Spec Changelog - Monitoring / Operating Mode Retirement R8 - 2026-09-04
+
+## Final Result
+
+R0-R8 are complete. The former Production monitoring/operating permission
+switch is fully retired and the Big Feature is frozen at 100 percent pending
+selective Git Closure.
+
+## R7 Correction
+
+The final three stale tests no longer expect
+`real_trade_enabled=False -> MONITORING`:
+
+- no valid current transition leaves RUNNING unchanged;
+- operation-mode change/unregister uses an idle STOPPED fixture;
+- read-back mismatch uses the current `signal_probe_only` transition.
+
+Production source, data, and docs were unchanged during the correction.
+
+## R8 Evidence
+
+- current retired config/state/timestamp fields: 0;
+- Backend/UI/writer/default/mirror/alias/replacement flag: 0;
+- legacy presence: `MIGRATION_REQUIRED`;
+- malformed/identity conflict: `DATA_INVALID`;
+- false-to-true conversion: 0;
+- disabled Instance and all independent safety gates preserved;
+- Production and Mock data-tree hashes unchanged;
+- actual Broker SendOrder: 0;
+- Mock: 196 passed;
+- full regression: 583/583 files, 9,239 tests, 9,212 passed, 8 skipped;
+- 19 failed methods / 20 records are verified pre-existing debt;
+- retirement residual: 0;
+- new Production regression: 0;
+- isolated-process native crash: 0;
+- py_compile/import/static/diff checks: PASS.
+
+Two failures beyond the earlier inventory were reproduced unchanged from code
+Freeze SHA `7a401938fd8a339ad4ac11a92ae8f8da44f20766`; they are stale Recovery
+summary wording and BUY mapper expectations, not retirement regressions.
+
+## Protected Scope
+
+Early Close zero-holding, Persistent Context Menu, Mock Validation,
+`operation_excluded`, `signal_probe_only`, normal MONITORING provenance,
+Assignment, and broker/execution safety retain their existing contracts.
+
+## Git State
+
+No staging, commit, or push was performed. Exact retirement-only Git Closure is
+pending user review. Existing unrelated dirty/untracked changes remain protected.

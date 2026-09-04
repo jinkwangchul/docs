@@ -1,0 +1,54 @@
+# Work Resume - Monitoring / Operating Mode Retirement R7 - 2026-09-04
+
+## Repository Checkpoints
+
+Code:
+- repository: `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`
+- branch: `feat/restore-auto-trade-setting-ui`
+- HEAD during R7: `87522a2d1c6525648e22023415db81c655bc3649`
+
+Docs:
+- repository: `C:\Users\JIN KWANG CHUL\Documents\docs`
+- branch: `agent/project-prompt-standard`
+- HEAD during R7: `572d23d1237a6b45595648f79fe1a9d1ba2fdd81`
+
+## Progress
+
+- R0 COMPLETE: retirement decision and scope
+- R1 COMPLETE: data preview and inventory
+- R2 COMPLETE: approved False legacy migration
+- R3 COMPLETE: residual/permission-expansion audit
+- R4 COMPLETE: Backend authority retirement
+- R5 COMPLETE: UI/writer/DTO/Event creation retirement
+- R6 COMPLETE: active data cleanup and legacy compatibility guard
+- R7 COMPLETE: test contract and Current documentation supersede
+- R8 NEXT: full regression and final freeze
+
+## Current Production Contract
+
+- active retired config/state/timestamp fields: 0
+- active Backend permission reader: 0
+- permission QAction/callback/writer: 0
+- replacement permission flag: 0
+- current active data: normal Production use allowed
+- restored legacy retired-field data: `MIGRATION_REQUIRED`
+- malformed/identity-conflicting data: `DATA_INVALID`
+- one Production operation path, protected by independent safety gates
+
+## R7 Test State
+
+- current fixtures use absent-field schema
+- legacy compatibility matrix retained
+- general MONITORING, signal probe, operation exclusion, disabled Instance,
+  Approval/readiness/Final Send, Early Close, Persistent Menu, and Mock safety
+  preserved
+- unrelated verified baseline debt remains intentionally unchanged
+- actual Broker SendOrder during R7 tests: 0
+
+## R8 Next
+
+Run full fresh-process regression and final static/data/document audit. Stage
+only the approved retirement scope after all R8 conditions pass. Do not declare
+the final retirement freeze before R8.
+
+Reserved Indicator Follow BUY UI recovery remains deferred and unchanged.

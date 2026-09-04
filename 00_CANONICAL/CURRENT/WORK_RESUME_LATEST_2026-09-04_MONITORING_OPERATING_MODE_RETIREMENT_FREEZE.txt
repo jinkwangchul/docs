@@ -1,0 +1,59 @@
+# Work Resume - Monitoring / Operating Mode Retirement Final Freeze - 2026-09-04
+
+## Repository Checkpoints
+
+Code:
+- branch: `feat/restore-auto-trade-setting-ui`
+- audited HEAD: `87522a2d1c6525648e22023415db81c655bc3649`
+- commit/push: PENDING USER REVIEW / GIT CLOSURE
+
+Docs:
+- branch: `agent/project-prompt-standard`
+- audited HEAD: `572d23d1237a6b45595648f79fe1a9d1ba2fdd81`
+- commit/push: PENDING USER REVIEW / GIT CLOSURE
+
+## Completion
+
+- R0 scope/retirement decision: COMPLETE
+- R1 inventory/preview: COMPLETE
+- R2 canonical legacy migration: COMPLETE
+- R3 residual/permission expansion audit: COMPLETE
+- R4 Backend retirement: COMPLETE
+- R5 UI/writer retirement: COMPLETE
+- R6 compatibility guard and active cleanup: COMPLETE
+- R7 test/document contract: COMPLETE
+- R7 minimal test-contract correction: COMPLETE
+- R8 full Production/Mock regression and Final Freeze: COMPLETE
+
+## Current Contract
+
+- one Production operation path;
+- retired active config/state fields: 0;
+- Backend/UI/writer/default/mirror/alias/replacement permission: 0;
+- restored legacy fields: `MIGRATION_REQUIRED`;
+- malformed or conflicting data: `DATA_INVALID`;
+- disabled Routine Instance, Assignment, exclusion, probe, Review/Recovery,
+  Approval, REAL_READY, Queue/Runtime/Lock, Final Send, and broker safety remain;
+- Mock remains isolated; actual SendOrder during validation: 0.
+
+## Final Regression
+
+- 583/583 files;
+- 9,239 tests;
+- 9,212 passed;
+- 8 skipped;
+- 19 known-debt failed methods / 20 failure records;
+- retirement residual: 0;
+- new Production regression: 0;
+- isolated-process native crash: 0.
+
+## Git Closure
+
+Do not stage by broad path or use `git add .` / `git add -A`. Reconstruct the
+R2-R8 retirement paths and hunks, exclude unrelated Persistent Menu, Early
+Close, Mock, Routine, data, and user dirty work, then perform cached-diff audit.
+
+## Next Work
+
+Git Closure after user review. No new functional phase is required for this
+retirement.

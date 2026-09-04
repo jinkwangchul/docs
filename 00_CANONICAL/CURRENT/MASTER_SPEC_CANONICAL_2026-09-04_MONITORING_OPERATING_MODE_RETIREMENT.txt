@@ -1,0 +1,233 @@
+# Master Spec Canonical - Monitoring / Operating Mode Retirement - 2026-09-04
+
+==================================================
+1. Purpose And Authority
+==================================================
+
+This document is the current authority for retirement of the former Production
+monitoring/operating permission switch. It supersedes active-contract wording
+about that switch in older Current documents and references. Historical files,
+Event records, and Changelogs remain evidence and are not rewritten.
+
+R7 records the completed R2-R6 implementation and test contract. R8 full
+regression and final feature freeze are still required; this document does not
+declare the R8 freeze complete.
+
+==================================================
+2. Retired Feature
+==================================================
+
+Production no longer has:
+
+- `감시모드` / `감시전용` as a per-Stock order permission mode;
+- an `운영모드` transition paired with that mode;
+- a context-menu or Settings action that toggles the pair;
+- monitoring-only REAL-order suppression owned by `real_trade_enabled`;
+- `real_trade_policy_updated_at` as an active policy field;
+- a `real_trade_guard_ok`, `real_trade_allowed`, live/watch, or equivalent
+  replacement permission boolean.
+
+There is one Production operation path. Removing this switch does not bypass
+the independent safety gates listed below.
+
+==================================================
+3. Current Active Data Schema
+==================================================
+
+Normal active Stock config:
+
+- `real_trade_enabled`: ABSENT
+- `real_trade_policy_updated_at`: ABSENT
+
+Normal active Stock state:
+
+- `real_trade_enabled`: ABSENT
+
+Presence of a retired field is legacy-schema evidence, not a current feature or
+permission value. R6 cleanup confirmed all 18 active Stocks use the absent-field
+schema.
+
+==================================================
+4. Legacy Compatibility
+==================================================
+
+Compatibility results are:
+
+- `CURRENT_SCHEMA`: all retired fields absent and identity valid;
+- `MIGRATION_REQUIRED`: any retired config/state/guard field exists;
+- `DATA_INVALID`: malformed JSON or Stock identity conflict.
+
+False and false-compatible values additionally carry
+`LEGACY_DENIAL_PRESENT`. True values also require migration. Neither True nor
+False is interpreted as an active Production permission.
+
+`MIGRATION_REQUIRED` is a schema guard, not a new order-authority state.
+
+==================================================
+5. Migration Behavior
+==================================================
+
+Migration removes retired keys through the canonical Stock config and Runtime
+state field-deletion boundaries. It does not convert False to True, create a
+replacement flag, change Assignment/status/exclusion, or rewrite unrelated
+data. Hash drift, malformed input, obligations, or identity conflicts fail
+closed. Re-execution is idempotent.
+
+A restored legacy backup may not enter Production operation-start, recovery,
+signal creation, Candidate, Queue, or SendOrder progression until explicit
+migration restores `CURRENT_SCHEMA`.
+
+==================================================
+6. Production Operation And Safety
+==================================================
+
+The single Production path remains protected by independent authorities:
+
+- current-session participant;
+- `operation_excluded`;
+- Review and Emergency;
+- Recovery/session identity;
+- Stock Assignment;
+- Routine Instance `enabled`;
+- Approval and Operation Policy;
+- Execution Enable and `REAL_READY`;
+- login, account selection, and account match;
+- Queue, Runtime, Lock, request identity, and duplicate protection;
+- current-price/freshness checks;
+- Dispatch Claim, Final Send Gate, SendOrder validation;
+- Chejan, Fill, Position, and reconciliation.
+
+Legacy-schema checks execute before Production mutation. A blocked legacy Stock
+does not create a participant, signal, Candidate, Queue item, or broker call.
+
+==================================================
+7. Routine Instance And Assignment
+==================================================
+
+Assignment remains the Stock-to-Instance authority. A disabled Routine
+Instance remains fail-closed with `ROUTINE_INSTANCE_DISABLED`; it creates no
+durable signal, Candidate, Approval entry, Queue record, or SendOrder call.
+Retirement of the permission switch does not enable a disabled Instance.
+
+==================================================
+8. Operation Exclusion
+==================================================
+
+`operation_excluded` is an independent current feature. Global and selective
+start exclusion, Execution Universe exclusion, and the operator's
+운영제외/해제 controls remain unchanged. Legacy cleanup never clears or creates
+operation exclusion.
+
+==================================================
+9. Signal Probe And MONITORING
+==================================================
+
+`signal_probe_only` remains independent. Probe start/stop, signal evaluation,
+MONITORING projection, restart/recovery, and REAL-order blocking remain.
+
+The `MONITORING` status is not retired. Valid provenance includes time policy,
+signal probe, Review/Recovery, close lifecycle, and other existing status
+policy. Only the former permission-derived branch
+`real_trade_enabled=False -> MONITORING` is retired.
+
+`operation_mode` (`SCHEDULED`, `CONTINUOUS`, manual/time operation, ATS) is not
+the retired monitoring/operating permission switch and remains current.
+
+==================================================
+10. Operator UI
+==================================================
+
+Main and AutoTradeSetting context menus contain no monitoring/operating
+permission QAction. In Review state the retired action is ABSENT, not merely
+visible-disabled. Existing operation start, operation exclusion, Review,
+early-close, liquidation, ATS, Mock, and other actions retain their contracts.
+Persistent context-menu behavior remains unchanged.
+
+==================================================
+11. Historical Evidence
+==================================================
+
+Past `TRADE_PERMISSION_TOGGLE` Event records, Changelogs, old monitoring-only
+design documents, operation rosters, and session evidence are retained as
+history. Reading old records is allowed. Creating a new toggle Event or treating
+historical wording as current authority is not allowed.
+
+==================================================
+12. Mock Validation Separation
+==================================================
+
+Mock Validation remains an isolated execution domain with its own Session,
+Order, Fill, Position, PnL, Event, and Review state. It is not a replacement
+monitoring mode and is not implemented through a Production permission flag.
+Mock SendOrder remains zero.
+
+==================================================
+13. Unaffected Contracts
+==================================================
+
+The following remain unchanged:
+
+- Early Close, including zero-holding canonical completion;
+- close/liquidation and participant retirement;
+- Persistent Context Menu;
+- Mock/Production start coexistence exclusion;
+- Budget, Queue, Runtime, Execution, and Broker boundaries.
+
+Historical roster membership is session evidence and is not a current durable
+participant by itself.
+
+==================================================
+14. R2-R6 Implementation Evidence
+==================================================
+
+- R2: canonical migration of approved False legacy data.
+- R3: residual and permission-expansion audit.
+- R4: Backend permission ownership removed.
+- R5: UI actions, callbacks, writer, DTO fields, and current Event creation
+  removed.
+- R6: active True/timestamp/state data cleanup; compatibility inspection wired
+  to operation-start, recovery/order preflight, and Execution Universe.
+- Active inventory after R6: config retired fields 0; state retired fields 0;
+  timestamp fields 0; all 18 active Stocks `CURRENT_SCHEMA`.
+
+No new Production SoT, canonical writer, Runtime schema, or replacement
+permission flag was introduced.
+
+==================================================
+15. R7 Test Contract
+==================================================
+
+Current-schema fixtures omit retired fields. Tests that previously expected a
+toggle, permission-derived MONITORING, or retired guard text are superseded.
+Compatibility tests retain True/False/false-compatible/timestamp/malformed
+inputs and verify fail-closed migration behavior. General MONITORING,
+signal-probe, exclusion, disabled-Instance, Approval, readiness, Final Send,
+Early Close, and Mock safety tests remain.
+
+Known baseline failures are not repaired as part of this retirement.
+
+==================================================
+16. Superseded Current Wording
+==================================================
+
+This document supersedes only monitoring/operating permission-switch wording in:
+
+- `MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt`;
+- section 16 of
+  `MASTER_SPEC_CANONICAL_2026-08-24_CURRENT_WINDOW_RESET_STOCK_UI_FINALIZATION.txt`;
+- older Work Resumes and Reference Index wording that describes
+  monitoring-only as an active REAL execution-suppression mode;
+- old `MAIN_OPERATOR_UI_REFERENCE.md` entries for `감시전용 전환` and
+  `● 감시전용 운영`.
+
+All unrelated contracts in those documents remain current according to their
+existing owners.
+
+==================================================
+17. Remaining R8 Work
+==================================================
+
+R8 must perform full regression, static residual verification, active-data and
+mutation verification, documentation consistency checks, selective staging,
+and final freeze determination. Until R8 passes, this retirement is R7-complete
+but not declared a final Big Feature freeze.

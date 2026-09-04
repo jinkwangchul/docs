@@ -1,0 +1,180 @@
+# Master Spec Canonical - Monitoring / Operating Mode Retirement Final Freeze - 2026-09-04
+
+==================================================
+1. Authority And Status
+==================================================
+
+Status: R0-R8 COMPLETE / BIG FEATURE FROZEN.
+
+This is the final current authority for retirement of the former Production
+monitoring/operating permission switch. It supersedes
+`MASTER_SPEC_CANONICAL_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT.txt`.
+Historical documents, Events, and Changelogs remain evidence only.
+
+Audited code branch: `feat/restore-auto-trade-setting-ui`
+Audited HEAD: `87522a2d1c6525648e22023415db81c655bc3649`
+Code/Docs commit and push: PENDING USER REVIEW / GIT CLOSURE.
+
+==================================================
+2. Retired Production Contract
+==================================================
+
+Production no longer has:
+
+- a per-Stock `감시모드` / `감시전용` REAL-order permission;
+- a paired `운영모드` permission transition;
+- `real_trade_enabled` or `real_trade_policy_updated_at` as active policy;
+- `real_trade_guard_ok`, `real_trade_allowed`, or an equivalent alias;
+- a permission QAction, callback, writer, default, Runtime mirror, or new toggle
+  Event;
+- a replacement permission boolean.
+
+There is one Production operation path. Independent safety gates remain.
+
+==================================================
+3. Current Active Schema
+==================================================
+
+All 18 active Stock configs are `CURRENT_SCHEMA`:
+
+- config `real_trade_enabled`: absent (0 present);
+- config `real_trade_policy_updated_at`: absent (0 present);
+- state `real_trade_enabled`: absent (0 present);
+- malformed config/state: 0;
+- duplicate Stock identity: 0.
+
+R8 did not mutate current Stock, Runtime, Routine Instance, Mock, performance,
+or assignment data.
+
+==================================================
+4. Legacy Compatibility
+==================================================
+
+- all retired fields absent and identity valid: `CURRENT_SCHEMA`;
+- any retired config/state/guard field present: `MIGRATION_REQUIRED`;
+- malformed JSON or identity conflict: `DATA_INVALID`;
+- False or false-compatible values also report `LEGACY_DENIAL_PRESENT`.
+
+True and False are legacy evidence, not permission decisions. Legacy data may
+not progress through operation start, participant mutation, Signal, Candidate,
+Approval, Queue, Runtime, Dispatch, or SendOrder before explicit migration.
+False-to-True conversion is forbidden and absent.
+
+==================================================
+5. Independent Production Safety
+==================================================
+
+Retirement does not weaken:
+
+- current-session participant and `operation_excluded`;
+- Review, Emergency, Recovery, and session identity;
+- Assignment and Routine Instance `enabled`;
+- Approval, Operation Policy, Execution Enable, and `REAL_READY`;
+- login, account selection, and account match;
+- Queue, Runtime, Lock, request identity, and duplicate protection;
+- current-price freshness and dispatch preflight;
+- Final Send Gate and SendOrder validation;
+- Chejan, Fill, Position, PnL, and reconciliation.
+
+A disabled Routine Instance remains `ROUTINE_INSTANCE_DISABLED` and creates no
+durable Signal, Candidate, Queue item, Runtime commit, or SendOrder call.
+
+==================================================
+6. Assignment, Exclusion, Probe, And MONITORING
+==================================================
+
+Assignment remains the Stock-to-Instance authority. `operation_excluded` and
+`signal_probe_only` remain independent current features.
+
+`MONITORING` remains valid for time policy, pre/post-market operation, signal
+probe, Review/Recovery, close lifecycle, and other existing status policy.
+Only `real_trade_enabled=False -> MONITORING` was retired.
+
+R7 correction replaced the final three permission-derived MONITORING test
+expectations with current behavior: unchanged RUNNING without a valid policy
+transition, idle STOPPED operation-mode change/unregister, and signal-probe
+read-back mismatch failure.
+
+==================================================
+7. UI And Writer Retirement
+==================================================
+
+Main, AutoTradeSettingWindow, Review, and multi-selection contain no retired
+permission QAction or placeholder. Registration, assignment, unassignment,
+status projection, and context-menu handling create no legacy permission field.
+Persistent Context Menu behavior remains unchanged.
+
+==================================================
+8. Protected Adjacent Features
+==================================================
+
+- Early Close zero-holding canonical completion remains unchanged and creates
+  no unnecessary order.
+- Persistent Context Menu focused regression remains PASS.
+- Mock Validation remains an isolated execution domain and is not a replacement
+  monitoring mode.
+- Production/Mock coexistence exclusion and Mock SendOrder-zero contract remain.
+
+==================================================
+9. Regression Evidence
+==================================================
+
+Fresh subprocess, one test file per process:
+
+- files: 583/583;
+- tests run: 9,239;
+- passed: 9,212;
+- skipped: 8;
+- failed methods: 19;
+- failure records: 20;
+- isolated-process native crash: 0;
+- retirement residual: 0;
+- Production functional regression introduced by retirement: 0.
+
+Known debt consists of Phase 8B verified baseline 16 methods/17 records, one
+known Early Close stale expectation, and two additional stale failures verified
+unchanged at Freeze SHA `7a401938fd8a339ad4ac11a92ae8f8da44f20766`.
+Those two concern Recovery summary wording and an Indicator Follow BUY mapper
+expectation. They are not retirement regressions.
+
+Focused evidence:
+
+- corrected status file: 16 passed;
+- status/mode/unregister/probe/exclusion/Early Close/compatibility: 152 passed;
+- independent Production safety: 462 passed;
+- Persistent Context Menu/Review/Early Close: 103 passed;
+- Mock full suite: 196 passed;
+- py_compile: 1,085 files PASS;
+- import smoke, AST isolation, and `git diff --check`: PASS;
+- actual Broker SendOrder: 0.
+
+==================================================
+10. Data And Dirty-Tree Protection
+==================================================
+
+R8 before/after hashes are identical for `stocks`, `routine_instances`,
+`runtime`, `mock_validation`, `performance_ledger`, and
+`assignment_episodes`, including operation state, Queue, Executions, Locks,
+Positions, Fills, and Broker holdings.
+
+Existing dirty/untracked content was preserved. R8 Production source changes
+are zero. The only correction is the approved test-contract update in
+`tests/test_auto_trade_status_recalculation_pipeline.py`.
+
+==================================================
+11. Historical Evidence
+==================================================
+
+Past `TRADE_PERMISSION_TOGGLE` Events, old monitoring-only design wording,
+operation rosters, and older Current/Work Resume/Changelog records are retained
+as history. They do not restore the retired feature or outrank this Freeze.
+
+==================================================
+12. Freeze Judgment
+==================================================
+
+`MONITORING / OPERATING MODE RETIREMENT BIG FEATURE FROZEN - 100%`.
+
+Functional and documentation Freeze is complete. Selective Git staging,
+commit, and push remain pending explicit user review and Git Closure. Existing
+unrelated dirty hunks must not be included in that closure.

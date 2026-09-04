@@ -86,9 +86,9 @@ Event Journal, and PAPER Recovery.
 v1 does not attempt complete exchange emulation, order-book-accurate fills,
 complex partial fills, a precision slippage model, or Chejan emulation.
 
-## Relationship To Monitoring-only
+## Relationship To Retired Monitoring-only
 
-The current monitoring-only path keeps REAL-domain MarketData and Routine
+The former monitoring-only path kept REAL-domain MarketData and Routine
 evaluation while suppressing execution before REAL_READY/ORDER_QUEUED and
 SendOrder. It has no virtual account, fill, position, performance, event
 journal, or recovery domain. Therefore:
