@@ -1,0 +1,151 @@
+# Project Current State - Post Monitoring / Operating Mode Retirement Freeze - 2026-09-04
+
+Status: CURRENT PROJECT HANDOFF / RECOVERY ENTRY POINT.
+
+This document does not replace or rewrite a feature Freeze. It records the
+project state immediately after the Monitoring / Operating Mode Retirement Git
+Closure and identifies the local work that was deliberately left outside that
+feature commit.
+
+1. Repository Authority
+
+Code repository:
+- path: `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`
+- branch: `feat/restore-auto-trade-setting-ui`
+- feature Freeze SHA: `fb2e5713f9f756bbe9a1a8c325f1c6dab1f5ec70`
+- commit: `Retire monitoring and operating mode switch`
+- local/remote: synchronized, ahead/behind `0/0`
+
+Docs repository:
+- path: `C:\Users\JIN KWANG CHUL\Documents\docs`
+- branch: `agent/project-prompt-standard`
+- Retirement feature-docs Freeze SHA:
+  `bdd96e52042da9a3286d69cf0bd4c1bb0b640a1d`
+- commit: `Freeze monitoring and operating mode retirement`
+- local/remote at the feature Freeze: synchronized, ahead/behind `0/0`
+- this Current State document is additive. Its exact containing commit is owned
+  by the post-freeze backup manifest and the annotated Docs backup tag; the
+  immutable feature-docs Freeze SHA above remains unchanged.
+
+2. Monitoring / Operating Mode Retirement
+
+Final state:
+`MONITORING / OPERATING MODE RETIREMENT BIG FEATURE FROZEN - 100%`.
+
+Current Production contract:
+- no monitoring-mode permission;
+- no operating-mode transition;
+- no active `real_trade_enabled` permission;
+- no user-visible permission toggle QAction;
+- no active permission writer;
+- no active Backend permission reader;
+- no replacement permission flag;
+- active current-schema Stock data contains zero retired fields;
+- legacy retired fields fail closed as `MIGRATION_REQUIRED`;
+- malformed data or identity conflict fails closed as `DATA_INVALID`.
+
+Authoritative feature Freeze:
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT_FREEZE.txt`.
+
+3. Independent Safety Boundaries Preserved
+
+The retirement did not weaken or replace:
+- Routine Instance `enabled`;
+- `operation_excluded`;
+- `signal_probe_only`;
+- Approval and Operation Policy;
+- Execution Enable and REAL_READY;
+- login/account readiness;
+- Queue, Runtime, and Lock identity;
+- market-evidence freshness;
+- Final Send Gate and SendOrder validation;
+- Chejan reconciliation.
+
+4. Mock Validation
+
+Mock Validation remains frozen and isolated. The Retirement commit changed no
+Mock implementation file and did not merge Mock state with Production state.
+
+Mock implementation authority:
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-03_MOCK_VALIDATION_IMPLEMENTATION_FREEZE.txt`.
+
+Mock work resume:
+`00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-03_MOCK_VALIDATION_IMPLEMENTATION_FREEZE.txt`.
+
+5. Early Close Zero-Holding
+
+The current local Code Working Tree contains separate completed work for:
+- `holding == 0`;
+- pending obligation `== 0`;
+- `EARLY_CLOSE_REQUEST`;
+- canonical close completion.
+
+This work was deliberately excluded from the Monitoring Retirement commit. It
+remains local work and must be staged and closed independently.
+
+6. Persistent Context Menu
+
+The current local Code Working Tree contains separate completed work for:
+- keeping the menu open after non-terminal actions;
+- submenu, keyboard, and modal restoration;
+- stale-target protection;
+- terminal-action close behavior.
+
+The mixed context-menu hunks were deliberately excluded from the Monitoring
+Retirement commit. They remain local work and must be staged independently.
+
+7. Known Non-Blocking Debt
+
+The verified debt inventory includes:
+- the Phase 8B baseline failure set;
+- the Early Close stale expectation;
+- Recovery summary stale expectations;
+- the Indicator Follow BUY mapper stale expectation;
+- PyQt multi-file process-lifetime/test-harness debt.
+
+The final R8 classification recorded 19 failing methods / 20 failure records as
+existing or separate stale debt. Mock-introduced and Retirement-introduced
+Production regressions were zero. These items are not Monitoring Retirement
+blockers and must not be repaired opportunistically during unrelated work.
+
+8. Current Dirty / Untracked State
+
+Snapshot time: immediately after Retirement Git Closure and before this
+documentation commit.
+
+Code:
+- staged: 0
+- porcelain tracked-status paths: 87
+- content-diff tracked paths: 86
+- untracked paths: 121
+
+Docs:
+- staged: 0
+- porcelain tracked-status paths: 122
+- content-diff tracked paths: 122
+- untracked paths: 10
+
+Dirty/untracked does not mean damaged or carelessly unfinished state. It is the
+expected result of deliberately preserving user changes unrelated to the
+Monitoring Retirement Git Closure. The external post-freeze recovery backup
+owns the exact status, patch, path-list, snapshot, and SHA-256 evidence.
+
+9. Next Work Rule
+
+- Never reset the Code feature Freeze commit.
+- Do not automatically clean, restore, stash, or delete remaining local work.
+- Start the next Big Feature from the current Working Tree unless the user
+  explicitly chooses another recovery point.
+- Split mixed hunks by feature during every later staging operation.
+- Keep the feature Freeze SHA as an immutable restore point.
+- Review this document and the external backup manifest before any recovery.
+
+10. Authority Relationship
+
+Monitoring Retirement Final Freeze:
+- authoritative feature contract and completion evidence.
+
+This Post-Freeze Current State document:
+- current project handoff and recovery entry point;
+- does not supersede the feature contract;
+- adds exact local-state and deferred-work context.

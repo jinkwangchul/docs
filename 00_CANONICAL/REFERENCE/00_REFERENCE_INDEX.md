@@ -54,6 +54,8 @@ does not supersede them.
 
 - Production monitoring/operating permission retirement:
   `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT_FREEZE.txt`
+- Post-Freeze current project handoff and recovery entry point:
+  `00_CANONICAL/CURRENT/PROJECT_CURRENT_STATE_2026-09-04_POST_RETIREMENT_FREEZE.txt`
 
 ## Current Resume And Changelog
 
