@@ -1,0 +1,138 @@
+# Work Resume - Indicator Follow Routine Settings Completion Freeze - 2026-09-04
+
+Status:
+`PRODUCTION BIG FEATURE FROZEN - 100% / GIT CLOSURE PENDING USER REVIEW`.
+
+Mock parity:
+`DEFERRED - FAIL-CLOSED`.
+
+==================================================
+1. Repository Baseline
+==================================================
+
+Code repository:
+- path: `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`
+- branch: `feat/restore-auto-trade-setting-ui`
+- committed HEAD: `fb2e5713f9f756bbe9a1a8c325f1c6dab1f5ec70`
+- P1/P2/P3 changes: uncommitted in the current Local Working Tree
+- staged: 0 at P5 entry
+
+Docs repository:
+- path: `C:\Users\JIN KWANG CHUL\Documents\docs`
+- branch: `agent/project-prompt-standard`
+- P5 entry HEAD: `64e7298442bee818a06a504ff28030d63bc875d5`
+- P5 documents: uncommitted pending later exact Git Closure
+
+The Local Working Tree is the Production Freeze candidate. Do not reset,
+restore, stash, clean, or broadly stage it.
+
+==================================================
+2. Completed Supported Scope
+==================================================
+
+- Previous-Round Price Skip: skips only the current generation without round
+  consumption, Candidate, Queue, or cycle termination.
+- Last+1 MARKET/CURRENT_PRICE/ACTIVE: one closing generation after normal-round
+  completion and a new valid BUY signal; completed Fill is terminal.
+- Multi-Point Last-Round Active Buy: final-child conditional gate for
+  MULTI_TIME/MULTI_RATIO; no replacement or budget override.
+- Signal-Scoped Cycle: source-signal-driven SINGLE/MULTI_HOGA/MULTI_TIME/
+  MULTI_RATIO progression through existing Production planners and safety.
+
+==================================================
+3. Reserved Scope
+==================================================
+
+- Repeat ACTIVE_BUY: `ACTIVE_BUY_NOT_IMPLEMENTED`.
+- Cycle PRICE_COMPARE + CANCEL_BATCH:
+  `CYCLE_OPTION_EXECUTION_NOT_CONNECTED`.
+
+Both remain explicitly locked and cannot downgrade to another strategy.
+
+==================================================
+4. Adjustable Numeric Contract
+==================================================
+
+Ratio/percent values are user-adjustable parameters. Historical values such as
+0.15 and 0.45 are examples or saved inputs, not fixed semantics. Explicit saved
+values have precedence and must survive UI -> save/load -> Mapper -> execution.
+
+Last+1 ACTIVE and Last-Round Active Buy use separate state, canonical paths,
+widgets, and consumers. Repeat ACTIVE_BUY is a third, reserved concept.
+
+==================================================
+5. P1-P4 Outcome
+==================================================
+
+P1 completed State/Canonical/Mapper separation and legacy-safe normalization.
+P2 completed Production consumers and recovery/idempotency boundaries.
+P3 completed connected UI and prerequisite behavior.
+P4 completed integrated Production regression and frozen Mock parity audit.
+
+P4 Production evidence:
+- 575 fresh-process files;
+- 9,119 tests;
+- 9,089 passed;
+- 22 classified failure records;
+- 8 skipped;
+- errors 0;
+- native crashes 0;
+- P1/P2/P3 new regression 0;
+- unknown regression 0;
+- actual SendOrder 0;
+- Runtime/data mutation 0.
+
+==================================================
+6. Mock Status
+==================================================
+
+Mock remains frozen and unchanged:
+- 11 files / 196 tests passed;
+- SendOrder 0;
+- Production mutation 0.
+
+Previous Skip, Last+1, and Last-Round Active currently fail closed when Mock
+lacks required price/average/evidence. Signal-Scoped Cycle has automatic parity.
+No unsupported feature becomes a different virtual Order.
+
+Do not reopen Mock Freeze without a separate explicit approval.
+
+==================================================
+7. Protected Adjacent Work
+==================================================
+
+- Monitoring/Operating Mode Retirement remains fully retired.
+- Early Close Zero-Holding remains separate local work and is unchanged.
+- Persistent Context Menu remains separate local work and is unchanged.
+- Existing dirty/untracked content is intentional and must be preserved.
+
+==================================================
+8. Current Authorities
+==================================================
+
+Feature Canonical:
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_INDICATOR_FOLLOW_ROUTINE_SETTINGS_COMPLETION_FREEZE.txt`.
+
+P5 Changelog:
+`00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-04_INDICATOR_FOLLOW_ROUTINE_SETTINGS_COMPLETION_P5.txt`.
+
+Independent Mock authority:
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-03_MOCK_VALIDATION_IMPLEMENTATION_FREEZE.txt`.
+
+Independent Retirement authority:
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT_FREEZE.txt`.
+
+==================================================
+9. Exact Next Step
+==================================================
+
+`GIT CLOSURE PENDING USER REVIEW`.
+
+The closure must reconstruct P1/P2/P3 Production and test changes exactly,
+separate mixed hunks from unrelated work, exclude Runtime/user data and Mock,
+avoid `git add .` and `git add -A`, audit cached diffs, and only then commit and
+push under a separate user instruction.
+
+No Code Freeze SHA for this feature exists yet. The current committed Code HEAD
+is the pre-feature restore point, while the completed feature remains in the
+protected Local Working Tree.

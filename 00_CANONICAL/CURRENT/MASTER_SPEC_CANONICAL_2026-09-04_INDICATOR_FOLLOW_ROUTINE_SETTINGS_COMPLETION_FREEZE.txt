@@ -1,0 +1,369 @@
+# Master Spec Canonical - Indicator Follow Routine Settings Missing Implementation Completion Freeze - 2026-09-04
+
+==================================================
+1. Authority And Final Status
+==================================================
+
+Feature name:
+`Indicator Follow Routine Settings Missing Implementation Completion`
+
+Korean meaning:
+`지표추종매매 루틴설정 누락 구현 완성`
+
+Final Production judgment:
+`INDICATOR FOLLOW ROUTINE SETTINGS MISSING IMPLEMENTATION PRODUCTION BIG FEATURE FROZEN - 100%`.
+
+Completion means the supported and approved scope defined in this document is
+100% complete. Reserved ideas are not silently counted as implemented.
+
+Mock parity enhancement status:
+`DEFERRED - FAIL-CLOSED`.
+
+Audited Code repository:
+- path: `C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto`
+- branch: `feat/restore-auto-trade-setting-ui`
+- committed base HEAD: `fb2e5713f9f756bbe9a1a8c325f1c6dab1f5ec70`
+- P1-P3 feature changes: present in the Local Working Tree and not yet committed
+- P4 result: Production complete; Mock parity gaps fail closed
+
+This document is the current Production authority for this feature. It does
+not supersede the independent Monitoring/Operating Mode Retirement or Mock
+Validation Freeze authorities.
+
+==================================================
+2. Phase Progression
+==================================================
+
+P0 - Delta Audit:
+- reconstructed historical UI, rule, execution, and missing-connection evidence;
+- separated three distinct ACTIVE concepts;
+- identified supported and reserved execution scope.
+
+P1 - State / Canonical / Mapper:
+- separated Additional policies into independent nested namespaces;
+- added Last-Round Active Buy canonical state;
+- normalized legacy data without guessing unrecoverable enabled intent;
+- connected mapper, preview, validation, approval, patch, apply, and commit rules.
+
+P2 - Execution Consumers:
+- connected Previous-Round Price Skip;
+- connected Last+1 MARKET, CURRENT_PRICE, and ACTIVE;
+- connected Multi-Point Last-Round Active Buy final-child gating;
+- connected supported signal-scoped cycle progression through existing planners.
+
+P3 - Connected UI:
+- restored the approved controls and prerequisite logic;
+- preserved user-entered values across collect/apply/save/load;
+- retained per-option fail-closed locks for reserved policies.
+
+P4 - Integrated Regression / Frozen Mock Audit:
+- completed Production regression and safety audit;
+- confirmed no new P1/P2/P3 regression;
+- confirmed Mock Freeze unchanged;
+- classified three Mock price-evidence gaps as fail-closed and deferred.
+
+P5 - Final Freeze:
+- fixes the supported Production contract, reserved boundary, regression
+  evidence, and Git Closure scope without changing code, tests, Mock, or data.
+
+==================================================
+3. Connected Production Scope
+==================================================
+
+A. Previous-Round Price Skip
+
+UI meaning: `직전회차주문가 대비 현재주문가`.
+
+When its condition is satisfied, only the current BUY generation is skipped.
+The skip does not increment a confirmed round, consume the normal maximum-round
+budget, terminate the cycle, create a Candidate, or enqueue an Order. A later
+new BUY signal may be evaluated again. Missing, conflicting, or stale previous
+order evidence fails closed.
+
+B. Last+1
+
+Supported methods:
+- MARKET;
+- CURRENT_PRICE;
+- ACTIVE.
+
+Eligibility requires normal maximum-round completion, a new valid BUY signal,
+and no pending, deferred, uncertain, or unresolved obligation. Last+1 is one
+separate closing generation with its own identity. It reuses existing budget
+authority and safety gates. Queueing, send acceptance, rejection, cancellation,
+or partial fill is not terminal completion. Confirmed completed Fill evidence
+is required. SEND_UNCERTAIN is never blindly retried.
+
+C. Multi-Point Last-Round Active Buy
+
+UI meaning: `마지막회차 능동매수`.
+
+It is available only for MULTI_TIME or MULTI_RATIO and applies only to the
+final child. It is not a budget policy. A true condition preserves the original
+child price, quantity, and budget. A false condition terminally skips that
+final child without replacement Order, extra quantity, budget override, or
+rollback of earlier children.
+
+D. Signal-Scoped Cycle
+
+A BUY source signal is mandatory. The cycle is not an autonomous scheduler.
+Supported execution uses the existing SINGLE, MULTI_HOGA, MULTI_TIME, and
+MULTI_RATIO planners and already connected timeout/cancel and price-reset
+primitives. Children share source-signal lineage and deterministic identity.
+Child count is not confirmed BUY round count. Restart restores only incomplete
+children from durable evidence. The same source signal cannot reopen a
+completed cycle; a new BUY signal is required.
+
+==================================================
+4. Reserved Scope
+==================================================
+
+A. Repeat ACTIVE_BUY
+
+Status: `ACTIVE_BUY_NOT_IMPLEMENTED`.
+
+The authoritative automatic-budget formula is not fixed. This is distinct from
+Last+1 ACTIVE and Last-Round Active Buy. The UI remains unselectable and a
+synthetic rule fails closed.
+
+B. Cycle PRICE_COMPARE + CANCEL_BATCH
+
+Status: `CYCLE_OPTION_EXECUTION_NOT_CONNECTED`.
+
+It is not executable through the UI, Mapper, Validator, or execution consumer.
+It is not downgraded to a single CANCEL, RESET, or another generic action.
+
+These reserved items are outside the supported/approved completion percentage.
+
+==================================================
+5. User-Adjustable Numeric Contract
+==================================================
+
+Ratio and percent values are `USER-ADJUSTABLE PARAMETER` values.
+
+Examples such as `0.15`, `0.45`, `0.62`, `0.77`, and `5` are historical UI
+examples or user-entered values, not semantic constants. The governing rules
+are:
+
+- an explicit saved value has precedence;
+- UI -> collect -> save/load -> Mapper -> execution preserves the value;
+- load/apply does not force a particular number;
+- validation checks finite, non-negative, and applicable range/format rules;
+- no feature is identified by comparing its numeric value to a fixed literal;
+- Last+1 ACTIVE and Last-Round Active Buy values are independent.
+
+==================================================
+6. Three ACTIVE Separation
+==================================================
+
+| Concept | Canonical path | Role | Status |
+|---|---|---|---|
+| Repeat ACTIVE_BUY | repeat policy namespace | average-price/repeat policy | RESERVED |
+| Last+1 ACTIVE | `buy.execution.additional.last_plus_one.active_condition` | Last+1 closing-generation condition | CONNECTED |
+| Last-Round Active Buy | `buy.execution.base.last_round_active_buy` | multi-point final-child conditional gate | CONNECTED |
+
+They have different widgets, namespaces, canonical paths, consumers, and ratio
+values. State aliasing and numeric cross-copy are zero.
+
+==================================================
+7. Additional Namespace And Legacy Contract
+==================================================
+
+Current Additional structure:
+
+`additional.price_compare_skip`
+
+`additional.last_plus_one`
+
+The former flat fields (`check`, `direction`, `ratio`, and `comparator`) no
+longer collide between the two policies. Legacy normalization recovers only
+unambiguous fields. It never guesses unrecoverable Last+1 enabled intent and
+does not rewrite a file merely because it was loaded. A normal later save uses
+the current nested schema.
+
+==================================================
+8. Last-Round Active UI And Cycle/Exit-Time Contract
+==================================================
+
+The restored Last-Round Active UI is a Multi-Point suboption and has the form:
+
+`설정가에 평단이 [방향] [사용자 입력 비율] [비교조건]`.
+
+Its raw widget state may remain saved while an unmet Multi-Point prerequisite
+forces effective `enabled=False`. Re-enabling the prerequisite restores the
+saved user value.
+
+When Cycle MULTI_TIME or Cycle 미체결 is selected, exit-time is unchecked and
+disabled and its detail is disabled. Returning to a supported non-conflicting
+state restores the normal ability to select exit-time. Cycle is no longer
+globally hard-disabled; reserved options retain their individual lock.
+
+==================================================
+9. Production Call Graph
+==================================================
+
+`UI setting`
+`-> collect`
+`-> save/load`
+`-> Rule Mapper`
+`-> Preview`
+`-> Approval`
+`-> Patch / Apply / Commit`
+`-> Routine evaluate`
+`-> Routine-owned BUY intent`
+`-> durable Signal`
+`-> Routine Admission`
+`-> Candidate`
+`-> Operation Policy`
+`-> Execution Enable`
+`-> REAL_READY`
+`-> Queue / Runtime`
+`-> Final Send Gate`
+`-> existing SendOrder`
+`-> Chejan / Fill / Position`
+`-> cycle projection`.
+
+The new feature consumers directly write no Queue, Runtime, or Broker state and
+call no SendOrder. They produce routine-owned intent and reuse the existing
+Production pipeline.
+
+==================================================
+10. Budget, Round, And Evidence Authority
+==================================================
+
+- confirmed round: canonical Fill/cycle projection;
+- previous round price: confirmed BUY round evidence;
+- approved budget: existing approved execution evidence;
+- Position average: canonical Position;
+- stock/routine/account/system limits: existing Production gates;
+- actionable price: existing freshness boundary.
+
+New budget Source of Truth: 0.
+New round counter: 0.
+New Runtime writer: 0.
+
+==================================================
+11. Independent Safety Chain And SELL Priority
+==================================================
+
+The following are unchanged and reused:
+
+- Routine Instance enabled;
+- Assignment and operation_excluded;
+- signal_probe_only;
+- Approval and Operation Policy;
+- Execution Enable and REAL_READY;
+- login/account readiness;
+- current-price freshness;
+- Queue, Runtime, and Lock identity;
+- Final Send Gate and SendOrder validation;
+- Chejan, Fill, Position, and reconciliation.
+
+Existing SELL-first priority is unchanged. Previous Skip, Last+1, Last-Round
+Active, and Cycle BUY continuation cannot move ahead of an eligible SELL.
+
+==================================================
+12. Mock Freeze And Deferred Parity
+==================================================
+
+Mock Validation remains an independent frozen feature. P1-P5 changed no Mock
+source, test, Runtime, or document.
+
+P4 Mock regression:
+- files: 11;
+- tests: 196 passed;
+- failures: 0;
+- native crash: 0;
+- SendOrder: 0;
+- Production mutable-state mutation: 0.
+
+Parity matrix:
+
+| Feature | Mock result | Classification |
+|---|---|---|
+| Previous-Round Price Skip | previous-order evidence unavailable | PARITY_GAP_FAIL_CLOSED |
+| Last+1 | required average-price/evidence unavailable | PARITY_GAP_FAIL_CLOSED |
+| Last-Round Active Buy | required average-price evidence unavailable | PARITY_GAP_FAIL_CLOSED |
+| Signal-Scoped Cycle | shared evaluator behavior available | PARITY_AUTOMATIC |
+| Cycle CANCEL_BATCH | execution locked | RESERVED / FAIL_CLOSED |
+
+No gap downgrades to a different virtual Order or falsely reports successful
+execution. It is not a Production blocker and does not reopen the Mock Freeze.
+Any parity enhancement is a separate feature requiring explicit approval.
+
+==================================================
+13. Adjacent Feature Protection
+==================================================
+
+Monitoring / Operating Mode Retirement:
+- active `real_trade_enabled` permission: 0;
+- mode-toggle UI: 0;
+- active writer: 0;
+- replacement permission flag: 0;
+- legacy fields remain `MIGRATION_REQUIRED`.
+
+Early Close Zero-Holding and Persistent Context Menu remain separate local
+features. P1-P5 changed neither feature. Persistent Context Menu fresh-process
+focused regression passed. Known stale Early Close expectations are separate
+test debt, not this feature's contract.
+
+==================================================
+14. P4 Regression Evidence
+==================================================
+
+Fresh subprocess, one Production test file per process:
+- files: 575;
+- tests: 9,119;
+- passed: 9,089;
+- failed methods/records: 22;
+- skipped: 8;
+- errors: 0;
+- native crashes: 0;
+- failure files: 12;
+- isolated reruns: same classified causes;
+- P1/P2/P3 new regression: 0;
+- unknown regression: 0.
+
+Additional focused evidence:
+- P1 contract: 18 passed;
+- P2 consumers: 46 passed;
+- P3 connected UI: 12 passed;
+- Mapper/Preview: 194 passed;
+- BUY broad: 385 passed, 1 skipped;
+- SELL broad: 1,053 passed;
+- actual Broker SendOrder: 0;
+- Runtime/data mutation: 0.
+
+==================================================
+15. Known Non-Blocking Debt
+==================================================
+
+The remaining failures are verified baseline, stale expectation, or separate
+dirty-feature debt. Categories include:
+
+- Recovery summary and user-wording expectations;
+- AutoTradeSetting historical geometry expectations;
+- Runtime schema/write-preview old fixtures;
+- Phase1 singular signal-to-candidate mock;
+- P2 explicit AMOUNT old expectation;
+- Early Close stale expectations;
+- same-day restart independent dirty contract;
+- ATS tooltip old expectation;
+- PyQt multi-file process-lifetime/test-harness debt.
+
+None is a blocker for this Big Feature. They must not be repaired
+opportunistically during this Freeze or Git Closure.
+
+==================================================
+16. Final Freeze Judgment
+==================================================
+
+`SUPPORTED / APPROVED PRODUCTION SCOPE 100% COMPLETE`.
+
+`INDICATOR FOLLOW ROUTINE SETTINGS MISSING IMPLEMENTATION PRODUCTION BIG FEATURE FROZEN - 100%`.
+
+`MOCK PARITY ENHANCEMENT: DEFERRED - FAIL-CLOSED`.
+
+Code and Docs Git Closure are pending explicit user review. The current Code
+HEAD remains the prior committed restore point; the P1-P3 feature changes are
+still uncommitted in the protected Local Working Tree.

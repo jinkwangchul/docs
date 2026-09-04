@@ -1,0 +1,103 @@
+# Master Spec Changelog - Indicator Follow Routine Settings Completion - P5 - 2026-09-04
+
+Feature:
+`Indicator Follow Routine Settings Missing Implementation Completion`.
+
+Final status:
+`SUPPORTED / APPROVED PRODUCTION SCOPE 100% COMPLETE`.
+
+Mock parity:
+`DEFERRED - FAIL-CLOSED`.
+
+==================================================
+P0 - Delta Audit
+==================================================
+
+- Audited historical UI, current state, Mapper, preview, and execution paths.
+- Separated Repeat ACTIVE_BUY, Last+1 ACTIVE, and Last-Round Active Buy.
+- Identified connected and reserved scope without guessing missing policy.
+
+==================================================
+P1 - State / Canonical / Mapper
+==================================================
+
+- Split Additional into `price_compare_skip` and `last_plus_one` namespaces.
+- Added `base.last_round_active_buy` canonical state.
+- Added legacy-safe normalization without guessing Last+1 enabled intent.
+- Connected preview, validation, approval, patch, apply, and commit contracts.
+
+==================================================
+P2 - Execution Consumers
+==================================================
+
+- Connected Previous-Round Price Skip.
+- Connected Last+1 MARKET, CURRENT_PRICE, and ACTIVE.
+- Connected Last-Round Active final-child gating.
+- Connected supported signal-scoped cycle planners and existing continuation
+  primitives.
+- Reused existing budget, identity, recovery, Queue, Runtime, and Broker safety
+  boundaries; added no broker executor or canonical writer.
+
+==================================================
+P3 - Connected UI
+==================================================
+
+- Restored connected Previous Skip, Last+1, Last-Round Active, Cycle, and
+  exit-time prerequisite behavior.
+- Preserved independent user-adjustable numeric values.
+- Retained explicit locks for Repeat ACTIVE_BUY and Cycle CANCEL_BATCH.
+
+==================================================
+P4 - Integrated Regression / Frozen Mock Audit
+==================================================
+
+- Production: 575 fresh-process files / 9,119 tests.
+- Passed: 9,089; skipped: 8; classified failure records: 22.
+- Errors: 0; native crashes: 0.
+- P1/P2/P3 new regression: 0; unknown regression: 0.
+- BUY broad: 385 passed, 1 skipped.
+- SELL broad: 1,053 passed.
+- Mock: 11 files / 196 passed / failure 0.
+- Actual SendOrder and Production data mutation: 0.
+
+Mock parity classification:
+- Previous Skip: PARITY_GAP_FAIL_CLOSED;
+- Last+1: PARITY_GAP_FAIL_CLOSED;
+- Last-Round Active: PARITY_GAP_FAIL_CLOSED;
+- Signal-Scoped Cycle: PARITY_AUTOMATIC;
+- Cycle CANCEL_BATCH: RESERVED / FAIL_CLOSED.
+
+No unsafe virtual-order downgrade was found. Mock Freeze remains closed.
+
+==================================================
+P5 - Final Freeze Documentation
+==================================================
+
+- Added the final Current Canonical.
+- Added the final Work Resume.
+- Added this Changelog.
+- Updated the Reference Index with an independent feature authority and latest
+  resume/changelog pointers.
+- Changed no Production source, test, Mock source/test/runtime, or user data.
+- Created no commit or push; exact Git Closure awaits user review.
+
+==================================================
+Known Non-Blocking Debt
+==================================================
+
+Known debt remains separate: Recovery wording, AutoTradeSetting geometry,
+Runtime schema/write-preview fixtures, singular candidate mock, P2 AMOUNT
+expectation, Early Close expectations, same-day restart dirty contract, ATS
+tooltip expectation, and PyQt process-lifetime debt.
+
+These are not blockers for the supported Production scope.
+
+==================================================
+Freeze Judgment
+==================================================
+
+`INDICATOR FOLLOW ROUTINE SETTINGS MISSING IMPLEMENTATION PRODUCTION BIG FEATURE FROZEN - 100%`.
+
+`MOCK PARITY ENHANCEMENT: DEFERRED - FAIL-CLOSED`.
+
+`GIT CLOSURE: READY / WAITING FOR USER REVIEW`.
