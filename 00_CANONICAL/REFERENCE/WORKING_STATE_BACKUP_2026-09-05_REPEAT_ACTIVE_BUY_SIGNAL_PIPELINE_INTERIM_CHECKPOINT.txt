@@ -1,0 +1,389 @@
+WORKING-STATE BACKUP - REPEAT ACTIVE_BUY AND SIGNAL PIPELINE
+================================================================
+
+Checkpoint status
+-----------------
+
+LOCAL WIP INTERIM CHECKPOINT
+WORK RESUME BACKUP
+
+This document is not a new Code Freeze, a remote deployment statement, or a
+replacement for the frozen 20-Control authority. It records the important
+uncommitted implementation state that exists in the local Code working tree on
+2026-09-05 Asia/Seoul.
+
+Repository authority
+--------------------
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Remote committed baseline / local committed HEAD at checkpoint preparation:
+9970b2e855c6ebad6c8c889f413d0520e9082ef7
+
+Commit:
+Complete indicator-follow 20-control provenance
+
+The Code branch and origin were synchronized at that SHA. The implementation
+described below is later Local WIP: staged 0, tracked status 104, content-diff
+paths 103, and untracked paths 123 at the pre-documentation audit. It is not a
+remote Code Freeze.
+
+Frozen authority retained
+-------------------------
+
+The latest frozen Production authority remains:
+
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-05_INDICATOR_FOLLOW_20_CONTROL_PROVENANCE_FINAL_FREEZE.txt
+
+Historical wording that Repeat ACTIVE_BUY was reserved was correct for that
+Freeze point: its calculation and lifecycle contract had not yet been approved.
+The present document records the later Local WIP after the user approved that
+contract. The frozen document is not rewritten or superseded by this checkpoint.
+
+1. Situation Response direction/comparator repair
+-------------------------------------------------
+
+Status:
+IMPLEMENTED LOCALLY / PENDING FINAL CODE FREEZE
+
+Contract:
+
+- UP and DOWN accept >= or <=.
+- BOTH accepts WITHIN or OUTSIDE.
+- Canonical tokens are UP, DOWN, BOTH, >=, <=, WITHIN, and OUTSIDE.
+
+Local repair evidence:
+
+- The Situation Response UI uses the existing
+  sync_buy_direction_comparator(...) helper.
+- The pair is normalized at widget construction, on direction changes, and
+  after load/apply through the existing updater path.
+- A legacy invalid UI state is normalized in memory; no saved file is
+  automatically rewritten merely by viewing it.
+- routine_rule_mapper rejects invalid pairs instead of silently retaining or
+  downgrading them.
+- routine_rule_commit_validator independently guards the committed pair.
+- The existing execution_price_comparison primitive remains the execution
+  meaning; BUY_PRICE_CHANGE_RESET behavior is not redefined.
+- Situation Response CANCEL_BATCH remains RESERVED / locked.
+
+2. BUY Base MULTI_RATIO direction/comparator repair
+---------------------------------------------------
+
+Status:
+IMPLEMENTED LOCALLY / PENDING FINAL CODE FREEZE
+
+The same pair contract applies to BUY Base MULTI_RATIO:
+
+- UP and DOWN: >= or <=.
+- BOTH: WITHIN or OUTSIDE.
+
+The Base MULTI_RATIO UI now invokes the shared normalization helper on initial
+construction, direction changes, and load/apply update. The mapper and commit
+validator fail closed on an invalid pair. The existing MULTI_RATIO planner and
+child-distribution meaning are unchanged.
+
+3. Repeat ACTIVE_BUY scope separation
+-------------------------------------
+
+The locally implemented feature is Repeat ACTIVE_BUY only.
+
+- Repeat ACTIVE_BUY: implemented locally under the contract below.
+- Price-Compare ACTIVE_BUY: RESERVED / ACTIVE_BUY_NOT_IMPLEMENTED.
+- Last+1 ACTIVE: existing independent policy and namespace.
+- Last-Round Active Buy: existing independent policy and namespace.
+
+No one ACTIVE policy inherits another policy's numeric input or lifecycle.
+
+4. Repeat ACTIVE_BUY authorities
+--------------------------------
+
+Q:
+The current holding quantity from canonical Position, confirmed against the
+existing Fill/Broker reconciliation boundary.
+
+A:
+The current canonical Position average_price.
+
+R:
+The stable reference_price carried by the existing Signal/generation policy.
+
+P:
+The current actionable acquisition price supplied through the existing
+Production freshness boundary.
+
+The implementation creates no new Position source of truth, price authority,
+fill counter, or ACTIVE_BUY budget source of truth.
+
+5. Target band and condition
+----------------------------
+
+For user ratio n and stable reference R:
+
+  U = R * (1 + n / 100)
+  L = R * (1 - n / 100)
+
+UP uses U. DOWN uses L. BOTH is the range [L, U], not a directional synonym.
+
+- UP + >=: final average >= U
+- UP + <=: final average <= U
+- DOWN + >=: final average >= L
+- DOWN + <=: final average <= L
+- BOTH + WITHIN: L <= final average <= U
+- BOTH + OUTSIDE: final average < L or final average > U
+
+OUTSIDE uses a strict boundary.
+
+6. Required quantity
+--------------------
+
+For current Q, current average A, actionable price P, and selected target T:
+
+  x = Q * (A - T) / (T - P)
+
+The policy converts the continuous solution to a whole-share candidate, then
+checks the projected final average and finds the minimum integer quantity that
+actually satisfies the selected comparator. A simple ceil without the final
+condition check is not authoritative; strict OUTSIDE and floating-point edge
+cases are explicitly rechecked.
+
+Regression examples:
+
+- Q=3, A=50,000, P=13,000, T=13,130 -> required quantity 851.
+- Q=3, A=50,000, P=13,000, T=14,900 -> required quantity 56.
+
+The numbers 851 and 56 are regression examples, not Production constants or
+limits.
+
+7. Calculation result states
+----------------------------
+
+READY:
+The minimum additional whole-share quantity can be calculated and the projected
+average satisfies the selected condition.
+
+NO_BUY:
+The current average already satisfies the target. No new order is needed. This
+is not an error, does not advance a round, and does not require Review.
+
+WAIT:
+The condition cannot be reached with the current actionable P, or there is no
+valid integer solution at that price. No order is created, no round advances,
+and Review is not required solely for this outcome.
+
+INVALID:
+An authority or policy input is malformed or inconsistent. Processing fails
+closed.
+
+8. Lifecycle and generation integrity
+--------------------------------------
+
+An approved quantity is never edited in place immediately before dispatch.
+When P, Q, or A changes and the required quantity changes, the old undispatched
+generation is ended with BLOCKED / ACTIVE_BUY_PLAN_SUPERSEDED. A new
+plan_generation is then built from the latest Q/A/R/P and returns through the
+normal Candidate, Approval, Operation Policy, and execution pipeline. Approval
+identity and hashes are not bypassed.
+
+Pre-dispatch:
+
+- If the required quantity is unchanged, the approved generation remains.
+- If it changes, the old undispatched generation is superseded and generation
+  + 1 is proposed through the normal approval path.
+- NO_BUY or WAIT supersedes stale undispatched work without creating a new
+  generation.
+
+Broker-open order:
+
+- ACTIVE_BUY does not cancel a broker-accepted order merely because price P
+  changed. Generic unfilled price-change behavior belongs to Situation Response.
+- If open remaining is greater than the newly required quantity, the excess
+  creates overbuy risk: request cancel, wait for confirmed cancel effect,
+  re-read Position, and replan only if still required.
+- If open remaining is less than or equal to the newly required quantity, keep
+  the unresolved obligation and wait. Do not dispatch a duplicate generation.
+
+Partial fill:
+
+- Confirmed Fill updates canonical Position.
+- The lifecycle then re-reads Q and A, obtains a fresh actionable P, and runs
+  the same minimum-quantity calculation.
+- Old quantities are not reused.
+
+Early target satisfaction:
+
+- Stop creating new ACTIVE_BUY orders.
+- Supersede undispatched children.
+- Cancel any broker-open remainder through existing cancel authority.
+- Wait for cancel-effect confirmation.
+- Do not create another generation.
+
+The above cancel is ACTIVE_BUY execution reconciliation. It is not the reserved
+Situation Response CANCEL_BATCH user policy.
+
+SEND_UNCERTAIN and reconciliation uncertainty:
+
+- Blind retry: 0.
+- Blind supersede: 0.
+- New generation: 0.
+- Wait for existing manual/broker reconciliation authority.
+
+9. Main-limit handoff
+---------------------
+
+Repeat ACTIVE_BUY owns the mathematical required quantity, not an independent
+budget. If the calculation requires 851 shares, it reports 851 rather than
+silently trimming the result to 100. Existing Production gates subsequently
+decide orderable cash, system limit, Routine limit, stock limit, and every other
+admission/safety condition. Handling a limit excess belongs to the Main
+Production policy, not to an ACTIVE_BUY-local budget source of truth.
+
+10. Planner contract
+--------------------
+
+Repeat ACTIVE_BUY supplies the total required quantity to the existing planner.
+The existing planners preserve their own child semantics for:
+
+- SINGLE
+- MULTI_HOGA
+- MULTI_TIME
+- MULTI_RATIO
+
+A replan supplies the newly calculated total quantity and reruns the applicable
+planner; it does not patch a prior child quantity in place.
+
+11. Local verification evidence
+-------------------------------
+
+Evidence reported for the present Local WIP:
+
+- Pure math/lifecycle: 17 PASS.
+- BUY broad: 411 PASS, 1 SKIP.
+- Mapper/P1/P2: 329 PASS.
+- P3 UI: 19 PASS.
+- Approval/Final Send boundary: 174 PASS.
+- Timeout/reset/slice/exit: 109 PASS.
+- Slice-focused: 70 PASS.
+- SELL broad: 1,053 PASS.
+- Chejan/Fill/Position: 258 PASS.
+- Mock adapter: 21 PASS.
+- Recovery: 266 PASS; one unrelated pre-existing stale mock-call expectation.
+- Indicator-follow fresh-process shards: new related coverage PASS; the existing
+  phase1_effective_activation stale fixture remains one baseline item.
+- py_compile: PASS.
+- import smoke: PASS.
+- git diff --check: PASS.
+- Random brute-force: 2,500 minimum-quantity cases PASS.
+
+The stale fixtures above are not classified as new Repeat ACTIVE_BUY regressions.
+
+12. Production automatic signal call graph
+------------------------------------------
+
+The verified Production path is:
+
+  explicit user operation start
+  -> AutoTradeOperationHost starts operation/recovery coordination
+  -> realtime monitoring/execution targets are registered
+  -> Kiwoom realtime trade ticks
+  -> RealtimeShadowBarBuilder
+  -> completed one-minute OHLCV bar
+  -> realtime-primary or TR canonical candle commit
+  -> commit read-back / changed verification
+  -> BAR_COMMITTED
+  -> MarketDataHost._on_bar_committed(...)
+  -> canonical event queue
+  -> canonical_bar_ready_for_operation
+  -> AutoTradeOperationHost._on_canonical_bar_ready_for_operation(...)
+  -> bar-commit trigger queue
+  -> AutoTradeOperationHost._process_bar_commit_trigger(...)
+  -> stock execution-readiness verification
+  -> probe_execution_stock_for_committed_bar(...)
+  -> Routine instance, definition, and approved rules lookup
+  -> completed_timeframe_candles(raw_candles, instance_rules, now=...)
+  -> routine evaluate(context)
+  -> BUY / SELL / SKIP / ERROR
+  -> BUY or SELL: enqueue_routine_signal(...)
+  -> durable routine signal queue
+  -> _process_pending_signal_pipeline(...)
+  -> existing Candidate / Approval / Operation Policy / execution pipeline
+
+Therefore Production automatic signal generation is connected: YES.
+
+13. Ten-second operation timer is not signal cadence
+-----------------------------------------------------
+
+AutoTradeOperationHost owns a QTimer with a 10,000 ms interval. That timer keeps
+durable operation lifecycle, state re-evaluation, pending-pipeline, and related
+coordinators moving. It does not mean that BUY/SELL indicators are calculated
+every ten seconds. New market-bar signal evaluation is triggered by the verified
+canonical BAR_COMMITTED event.
+
+  operation timer cadence != signal candle cadence
+
+14. Meaning of a completed one-minute canonical bar
+----------------------------------------------------
+
+A one-minute bar is not authoritative merely because the wall clock crossed a
+minute boundary. Production requires realtime ticks to complete the interval's
+OHLCV, a canonical candle commit, commit/read-back and changed confirmation,
+and a BAR_COMMITTED event. Only then is the bar sent toward operation evaluation.
+The still-forming one-minute bar is not used directly as Production signal
+authority, preventing transient pre-close conditions from being mistaken for a
+durable decision.
+
+15. Trigger timeframe versus Routine evaluation timeframe
+----------------------------------------------------------
+
+The market-data trigger is a completed one-minute canonical commit. The Routine
+does not therefore always evaluate a one-minute candle set. In
+routine_signal_probe, completed_timeframe_candles(raw_candles, instance_rules,
+now=...) projects the canonical minute data into the completed timeframe chosen
+by the Routine instance, such as three or five minutes, before evaluate(context)
+is called.
+
+  trigger = completed canonical one-minute commit
+  evaluation input = completed configured-timeframe projection
+
+No additional timing semantics are inferred by this checkpoint.
+
+16. Explicit deferred scope
+---------------------------
+
+- Price-Compare ACTIVE_BUY: RESERVED / ACTIVE_BUY_NOT_IMPLEMENTED.
+- Situation Response redesign: next primary discussion; no redesign decision is
+  made by this document.
+- Situation Response CANCEL_BATCH: RESERVED / locked. The user's tentative
+  concept is cancel related orders, finish the current signal BUY flow, and wait
+  for the next BUY signal, but Production implementation is not claimed.
+- Mock parity implementation: deferred.
+- Existing stale test debt: retained and separated from new regression status.
+- Further direction/comparator audit candidates: Previous Price Skip, Last+1,
+  and Last-Round Active.
+
+17. Next primary discussion
+---------------------------
+
+NEXT PRIMARY DISCUSSION:
+SITUATION_RESPONSE_REDESIGN
+
+The next discussion must separate ACTIVE_BUY execution reconciliation from the
+user's Situation Response policy and decide the contracts for unfilled orders,
+price comparison, BUY reset, batch cancel, current-signal retention/termination,
+cancel-effect confirmation, replan eligibility, and waiting for the next BUY
+signal. This checkpoint does not decide or implement that redesign.
+
+Recovery warning
+----------------
+
+Do not reset, restore, stash, clean, or overwrite the current Code working tree
+before reviewing this checkpoint. The committed SHA is only the remote baseline;
+the Situation Response repair, Base MULTI_RATIO repair, Repeat ACTIVE_BUY work,
+Early Close work, Persistent Context Menu work, runtime/stock state, Mock state,
+and other unrelated local changes are deliberately preserved outside this Docs
+checkpoint commit.

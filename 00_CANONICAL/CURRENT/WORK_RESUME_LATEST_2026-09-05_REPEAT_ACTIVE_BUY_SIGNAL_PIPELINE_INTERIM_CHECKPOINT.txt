@@ -1,0 +1,154 @@
+WORK RESUME - REPEAT ACTIVE_BUY AND SIGNAL PIPELINE INTERIM CHECKPOINT
+=====================================================================
+
+Checkpoint type
+---------------
+
+LOCAL WIP INTERIM CHECKPOINT
+WORK RESUME BACKUP
+
+This is not a Code Freeze. The frozen authority remains the 2026-09-05
+Indicator Follow 20-Control Provenance Final Freeze.
+
+Repository position
+-------------------
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Committed local/origin baseline:
+9970b2e855c6ebad6c8c889f413d0520e9082ef7
+
+Commit:
+Complete indicator-follow 20-control provenance
+
+Pre-documentation Local WIP inventory:
+
+- staged: 0
+- tracked status: 104
+- content-diff paths: 103
+- untracked: 123
+
+Current Local WIP
+-----------------
+
+1. Situation Response direction/comparator repair
+
+- UP/DOWN -> >= or <=.
+- BOTH -> WITHIN or OUTSIDE.
+- Shared UI normalization on creation, direction change, and load/apply.
+- Mapper and commit validator fail closed on invalid pairs.
+- CANCEL_BATCH remains reserved and locked.
+- Status: IMPLEMENTED LOCALLY / PENDING FINAL CODE FREEZE.
+
+2. BUY Base MULTI_RATIO direction/comparator repair
+
+- Same direction/comparator contract and shared normalizer.
+- Mapper and commit-validator pair guards.
+- Existing planner meaning unchanged.
+- Status: IMPLEMENTED LOCALLY / PENDING FINAL CODE FREEZE.
+
+3. Repeat ACTIVE_BUY Production implementation
+
+- Q = canonical current Position quantity.
+- A = canonical current Position average_price.
+- R = stable Signal/generation reference_price.
+- P = actionable fresh acquisition price.
+- U = R * (1 + n/100), L = R * (1 - n/100).
+- Minimum quantity is solved from x = Q*(A-T)/(T-P), rounded to a whole-share
+  candidate and verified against the actual comparator.
+- READY creates an exact required-quantity plan; NO_BUY and WAIT create no
+  order/round advancement; INVALID fails closed.
+- P/Q/A changes do not mutate approved quantity in place. An undispatched stale
+  generation is BLOCKED / ACTIVE_BUY_PLAN_SUPERSEDED and generation+1 re-enters
+  Candidate, Approval, Operation Policy, and the normal execution path.
+- Confirmed partial fills update Position before Q/A/P are re-read.
+- Open remainder greater than new required quantity is canceled and waits for
+  effect confirmation; open remainder less than or equal to required remains an
+  unresolved obligation without duplicate dispatch.
+- SEND_UNCERTAIN permits no blind retry, blind supersede, or new generation.
+- ACTIVE_BUY has no independent budget SoT and does not trim the required
+  quantity; existing Main cash/limit/safety gates decide admission.
+- SINGLE, MULTI_HOGA, MULTI_TIME, and MULTI_RATIO planners are supported.
+
+The 851-share and 56-share cases are regression examples only, not constants.
+
+Automatic signal connection
+---------------------------
+
+Production automatic signal generation is connected:
+
+  explicit operation start
+  -> realtime target registration and tick stream
+  -> RealtimeShadowBarBuilder
+  -> completed one-minute canonical candle commit
+  -> verified BAR_COMMITTED
+  -> MarketDataHost canonical queue/signal
+  -> AutoTradeOperationHost bar-trigger queue
+  -> probe_execution_stock_for_committed_bar(...)
+  -> completed_timeframe_candles(...)
+  -> routine evaluate(context)
+  -> BUY/SELL enqueue_routine_signal(...)
+  -> _process_pending_signal_pipeline(...)
+  -> normal Production approval/execution boundary
+
+The AutoTradeOperationHost 10,000 ms QTimer is operation lifecycle/pending work
+coordination, not the market signal calculation cadence. A forming minute bar is
+not signal authority. The trigger is a committed/read-back-verified canonical
+one-minute bar, while the Routine evaluator receives completed candles projected
+to the instance's configured timeframe.
+
+Verification evidence
+---------------------
+
+- Pure math/lifecycle: 17 PASS.
+- BUY broad: 411 PASS, 1 SKIP.
+- Mapper/P1/P2: 329 PASS.
+- P3 UI: 19 PASS.
+- Approval/Final Send: 174 PASS.
+- Timeout/reset/slice/exit: 109 PASS.
+- Slice-focused: 70 PASS.
+- SELL broad: 1,053 PASS.
+- Chejan/Fill/Position: 258 PASS.
+- Mock adapter: 21 PASS.
+- Recovery: 266 PASS plus one unrelated baseline stale expectation.
+- Fresh-process related shards: PASS; one existing
+  phase1_effective_activation stale fixture remains.
+- py_compile, import smoke, and git diff --check: PASS.
+- Minimum-quantity brute force: 2,500 PASS.
+
+Deferred
+--------
+
+- Price-Compare ACTIVE_BUY remains RESERVED / ACTIVE_BUY_NOT_IMPLEMENTED.
+- Situation Response CANCEL_BATCH remains RESERVED / locked.
+- Mock parity implementation is deferred.
+- Existing stale tests remain separate debt.
+- Previous Price Skip, Last+1, and Last-Round Active remain candidates for a
+  further direction/comparator audit.
+
+Next primary discussion
+-----------------------
+
+SITUATION_RESPONSE_REDESIGN
+
+Discuss, but do not assume, the final separation among ACTIVE_BUY
+reconciliation, unfilled handling, price response, BUY reset, batch cancel,
+current-signal termination, cancel-effect confirmation, replan behavior, and
+waiting for the next BUY signal.
+
+Detailed recovery authority
+---------------------------
+
+00_CANONICAL/REFERENCE/
+WORKING_STATE_BACKUP_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt
+
+Protection rule
+---------------
+
+Continue from the current Local Working Tree. Do not reset/restore/stash/clean
+or treat the committed SHA as containing this later WIP. Stage or Freeze the
+Code only under a separate explicit user instruction.

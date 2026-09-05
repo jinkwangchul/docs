@@ -1,0 +1,110 @@
+CHANGELOG - REPEAT ACTIVE_BUY AND SIGNAL PIPELINE INTERIM CHECKPOINT
+===================================================================
+
+Date
+----
+
+2026-09-05 Asia/Seoul
+
+Classification
+--------------
+
+LOCAL WIP INTERIM CHECKPOINT / WORK RESUME BACKUP
+
+This changelog records the current local implementation state. It is not a new
+Code Freeze and does not replace the Indicator Follow 20-Control Provenance
+Final Freeze.
+
+Committed baseline
+------------------
+
+Code branch:
+feat/restore-auto-trade-setting-ui
+
+Local/origin committed baseline:
+9970b2e855c6ebad6c8c889f413d0520e9082ef7
+
+Commit:
+Complete indicator-follow 20-control provenance
+
+Local changes documented
+------------------------
+
+1. Situation Response direction/comparator contract repair
+
+- Restored shared UI normalization.
+- UP/DOWN accept >= or <=; BOTH accepts WITHIN or OUTSIDE.
+- Added mapper and commit-validator fail-closed pair guards.
+- Preserved existing execution comparison and BUY reset behavior.
+- Left CANCEL_BATCH reserved/locked.
+
+2. BUY Base MULTI_RATIO direction/comparator contract repair
+
+- Applied the same UI, mapper, and commit-validation contract.
+- Preserved planner semantics.
+
+3. Repeat ACTIVE_BUY Production implementation
+
+- Enabled only Repeat ACTIVE_BUY; Price-Compare ACTIVE remains reserved.
+- Added exact Q/A/R/P minimum-quantity calculation and READY, NO_BUY, WAIT,
+  and INVALID outcomes.
+- Preserved exact required quantity for the Main cash/limit safety boundary.
+- Added lifecycle inspection for pre-dispatch supersede, generation+1 normal
+  re-approval, partial-fill re-read, open-remainder cancellation, and uncertain
+  reconciliation waits.
+- Preserved planner coverage for SINGLE, MULTI_HOGA, MULTI_TIME, and
+  MULTI_RATIO.
+- Kept Last+1 ACTIVE and Last-Round Active Buy independent.
+
+4. Production signal-path evidence
+
+- Documented the actual operation-start to realtime-tick, canonical one-minute
+  commit, BAR_COMMITTED, operation trigger, Routine probe/evaluate, durable
+  signal enqueue, and pending execution pipeline.
+- Distinguished the 10-second operation timer from signal candle cadence.
+- Distinguished the completed one-minute commit trigger from the Routine's
+  configured completed-timeframe projection.
+
+Verification snapshot
+---------------------
+
+- Pure math/lifecycle: 17 PASS.
+- BUY broad: 411 PASS, 1 SKIP.
+- Mapper/P1/P2: 329 PASS.
+- P3 UI: 19 PASS.
+- Approval/Final Send: 174 PASS.
+- Timeout/reset/slice/exit: 109 PASS.
+- Slice-focused: 70 PASS.
+- SELL broad: 1,053 PASS.
+- Chejan/Fill/Position: 258 PASS.
+- Mock adapter: 21 PASS.
+- Recovery: 266 PASS plus one unrelated stale baseline expectation.
+- Static/import checks: PASS.
+- Random minimum-quantity verification: 2,500 PASS.
+
+Known deferred scope
+--------------------
+
+- Price-Compare ACTIVE_BUY: RESERVED / ACTIVE_BUY_NOT_IMPLEMENTED.
+- Situation Response redesign: next primary discussion.
+- Situation Response CANCEL_BATCH: RESERVED / locked.
+- Mock parity: deferred.
+- Existing stale tests: unchanged debt, not a new ACTIVE_BUY regression.
+- Possible further direction/comparator audit for Previous Price Skip, Last+1,
+  and Last-Round Active.
+
+Working-tree status at documentation preparation
+------------------------------------------------
+
+- Code staged: 0.
+- Code tracked status: 104.
+- Code content-diff paths: 103.
+- Code untracked: 123.
+
+The Code changes remain local and uncommitted. This Docs checkpoint must not be
+read as a remote Code Freeze or deployment record.
+
+Next discussion
+---------------
+
+SITUATION_RESPONSE_REDESIGN
