@@ -1,0 +1,104 @@
+WORK RESUME - INDICATOR FOLLOW 20-CONTROL PROVENANCE FINAL FREEZE
+================================================================
+
+Feature status
+--------------
+
+INDICATOR FOLLOW 20-CONTROL PROVENANCE
+PRODUCTION FINAL FREEZE COMPLETE
+
+Code authority
+--------------
+
+Repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Previous SHA:
+c8ed1d061ce2c0b78824d36abce6c450786b4efa
+
+Code Freeze SHA / origin SHA:
+9970b2e855c6ebad6c8c889f413d0520e9082ef7
+
+Commit:
+Complete indicator-follow 20-control provenance
+
+Docs authority at Freeze preparation
+------------------------------------
+
+Repository:
+C:\Users\JIN KWANG CHUL\Documents\docs
+
+Branch:
+agent/project-prompt-standard
+
+Docs pre-Freeze SHA / origin SHA:
+304514389119e452c9e3e2c9ab3ad8d5b36fa521
+
+Current functional contract
+---------------------------
+
+- Signal expressions support AND, OR, binary identity-set NOT, and parentheses.
+- SELL A/B/C preserve all six row operators and left-to-right group evaluation.
+- SELL A OCR uses MACD Oscillator transition offsets 0/1/2.
+- SELL B Price Box uses the official CLOSE, SIMPLE MA 24 formula and full
+  caller-supplied dataset AvgIf/StdevIf scope.
+- Historical no-lookahead is owned by the caller's candle cutoff.
+- BUY price comparison preserves <= and > branches and user ROUND/BUDGET values.
+- Duplicate leading/trailing policies execute before Candidate mutation and
+  require cancel-effect and holding consistency for trailing replacement.
+- Abnormal Routine flow records Production Event evidence and follows the
+  committed Review-stop or next-cycle policy.
+
+Verification evidence
+---------------------
+
+- Price Box + Indicator: 30 PASS
+- 20-Control / Mapper / Validator / Signal lifecycle: 492 PASS
+- SELL: 1,053 PASS
+- BUY: 305 PASS, 1 skipped
+- Cancel / Position / Event / Review: 2,206 PASS
+- Commit preflight: 196 PASS
+- New regression: 0
+- SendOrder/Broker side effects: 0
+- Runtime/user-data mutation: 0
+- Mock changes: 0
+
+Known baseline debt
+-------------------
+
+The four runtime-write preview-validator fixture failures reproduce at the
+pre-feature committed baseline and remain VERIFIED BASELINE DEBT.
+
+Non-blocking note
+-----------------
+
+KIWOOM_STDEVIF_DIVISOR_EXACT_PARITY_NOT_OFFICIALLY_EXPOSED
+
+The project population-variance convention is retained until official divisor
+evidence becomes available.
+
+Protected Local Working Tree
+----------------------------
+
+Code after the feature commit retained 87 unrelated tracked paths and 121
+untracked files. The feature test leaving the untracked set and entering the
+commit is expected. Runtime, Stocks, routine_instances, Early Close Zero-Holding,
+Persistent Context Menu, Mock Validation, and other unrelated work remain
+outside the feature commit.
+
+Docs before this documentation Freeze retained 122 tracked dirty paths and 10
+untracked files. Only the three new 2026-09-05 Freeze documents and the exact
+Reference Index authority hunk belong to this documentation closure.
+
+Resume rule
+-----------
+
+- Never reset, restore, stash, clean, or broadly stage the protected worktree.
+- Use Code Freeze SHA 9970b2e855c6ebad6c8c889f413d0520e9082ef7 as the
+  Production restore point for this feature.
+- Older Routine Settings documents remain historical evidence.
+- The 2026-09-05 Final Canonical is the current 20-Control owner.
+- No next Big Feature is selected by this Work Resume.

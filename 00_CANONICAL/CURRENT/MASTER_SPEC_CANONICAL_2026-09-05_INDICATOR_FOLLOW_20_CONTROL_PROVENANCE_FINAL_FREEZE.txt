@@ -1,0 +1,209 @@
+INDICATOR FOLLOW 20-CONTROL PROVENANCE FINAL FREEZE
+===================================================
+
+Authority
+---------
+
+Feature:
+Indicator Follow 20-Control Provenance Production Completion
+
+Korean identity:
+지표추종매매 사용자 조절 Control 실행 Provenance 완성
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Code branch:
+feat/restore-auto-trade-setting-ui
+
+Code Freeze SHA:
+9970b2e855c6ebad6c8c889f413d0520e9082ef7
+
+Commit:
+Complete indicator-follow 20-control provenance
+
+This document is the latest authority for the Indicator Follow 20-Control
+Provenance scope. The 2026-09-04 Routine Settings completion documents remain
+immutable point-in-time evidence and continue to own their independent scope.
+
+Final status
+------------
+
+IMPLEMENTATION VERIFIED
+PRODUCTION COMPLETE
+
+Signal expression contract
+--------------------------
+
+- Supported operators: AND, OR, binary NOT, and parentheses.
+- Parentheses are evaluated first.
+- Operators outside parentheses are evaluated from left to right.
+- Binary NOT is identity-set difference: identities in the LEFT result that
+  overlap the RIGHT result are removed. It is not boolean negation.
+- Invalid, incomplete, or unsupported expressions fail closed.
+- The same parsed AST travels through Preview, Approval, Commit, and the
+  Production evaluator.
+
+SELL A/B/C contract
+-------------------
+
+- Each of A, B, and C has three rows and two user-selected operators.
+- All six operators are connected to Production execution.
+- Each group evaluates as `(ROW1 OP1 ROW2) OP2 ROW3`.
+- The user-selected AND, OR, and binary NOT values are preserved.
+- A/B/C group identities remain distinct through mapping and evaluation.
+
+SELL A OCR contract
+-------------------
+
+- The OCR source is the MACD Oscillator histogram.
+- Threshold, comparison, and direction are user-controlled values.
+- Transition offsets are: first transition bar = 0, next = 1, next = 2.
+- No new consecutive-bar suppression or re-arm policy is implied.
+- The operational outcome of the configured values remains the operator's
+  settings responsibility.
+
+SELL B Price Box contract
+-------------------------
+
+Kiwoom Hero 4 basic-indicator evidence supplied by the user:
+
+  Price        = CLOSE
+  MA period    = 24
+  MA method    = SIMPLE
+  A            = MA(CLOSE, 24, SIMPLE)
+  Middle       = A
+  Upper        = A + AvgIf(CLOSE - A, 1, 0.0)
+                   + 2 * StdevIf(CLOSE - A, 1, 0.0)
+  Lower        = A + AvgIf(CLOSE - A, -1, 0.0)
+                   - 2 * StdevIf(CLOSE - A, -1, 0.0)
+
+AvgIf/StdevIf operate on matching deviations from the full candle dataset
+supplied to the indicator. Historical no-lookahead is an input-availability
+boundary: a historical caller supplies candles only through its cutoff. The
+indicator formula itself is not rewritten as a prefix-cumulative formula.
+
+Direction mapping:
+
+- upward -> PRICE_BOX_UPPER
+- downward -> PRICE_BOX_LOWER
+
+Comparison mapping:
+
+- at least p percent -> selected line * (1 + p / 100), then >=
+- at most p percent  -> selected line * (1 - p / 100), then <=
+
+`p` is the user's value. Price Box can be the sole active condition.
+
+Non-blocking parity note:
+KIWOOM_STDEVIF_DIVISOR_EXACT_PARITY_NOT_OFFICIALLY_EXPOSED
+
+The official N versus N-1 divisor was not exposed by the acquired evidence.
+The current project population-variance convention is retained.
+
+BUY price-comparison contract
+-----------------------------
+
+Both mutually exclusive branches are retained:
+
+- average price <= actionable order price
+- average price > actionable order price
+
+The actual price relationship selects exactly one configured branch. Each
+branch independently preserves its mode, operator, and user values.
+
+ROUND ADD:
+(confirmed previous buy round + user value) * starting budget
+
+ROUND MULTIPLY:
+(confirmed previous buy round * user value) * starting budget
+
+BUDGET:
+previous budget * user ratio
+
+No fixed example number is an execution semantic. Price-comparison ACTIVE_BUY
+remains unsupported and fail closed; it is distinct from Last-Round Active Buy.
+
+Duplicate-signal contract
+-------------------------
+
+A duplicate exists when a later signal arrives before the earlier signal flow
+has completed.
+
+LEADING priority:
+
+- The leading flow continues.
+- Overlapping later signals are durably neutralized/CANCELLED.
+
+TRAILING priority:
+
+- Outstanding predecessor orders are canceled or neutralized.
+- Cancel effect and actual fills are reconciled.
+- Latest Position/Broker holding consistency is required.
+- The predecessor is durably neutralized before the successor progresses.
+
+The behavior is symmetric for BUY-to-SELL and SELL-to-BUY overlap. Normal
+duplicate arbitration cancellation is not an execution error.
+
+Error-policy contract
+---------------------
+
+An error means an abnormal Routine flow such as an omitted BUY/SELL result or
+an equivalent non-regular execution result.
+
+STOP_AND_REVIEW:
+
+- Records Production Event evidence.
+- Creates Review Management classification/evidence.
+
+CONTINUE_NEXT_CYCLE:
+
+- Records Production Event evidence.
+- Records cycle-failure evidence.
+- Allows the next normal cycle to continue.
+
+Production boundaries reused
+----------------------------
+
+The implementation reuses the existing Rule Preview/Approval/Commit boundary,
+Routine Signal SoT, Candidate/Approval path, Operation Policy, Execution Enable,
+REAL_READY, Runtime/Queue, final safety, dispatch claim, SendOrder validation,
+Chejan reconciliation, Position, PnL, and Review/Event infrastructure. It adds
+no direct SendOrder path, Runtime writer, Queue writer, or new Source of Truth.
+
+Verification evidence
+---------------------
+
+- Price Box and Indicator focused: 30 PASS
+- 20-Control / Mapper / Validator / Signal lifecycle: 492 PASS
+- SELL regression: 1,053 PASS
+- BUY regression: 305 PASS, 1 skipped
+- Cancel / Position / Event / Review broad: 2,206 PASS
+- Commit-preflight focused verification: 196 PASS
+- py_compile: PASS
+- import smoke: PASS
+- git diff --check: PASS
+- new Production regression: 0
+- actual SendOrder calls: 0
+- Broker side effects: 0
+- Runtime/user-data mutation from verification: 0
+- Mock changes: 0
+
+Verified baseline debt
+----------------------
+
+Four failures in tests/test_execution_runtime_write_preview_validator.py occur
+with the same essential mismatch at the pre-feature Freeze SHA. They are
+VERIFIED BASELINE DEBT and are not introduced by this feature.
+
+Protected independent work
+--------------------------
+
+Runtime, Stocks, routine_instances, Mock Validation, Early Close Zero-Holding,
+Persistent Context Menu, and all other unrelated dirty/untracked work were
+excluded from this Freeze commit and preserved in the Local Working Tree.
+
+Final Production judgment
+-------------------------
+
+INDICATOR_FOLLOW_20_CONTROL_PROVENANCE_FINAL_FREEZE_COMPLETE

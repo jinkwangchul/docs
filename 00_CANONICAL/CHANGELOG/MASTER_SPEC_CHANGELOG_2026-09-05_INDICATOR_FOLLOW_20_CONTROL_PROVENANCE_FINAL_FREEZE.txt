@@ -1,0 +1,98 @@
+CHANGELOG - INDICATOR FOLLOW 20-CONTROL PROVENANCE FINAL FREEZE
+================================================================
+
+Date
+----
+
+2026-09-05 Asia/Seoul
+
+Summary
+-------
+
+The 2026-09-04 Indicator Follow Routine Settings Freeze completed the supported
+settings/execution surface. A post-Freeze provenance audit then found controls
+whose UI presence alone did not yet prove complete Production consumption. The
+audit began with 16 controls and expanded to 20 when the full A/B/C row-operator,
+price-comparison, duplicate-signal, and error-policy contracts were resolved.
+
+Contract restored
+-----------------
+
+- Added AND/OR/binary-NOT/parentheses expression parsing and evaluation.
+- Defined binary NOT as result-identity set difference, not boolean negation.
+- Connected all six SELL A/B/C row operators to the Production evaluator.
+- Connected SELL A OCR transition semantics for bars 0, 1, and 2.
+- Connected SELL B Price Box and the Price Box-only signal path.
+- Connected both BUY price-comparison branches and their user budget policies.
+- Connected duplicate-signal leading/trailing arbitration to durable signal,
+  cancel-effect, and holding-consistency boundaries.
+- Connected abnormal Routine flow to Production Event and Review/continue policy.
+
+Price Box evidence and correction
+---------------------------------
+
+User-supplied Kiwoom Hero 4 evidence established:
+
+  A      = SIMPLE_MA(CLOSE, 24)
+  Middle = A
+  Upper  = A + AvgIf(CLOSE-A, positive, 0.0)
+             + 2 * StdevIf(CLOSE-A, positive, 0.0)
+  Lower  = A + AvgIf(CLOSE-A, negative, 0.0)
+             - 2 * StdevIf(CLOSE-A, negative, 0.0)
+
+The first implementation used prefix-cumulative conditional aggregates. Final
+verification corrected the indicator to aggregate over the full candle dataset
+supplied by the caller. Historical no-lookahead remains a caller/input cutoff.
+
+Code Freeze
+-----------
+
+Repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Previous SHA:
+c8ed1d061ce2c0b78824d36abce6c450786b4efa
+
+Freeze SHA:
+9970b2e855c6ebad6c8c889f413d0520e9082ef7
+
+Commit:
+Complete indicator-follow 20-control provenance
+
+Verification
+------------
+
+- Price Box + Indicator: 30 PASS
+- 20-Control / Mapper / Validator / Signal lifecycle: 492 PASS
+- SELL: 1,053 PASS
+- BUY: 305 PASS, 1 skipped
+- Cancel / Position / Event / Review: 2,206 PASS
+- Commit preflight: 196 PASS
+- New Production regression: 0
+- Baseline debt: four verified runtime-write preview-validator fixture failures
+- py_compile/import/diff-check: PASS
+- SendOrder/Broker side effects: 0
+- Runtime/user-data mutation: 0
+
+Isolation and exclusions
+------------------------
+
+- Mock source, tests, and runtime were unchanged and excluded.
+- Runtime, Stocks, and routine_instances operational data were excluded.
+- Early Close Zero-Holding and Persistent Context Menu work were excluded.
+- All other unrelated dirty/untracked paths and hunks were preserved.
+
+Non-blocking note
+-----------------
+
+KIWOOM_STDEVIF_DIVISOR_EXACT_PARITY_NOT_OFFICIALLY_EXPOSED
+
+The project population-variance convention remains in use.
+
+Final result
+------------
+
+INDICATOR_FOLLOW_20_CONTROL_PROVENANCE_FINAL_FREEZE_COMPLETE
