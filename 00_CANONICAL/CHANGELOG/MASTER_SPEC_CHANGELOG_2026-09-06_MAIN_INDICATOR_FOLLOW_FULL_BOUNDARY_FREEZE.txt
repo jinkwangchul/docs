@@ -24,6 +24,8 @@ Production lifecycle normalized
 - Completed SELL repeat, carry, final residual, and post-carry transition rules.
 - Defined holding-based fallback for simultaneous BUY and SELL signals.
 - Connected OCR 0/N-bar semantics without a bar-close-only downgrade.
+- Kept unfilled handling and price comparison independently activatable; either
+  setting can remain enabled without disabling the other.
 - Normalized Situation Response setting 1/2, direction/comparator validation,
   independent Recovery timeout, and removal of stale cycle UI meaning.
 
@@ -60,11 +62,17 @@ feat/restore-auto-trade-setting-ui
 Previous SHA:
 9970b2e855c6ebad6c8c889f413d0520e9082ef7
 
-Freeze SHA:
+Base ownership Freeze SHA:
 e41392d525ef0dce78fe130d503b05d276678385
 
-Commit:
+Base commit:
 Normalize main and indicator-follow ownership boundary
+
+Current Code Freeze SHA / origin SHA:
+5e86c24c0298e717bc76be8ea89480faa3dc5874
+
+Closing correction commit:
+Correct situation response independent activation
 
 Verification
 ------------

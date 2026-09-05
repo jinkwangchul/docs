@@ -14,10 +14,14 @@ Code branch:
 feat/restore-auto-trade-setting-ui
 
 Code Freeze SHA:
-e41392d525ef0dce78fe130d503b05d276678385
+5e86c24c0298e717bc76be8ea89480faa3dc5874
 
-Commit:
+Base ownership Freeze SHA / commit:
+e41392d525ef0dce78fe130d503b05d276678385
 Normalize main and indicator-follow ownership boundary
+
+Closing correction commit:
+Correct situation response independent activation
 
 Final verdict:
 MAIN <-> INDICATOR FOLLOW FULL BOUNDARY — FULL_BOUNDARY_VERIFIED_PASS
@@ -103,8 +107,8 @@ OCR bar contract
 Situation Response and exit UI contract
 ---------------------------------------
 
-- Unfilled handling and price comparison are separately represented settings;
-  the currently approved UI makes the two top-level modes mutually exclusive.
+- Unfilled handling and price comparison are independently activatable settings.
+  Enabling either one does not disable the other.
 - Price comparison has generic setting 1 and setting 2 slots. The slots are not
   permanently assigned to rising/falling roles. Setting 2 supports an explicit
   unconfigured state.
