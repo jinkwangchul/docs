@@ -1,0 +1,88 @@
+CHANGELOG - MAIN <-> INDICATOR FOLLOW FULL BOUNDARY FREEZE
+========================================================
+
+Date
+----
+
+2026-09-06 Asia/Seoul
+
+Summary
+-------
+
+Normalized the Indicator Follow Production lifecycle and the ownership boundary
+between Main and Routine, closed the remaining signal-Facts and package callback
+residuals, and verified the full definition-to-execution surface.
+
+Production lifecycle normalized
+-------------------------------
+
+- Defined EACH and BATCH unfilled timeout anchors from actual child submission.
+- Restricted BUY Recovery to confirmed residual from cancelled existing orders.
+- Defined BUY reset as BASE replanning, not residual Recovery.
+- Connected independent OR-based Recovery price/count/time exits.
+- Put global BUY/SELL signal arbitration before all lifecycle mutation.
+- Completed SELL repeat, carry, final residual, and post-carry transition rules.
+- Defined holding-based fallback for simultaneous BUY and SELL signals.
+- Connected OCR 0/N-bar semantics without a bar-close-only downgrade.
+- Normalized Situation Response setting 1/2, direction/comparator validation,
+  independent Recovery timeout, and removal of stale cycle UI meaning.
+
+Ownership boundary normalized
+-----------------------------
+
+- Introduced sealed, revision/hash-identified Main Facts.
+- Unified Routine Decision commands and Main writer execution.
+- Required Facts recapture after every Main mutation.
+- Retired Main-side Indicator Follow strategy interpretation.
+- Retired Routine direct/indirect Main SoT access.
+- Kept TIME/RATIO as generic Main executors.
+- Split opaque Routine budget scope/request from Main ceiling/consumption/reserve.
+- Kept STOP_AND_REVIEW stock-local and unassigned handling as generic SKIP.
+- Made stale Facts and malformed/identity-mismatched decisions fail closed.
+
+Packaging correction
+--------------------
+
+- Added routine_startup_recovery.py to the Indicator Follow Group Pack manifest.
+- Extended registration capability validation to all eleven Production
+  callbacks declared by the Routine definition.
+- Prohibited missing-callback implicit fallback or strategy downgrade.
+
+Code Freeze
+-----------
+
+Repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Previous SHA:
+9970b2e855c6ebad6c8c889f413d0520e9082ef7
+
+Freeze SHA:
+e41392d525ef0dce78fe130d503b05d276678385
+
+Commit:
+Normalize main and indicator-follow ownership boundary
+
+Verification
+------------
+
+- 567 tests PASS.
+- 108 subtests PASS.
+- Failure 0.
+- Full boundary static/call-graph audit PASS.
+- Group Pack/register/installed Definition capability completeness PASS.
+- Broker/SendOrder calls 0.
+- New permanent SoT/writer 0.
+- Final verdict: FULL_BOUNDARY_VERIFIED_PASS.
+
+Isolation
+---------
+
+- Runtime, stocks, Mock, Early Close, Persistent Context Menu, BUY text-clipping
+  WIP, and unrelated dirty/untracked changes were excluded from the Code commit.
+- Root helper movement and legacy metadata cleanup were not performed.
+- Group Pack Host API/version policy and concrete new-Routine Main-source
+  isolation remain future user decisions.

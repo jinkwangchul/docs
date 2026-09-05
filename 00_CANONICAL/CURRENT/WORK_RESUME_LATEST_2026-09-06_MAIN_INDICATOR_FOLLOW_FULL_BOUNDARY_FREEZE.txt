@@ -1,0 +1,129 @@
+WORK RESUME - MAIN <-> INDICATOR FOLLOW FULL BOUNDARY FREEZE
+===========================================================
+
+Final status
+------------
+
+MAIN <-> INDICATOR FOLLOW FULL BOUNDARY
+FULL_BOUNDARY_VERIFIED_PASS
+
+Code authority
+--------------
+
+Repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Previous SHA:
+9970b2e855c6ebad6c8c889f413d0520e9082ef7
+
+Code Freeze SHA / origin SHA:
+e41392d525ef0dce78fe130d503b05d276678385
+
+Commit:
+Normalize main and indicator-follow ownership boundary
+
+Docs authority
+--------------
+
+Repository:
+C:\Users\JIN KWANG CHUL\Documents\docs
+
+Branch:
+agent/project-prompt-standard
+
+Docs pre-closure SHA / origin SHA:
+98929359261698a7012144c6daf5871f75ee95e1
+
+The resulting Docs Freeze SHA is the commit containing this Work Resume and is
+recorded by Git history and the Conversation Closing result. A document cannot
+embed its own commit hash without changing that hash.
+
+Current Production contract
+---------------------------
+
+- Main owns sealed Facts, common safety/budget approval, Queue/Runtime,
+  Cancel/Broker, Fill/Position, Event/Review, and Production writers.
+- Indicator Follow owns Signal and BUY/SELL strategy, Round/Cycle/Generation,
+  Reset/Recovery/Exit/Repeat/Carry decisions.
+- The flow is sealed Main Facts -> Routine Decision -> Main Writer -> fresh
+  Facts recapture. Revision/hash identity is retained from signal evaluation
+  through lifecycle, and stale Facts cannot authorize mutation.
+- Main interprets no Indicator Follow strategy meaning. The Routine directly or
+  indirectly reads/writes no Main SoT.
+- TIME/RATIO are generic Main executors. Routine supplies opaque budget scope
+  identity and requested amount; Main owns ceiling, consumption, and reservation.
+- STOP_AND_REVIEW is stock-local. Unassigned is
+  ROUTINE_ASSIGNMENT_MISSING generic SKIP.
+- Eleven Production capabilities resolve fail-closed through routine.json,
+  Group Pack, registration, and installed Definition. Missing callbacks do not
+  silently fall back or downgrade.
+- Group Pack includes routine_startup_recovery.py.
+
+Lifecycle summary
+-----------------
+
+- BUY EACH uses each child submission time; BATCH uses the last child submission
+  time. Cancel effect and fills precede Recovery.
+- Recovery consumes confirmed unfilled residual only. BUY reset replans BASE in
+  the same process and a new generation.
+- Recovery price/count/time exits are independent OR conditions.
+- Signal Priority arbitrates globally across BUY and SELL before lifecycle work.
+- SELL repeat/carry/final residual remain one process until canonical terminal.
+- Simultaneous BUY+SELL selects SELL with holding and BUY without holding.
+- OCR 0-bar is current incomplete signal; N-bar is completed-signal delay until
+  entry into the Nth following reference candle.
+- Situation Response price setting 1/2 are generic validated slots; Recovery
+  timeout is independently active.
+
+Verification
+------------
+
+- Tests: 567 PASS.
+- Subtests: 108 PASS.
+- Failures: 0.
+- FULL_BOUNDARY_VERIFIED_PASS.
+- Actual Broker/SendOrder calls: 0.
+- New permanent SoT/writer: 0.
+
+Protected Local Working Tree
+----------------------------
+
+After the Code Freeze commit, the repository intentionally retained:
+
+- staged: 0
+- tracked status paths: 88
+- content-diff paths: 87
+- untracked paths: 122
+
+These paths include unrelated/local WIP and operational state. The exact
+unstaged diff and untracked fingerprints matched before and after the Code
+commit. Runtime, stocks, Mock, Early Close, Persistent Context Menu, BUY
+text-clipping WIP, and other unrelated changes were not staged.
+
+Docs started this closure with 122 tracked dirty paths, 10 untracked paths, and
+staged 0. Only this closure's three new documents plus selected Workflow and
+Reference Index hunks belong to the Docs commit.
+
+Deferred and non-authoritative material
+---------------------------------------
+
+- Root strategy helper modules were not physically moved.
+- Legacy Routine budget/runtime metadata remains present but non-authoritative.
+- Group Pack self-contained versus Host API/version policy remains undecided.
+- The concrete Main-source isolation method for new Routine development remains
+  undecided.
+- The non-reproduced multiprocessing Chejan transient and existing Monitoring
+  Retirement expectation debt are not Ownership blockers.
+- A separate Routine-structure audit occurs only on explicit user instruction.
+
+Resume rules
+------------
+
+- Do not reset, restore, stash, clean, or broadly stage the protected worktree.
+- Start future work from the current local Working Tree and the Code Freeze SHA.
+- Do not automatically select the next Production feature.
+- Do not create a Next Session Startup Prompt until the user completes separate
+  Result Verification and explicitly requests it.

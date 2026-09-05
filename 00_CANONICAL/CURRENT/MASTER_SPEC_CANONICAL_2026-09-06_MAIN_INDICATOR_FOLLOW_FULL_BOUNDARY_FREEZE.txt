@@ -1,0 +1,203 @@
+MAIN <-> INDICATOR FOLLOW FULL BOUNDARY FINAL FREEZE
+====================================================
+
+Authority
+---------
+
+Feature:
+Main <-> Indicator Follow Production Contract and Ownership Boundary
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Code branch:
+feat/restore-auto-trade-setting-ui
+
+Code Freeze SHA:
+e41392d525ef0dce78fe130d503b05d276678385
+
+Commit:
+Normalize main and indicator-follow ownership boundary
+
+Final verdict:
+MAIN <-> INDICATOR FOLLOW FULL BOUNDARY — FULL_BOUNDARY_VERIFIED_PASS
+
+This document is the latest authority for the Indicator Follow Production
+lifecycle and its ownership boundary with Main. Earlier Indicator Follow
+Freeze documents remain immutable evidence for their independent scopes.
+
+BUY unfilled and recovery contract
+----------------------------------
+
+- EACH timeout is anchored at each child order's actual submission time. At
+  that child's configured timeout, only its remaining unfilled quantity is
+  cancelled. Cancel effect and interim fills are confirmed before the final
+  unconsumed quantity enters Recovery.
+- BATCH timeout is anchored at the last related child's actual submission
+  time. All related orders remain open until that timeout, then their remaining
+  quantities are cancelled as one batch. Recovery uses the confirmed residual
+  after cancel effect and interim fills.
+- Recovery consumes only the unfilled residual of an already-created order
+  obligation. It never creates a new BUY round, budget, or quantity.
+- Recovery keeps source_signal_id, execution_process_id, and buy_round. A new
+  Recovery attempt increments plan_generation/recovery generation only.
+- Every recursive Recovery decision uses the latest actual Fill and Position.
+  A cancel request quantity is not authoritative residual evidence.
+- BUY reset is not residual Recovery. It cancels the current orders, confirms
+  cancel effect and fills, and replans the BASE BUY configuration at the new
+  price point in the same signal/process with a new plan_generation.
+- Recovery price, repeat-count, and timeout exits are independently selectable
+  and combine with OR semantics. Timeout is independently available and is
+  anchored at the first Recovery entry.
+- Residual zero completes normally. An exit condition stops new Recovery,
+  settles open orders and fills, and closes the BUY round in its confirmed
+  current state.
+- Round completion is a canonical terminal lifecycle result, not display-only
+  UI text.
+
+Signal ownership contract
+-------------------------
+
+- Signal arbitration precedes all lifecycle progression and mutation.
+- LEADING priority keeps the active BUY or SELL process and ignores later
+  signals while that process remains alive.
+- TRAILING priority blocks new work in the old process, cancels its open
+  orders, confirms cancel effect and interim fills, captures the latest
+  Position, terminates the old process, and only then admits the later signal.
+- Future TIME/RATIO/reset/recovery children of a superseded process cannot be
+  dispatched.
+- When BUY and SELL are both true at the same evaluation point, holding above
+  zero selects SELL and zero holding selects BUY. Conflict evidence is retained.
+- A stale Facts snapshot cannot authorize mutation. Main captures fresh Facts
+  and Routine reevaluates before a writer can act.
+
+SELL lifecycle contract
+-----------------------
+
+- The first SELL signal after a BUY interval owns liquidation of the full
+  holding at that time. SINGLE, HOGA, TIME, and RATIO are division methods for
+  that one SELL process.
+- SELL repeat is residual Recovery within the same signal/process; it is not a
+  new SELL round. Generation alone advances.
+- Final residual handling follows the selected terminal contract. Final
+  liquidation sells the confirmed remaining holding and finishes at zero.
+- Carry keeps the confirmed holding, terminates the current SELL process, and
+  permits later signals after open orders, cancel effect, and interim fills are
+  settled.
+- After carry, a new BUY inherits the existing quantity, acquisition cost, and
+  average price in Position. A new SELL owns the latest full holding.
+- TRAILING SELL->BUY and SELL->SELL transitions use the same cancel-effect,
+  interim-Fill, and latest-Position barrier before the next process starts.
+
+OCR bar contract
+----------------
+
+- 0-bar means the current incomplete reference candle may be treated as a
+  valid signal in the configured test mode.
+- N-bar, for N >= 1, delays an already-completed signal. Execution becomes due
+  when the Nth following reference candle begins; it does not wait for that
+  candle's close.
+- Routine owns this strategy meaning. Main provides sealed market/bar
+  projection facts only.
+
+Situation Response and exit UI contract
+---------------------------------------
+
+- Unfilled handling and price comparison are separately represented settings;
+  the currently approved UI makes the two top-level modes mutually exclusive.
+- Price comparison has generic setting 1 and setting 2 slots. The slots are not
+  permanently assigned to rising/falling roles. Setting 2 supports an explicit
+  unconfigured state.
+- Each configured slot owns its comparison inputs and action. A conflicting or
+  incomplete pair fails validation and cannot be registered or applied.
+- Direction/comparator pairing is UP/DOWN with >= or <=, and BOTH with WITHIN
+  or OUTSIDE.
+- Recovery price, repeat-count, and timeout exits are independently enabled;
+  multiple active exits use OR.
+- Recovery timeout is independent of the cycle TIME split option.
+- Stale cycle average-round, amount, and active fields are not part of the
+  current user UI contract and are not restored as new controls.
+
+Ownership boundary
+------------------
+
+Main owns:
+
+- immutable/sealed Facts capture;
+- common safety, account cash, limits, approved ceilings, reservations, and
+  budget consumption;
+- Approval, Operation Policy, Queue, Runtime, Cancel, Broker, REAL_READY,
+  Final Send, SEND_UNCERTAIN handling, Fill, Position, Event, Review, and all
+  Production writers.
+
+Indicator Follow Routine owns:
+
+- Signal meaning and arbitration;
+- BUY/SELL strategy, Round, Cycle, Generation, Reset, Recovery, Exit, Repeat,
+  Carry, and final-strategy decisions;
+- opaque budget scope/member identity and requested amount;
+- OCR 0/N-bar strategy meaning.
+
+The only authorized flow is:
+
+  sealed Main Facts -> Routine Decision -> validated Main Writer
+  -> Main mutation -> fresh Facts recapture
+
+- A single Routine judgment uses one revision/hash Facts identity from signal
+  evaluation through lifecycle decision.
+- Candidate/consumer mutation validates the same Facts identity. Mismatch is
+  fail-closed and triggers fresh capture plus reevaluation.
+- Main performs no Indicator Follow strategy interpretation.
+- Indicator Follow performs no direct or indirect Main SoT read/write.
+- TIME/RATIO remain generic Main executors; Main does not infer their strategy.
+- Routine supplies opaque budget_scope_id and requested membership/amount;
+  Main alone approves ceiling and executes consumption/reservation.
+- STOP_AND_REVIEW applies only to the affected stock.
+- An unassigned stock returns ROUTINE_ASSIGNMENT_MISSING generic SKIP.
+- Eight-loop exhaustion closes that tick fail-closed; the next tick may resume
+  only from fresh Facts.
+
+Packaging and registration
+--------------------------
+
+- The eleven Production capabilities declared by the Routine contract are
+  checked across routine.json, Group Pack, registration, and installed
+  Definition resolution.
+- Missing, malformed, or identity-mismatched callbacks fail closed.
+- No missing callback may silently downgrade to another strategy or Host path.
+- The Group Pack manifest includes routine_startup_recovery.py, the Production
+  startup_recovery callback target.
+
+Safety preservation
+-------------------
+
+- Approval, Operation Policy, Execution Enable, REAL_READY, cash/budget/stock
+  limits, cancel-effect confirmation, SEND_UNCERTAIN protection, Final Send
+  Gate, dispatch claim, Fill/Chejan idempotency, and Position consistency remain
+  authoritative Main boundaries.
+- Actual Broker and SendOrder calls during verification: 0.
+- New permanent SoT or writer: 0.
+- Main common policies for trading time, missing data, and reevaluation were not
+  redefined by this contract.
+
+Verification evidence
+---------------------
+
+- Focused and related regression: 567 PASS.
+- Subtests: 108 PASS.
+- Failure: 0.
+- Static/call-graph/full-boundary verification: PASS.
+- routine.json -> Group Pack -> register -> installed Definition capability
+  completeness: PASS.
+- Final verdict: FULL_BOUNDARY_VERIFIED_PASS.
+
+Explicitly deferred
+-------------------
+
+- Physical movement of root strategy helper modules was not performed.
+- Legacy Routine budget/runtime metadata remains non-authoritative and was not
+  cleaned in this Freeze.
+- Group Pack self-contained packaging versus Host API/version policy remains a
+  separate future decision.
+- A concrete SDK/workspace mechanism that prevents Main-source access during
+  new Routine development remains a separate future decision.

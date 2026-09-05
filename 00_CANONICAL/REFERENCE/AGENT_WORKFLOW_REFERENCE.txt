@@ -966,3 +966,16 @@ When in doubt:
 3. Fix only the proven blocker
 4. Verify with real evidence
 5. Report the next real blocker
+
+## 17. New Routine Development Boundary
+
+- For a new Routine, Codex should normally neither analyze nor modify Main
+  Production implementation. It should develop against the published Routine
+  Facts, Decision, Capability, Packaging, and Registration contracts.
+- A new Routine should be implementable through those public connection
+  contracts without acquiring Main Source of Truth or writer authority.
+- If implementation reveals that Main lacks a required public capability, do
+  not patch Main as part of the Routine task. Report PLATFORM_CAPABILITY_GAP and
+  obtain separate user approval for Main work.
+- The concrete isolation mechanism, including any SDK, Host API, workspace, or
+  access-control layout, is not yet decided and must not be treated as Canonical.
