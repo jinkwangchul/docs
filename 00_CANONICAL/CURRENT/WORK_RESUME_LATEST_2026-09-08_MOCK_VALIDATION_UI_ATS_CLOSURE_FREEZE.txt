@@ -5,7 +5,8 @@ WORK RESUME LATEST
 
 Code repository: jinkwangchul/kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
-Final Code Freeze SHA: f707797304d656d3c370f77f2aea6df08f3523d8
+Initial Sep-08 Code Freeze SHA: f707797304d656d3c370f77f2aea6df08f3523d8
+Final Correction Code Freeze SHA: 91f172580df1405597509caa13a3f13ab323ab1c
 Code push: local == origin, ahead/behind 0/0
 
 Docs repository: jinkwangchul/docs
@@ -33,6 +34,11 @@ after this document is committed; the document is not rewritten afterward.
   current execution meaning.
 - One stale ATS submenu separator expectation corrected.
 - One ATS removal test made independent of local operation_policy.json.
+- Step 4 independent verification found dormant shared generic ATS order-method
+  builder/dispatch residue despite active Production and Mock callers already
+  being zero. Correction Freeze 91f172580df1405597509caa13a3f13ab323ab1c
+  removed the builder, method actions/properties, dispatch/setter path, caller
+  compatibility flag, and stale generic-method test expectation.
 
 3. Preserved Current Behavior
 
@@ -66,6 +72,7 @@ evidence.
   3 known-debt methods deselected.
 - Known baseline reproduction: exactly 6 failures across 5 independent methods.
 - New regression: 0.
+- Residual generic builder/dispatch/setter/caller/test expectation: 0.
 - py_compile/import smoke/git diff check: PASS.
 - Actual Broker/SendOrder call: 0.
 - Runtime/user-data migration or rewrite: 0.
@@ -118,9 +125,9 @@ Code after Freeze:
 - content-diff paths: 89
 - untracked paths: 143
 - protected unstaged fingerprint:
-  00c1e5c0822498cb22d6eb9c94d80ed434c591b4
+  92c57e3459afe1b37349bff497ecf2a64e2d6ec9
 - protected untracked fingerprint:
-  77ed5d8f47e15f8eb0b3d8931291abf255b70dce
+  c4ecaf420e796cb2a9692b8c722d18f74c0b591c
 
 Docs before this closing document set:
 - staged: 0

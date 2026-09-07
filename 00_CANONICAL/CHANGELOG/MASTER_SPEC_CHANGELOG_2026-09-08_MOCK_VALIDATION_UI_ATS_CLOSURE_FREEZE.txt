@@ -2,6 +2,9 @@ MASTER SPEC CHANGELOG
 2026-09-08 Mock Validation UI / ATS Closure Freeze
 
 Code Freeze SHA:
+91f172580df1405597509caa13a3f13ab323ab1c
+
+Initial Sep-08 Code Freeze SHA:
 f707797304d656d3c370f77f2aea6df08f3523d8
 
 1. Production ATS
@@ -53,6 +56,20 @@ f707797304d656d3c370f77f2aea6df08f3523d8
   operation_policy.json by injecting one existing visible-session fixture.
 - Production/Mock source semantics were not changed by either correction.
 
+5.1 Step 4 Residual Implementation Correction
+
+- Independent Step 4 verification found a dormant shared generic ATS
+  `주문방식` builder/dispatch implementation after the initial Freeze.
+- Active Production and Mock callers were already zero.
+- Removed the shared generic menu builder, ROUTINE/MARKET/CURRENT_PRICE method
+  actions and properties, generic method dispatch/setter path, and obsolete
+  caller compatibility flag.
+- Replaced the stale shared-menu test that required generic method actions with
+  the current absence contract.
+- ATS sessions, Routine BUY/SELL, and legitimate MARKET/CURRENT_PRICE
+  liquidation remain unchanged.
+- New regression: 0.
+
 6. Verification
 
 - Working Tree and clean-index ATS: 172 PASS + 45 subtests PASS each.
@@ -68,4 +85,5 @@ f707797304d656d3c370f77f2aea6df08f3523d8
 7. Final Result
 
 UNAUTHORIZED_ATS_ORDER_METHOD_REMOVED_FROM_PRODUCTION_AND_MOCK
+RESIDUAL_UNAUTHORIZED_ATS_ORDER_METHOD_IMPLEMENTATION_REMOVED
 MOCK_VALIDATION_UI_EVENT_CLOSURE_FROZEN

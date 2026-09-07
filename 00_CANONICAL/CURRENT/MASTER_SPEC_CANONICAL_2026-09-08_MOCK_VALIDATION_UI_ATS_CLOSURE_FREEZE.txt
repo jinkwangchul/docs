@@ -4,7 +4,8 @@ MASTER SPEC CANONICAL
 Status: CURRENT FROZEN AUTHORITY
 Code repository: jinkwangchul/kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
-Code Freeze SHA: f707797304d656d3c370f77f2aea6df08f3523d8
+Code Freeze SHA: 91f172580df1405597509caa13a3f13ab323ab1c
+Initial Sep-08 Code Freeze SHA: f707797304d656d3c370f77f2aea6df08f3523d8
 
 1. Scope
 
@@ -28,6 +29,34 @@ Historical Production or Mock execution_method fields are retained as evidence.
 They are not migrated or rewritten, have no current runtime strategy meaning,
 and must not be emitted by new normal settings writers, session defaults, or
 operation snapshots.
+
+2.1 Step 4 Residual Removal Correction
+
+Independent Step 4 verification after the initial Sep-08 Freeze found a dormant
+shared helper implementation that could still construct and dispatch the removed
+generic `주문방식` feature. Active Production callers and active Mock callers were
+already zero, but dormant implementation residue was not permitted by the
+deletion contract.
+
+Correction Freeze 91f172580df1405597509caa13a3f13ab323ab1c removes:
+
+- the shared generic `주문방식` menu builder;
+- generic ROUTINE / MARKET / CURRENT_PRICE method actions and properties;
+- generic method dispatch and setter transport;
+- caller compatibility flags for the removed feature; and
+- the stale test expectation that required the generic method actions.
+
+Final removal proof:
+
+- active Production generic caller: 0;
+- active Mock generic caller: 0;
+- shared generic menu builder: 0;
+- generic method dispatch: 0;
+- generic execution-method setter path: 0; and
+- generic contract test expectation: 0.
+
+ATS session selection, Routine-generated BUY/SELL order methods, and legitimate
+MARKET/CURRENT_PRICE liquidation remain unchanged.
 
 3. Current ATS Contract
 
@@ -139,6 +168,7 @@ must not be reported as actual GUI confirmation.
 - import smoke: PASS.
 - git diff --cached --check: PASS.
 - Active Production generic ATS order-method symbols: 0.
+- Dormant shared generic ATS order-method builder/dispatch/setter symbols: 0.
 - Forbidden Runtime/stocks/operation_policy staging: 0.
 - Actual Broker/SendOrder verification calls: 0.
 
@@ -155,3 +185,4 @@ or Runtime mutation was performed to obtain visual evidence.
 
 MOCK VALIDATION UI / EVENT CLOSURE FROZEN
 UNAUTHORIZED ATS ORDER METHOD REMOVED FROM PRODUCTION AND MOCK
+RESIDUAL_UNAUTHORIZED_ATS_ORDER_METHOD_IMPLEMENTATION_REMOVED
