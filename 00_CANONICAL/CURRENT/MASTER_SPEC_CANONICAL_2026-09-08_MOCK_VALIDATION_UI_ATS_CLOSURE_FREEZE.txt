@@ -1,0 +1,157 @@
+MASTER SPEC CANONICAL
+2026-09-08 Mock Validation UI / Event Closure and ATS Order-Method Removal Freeze
+
+Status: CURRENT FROZEN AUTHORITY
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code Freeze SHA: f707797304d656d3c370f77f2aea6df08f3523d8
+
+1. Scope
+
+This supplemental Canonical freezes the verified Mock Validation UI/Event work
+and the removal of the unauthorized generic ATS order-method override from both
+Production and Mock. It does not create a new Production order, liquidation,
+Review, long-hold, Runtime, Position, or Broker contract.
+
+2. Supersession Boundary
+
+The 2026-08-26 clauses that treated
+manual_ats_selection.execution_method = ROUTINE / MARKET / CURRENT_PRICE as a
+current generic Routine BUY/SELL mapping are SUPERSEDED and MUST NOT be used for
+current implementation.
+
+Only that generic execution_method meaning is superseded. The 2026-08-26
+Budget, Starting Budget, Stock Limit, Operation Start, participant, time-gap,
+and ATS-session permission contracts remain current.
+
+Historical Production or Mock execution_method fields are retained as evidence.
+They are not migrated or rewritten, have no current runtime strategy meaning,
+and must not be emitted by new normal settings writers, session defaults, or
+operation snapshots.
+
+3. Current ATS Contract
+
+- 장전프리, 장마감NXT, and selected ATS sessions remain valid.
+- ATS sessions extend time permission; they do not replace the order method
+  produced by a Routine.
+- Normal Routine BUY/SELL uses the Routine-generated order method unchanged.
+- Production and Mock have no generic ATS MARKET/CURRENT_PRICE BUY/SELL
+  override UI, writer, projection, adapter transport, or execution branch.
+- A missing historical execution_method must not trigger fallback or downgrade.
+
+4. Liquidation Is A Separate Contract
+
+The legitimate liquidation choices 시장가 and 현재가 are not the removed generic
+ATS order method. Existing Production and Mock early close, individual or
+immediate liquidation, cancel/Fill reconciliation, Review, long-hold, and Mock
+carry behavior remain governed by their current Close/Liquidation owners.
+
+CURRENT_PRICE liquidation is not a guarantee that holdings equal zero at market
+close. Unfilled or partially filled current-price orders may intentionally leave
+a residual holding. That fact alone is not a liquidation failure, a reason to
+restore generic ATS execution_method, or authority for automatic market-order
+conversion. Residual holdings follow the existing Close, Liquidation, Review,
+and Long-Term Holding contracts. Long-hold ON is not a global bypass that hides
+an active-liquidation residual.
+
+The separate CURRENT_PRICE final-hoga/adapter normalization finding is not
+resolved or normalized by this residual-holding contract and was not changed in
+this Freeze.
+
+5. ATS UI Organization Contract And Evidence Status
+
+The user-confirmed organization is:
+
+ATS설정
+|- 장전프리
+|- 장마감NXT
+`- 청산방식
+   |- 시장가
+   `- 현재가
+
+`청산방식` is an organization title for existing legitimate liquidation, not a
+new execution method. The deletion of generic `주문방식` is code/test verified.
+The final submenu placement above was not independently observed in a safe live
+GUI during this Closing and remains ACTUAL_GUI_CONFIRMATION_PENDING. Test success
+must not be reported as actual GUI confirmation.
+
+6. Mock Validation Domain Contract
+
+6.1 Overlay and zero base
+
+- Mock registration is an independent Extra/Overlay count, not a fifth
+  exclusive Production stock state.
+- A stock may exist in Production and Mock at the same time.
+- Mock register/unregister does not move or change Production 운영/대기/제외/검토.
+- Mock registration begins from an isolated zero base: position quantity,
+  pending Mock orders, average price, purchase amount, realized/unrealized PnL,
+  order/fill history, and lifecycle do not inherit Broker or Production account
+  state.
+- Read-only market price/hoga input is allowed and is not account inheritance.
+
+6.2 Monitoring and interaction
+
+- Monitoring is Stock Parent -> Routine Instance Child.
+- The parent projects aggregate Mock PnL.
+- Parent context actions are 운영일지 and 등록해제.
+- Child context actions own Instance operation functions.
+- Production rows always use the Production menu; Mock rows use the Mock-only
+  adapter/menu.
+- Quick Chart entry/lifetime and shared opener are implemented. Chart-content
+  redesign remains explicitly DEFERRED.
+
+6.3 Common tax and settings interaction
+
+- `mock_validation/settings.json`, owned by the existing
+  MockValidationRepository, is the common Mock tax settings SoT.
+- Defaults are enabled and 0.20 percent (decimal 0.002).
+- A Running operation keeps its operation-start tax snapshot; a common setting
+  change is not retroactive.
+- Mock starting-budget interaction reuses the Production
+  RunningBudgetAdjustmentDialog presentation while all writes remain Mock-only.
+- Mock operation settings reuse Production presentation/default providers
+  read-only; they do not write Production configuration.
+
+6.4 Stop, Event, and isolation
+
+- Validation Stop cancels cancellable virtual orders, then stops the Instance
+  while preserving holding, average price, Position/PnL/history, and effective
+  settings. It does not auto-liquidate, auto-reset, or create Production Review.
+- Mock Event lifecycle and stock journal are stock/session scoped. Parent
+  운영일지 is the entry point. Successful unregister closes/archive-indexes the
+  lifecycle and purges its live Event projection; a failure preserves evidence.
+- Same-episode MOCK_MARKET_UNAVAILABLE observations are coalesced so a
+  same-second duplicate identity does not create a false ERROR.
+- The Production bottom `이벤트` control remains Production-owned and is not
+  replaced by a Mock switch.
+- Mock never mutates Production Queue, Runtime, Position, Fill/Chejan, Budget,
+  Broker, ATS state, or user operational data.
+
+7. Verification Evidence
+
+- Working Tree Production ATS focused: 172 PASS + 45 subtests PASS.
+- Working Tree Mock focused: 298 PASS + 9 subtests PASS.
+- Clean Git-index Production ATS focused: 172 PASS + 45 subtests PASS.
+- Clean Git-index Mock focused: 298 PASS + 9 subtests PASS.
+- Clean Git-index adjacent liquidation: 48 PASS + 15 subtests PASS;
+  3 known-debt methods deselected.
+- py_compile: PASS.
+- import smoke: PASS.
+- git diff --cached --check: PASS.
+- Active Production generic ATS order-method symbols: 0.
+- Forbidden Runtime/stocks/operation_policy staging: 0.
+- Actual Broker/SendOrder verification calls: 0.
+
+The six known baseline failures are verification debt, not normal behavior and
+not part of this Canonical contract.
+
+8. Actual GUI Status
+
+ACTUAL_GUI_CONFIRMATION_PENDING for items not independently observed in a safe
+live GUI during this Closing. No login, account connection, TR, Broker request,
+or Runtime mutation was performed to obtain visual evidence.
+
+9. Final Judgment
+
+MOCK VALIDATION UI / EVENT CLOSURE FROZEN
+UNAUTHORIZED ATS ORDER METHOD REMOVED FROM PRODUCTION AND MOCK

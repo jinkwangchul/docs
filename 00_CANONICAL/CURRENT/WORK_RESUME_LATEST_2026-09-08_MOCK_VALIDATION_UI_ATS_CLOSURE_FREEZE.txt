@@ -1,0 +1,153 @@
+WORK RESUME LATEST
+2026-09-08 Mock Validation UI / ATS Closure Freeze
+
+1. Repository Baseline
+
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Final Code Freeze SHA: f707797304d656d3c370f77f2aea6df08f3523d8
+Code push: local == origin, ahead/behind 0/0
+
+Docs repository: jinkwangchul/docs
+Docs branch: agent/project-prompt-standard
+Docs pre-closing HEAD: 31a94f1013f54640c263f2269603f6a201724b18
+The final Docs Freeze SHA is recorded in the Conversation Closing Step 3 report
+after this document is committed; the document is not rewritten afterward.
+
+2. Completed Scope
+
+- Mock Validation overlay/zero-base registration and Production coexistence.
+- Stock Parent -> Routine Instance Child monitoring, aggregate parent PnL, and
+  Mock-only parent/child interaction boundaries.
+- Common Mock tax settings, operation-start snapshot, inline tax projection,
+  and Mock-only persistence.
+- Production-native starting-budget/settings presentation reused read-only for
+  Mock-owned writes.
+- Mock Validation Stop, Instance isolation, Quick Chart entry/lifetime, stock
+  journal, Event lifecycle, and MARKET_UNAVAILABLE coalescing.
+- Production generic ATS order-method UI/writer/projection/runtime override
+  removal.
+- Mock generic ATS order-method UI/writer/default/snapshot/adapter/virtual
+  execution override removal.
+- Legacy execution_method data preserved without migration and ignored for
+  current execution meaning.
+- One stale ATS submenu separator expectation corrected.
+- One ATS removal test made independent of local operation_policy.json.
+
+3. Preserved Current Behavior
+
+- ATS sessions, 장전프리, 장마감NXT, and ATS-time Routine trading.
+- Routine-generated BUY/SELL order methods.
+- Production and Mock legitimate liquidation 시장가/현재가.
+- Production/Mock early close, individual/immediate liquidation, pending cancel,
+  Fill/Position reconciliation, Review, long-hold, Mock carry, and Validation
+  Stop boundaries.
+- CURRENT_PRICE liquidation may intentionally leave residual holdings after
+  market close; existing Review/Long-Hold contracts handle the result.
+
+4. UI / Actual GUI Evidence
+
+User-confirmed target organization:
+
+ATS설정 -> 장전프리 / 장마감NXT / 청산방식 -> 시장가 / 현재가
+
+Generic `주문방식` removal is code/test verified. The final `청산방식` submenu
+placement and other items not safely observed in a live GUI are
+ACTUAL_GUI_CONFIRMATION_PENDING. No test result is being promoted to live-GUI
+evidence.
+
+5. Verification
+
+- Working Tree ATS focused: 172 PASS + 45 subtests PASS.
+- Working Tree Mock focused: 298 PASS + 9 subtests PASS.
+- Clean-index ATS focused: 172 PASS + 45 subtests PASS.
+- Clean-index Mock focused: 298 PASS + 9 subtests PASS.
+- Clean-index adjacent liquidation: 48 PASS + 15 subtests PASS,
+  3 known-debt methods deselected.
+- Known baseline reproduction: exactly 6 failures across 5 independent methods.
+- New regression: 0.
+- py_compile/import smoke/git diff check: PASS.
+- Actual Broker/SendOrder call: 0.
+- Runtime/user-data migration or rewrite: 0.
+
+6. Known Test Debt
+
+EXACT FAILURE COUNT: 6
+INDEPENDENT METHODS: 5
+PRE_EXISTING_BASELINE: 6
+CHANGE_RELATED: 0
+INCONCLUSIVE: 0
+CONFIRMED PRODUCTION DEFECT: 0
+
+1) tests/test_gui_main_stock_operation_host.py
+   test_monitor_adapter_explicit_amount_does_not_depend_on_fresh_price
+   Category: BUDGET_FIXTURE_DEBT
+   The stale assertion expects None although explicit AMOUNT 1,000,000 resolves
+   to 1,000,000.
+
+2) tests/test_gui_main_stock_operation_host.py
+   test_operation_cycle_consumes_and_executes_once_without_visibility
+   Category: TIMER_FIXTURE_DEBT
+   The fixture lacks a valid assigned Routine/stock_dir and reaches the current
+   ROUTINE_ASSIGNMENT_MISSING/Main Facts fail-closed boundary.
+
+3-4) tests/test_individual_liquidation_time_contract.py
+   test_market_and_current_cannot_return_to_carryover_after_window_entry
+   Subtests: initial=시장가 and initial=현재가
+   Category: LIQUIDATION_STALE_EXPECTATION
+   The transition block is correct; the old internal reason-string expectation
+   is stale against the normalized user-facing message.
+
+5) tests/test_close_liquidation_execution_pipeline.py
+   test_routine_close_orders_follow_final_sell_marker_at_auto_execution_gate
+   Category: RECOVERY_FIXTURE_DEBT
+   The NEW-order fixture omits stock_code and correctly fails closed with
+   RECOVERY_STOCK_CODE_MISSING.
+
+6) tests/test_close_liquidation_execution_pipeline.py
+   test_auto_close_routine_allows_buy_before_final_sell_at_auto_execution_gate
+   Category: RECOVERY_FIXTURE_DEBT
+   The NEW-order fixture omits stock_code and correctly fails closed with
+   RECOVERY_STOCK_CODE_MISSING.
+
+7. Protected Working Tree
+
+Code after Freeze:
+- staged: 0
+- tracked dirty paths: 90
+- content-diff paths: 89
+- untracked paths: 143
+- protected unstaged fingerprint:
+  00c1e5c0822498cb22d6eb9c94d80ed434c591b4
+- protected untracked fingerprint:
+  77ed5d8f47e15f8eb0b3d8931291abf255b70dce
+
+Docs before this closing document set:
+- staged: 0
+- tracked/content-diff paths: 122
+- untracked paths: 10
+- existing dirty/untracked data remains protected.
+
+Protected scope includes Runtime/stocks/Mock-adjacent unrelated WIP, Early Close,
+Persistent Context Menu, BUY text-clipping, historical/archive work, and all
+other unrelated dirty/untracked paths. No reset/restore/stash/clean was used.
+
+8. Excluded / Deferred
+
+- Quick Chart content redesign: DEFERRED.
+- CURRENT_PRICE final-hoga/adapter normalization finding: not changed here.
+- Final live-GUI confirmation: PENDING.
+- The six baseline test debts: not corrected here.
+- Legacy JSON migration/rewrite: not performed.
+- New Production SoT/Writer/schema: none.
+- No next Production feature is automatically selected.
+
+Any later implementation requires a new explicit user instruction and the
+Mandatory Pre-Work Contract Audit Gate from AGENT_WORKFLOW_REFERENCE.
+
+9. Current Authority
+
+Use
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-08_MOCK_VALIDATION_UI_ATS_CLOSURE_FREEZE.txt
+for current Mock Validation UI/Event closure and generic ATS order-method
+retirement. Older execution_method mapping text is historical evidence only.

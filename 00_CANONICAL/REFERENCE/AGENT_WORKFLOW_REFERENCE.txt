@@ -84,12 +84,17 @@ GUI State And Context Menu Reference Rule:
 
 Current Operation / ATS / Long-Hold Reference Rule:
 - For Operation Start admission, order-time permission, operation-time
-  projection, ATS sessions and execution method, non-trading gaps, participant
+  projection, ATS sessions, non-trading gaps, participant
   membership and retirement, long-term holding, immediate Review, the bottom
   operation button, registration while operating, and Main/AutoTradeSetting
   projection, use
   `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-26_BUDGET_LIMIT_OPERATION_START_CONTRACT_FREEZE.txt`
   as the first current technical Source of Truth.
+- For retirement of the generic ATS Routine BUY/SELL order-method override and
+  its separation from legitimate liquidation methods, use
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-08_MOCK_VALIDATION_UI_ATS_CLOSURE_FREEZE.txt`.
+  Older `manual_ats_selection.execution_method` mapping text is historical
+  evidence and is not current implementation authority.
 - Audit Operation Start admission separately from order permission. Time outside
   an actual trading session does not by itself reject start; the final order
   gate remains fail-closed with `OUTSIDE_OPERATION_TIME`.
@@ -98,8 +103,8 @@ Current Operation / ATS / Long-Hold Reference Rule:
   boundary, then method/liquidation activity. Do not collapse these into one
   time boolean.
 - Treat pre-market and post-market ATS symmetrically as additional actual
-  trading sessions. ATS `execution_method` maps existing Routine BUY/SELL orders
-  and never proves liquidation or termination.
+  trading sessions. An ATS session does not replace the order method generated
+  by a Routine and never by itself proves liquidation or termination.
 - In a same-day NON_TRADING_GAP with a future session, retain the participant,
   project `감시/대기` with inactive method/liquidation, and keep orders blocked.
 - At final end, classify route/residual and perform required Review write/read-

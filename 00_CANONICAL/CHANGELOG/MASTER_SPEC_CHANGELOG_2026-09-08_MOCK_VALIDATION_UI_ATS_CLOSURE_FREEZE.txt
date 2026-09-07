@@ -1,0 +1,71 @@
+MASTER SPEC CHANGELOG
+2026-09-08 Mock Validation UI / ATS Closure Freeze
+
+Code Freeze SHA:
+f707797304d656d3c370f77f2aea6df08f3523d8
+
+1. Production ATS
+
+- Removed the unauthorized generic ATS `주문방식` UI group.
+- Removed its selection callbacks/writers, execution-method Event/projection,
+  project_manual_ats_execution_order path, and generic final BUY/SELL override.
+- Preserved ATS session selection, 장전프리/장마감NXT time permission, Routine
+  BUY/SELL order methods, and legitimate liquidation 시장가/현재가.
+
+2. Mock ATS
+
+- Removed the copied generic execution_method selector and setter.
+- Removed new-session default, new operation snapshot field, Host-to-Adapter
+  transport, virtual BUY/SELL override, and row projection for that feature.
+- Preserved Mock ATS sessions and all normal Mock liquidation behavior.
+- Historical fields remain untouched and ignored; no migration was performed.
+
+3. Mock Validation UI / Event Closure
+
+- Froze independent overlay/zero-base registration and Production coexistence.
+- Froze Stock Parent -> Routine Instance monitoring, parent aggregate PnL, and
+  parent/child context ownership.
+- Froze common tax settings and operation-start policy snapshot behavior.
+- Reused Production starting-budget/settings presentation as read-only input to
+  Mock-owned persistence.
+- Froze Validation Stop, Instance isolation, Quick Chart entry/lifetime, stock
+  journal, Event lifecycle, and same-episode MARKET_UNAVAILABLE coalescing.
+- Quick Chart content redesign remains deferred.
+- Items not independently observed in a safe live GUI remain
+  ACTUAL_GUI_CONFIRMATION_PENDING.
+
+4. Contract Reconciliation
+
+- Declared only the Aug-26 generic ATS execution_method mapping clauses
+  superseded.
+- Kept Aug-26 Budget/Operation Start/session/time contracts current.
+- Recorded that CURRENT_PRICE liquidation may intentionally leave residual
+  holdings after close and that existing Review/Long-Hold contracts own them.
+- Separated the removed generic order method from legitimate liquidation
+  methods.
+- Recorded the user-confirmed `청산방식` UI organization separately from actual
+  GUI confirmation status.
+
+5. Closing Blocker Corrections
+
+- Updated one stale ATS submenu separator expectation from 2 to 1.
+- Made the Production ATS removal test independent of the local
+  operation_policy.json by injecting one existing visible-session fixture.
+- Production/Mock source semantics were not changed by either correction.
+
+6. Verification
+
+- Working Tree and clean-index ATS: 172 PASS + 45 subtests PASS each.
+- Working Tree and clean-index Mock: 298 PASS + 9 subtests PASS each.
+- Clean-index adjacent liquidation: 48 PASS + 15 subtests PASS;
+  3 known-debt methods deselected.
+- Known baseline failures: exactly 6, all pre-existing, change-related 0.
+- New regression: 0.
+- py_compile/import smoke/diff check: PASS.
+- Broker/SendOrder verification calls: 0.
+- Runtime/user-data mutation or legacy rewrite: 0.
+
+7. Final Result
+
+UNAUTHORIZED_ATS_ORDER_METHOD_REMOVED_FROM_PRODUCTION_AND_MOCK
+MOCK_VALIDATION_UI_EVENT_CLOSURE_FROZEN
