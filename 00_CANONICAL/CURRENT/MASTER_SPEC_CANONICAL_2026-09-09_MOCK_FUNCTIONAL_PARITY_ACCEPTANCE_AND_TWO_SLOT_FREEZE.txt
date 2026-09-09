@@ -4,7 +4,8 @@ MASTER SPEC CANONICAL
 Status: CURRENT FROZEN AUTHORITY
 Code repository: jinkwangchul/kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
-Code Freeze SHA: 857ed95df73170e5bca5e7b567498b786c1ff885
+Code Freeze SHA: ed7e0ea3660dd9a675b81b95521fe3995cb2c3df
+Initial Closing Commit: 857ed95df73170e5bca5e7b567498b786c1ff885
 
 1. Scope
 
@@ -228,6 +229,13 @@ Automated verification:
   `_restart_recovery_blocked_session_ids`;
 - py_compile, import smoke, and diff check: PASS; and
 - Broker/SendOrder/real-account order: 0.
+
+The initial Closing commit was followed by a separate non-amending correction
+commit after index inspection proved that shared Candle/provider, chart
+projection, restart/session, and settings-dialog dependencies still existed only
+in protected Working Tree content. The correction committed only those already
+approved and verified Conversation dependencies and their focused tests. Runtime,
+stock data, rules, and unrelated WIP remained excluded.
 
 11. Final Judgment
 

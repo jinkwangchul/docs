@@ -2,6 +2,9 @@ MASTER SPEC CHANGELOG
 2026-09-09 Mock Functional Parity Acceptance and Situation Response Two-Slot Freeze
 
 Code Freeze SHA:
+ed7e0ea3660dd9a675b81b95521fe3995cb2c3df
+
+Initial Closing Commit:
 857ed95df73170e5bca5e7b567498b786c1ff885
 
 1. Mock Functional Parity
@@ -54,6 +57,15 @@ Code Freeze SHA:
   fixture failure.
 - py_compile/import smoke/diff check: PASS.
 - Broker/SendOrder/real-account order: 0.
+
+5.1 Closing Self-Containment Correction
+
+- Post-commit inspection found that the initial Closing commit referenced
+  approved shared Candle/provider, chart projection, restart/session, and
+  settings-dialog dependencies that remained only in the Working Tree.
+- Added those exact completed source/test dependencies in a separate correction
+  commit without amend, reset, restore, stash, clean, or broad staging.
+- Runtime, stock data, rules, reports, and unrelated WIP remained excluded.
 
 6. Final Result
 

@@ -6,7 +6,8 @@ WORK RESUME LATEST
 Code repository: jinkwangchul/kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
 Previous Code Freeze SHA: 91f172580df1405597509caa13a3f13ab323ab1c
-Current Code Freeze SHA: 857ed95df73170e5bca5e7b567498b786c1ff885
+Initial Closing Commit: 857ed95df73170e5bca5e7b567498b786c1ff885
+Current Code Freeze SHA: ed7e0ea3660dd9a675b81b95521fe3995cb2c3df
 Code push: local == origin, ahead/behind 0/0
 
 Docs repository: jinkwangchul/docs
@@ -128,6 +129,11 @@ These debts were not modified during Closing.
 - py_compile/import smoke/diff check: PASS.
 - Broker/SendOrder/real-account order: 0.
 - Runtime/rules manual mutation during Closing: 0.
+- A post-commit self-containment audit found that the initial Closing commit
+  referenced approved shared Candle/provider, chart projection, restart/session,
+  and settings-dialog code still present only in the Working Tree. A separate
+  correction commit added those exact completed dependencies and focused tests;
+  the original commit was not amended or rewritten.
 
 9. Protected Working State
 
