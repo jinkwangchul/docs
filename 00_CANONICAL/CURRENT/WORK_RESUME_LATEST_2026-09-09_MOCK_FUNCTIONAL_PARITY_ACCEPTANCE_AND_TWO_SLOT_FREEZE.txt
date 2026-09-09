@@ -1,0 +1,147 @@
+WORK RESUME LATEST
+2026-09-09 Mock Functional Parity Acceptance and Situation Response Two-Slot Freeze
+
+1. Repository Baseline
+
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Previous Code Freeze SHA: 91f172580df1405597509caa13a3f13ab323ab1c
+Current Code Freeze SHA: 857ed95df73170e5bca5e7b567498b786c1ff885
+Code push: local == origin, ahead/behind 0/0
+
+Docs repository: jinkwangchul/docs
+Docs branch: agent/project-prompt-standard
+Docs pre-closing HEAD: fcc112a9794af5a5023d554f816c18a388402804
+The final Docs Freeze SHA is reported after the closing document commit and is
+not back-written into this document.
+
+2. Current Big Feature
+
+Production -> Mock Validation Functional Parity
+
+Applicable Production trading/operation behavior has code/test implementation.
+Actual GUI Acceptance remains:
+
+PARTIAL_PARITY — ACCEPTANCE PRECONDITION UNAVAILABLE
+
+This is not an implementation-failure verdict. Remaining live paths require a
+safe natural Position or a second legitimate Production/Routine registration
+that was unavailable during acceptance.
+
+3. Completed And Accepted Scope
+
+- Mock start entry is individual or multi-selection Routine Instance context
+  menu only. No bottom global Mock start exists.
+- Operation container creation is allowed outside trading time; progression is
+  blocked by the existing time policy.
+- Environment Settings flow into Mock effective settings and the next
+  Operation's immutable policy snapshot. A RUNNING Operation is not hot-swapped.
+- Actual GUI verified the early-close option set ROUTINE/MARKET/CURRENT_PRICE/
+  PROFIT_LOSS/CARRYOVER/CANCEL.
+- ROUTINE close keeps progression until the first valid final SELL boundary.
+- PROFIT_LOSS 2%/2% snapshot, early-close cancel, and AUTO_CLOSE -> ROUTINE were
+  verified in Actual GUI.
+- Shutdown/restart restores Session WAITING and Instance VALIDATION_STOPPED,
+  preserves evidence, and performs no automatic start/evaluation/order/fill.
+- Shared Quick Chart minimum-height correction removed X-axis clipping in Mock
+  and preserved Production chart behavior.
+- Situation price-response SETTING1/SETTING2 are independent filters; direction,
+  source/target, threshold, comparator, action, and overlap do not impose a
+  cross-slot prohibition.
+- Existing simultaneous-TRUE/different-action runtime handling remains
+  `BUY_PRICE_RESPONSE_MULTIPLE_SLOTS_TRIGGERED` fail-closed with no new
+  precedence.
+
+4. Actual GUI Evidence And Environment Restoration
+
+Verified environment source: `자동매매설정 -> 환경설정`.
+Temporary acceptance window: 18:00-19:30.
+Final restored window: 09:00-13:30.
+
+Environment -> effective settings -> new Operation policy snapshot: PASS.
+RUNNING Operation hot swap: 0.
+Single start, outside-time start, outside-time progression block, early-close
+options, ROUTINE, PROFIT_LOSS, CANCEL, AUTO_CLOSE, restart, Quick Chart X-axis,
+and Production Chart regression: PASS.
+
+2-Slot Actual GUI round trip:
+
+- SETTING1 AVG_PRICE -> CURRENT_PRICE UP 0.15 >= CANCEL_BATCH;
+- SETTING2 AVG_PRICE -> CURRENT_PRICE DOWN 0.10 <= RESET;
+- save/reopen loss, exchange, or collapse: 0.
+
+5. Current Runtime Evidence
+
+- OPERATION_STARTED: 11
+- MOCK_MARKET_UNAVAILABLE: 8
+- MOCK_ORDERBOOK_STALE: 244
+- ROUTINE_EVALUATED: 550
+- BUY: 0
+- SELL: 26
+- Virtual Order/Fill: 0/0
+- Position: 0 shares
+- 000070 canonical Candles observed: 399
+
+The direct MARKET_UNAVAILABLE cause was absence of the latest orderbook snapshot,
+not missing Candles. The later stale state was the existing two-second freshness
+boundary.
+
+6. Remaining Acceptance Preconditions
+
+No safe existing normal Position source was found. Do not create fake Position,
+a Position injector, synthetic signal, fake Instance, replay infrastructure, or
+Runtime JSON fabrication merely to complete acceptance.
+
+Pending until safe natural evidence exists:
+
+- MARKET with a real Virtual Position;
+- CARRYOVER with a real Virtual Position;
+- IMMEDIATE LIQUIDATION with a real Virtual Position;
+- individual liquidation execution;
+- BUY/SELL markers when actual Fill evidence exists; and
+- CURRENT_PRICE, which remains at the Production P4 ceiling.
+
+Only one Production stock (000070), one Routine Instance (`지표추종매매A`),
+and one Mock Instance were available. Creating another would require Production
+registration mutation. Multi-start Actual GUI acceptance and multi-instance
+isolation therefore remain NOT VERIFIED.
+
+Acceptance resumes only when safe natural preconditions exist. No next feature
+or acceptance workaround is automatically selected.
+
+7. Known Unrelated Verification Debt
+
+- Closing focused rerun: 200 PASS and 71 subtests PASS; one existing fixture
+  failure because `MockValidationHost.__new__` omits
+  `_restart_recovery_blocked_session_ids`.
+- Chart integrated focused: new failure 0; two existing stale individual-
+  liquidation expectation subtests.
+
+These debts were not modified during Closing.
+
+8. Verification Summary
+
+- Chart focused: 48 PASS.
+- Chart integrated focused: 275 tests executed, new failure 0.
+- 2-Slot focused: 7 PASS and 31 subtests PASS.
+- 2-Slot expanded: 205 PASS, 1 deselected, 99 subtests PASS.
+- py_compile/import smoke/diff check: PASS.
+- Broker/SendOrder/real-account order: 0.
+- Runtime/rules manual mutation during Closing: 0.
+
+9. Protected Working State
+
+Large pre-existing dirty/untracked working state remains intentionally present in
+both repositories. Runtime JSON, stock state, Routine rules, user settings,
+actual operation evidence, unrelated reports, archive edits, AGENT edits, and
+other unrelated WIP were not staged, reset, restored, stashed, cleaned, deleted,
+or rewritten.
+
+10. Current Authority
+
+Use
+`00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-09_MOCK_FUNCTIONAL_PARITY_ACCEPTANCE_AND_TWO_SLOT_FREEZE.txt`
+for the current Mock parity acceptance, shared Quick Chart X-axis correction,
+and situation-price-response two-slot contract. Older independent Production,
+Close/Liquidation, Candle, Routine, and Sep-08 ATS retirement authorities remain
+in force for their unaffected scopes.

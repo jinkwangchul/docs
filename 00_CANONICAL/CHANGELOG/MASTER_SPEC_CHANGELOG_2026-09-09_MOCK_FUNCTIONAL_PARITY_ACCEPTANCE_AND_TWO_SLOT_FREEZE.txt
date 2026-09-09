@@ -1,0 +1,63 @@
+MASTER SPEC CHANGELOG
+2026-09-09 Mock Functional Parity Acceptance and Situation Response Two-Slot Freeze
+
+Code Freeze SHA:
+857ed95df73170e5bca5e7b567498b786c1ff885
+
+1. Mock Functional Parity
+
+- Froze the parity-first trading/operation boundary and the reduced Mock
+  administration boundary.
+- Recorded individual/multi-selection context-menu start as the only Mock start
+  entries; bottom global start, Emergency Stop/Recovery, Operation Exclusion,
+  and complete Production Review Management remain NOT_APPLICABLE_TO_MOCK.
+- Recorded outside-time Operation creation with time-policy progression block.
+- Recorded immutable per-Operation environment snapshot behavior.
+- Recorded Actual GUI acceptance for early-close options, ROUTINE close,
+  PROFIT_LOSS, cancel, AUTO_CLOSE, and restart manual-start behavior.
+
+2. Acceptance Status
+
+- Preserved the final verdict `PARTIAL_PARITY — ACCEPTANCE PRECONDITION
+  UNAVAILABLE`.
+- Recorded the no-safe-Position-source and no-safe-second-Instance blockers.
+- Kept multi-start/isolation NOT VERIFIED, position-based MARKET/CARRYOVER/
+  IMMEDIATE paths pending, CURRENT_PRICE at P4, and markers not applicable for
+  the run.
+- Prohibited fake Position, signal, Instance, or Runtime evidence as an
+  acceptance workaround.
+
+3. Quick Chart
+
+- Corrected shared chart minimum height so the actual window satisfies
+  `minimumSizeHint()` and no longer clips X-axis labels.
+- Verified Mock and Production chart presentation without Production trading or
+  Runtime semantic change.
+
+4. Situation Price Response Two-Slot
+
+- Removed the unauthorized mapper/commit-validator cross-slot conflict rule.
+- Froze SETTING1 and SETTING2 as independent filters with no direction, action,
+  overlap, or slot-number priority restriction beyond each slot's own validity.
+- Preserved the higher-level unfilled/price-compare mutual exclusion.
+- Preserved the existing simultaneous-TRUE/different-action runtime fail-closed
+  reason `BUY_PRICE_RESPONSE_MULTIPLE_SLOTS_TRIGGERED`; added no precedence.
+
+5. Verification
+
+- Mock Actual GUI Round 2 required paths: PASS where preconditions existed.
+- Chart focused: 48 PASS.
+- Chart integrated focused: 275 tests, new failure 0.
+- 2-Slot focused: 7 PASS and 31 subtests PASS.
+- 2-Slot expanded: 205 PASS, 1 deselected, 99 subtests PASS.
+- Closing focused rerun: 200 PASS and 71 subtests PASS plus one known existing
+  fixture failure.
+- py_compile/import smoke/diff check: PASS.
+- Broker/SendOrder/real-account order: 0.
+
+6. Final Result
+
+MOCK_FUNCTIONAL_PARITY_IMPLEMENTATION_FROZEN
+ACTUAL_GUI_ACCEPTANCE_PARTIAL_PRECONDITION_UNAVAILABLE
+QUICK_CHART_X_AXIS_CORRECTION_FROZEN
+SITUATION_PRICE_RESPONSE_TWO_SLOT_CONTRACT_FROZEN

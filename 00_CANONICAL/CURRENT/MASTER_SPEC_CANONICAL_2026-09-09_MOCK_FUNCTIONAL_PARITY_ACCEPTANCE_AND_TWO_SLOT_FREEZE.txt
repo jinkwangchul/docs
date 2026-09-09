@@ -1,0 +1,237 @@
+MASTER SPEC CANONICAL
+2026-09-09 Mock Functional Parity Acceptance and Situation Response Two-Slot Freeze
+
+Status: CURRENT FROZEN AUTHORITY
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code Freeze SHA: 857ed95df73170e5bca5e7b567498b786c1ff885
+
+1. Scope
+
+This supplemental Canonical freezes the confirmed Production-to-Mock functional
+parity implementation and Actual GUI acceptance state, the shared Quick Chart
+X-axis correction, and the Indicator Follow situation-price-response two-slot
+contract. It does not declare full parity where safe natural acceptance
+preconditions were unavailable, and it does not create a new Broker, Position,
+signal, Runtime, Review, or Production trading contract.
+
+2. Mock Functional Parity Boundary
+
+Mock Validation exists to validate Production trading and operation behavior in
+an isolated Virtual Order/Fill domain. Applicable trading and operation behavior
+is parity-first. Production administration, classification, and real-money
+recovery controls are not copied merely for visual or structural symmetry.
+
+The following are NOT_APPLICABLE_TO_MOCK and MUST NOT be implemented as Mock
+parity requirements:
+
+- a bottom global Mock operation-start control;
+- Emergency Stop;
+- Emergency Stop Recovery;
+- Operation Exclusion; and
+- the complete Production Review Management structure.
+
+Mock operation start has only these official entries:
+
+1. an individual Routine Instance context-menu `운영시작`; and
+2. a multi-selection Routine Instance context-menu `운영시작` affecting only
+   the selected valid targets.
+
+The Production bottom `운영시작` remains Production-only. Program restart never
+auto-starts an individual, selected set, or all Mock registrations.
+
+3. Operation Start, Time Policy, and Environment Snapshot
+
+Explicit Mock operation start creates a new operation container independently
+of current trade-time eligibility. Start outside the trading window is allowed;
+Routine evaluation, Virtual Order, Fill, and trade progression remain blocked by
+the existing Production time policy until eligible.
+
+The Actual GUI acceptance used `자동매매설정 -> 환경설정` as the source. The
+temporary verified window was 18:00-19:30 and was restored to 09:00-13:30 after
+the run. The flow was:
+
+Environment Settings -> Mock effective settings -> new Operation
+operation_policy_snapshot.
+
+A change does not hot-swap an already RUNNING Operation. The current Operation
+retains its snapshot; only a later explicit start captures the latest settings.
+
+4. Close Parity Confirmed In Actual GUI
+
+The Mock early-close menu exposes the existing Production-meaning set:
+
+- ROUTINE (`루틴마감`);
+- MARKET (`시장가`);
+- CURRENT_PRICE (`현재가`);
+- PROFIT_LOSS (`손/익절`);
+- CARRYOVER (`이월`); and
+- CANCEL (`취소`).
+
+The individual Instance path uses the same functional set.
+
+EARLY + ROUTINE preserves the Production contract: normal BUY/SELL progression
+continues, existing pending orders are not cancelled merely by the request, the
+first valid SELL is the final SELL boundary, and completion follows that
+boundary. It is not converted into a generic CLOSING state that immediately
+blocks BUY.
+
+PROFIT_LOSS was verified with profit_percent=2.0 and loss_percent=2.0 in the
+Operation snapshot. This does not extend behavior beyond the existing
+Production Partial ceiling.
+
+Early-close cancel removes the early-close request, returns to normal
+progression, records cancel evidence/Event, and leaves Position/PnL unchanged.
+The Instance automatic-close trigger was observed as AUTO_CLOSE -> ROUTINE when
+the operation time policy reached its end.
+
+5. Restart Contract And Evidence Preservation
+
+After normal shutdown while RUNNING and subsequent restart, Actual GUI evidence
+showed Session WAITING and Instance VALIDATION_STOPPED. Automatic Operation
+Start, Routine evaluation, Virtual Order, and Fill were all zero. Existing
+Operation evidence remained preserved. A new Operation requires the operator's
+explicit context-menu start.
+
+6. Actual GUI Acceptance Status
+
+Final verdict:
+
+PARTIAL_PARITY — ACCEPTANCE PRECONDITION UNAVAILABLE
+
+This is not an implementation-failure verdict. Applicable Production behavior
+has code/test implementation, while some live acceptance paths cannot currently
+be reached without fabricating state or mutating Production registration.
+
+Observed runtime evidence:
+
+- OPERATION_STARTED: 11;
+- MOCK_MARKET_UNAVAILABLE: 8;
+- MOCK_ORDERBOOK_STALE: 244;
+- ROUTINE_EVALUATED: 550;
+- BUY signal: 0;
+- SELL signal: 26;
+- Virtual Order: 0;
+- Virtual Fill: 0; and
+- Position: 0 shares.
+
+`MOCK_MARKET_UNAVAILABLE` was traced to
+`market_store.market_snapshot(stock) -> latest_orderbook(stock)` returning no
+latest orderbook, then `_market_freshness(None)`. It was not caused by missing
+Candle data: stock 000070 had 399 candles and the Quick Chart displayed them.
+After prior fresh orderbook evidence aged past the two-second boundary, the
+reason became `MOCK_ORDERBOOK_STALE`.
+
+No safe normal Position source currently exists through a runtime signal
+injector, Mock-only BUY command, recorded replay, historical execution replay,
+synthetic market input, or developer Position seed UI. Directly invoking the
+VirtualExecutionEngine is not GUI/Routine acceptance. Therefore:
+
+- MARKET position-based liquidation: PENDING_NO_SAFE_POSITION_SOURCE;
+- CURRENT_PRICE: P4 / PENDING;
+- CARRYOVER position-based liquidation: PENDING_NO_SAFE_POSITION_SOURCE;
+- immediate liquidation: PENDING_NO_SAFE_POSITION_SOURCE;
+- individual liquidation execution: PARTIAL; and
+- BUY/SELL markers: NOT_APPLICABLE_FOR_THIS_RUN because no fill evidence exists.
+
+Only one Production stock (000070), one Routine Instance
+(`지표추종매매A`), and one Mock Instance were available. A second real Mock
+Instance would require Production registration mutation. Thus multi-start Actual
+GUI acceptance and multi-instance isolation remain NOT VERIFIED.
+
+Fake Position, a Position injector, synthetic signal, fake Instance, or Runtime
+JSON fabrication MUST NOT be created to force these preconditions. Acceptance
+resumes only when safe natural preconditions exist.
+
+7. Shared Quick Chart X-Axis Correction
+
+The Actual GUI defect was that the chart window's actual height could be below
+`minimumSizeHint()`, clipping the X-axis label area. The shared
+`gui_stock_instance_chart_window.py` now computes the required minimum height
+after UI construction and applies it to the window.
+
+Verified result:
+
+- Mock Quick Chart X-axis and post-09:00 session labels: PASS;
+- Candle display: PASS;
+- Production Chart regression and 5-minute series: PASS;
+- Production X-axis clipping: 0; and
+- header/button layout: PASS.
+
+This changed shared Chart presentation only. Production trading behavior and
+Production Runtime mutation were zero. BUY/SELL markers were not applicable in
+this run because matching execution evidence was zero.
+
+8. Indicator Follow Situation Price Response Two-Slot Contract
+
+SETTING1 and SETTING2 are independent price-response filters. Each owns its own
+enabled, source/left, target/right, direction, threshold/ratio, comparator, and
+action values:
+
+SETTING1: IF condition_1 THEN action_1
+SETTING2: IF condition_2 THEN action_2
+
+The slot number has no fixed upper/lower, rise/fall, or priority meaning. All of
+the following are valid when each individual slot is valid:
+
+- UP + DOWN, UP + UP, and DOWN + DOWN;
+- same or different source/target;
+- same or different thresholds and comparators;
+- same or different actions; and
+- overlapping or disjoint price regions.
+
+The former mapper/commit-validator cross-slot rejection for overlapping regions
+with different actions was not authorized and is removed. Single-slot behavior
+and per-slot invalid-input fail-closed validation remain. The higher-level
+`미체결` versus `가격비교` mutual-exclusion contract remains unchanged.
+
+The Actual GUI round trip was verified with:
+
+- SETTING1: AVG_PRICE -> CURRENT_PRICE, UP, 0.15, >=, CANCEL_BATCH;
+- SETTING2: AVG_PRICE -> CURRENT_PRICE, DOWN, 0.10, <=, RESET.
+
+Save and reopen preserved both slots without value loss, exchange, or collapse.
+
+9. Simultaneous TRUE Runtime Boundary
+
+Validation freedom and runtime arbitration are separate. If two valid enabled
+slots with different actions are both TRUE in the same cycle, the existing
+runtime behavior remains fail-closed with:
+
+BUY_PRICE_RESPONSE_MULTIPLE_SLOTS_TRIGGERED
+
+No Slot-1, Slot-2, RESET, or CANCEL precedence was added. A future arbitration
+policy remains undecided and is not created by this Freeze.
+
+10. Verification Evidence
+
+Mock Actual GUI Round 2:
+
+- environment source/effective/new Operation snapshot: PASS;
+- RUNNING hot swap: 0;
+- single and outside-time start: PASS;
+- outside-time progression: blocked;
+- early-close option set, ROUTINE, PROFIT_LOSS, CANCEL, AUTO_CLOSE: PASS;
+- restart manual-start behavior: PASS;
+- Mock Quick Chart X-axis: PASS; and
+- Production Chart regression: PASS.
+
+Automated verification:
+
+- Chart focused: 48 PASS;
+- Chart integrated focused: 275 tests executed, new failure 0, two existing
+  stale individual-liquidation expectation subtests;
+- 2-Slot focused: 7 PASS and 31 subtests PASS;
+- 2-Slot expanded: 205 PASS, 1 deselected, and 99 subtests PASS;
+- Closing focused rerun: 200 PASS and 71 subtests PASS, plus one known fixture
+  failure where a `MockValidationHost.__new__` test fixture omits
+  `_restart_recovery_blocked_session_ids`;
+- py_compile, import smoke, and diff check: PASS; and
+- Broker/SendOrder/real-account order: 0.
+
+11. Final Judgment
+
+MOCK FUNCTIONAL PARITY IMPLEMENTATION FROZEN
+ACTUAL GUI ACCEPTANCE PARTIAL — PRECONDITION UNAVAILABLE
+QUICK CHART X-AXIS CORRECTION FROZEN
+SITUATION PRICE RESPONSE TWO-SLOT CONTRACT FROZEN
