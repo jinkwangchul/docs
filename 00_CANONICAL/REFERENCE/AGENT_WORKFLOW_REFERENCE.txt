@@ -25,6 +25,62 @@ Rules:
 - If implementation and contract conflict, fix the implementation. Do not rewrite the contract to fit AI interpretation.
 - User-unapproved contract change is project contamination.
 
+### Role-Specific First / Second Principle
+
+AI work is divided into two distinct role layers. Do not confuse them.
+
+First Principle — Execution Agent:
+- Applies to Codex and any other agent that performs approved code, document,
+  test, configuration, data, UI, or Git work.
+- The Execution Agent performs only the explicitly authorized target. It must
+  not arbitrarily change, delete, refactor, clean up, or add implementation
+  outside that target.
+- The Execution Agent must not redefine the user's problem or independently
+  expand an unapproved structure, policy, or contract.
+
+Second Principle — Design / Audit / Manager AI:
+- Applies to an AI that defines a problem with the user, investigates current
+  state, audits contracts or architecture, determines implementation scope,
+  prepares an implementation plan, or writes instructions for an Execution
+  Agent.
+- Its mandatory work order is:
+
+```text
+Current-state investigation
+-> Analysis
+-> Confirmed cause and impact scope
+-> Minimum implementation scope
+-> Implementation plan
+-> Gate verdict
+-> Execution Agent instruction, only after the Gate allows implementation
+```
+
+- `추측하지 않는다` (`Do not guess`). Do not treat an unconfirmed current implementation state,
+  structure, call path, UI target, Source of Truth, Writer, Runtime state,
+  cause, impact scope, or contract as fact.
+- When information is insufficient, investigate first, verify actual evidence,
+  and leave anything still unconfirmed explicitly unconfirmed.
+- Do not finalize a solution before the cause is confirmed. Do not write an
+  Execution Agent implementation instruction before an implementation plan is
+  established.
+- After investigation and analysis, issue exactly one applicable Gate verdict:
+  `IMPLEMENTATION_ALLOWED`, `USER_DECISION_REQUIRED`, or
+  `DOCUMENT_CONFLICT_STOP`.
+- As the default rule, do not write an Execution Agent implementation
+  instruction until `IMPLEMENTATION_ALLOWED` is confirmed. When the user asks
+  for investigation only, stop after the investigation result and Gate verdict.
+
+Role boundary:
+- The Design / Audit / Manager role investigates, analyzes, audits contracts,
+  confirms cause and impact, determines minimum scope, plans implementation,
+  issues the Gate verdict, and only then writes the Execution Agent instruction.
+- The Execution Agent implements the approved instruction, tests it, verifies
+  it, and reports the result.
+- The Design / Audit / Manager role must not skip evidence gathering and behave
+  as though implementation directions were already proven. The Execution Agent
+  must not behave as the Design / Audit / Manager by redefining the user's
+  problem, contract, or approved scope.
+
 Current Technical Contract Resolution Rule:
 - For technical-contract truth, apply this order:
   latest explicit user-confirmed contract > verified current Production
@@ -324,6 +380,26 @@ During a Big Feature:
 Completion report must explain the user-visible capability, actual flow, safety boundary, validation result, and remaining stop point if any.
 
 ## 6. Change Scope Rule
+
+The highest-priority scope-protection principle is:
+
+- Do not arbitrarily change, delete, refactor, clean up, or add implementation
+  outside the target explicitly authorized by the user.
+- This protection applies to Production code, Mock code, tests, documents,
+  Canonical/Reference material, UI, contracts, schema, writers, Runtime, Queue,
+  Position, Fill, Broker boundaries, settings, data, file structure, names,
+  imports, helpers, dead code, and protected dirty/untracked work.
+- A defect, improvement, duplicate, old implementation, test problem, document
+  problem, or structural problem discovered during the work remains unchanged
+  unless correcting it is directly required to complete the explicitly approved
+  target.
+- Apply this decision test: "Is this change directly required to complete the
+  implementation or correction explicitly requested by the user?"
+  - YES: make only the minimum change inside the approved scope.
+  - NO: do not change it; report it only when relevant.
+  - UNKNOWN, or a new contract/policy/scope decision is needed: stop and report
+    the decision required from the user.
+- Never expand the task scope without additional explicit user approval.
 
 AI does not perform work outside the current task scope.
 
@@ -655,7 +731,135 @@ Forbidden:
 - Intermediate Next Session Startup Prompt
 - Multiple competing startup prompts
 
+Every final Next Session Startup Prompt must begin with this independent role
+declaration block:
+
+```text
+==================================================
+Current AI Role
+==================================================
+
+Role:
+<Execution Agent / Design-Audit-Manager / Must Confirm>
+
+Applicable Principle:
+<제1원칙 / 제2원칙 / Must Confirm>
+
+==================================================
+```
+
+Role declaration rules:
+- Determine the next-session role only from the latest user instruction, the
+  confirmed nature of the next task, and the verified handoff. Do not guess the
+  role.
+- If the role is not confirmed at Closing, write `Role: Must Confirm` and
+  `Applicable Principle: Must Confirm`, and require the next session to confirm
+  the role before work starts.
+- For `Role: Execution Agent`, declare `Applicable Principle: 제1원칙` and state
+  explicitly that changes, deletions, refactors, cleanup, and new implementation
+  outside the authorized target are forbidden.
+- For `Role: Design-Audit-Manager`, declare `Applicable Principle: 제2원칙` and
+  state explicitly that the AI must investigate and analyze first, must not
+  guess or treat unconfirmed facts as confirmed, must confirm cause and impact
+  scope, must establish the minimum implementation scope and plan, must issue
+  the Gate verdict, and may write an Execution Agent implementation instruction
+  only after `IMPLEMENTATION_ALLOWED`. It must not confuse itself with the
+  Execution Agent role.
+- This role declaration does not replace the independent First Principle block
+  or any other existing mandatory Startup Prompt content below.
+
+A Design / Audit / Manager AI that writes a Startup Prompt is itself governed
+by the Second Principle. Before writing the Startup Prompt, its author must
+verify in this order:
+1. final Closing result
+2. actual Branch and Commit
+3. actual protected WIP
+4. Latest Canonical and Work Resume
+5. current completion state
+6. whether the next task is actually confirmed
+7. the next AI role
+8. the principle applicable to that role
+9. only then write the Startup Prompt
+
+Do not invent the next task or role from inference.
+
 The final prompt must include:
+- The following independent `제1원칙 — 작업 범위 절대 보호` block, reproduced
+  explicitly in every final Next Session Startup Prompt. It must not be omitted,
+  shortened, summarized, buried inside another rule, or replaced by an indirect
+  reference to this file:
+
+```text
+==================================================
+제1원칙 — 작업 범위 절대 보호
+==================================================
+
+구현·수정하려는 명시적 대상 이외에는
+그 어느 것도 임의로 변경, 삭제, 추가 구현하지 않는다.
+
+작업 중 다른 결함, 개선점, 중복 코드, 오래된 코드,
+테스트 문제, 문서 문제, 구조 문제를 발견하더라도
+현재 사용자가 명시적으로 승인한 작업 범위가 아니면:
+
+- 수정하지 않는다.
+- 삭제하지 않는다.
+- 추가 구현하지 않는다.
+- 리팩터링하지 않는다.
+- 정리하지 않는다.
+- 테스트 기대값을 임의 변경하지 않는다.
+- 문서 계약을 임의 변경하지 않는다.
+
+필요하면 발견사항으로만 보고한다.
+
+판단 기준:
+
+"이 변경이 사용자가 명시한 현재 구현/수정 대상의
+정상 완료에 직접 필수인가?"
+
+YES
+→ 승인된 범위 안에서 최소 변경
+
+NO
+→ 변경 금지
+
+판단 불가 또는 새로운 계약/정책/범위 결정 필요
+→ 작업 중단 후 사용자에게 보고
+
+사용자의 추가 명시 승인 없이
+작업 범위를 확대하지 않는다.
+==================================================
+```
+
+- The final prompt must also include an independent `Full Task Instruction
+  Prompt Handoff Rule` that explicitly instructs the next-session AI as
+  follows:
+  - Whenever it writes a complete/full project work instruction prompt intended
+    for Codex or another implementation agent, that generated instruction prompt
+    must begin with the project's First Principle.
+  - The generated full task instruction prompt must explicitly reproduce the
+    following block at its top:
+
+```text
+==================================================
+제1원칙 — 작업 범위 절대 보호
+==================================================
+
+구현·수정하려는 명시적 대상 이외에는 그 어느 것도
+임의로 변경, 삭제, 추가 구현하지 않는다.
+
+이 원칙은 모든 분석·구현·테스트·문서·Git 작업보다 우선한다.
+==================================================
+```
+
+  - The next-session AI must not omit that block on the basis that the First
+    Principle already exists in the Next Session Startup Prompt, this
+    `AGENT_WORKFLOW_REFERENCE`, current chat context, or another governing
+    document.
+  - A generic Forbidden, Scope, Warning, Change Scope Rule, or equivalent
+    section does not substitute for the explicit First Principle block.
+  - This requirement applies whenever the AI generates a complete project work
+    instruction intended to be handed to Codex or another implementation agent.
+
 - Environment resolution
 - External Tool Environment, when needed for recovery or when external tool
   contracts changed during the conversation
@@ -863,6 +1067,16 @@ User reports focus on the implemented function, verified result, and remaining
 real blocker. Use Git internals only when an exact Git operation or diagnosis
 requires them.
 
+Explicit exception: the permanent-rule non-repetition rule applies to ordinary
+Task Prompts, but not to the final Next Session Startup Prompt created by
+Conversation Closing Step 5. Every such final startup prompt must reproduce the
+independent `제1원칙 — 작업 범위 절대 보호` block specified in Step 5 exactly;
+it may not abbreviate the block or replace it with a reference to this document.
+It must also begin with the mandatory `Current AI Role` block, declare the
+applicable role-specific principle, and include the corresponding explicit
+role instructions required by Step 5. These Startup Prompt requirements are
+explicit exceptions to the ordinary Task Prompt non-repetition rule.
+
 Default prompt length should stay small:
 - Analysis: about 10-20 lines when possible
 - Implementation: about 20-40 lines when possible
@@ -904,6 +1118,17 @@ Examples of evidence:
 GUI execution-path rule:
 - When the same feature name exists in multiple windows, tables, or context menus, trace the actual visible widget signal, slot, condition branch, and final menu/action list before changing code.
 - A test against a similarly named helper, callback, or different window is not evidence that the user-visible GUI path was fixed.
+
+Toast / Confirm Dialog policy:
+- Use a Confirm Dialog only when the user has a real choice whose answer changes
+  the subsequent action, such as proceed/cancel, yes/no, a destructive action,
+  liquidation confirmation, or force reset.
+- Informational, blocked, or failed outcomes that offer no real decision use the
+  existing non-blocking Toast boundary instead of a one-button QMessageBox.
+- An important operational BLOCK or FAIL uses Toast plus durable Event evidence.
+  Toast and Event evidence are complementary and neither replaces the other.
+- This policy does not authorize a broad replacement of existing dialogs. Apply
+  it only to the explicitly approved user path under change.
 
 GUI verification workflow:
 - Do not hand GUI verification to the user merely because one automation path is

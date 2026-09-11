@@ -1,0 +1,52 @@
+MASTER SPEC CHANGELOG
+2026-09-11 Regular Window Closing Freeze
+
+Code Freeze SHA: 0ad5aab1659dbd59c0bccb3451d63958cceafcab
+
+1. Operation And Close
+
+- Normalized Production pre-start operation-mode admission against current
+  participant evidence and preserved detailed failure reasons.
+- Allowed inactive Mock pre-start mode/ATS/schedule editing without Broker auth.
+- Implemented the CONTINUOUS/SCHEDULED close and liquidation display matrix.
+- Prevented false CONTINUOUS AUTO-close creation at final session end while
+  preserving SCHEDULED automatic close and legitimate liquidation.
+
+2. Mock, Routine, And Context Operations
+
+- Deferred Mock direct base-stock creation until Routine selection succeeds.
+- Preserved per-Instance identity in flat Mock display and interaction targets.
+- Added exact Mock unregister and Routine unregister dependency guards with
+  atomic preflight and no cascade stock unassignment.
+- Reused the shared Routine-selection UI with Mock-only empty initial selection.
+- Normalized approved Indicator Follow validation-on-commit and expression-
+  referenced group behavior.
+- Added persistent non-terminal stock-context interaction with in-place guard
+  refresh; terminal identity changes still close the menu.
+
+3. Quick Chart And Monitoring
+
+- Added live header refresh for Production and Mock without full chart rebuild.
+- Added the display-only last-confirmed-price to current-price bridge in the
+  shared renderer; no synthetic candle/history write was introduced.
+- Completed the read-only internal TR capacity gauge and six equal graphic
+  segments with green/green/orange/orange/red/red levels and gray inactive bars.
+
+4. Documentation Reconciliation
+
+- Changed the Sep-11 display Supplemental from code-pending to code-frozen.
+- Clarified termination-route-first long-hold classification.
+- Recorded current-cycle reset versus completed-cycle history separation.
+- Reinforced Toast versus Confirm Dialog policy in the workflow authority.
+- Corrected the stale Closing assumption that the TR 6-segment UI was pending;
+  code, focused tests, and Actual GUI evidence show it completed before Closing.
+
+5. Verification
+
+- Working Tree core: 267 tests + 143 subtests PASS.
+- index-only core: 266 tests + 143 subtests PASS.
+- py_compile and staged diff check: PASS.
+- six prior-HEAD baseline failures remain unchanged; new committed regression 0.
+- Broker/SendOrder/Runtime or stock-data migration: 0.
+
+REGULAR_WINDOW_CHANGELOG_RECORDED

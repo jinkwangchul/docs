@@ -1,0 +1,242 @@
+MASTER SPEC CANONICAL
+2026-09-11 Operation Mode x Close/Liquidation Display Contract Reconciliation
+
+Status: CURRENT SUPPLEMENTAL AUTHORITY
+Scope: Production and Mock operation-mode, close-admission, and display semantics
+
+==================================================
+1. Purpose And Authority
+==================================================
+
+This Supplemental Canonical resolves the conflict between the current user-
+confirmed CONTINUOUS liquidation display contract and the 2026-08-26 Current
+Canonical wording that could allow a configured liquidation value to appear
+during ordinary CONTINUOUS operation.
+
+For the display meanings defined here, authority order is:
+
+1. this 2026-09-11 Supplemental Canonical;
+2. the unaffected provisions of the 2026-08-26 Budget / Operation Start / ATS
+   Freeze; and
+3. the existing Close, Individual Liquidation, Mock, and GUI supporting owners.
+
+Only the conflicting CONTINUOUS current-display meaning is superseded. The
+2026-08-26 document remains historical evidence and remains current for its
+unaffected Budget, Operation Start, participant, session, gap, and SCHEDULED
+contracts.
+
+==================================================
+2. Supersession Boundary
+==================================================
+
+The following older interpretation is SUPERSEDED and MUST NOT be used for
+current implementation:
+
+- during ordinary CONTINUOUS / manual or manual+ATS operation with no operator
+  Early Close and no legitimate liquidation entry, a stored or configured
+  liquidation policy may cause the current liquidation cell to show or activate
+  that configured value.
+
+The following 2026-08-26 meanings remain current:
+
+- status, method activity, liquidation text, liquidation activity, participant
+  membership, and order permission are separate projections;
+- ATS is a selected additional trading session rather than an independent
+  operation mode;
+- an ATS session end is not Operation end, automatic close, liquidation, or
+  Review entry;
+- SCHEDULED retains its configured time boundary and automatic-close route; and
+- non-trading gaps block order progression without inventing a close route.
+
+==================================================
+3. Text And Active Are Independent
+==================================================
+
+`liquidation_text` and `liquidation_active` are different facts.
+
+- `liquidation_active == false` does not by itself require text `-`.
+- SCHEDULED may show a configured policy while the policy is inactive.
+- CONTINUOUS ordinary operation shows `-` because no current close/liquidation
+  route exists, not merely because the cell is inactive.
+- A configured or historically preserved policy is not current execution
+  evidence.
+
+The display projection must not derive policy existence solely from whether the
+final text is `-`, and it must not turn a configured SCHEDULED policy into `-`
+merely because the policy is currently inactive.
+
+==================================================
+4. CONTINUOUS / Manual
+==================================================
+
+Unless the operator has entered Early Close or another legitimate liquidation
+route, CONTINUOUS / manual has:
+
+- automatic close: absent;
+- regular close plus liquidation route: absent;
+- liquidation text: `-`; and
+- liquidation active: false.
+
+This result is independent of time phase:
+
+- PRE: `-`;
+- ACTIVE: `-`;
+- NON_TRADING_GAP: `-`; and
+- FINAL_END: `-`.
+
+FINAL_END in CONTINUOUS may stop time-permitted BUY/SELL progression. It does not
+create close_source, close_method, automatic close, or liquidation evidence.
+
+==================================================
+5. CONTINUOUS / Manual+ATS
+==================================================
+
+CONTINUOUS / manual+ATS follows the same ordinary-operation liquidation rule:
+
+- active selected ATS session: `-`;
+- ATS gap: `-`;
+- final selected ATS session end: `-`; and
+- liquidation active: false.
+
+ATS extends eligible trading time. It does not override the Routine-generated
+BUY/SELL method and does not create automatic close, Early Close, liquidation,
+or Operation-end evidence.
+
+An operator Early Close or legitimate individual/immediate liquidation leaves
+this ordinary-operation branch and follows the existing Close/Liquidation
+owners.
+
+==================================================
+6. SCHEDULED / Timed Operation
+==================================================
+
+SCHEDULED retains the existing time-based close/liquidation contract.
+
+If the configured policy is `5분/시장가`, the minimum display matrix is:
+
+PRE_OPERATION_BOUNDARY:
+
+- status: `감시/대기`;
+- method: `루틴`, inactive;
+- liquidation text: `5분/시장가`;
+- liquidation active: false; and
+- automatic close trigger: not yet due.
+
+OPERATION_BOUNDARY_REACHED:
+
+- status: `감시/대기` until the stock trading window is active;
+- method: `루틴`, active under the existing phase contract;
+- liquidation text: configured policy text;
+- liquidation active: governed by the existing phase contract.
+
+ACTIVE_TRADING_WINDOW:
+
+- status: `매수/매도`;
+- method: `루틴`, active;
+- liquidation text: configured policy text;
+- liquidation active: governed by the existing phase contract; and
+- final order permission remains subject to every existing safety gate.
+
+FINAL_END:
+
+- configured policy text is not erased merely because the cell is inactive;
+- the existing SCHEDULED automatic-close trigger remains permitted; and
+- the resulting AUTO Close and liquidation phases follow the existing Close and
+  Liquidation contracts.
+
+==================================================
+7. Legitimate Close And Liquidation
+==================================================
+
+The following are not ordinary CONTINUOUS display states and remain valid:
+
+- operator Early Close;
+- SCHEDULED AUTO Close;
+- individual liquidation;
+- immediate liquidation;
+- MARKET liquidation;
+- CURRENT_PRICE liquidation; and
+- CARRYOVER where already authorized by its current owner.
+
+During a legitimate route, the status, method, liquidation text, and active state
+must come from the current close/liquidation evidence and its existing policy.
+CARRYOVER does not become active MARKET/CURRENT_PRICE liquidation.
+
+CURRENT_PRICE may leave an intentional residual holding. That does not authorize
+generic ATS order-method restoration, forced MARKET conversion, or a new Review
+bypass.
+
+==================================================
+8. WAITING And VALIDATION_STOPPED
+==================================================
+
+When no active Operation exists, WAITING and VALIDATION_STOPPED display the next
+effective settings. A past stopped Operation remains historical evidence and
+does not become current close/liquidation evidence.
+
+- next effective CONTINUOUS: liquidation text `-`, inactive;
+- next effective SCHEDULED: configured liquidation text, inactive.
+
+When an active RUNNING or CLOSING Operation exists, its immutable Operation
+snapshot remains authoritative. Mutable next-start settings must not hot-swap the
+current Operation.
+
+==================================================
+9. Production / Mock / Main / Quick Chart Parity
+==================================================
+
+Production and Mock must use the same semantic result for the same operation
+mode, time phase, Operation state, close evidence, ATS state, and liquidation
+policy state.
+
+Main and Quick Chart may use different UI adapters, but they must not disagree on:
+
+- status text;
+- method text and active state;
+- liquidation text;
+- liquidation policy existence; or
+- liquidation active state.
+
+No Main-only or Quick-Chart-only exception may hide an upstream projection
+defect.
+
+==================================================
+10. Preserved Boundaries
+==================================================
+
+This reconciliation does not change or authorize changes to:
+
+- Runtime schema or writers;
+- Production or Mock execution;
+- Mock Session or stock data;
+- frozen reference snapshots or snapshot hashes;
+- active Operation snapshot ownership;
+- SCHEDULED automatic close;
+- Early Close or liquidation execution;
+- ATS session selection;
+- Routine BUY/SELL; or
+- Broker/SendOrder behavior.
+
+==================================================
+11. Current Implementation Status
+==================================================
+
+The prior DOCUMENT_CONFLICT_STOP is resolved. The separately authorized code
+corrections are implemented and frozen at:
+
+- repository: `jinkwangchul/kiwoom_auto`;
+- branch: `feat/restore-auto-trade-setting-ui`; and
+- Code Freeze SHA: `0ad5aab1659dbd59c0bccb3451d63958cceafcab`.
+
+The implementation uses the active Operation's immutable snapshot for close
+admission. `CONTINUOUS` does not create AUTO close merely because the final
+session ended. `SCHEDULED` retains the existing time-triggered route. Main and
+Quick Chart consume the current Projection rather than frozen display text.
+
+Focused Working Tree verification passed 267 tests and 143 subtests. The final
+index-only snapshot passed 266 tests and 143 subtests; one non-self-contained
+test method that depended on the user's unstaged ATS visibility setting was
+kept outside the commit without modifying that protected setting.
+
+DOCUMENT_CONFLICT_RESOLVED
+CODE_CORRECTION_FROZEN

@@ -1,0 +1,99 @@
+INDICATOR FOLLOW SETTINGS VALIDATION-ON-COMMIT SUPPLEMENTAL CANONICAL
+====================================================================
+
+Authority date: 2026-09-08
+Scope: ordinary Indicator Follow Routine registration and settings change
+Status: IMPLEMENTED, LOCALLY VERIFIED, AND GIT FROZEN
+
+Code Freeze SHA: 0ad5aab1659dbd59c0bccb3451d63958cceafcab
+
+1. Current ordinary settings contract
+-------------------------------------
+
+There is no separate user-facing `설정 검증` step.
+
+New registration:
+
+  current UI -> normalized UI state -> Routine mapper -> prospective complete
+  rules -> Routine-owned validation -> instance creation with those rules as the
+  Initial Applied Rules -> persisted read-back equality check
+
+Existing settings change:
+
+  current UI -> normalized UI state -> Routine mapper -> prospective complete
+  rules -> Routine-owned validation -> existing atomic rules writer -> rules,
+  hash, and instance-identity read-back -> success
+
+Invalid mapping or validation fails closed before persistent mutation. A writer
+or read-back failure leaves or restores the previous Applied Rules.
+
+For these ordinary registration/change paths, Pending, an Approval Session,
+APPROVED/REJECTED/DEFERRED decisions, and a separate Apply action are not
+prerequisites. Existing historical Pending/Approval implementation is not
+deleted and remains available only to independently authorized callers.
+
+This section supersedes only older wording that required the ordinary Indicator
+Follow settings workflow to pass through:
+
+  설정 검증 -> Pending -> Approval -> Commit/Apply
+
+It does not supersede Production Candidate Approval, order/execution approval,
+or any other safety boundary.
+
+2. Validation authority
+-----------------------
+
+Registration and change use the same Routine-owned validation entry point. The
+validated object is the prospective complete rules consumed by the engine, not
+the widgets alone. Existing mapper validation, warnings, postponed mappings,
+execution locks, committed-rules validation, and engine preconditions are
+reused. An active setting with no proven validation contract fails closed; no
+default or numeric range may be invented.
+
+Supported candle intervals remain:
+
+  1, 3, 5, 10, 15, 30, 60, 120, 240 minutes
+
+The Applied interval remains the Production Candle request interval.
+
+3. Display and effective-rule contract
+--------------------------------------
+
+After a successful registration or change, the serialized UI state and the
+canonical Applied fields represent the same validated settings. Reopening the
+settings dialog displays that Applied state. Unapplied Pending or an old
+Approval candidate is not the ordinary display authority.
+
+4. Mock Operation versioned snapshot
+------------------------------------
+
+Changing Production Applied Rules does not hot-swap a running Mock Operation.
+Each explicit Mock operation start captures the latest Applied Rules into that
+Operation's rules snapshot. The snapshot is immutable for that Operation and is
+also the effective rules source for its Mock Quick Chart. A later Operation
+captures the then-latest Applied Rules without requiring reset or re-registration.
+
+5. Preserved boundaries
+-----------------------
+
+- No new Source of Truth, Writer, Schema, validation PASS state machine, or
+  Approval system was introduced.
+- Production/Routine ownership, Routine unregister integrity, Candle
+  aggregation, order execution, Position/PnL, Broker, and SendOrder contracts
+  are unchanged.
+- Verification used fixture/temp repositories and offscreen tests. Broker and
+  SendOrder calls were zero.
+
+6. Local verification evidence
+------------------------------
+
+- Validation-on-commit, registration, mapper, atomic writer, Mock snapshot,
+  Quick Chart, and Routine unregister protection: 367 PASS
+- Indicator Follow policy, BUY/SELL, lifecycle, and ownership: 190 PASS
+- py_compile: PASS
+- import smoke: PASS
+- git diff --check: PASS
+
+Final contract verdict:
+
+INDICATOR_FOLLOW_SETTINGS_VALIDATION_ON_COMMIT_VERIFIED

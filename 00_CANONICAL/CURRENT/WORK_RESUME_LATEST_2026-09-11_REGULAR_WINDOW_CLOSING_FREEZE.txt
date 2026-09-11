@@ -1,0 +1,87 @@
+WORK RESUME LATEST
+2026-09-11 Regular Window Closing Freeze
+
+1. Repository Baseline
+
+Code repository: jinkwangchul/kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Previous Code Freeze SHA: ed7e0ea3660dd9a675b81b95521fe3995cb2c3df
+Current Code Freeze SHA: 0ad5aab1659dbd59c0bccb3451d63958cceafcab
+Code push: local == origin, ahead/behind 0/0
+
+Docs repository: jinkwangchul/docs
+Docs branch: agent/project-prompt-standard
+Previous Docs Freeze SHA: a90332aa74433775d85cffc72ad75c865604e84b
+The final Docs SHA is verified after commit/push and is not self-referentially
+back-written into this file.
+
+2. Completed Current Scope
+
+- Production pre-start operation-mode admission: NORMALIZED.
+- Mock inactive pre-auth operation mode/ATS/schedule admission: NORMALIZED.
+- Operation mode x close/liquidation matrix and false CONTINUOUS auto-close:
+  NORMALIZED.
+- Mock direct registration, flat Instance identity, exact unregister, and
+  Routine deletion dependency guards: NORMALIZED.
+- Indicator Follow validation-on-commit and expression-referenced group
+  validation: NORMALIZED.
+- Persistent stock context-menu interaction: NORMALIZED.
+- Production/Mock Quick Chart live header and current-price bridge: NORMALIZED.
+- Internal TR load measurement and six-segment graphic indicator: NORMALIZED.
+
+3. TR Gauge Final State
+
+The gauge is read-only internal capacity evidence, not official Kiwoom quota or
+stock capacity. Six equal segments are implemented. Active colors are green x2,
+orange x2, red x2; inactive segments are gray. Level meanings are 0 비용 없음,
+1 매우양호, 2 양호, 3 아주보통, 4 보통, 5 부담, 6 매우부담. Unicode bar/box
+characters and blue indicator styling are absent. Actual GUI acceptance verified
+0/1/3/6 and the existing Monitoring-window button action.
+
+4. Actual GUI Evidence
+
+Previously reported and code-consistent Actual GUI acceptance covers Production
+pre-start mode change, Mock pre-auth settings, the operation/display matrix,
+Quick Chart live transitions, current-price bridge movement/new-bar origin
+movement, and the TR six-segment states. Closing introduced no new GUI behavior.
+
+5. Verification
+
+- py_compile, 22 changed modules: PASS.
+- Working Tree core: 267 tests + 143 subtests PASS.
+- final index-only core: 266 tests + 143 subtests PASS.
+- independent persistent-menu rerun: 10 PASS.
+- previous HEAD and final index both reproduce the same six baseline failures:
+  Recovery fixture 2, signal-ownership fixture 2, Main button fixture 2.
+- new committed regression: 0.
+
+6. Protected Working State
+
+Large dirty/untracked state remains intentional. Runtime JSON, stock state,
+RoutineInstance data, operation/global policy settings, reports, archive edits,
+and unrelated tests/docs were not staged, reset, restored, stashed, cleaned,
+deleted, or rewritten. A non-self-contained ATS-visibility test method remains
+in the Working Tree only; its user-policy dependency was not promoted into the
+commit.
+
+7. Remaining Known Items
+
+- Existing six baseline failures remain debt and were not fixed.
+- One protected ATS-visibility test method needs a separately authorized,
+  self-contained fixture decision before it can be committed.
+- Existing Mock parity acceptance preconditions from the Sep-09 owner remain
+  unchanged where safe natural Position/second-Instance evidence is unavailable.
+- No automatically selected next feature exists. The TR six-segment indicator
+  is complete and must not be repeated as next work.
+
+8. Current Recovery Entry
+
+Use
+`MASTER_SPEC_CANONICAL_2026-09-11_REGULAR_WINDOW_CLOSING_FREEZE.txt`
+with the separate Sep-11 display Supplemental, Sep-09 Mock parity Freeze, and
+unaffected independent owners. Any next implementation requires a new explicit
+user instruction and the Mandatory Pre-Work Contract Audit.
+
+ACTUAL_GUI_CONFIRMATION: VERIFIED FOR THE LISTED ACCEPTED PATHS
+BROKER/SENDORDER: 0
+NEXT_SESSION_PROMPT: NOT CREATED BY CODEX

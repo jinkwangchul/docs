@@ -156,6 +156,25 @@ must not be reported as actual GUI confirmation.
 - Mock never mutates Production Queue, Runtime, Position, Fill/Chejan, Budget,
   Broker, ATS state, or user operational data.
 
+6.5 Application shutdown and restart
+
+- The current default policy is manual restart: restarting the program does not
+  automatically resume Mock Validation operation.
+- Normal application shutdown applies the existing Instance Validation Stop
+  lifecycle to RUNNING or CLOSING Mock Instances. Active virtual orders follow
+  the existing cancellation lifecycle, while Position, average price, PnL,
+  fills, Event history, effective settings, registration, Session identity, and
+  prior Operation evidence are preserved.
+- Startup defensively normalizes a persisted RUNNING or CLOSING Mock Instance to
+  VALIDATION_STOPPED before host-cycle evaluation can run. WAITING and already
+  VALIDATION_STOPPED Instances remain unchanged; ERROR evidence and its existing
+  reset/stop recovery contracts remain unchanged.
+- Program shutdown or restart is not Reset. It does not zero current Mock data,
+  archive the Session, or delete registration/history.
+- Only the operator's explicit `운영시작` action creates a new Operation identity
+  and enables progression after restart. The prior Operation identity must not be
+  reactivated.
+
 7. Verification Evidence
 
 - Working Tree Production ATS focused: 172 PASS + 45 subtests PASS.

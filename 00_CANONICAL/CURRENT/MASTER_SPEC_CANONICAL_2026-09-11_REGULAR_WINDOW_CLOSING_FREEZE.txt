@@ -1,0 +1,128 @@
+MASTER SPEC CANONICAL
+2026-09-11 Regular Window Closing Freeze
+
+Status: CURRENT SUPPLEMENTAL FREEZE
+Code Freeze SHA: 0ad5aab1659dbd59c0bccb3451d63958cceafcab
+Code branch: feat/restore-auto-trade-setting-ui
+
+1. Authority Boundary
+
+This Freeze records only the durable contracts implemented and verified after
+the 2026-09-09 Freeze. Older independent Candle, Broker, Queue, Position, Fill,
+Review, Close, Routine, and ATS owners remain authoritative for unaffected
+scope. No Runtime, stock data, operation-policy setting, schema, migration, or
+Broker execution change is authorized by this document.
+
+2. Operation-Mode Admission
+
+Production pre-start operation-mode admission uses current process/session
+participation rather than stale persisted RUNNING alone. A real current
+participant that is RUNNING remains blocked, and independent safety guards are
+unchanged. A BLOCK/FAIL with no user choice uses Toast; important operational
+failure also records Event evidence with the detailed reason.
+
+Mock WAITING or VALIDATION_STOPPED with no active Operation may edit operation
+mode, selected ATS sessions, and operation schedule without Broker login/account
+authorization. Initial-buy budget and any fresh-price-dependent calculation
+retain their existing authorization and freshness requirements. RUNNING,
+CLOSING, ERROR, ENDED, and REVIEW_STOPPED guards remain fail-closed.
+
+3. Close And Display
+
+The detailed matrix is owned by
+`MASTER_SPEC_CANONICAL_2026-09-11_OPERATION_MODE_CLOSE_LIQUIDATION_DISPLAY_RECONCILIATION.txt`.
+An active Operation uses its immutable snapshot. Next effective settings do not
+hot-swap it. CONTINUOUS manual/manual+ATS does not create AUTO close from session
+FINAL_END; progression may stop while current status projects `감시/대기` and
+liquidation projects `-`. SCHEDULED retains its configured policy and existing
+time-triggered AUTO-close route. Legitimate Early Close and individual/immediate
+liquidation remain preserved.
+
+4. Monitoring And Quick Chart
+
+Production and Mock Quick Chart headers refresh status, method, liquidation,
+and the operation badge from the same current semantic Projection used by Main.
+The 1,000 ms header refresh performs no candle/marker/PnL rebuild, Broker/TR
+request, or Runtime write.
+
+The shared chart renderer draws a display-only bridge from the last valid
+confirmed plotted price point to the current-price marker. It does not append a
+price to `close_series`, create a fake candle, rewrite history, or persist bridge
+state. A new confirmed bar moves the bridge origin; past-date charts without a
+live marker draw no bridge. Production and Mock use the same renderer.
+
+5. TR Capacity Gauge
+
+TR capacity is an internal processing-load observation based on recent 60-second
+actual dispatch count divided by the existing centralized governor pacing
+capacity. It is not an official Kiwoom remaining quota, maximum-stock count, or
+stability guarantee. Queue depth and wait remain supplementary evidence, and
+the indicator itself generates no TR.
+
+The completed Main UI is six equal QFrame segments with identical geometry and
+spacing. Inactive segments are gray. Active position colors are green, green,
+orange, orange, red, red. Levels 0 through 6 mean respectively `비용 없음`,
+`매우양호`, `양호`, `아주보통`, `보통`, `부담`, and `매우부담`. Unicode box/bar
+characters and the former blue character indicator are absent. Actual GUI
+acceptance verified 0/1/3/6 states and the existing Monitoring-window click.
+
+6. Registration, Identity, And Unregister Integrity
+
+Mock direct registration defers new base-stock mutation until at least one
+Routine is selected in the shared Routine-selection dialog. Zero selection or
+cancel creates neither base Stock nor Mock Session/Instance. Existing Stock
+identity and Production assignment remain unchanged.
+
+Mock valid-stock flat projection preserves Stock x RoutineInstance identity,
+context-menu target, Quick Chart target, effective settings, and Session ID.
+Routine unregister fails closed while canonical assigned Stocks or current Mock
+registrations exist; it performs no cascade unassignment and preserves Group.
+Mock all-unregister preflights every target before the first mutation.
+
+7. Routine Settings And Context Interaction
+
+Ordinary Indicator Follow registration/change follows the separate 2026-09-08
+validation-on-commit Supplemental. Sell-expression validation is based on the
+groups referenced by the expression; an unused configured group does not become
+an execution participant. The approved two-slot price-response independence and
+its existing simultaneous-TRUE fail-closed boundary remain unchanged.
+
+The stock context menu may remain open across non-terminal actions, refresh
+availability in place, and close for terminal identity-changing actions. This
+changes interaction lifecycle only, not the underlying Production or Mock
+command contracts.
+
+8. Cycle And Performance Separation
+
+After normal close and liquidation completion, current monitoring-cycle
+aggregation resets at the completion boundary. An abnormal cycle preserves its
+evidence until operator intervention restores integrity; only then may the
+current cycle reset.
+
+Monitoring-window metrics are current-cycle values. AutoTradeSetting
+performance/history is completed-cycle history. Resetting the monitoring cycle
+does not delete historical performance.
+
+9. Verification And Safety
+
+- py_compile for 22 changed source modules: PASS.
+- core Working Tree regression: 267 tests + 143 subtests PASS.
+- final index-only core regression: 266 tests + 143 subtests PASS.
+- new focused context/identity tests: 33 tests + 36 subtests passed when run as
+  a group except one Qt menu-visibility timing assertion; that file passed 10/10
+  when rerun independently.
+- exact baseline comparison: six failures reproduce from both previous HEAD and
+  final index (Recovery fixture 2, signal-ownership fixture 2, Main button
+  fixture 2).
+- new committed regression: 0.
+- Broker, SendOrder, account order, Runtime migration, and stock-data rewrite: 0.
+
+10. Protected Evidence
+
+Runtime, stocks, routine_instances, user policy/settings, reports, unrelated
+tests, and all other dirty/untracked paths remain outside this Code Freeze.
+One new display-matrix test method that depended on the user's unstaged ATS
+visibility setting was retained only as protected Working Tree WIP and was not
+committed or rewritten during Closing.
+
+REGULAR_WINDOW_CODE_FREEZE_COMPLETE

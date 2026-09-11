@@ -188,3 +188,19 @@ This contract does not change:
 - Review safety/integrity reasons
 - operation-policy time ownership
 - user Runtime or historical stock data
+
+12. Termination-Route Clarification (2026-09-11)
+
+Long-term-holding eligibility is determined by the proven termination route,
+not by `long_term_holding_enabled` alone.
+
+- A normal holding-continuation route with the global policy ON may carry a
+  residual holding into the next trading day.
+- The same normal route with the global policy OFF and a residual holding enters
+  the existing next-day Review classification.
+- Emergency, integrity failure, abnormal Recovery, forced termination, active
+  liquidation residual, and Review-classified routes never gain a global Review
+  bypass from the long-term-holding switch.
+
+This clarification narrows no broader safety case in sections 7 through 9 and
+introduces no new state, Writer, migration, or Review bypass.
