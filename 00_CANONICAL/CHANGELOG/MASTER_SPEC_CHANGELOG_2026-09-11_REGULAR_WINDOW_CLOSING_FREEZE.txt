@@ -81,3 +81,18 @@ REGULAR_WINDOW_CHANGELOG_RECORDED
 - No Runtime, stock, Broker, SendOrder, or user-data migration was performed.
 
 INDIVIDUAL_LIQUIDATION_RESERVATION_CHANGELOG_RECORDED
+
+8. 2026-09-12 CARRYOVER Canonical Conflict Repair
+
+- Preserved close-stage CARRYOVER as immediate cancel, confirmation, fill and
+  holding reconciliation, no-new-SELL, then HOLD.
+- Corrected liquidation-stage CARRYOVER to perform no action at
+  `liquidation_start`; pending cancel, SELL, and liquidation action are zero at
+  that boundary.
+- Recorded the common pending cleanup boundary as active Operation regular-end
+  minus the configured lead, currently 30 seconds by default.  Remaining
+  pending orders for MARKET, CURRENT_PRICE, and CARRYOVER are handled there,
+  with no order recreation afterward.
+- Documentation-only correction; Code repository modification: 0.
+
+CARRYOVER_CANONICAL_CONFLICT_REPAIRED

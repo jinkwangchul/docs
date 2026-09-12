@@ -131,3 +131,16 @@ NEXT_SESSION_PROMPT: NOT CREATED BY CODEX
 
 These findings were neither repaired nor used to weaken the current individual-
 liquidation reservation contract.  No next-session startup prompt was created.
+
+12. 2026-09-12 CARRYOVER Documentation Conflict Repair
+
+- Close-stage CARRYOVER retains its immediate cancel, cancellation/fill
+  confirmation, holding reconciliation, no-new-SELL, and HOLD sequence.
+- Liquidation-stage CARRYOVER performs no action at `liquidation_start`:
+  pending cancel 0, SELL 0, and liquidation action 0.
+- The common `pending_order_cancel_boundary` is the active Operation's frozen
+  regular-market end minus `pending_order_cancel_lead_seconds`, currently 30
+  seconds by default.  MARKET, CURRENT_PRICE, and CARRYOVER all perform any
+  remaining pending cleanup there, and no method recreates an order afterward.
+- This checkpoint repairs documentation conflict only.  Code, tests, Runtime,
+  Broker, SendOrder, and user data were not changed.
