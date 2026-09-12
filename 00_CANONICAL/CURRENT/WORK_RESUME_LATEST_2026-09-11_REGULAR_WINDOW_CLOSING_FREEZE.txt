@@ -85,3 +85,49 @@ user instruction and the Mandatory Pre-Work Contract Audit.
 ACTUAL_GUI_CONFIRMATION: VERIFIED FOR THE LISTED ACCEPTED PATHS
 BROKER/SENDORDER: 0
 NEXT_SESSION_PROMPT: NOT CREATED BY CODEX
+
+9. 2026-09-12 Individual Liquidation Closing Checkpoint
+
+- Production and Mock expose equivalent individual-liquidation user meaning
+  while retaining fully independent state, writers, execution, Position, and
+  lifecycle ownership.
+- Individual liquidation is configurable before Operation start and with zero
+  holding.  It is setting-only: pre-start choice is a one-shot
+  `NEXT_OPERATION` reservation, bound to the exact `CURRENT_OPERATION` at
+  Operation start.  Execution-time reconciled holding decides whether a SELL
+  may be created; zero holding starts no liquidation lifecycle.
+- Global liquidation policy remains persistent.  Context-menu overrides are
+  one-shot.  Restart expires stale prior-process `NEXT_OPERATION` reservations
+  through startup cleanup and the Operation-start binding guard, while a
+  matching active `CURRENT_OPERATION` snapshot remains recoverable.
+- Display is `N분/시장가`, `N분/현재가`, or `이월`; carryover never owns a
+  minute value.
+- Mock context-menu current-value priority is active `RUNNING`/`CLOSING`
+  snapshot, current-process pending reservation, then global policy.  Stopped or
+  completed historical snapshots remain evidence but are not current UI input.
+- Persistent context-menu method/time changes reuse the same open menu.  Carry
+  disables the time submenu and market/current-price re-enable it.
+
+10. 2026-09-12 Focused Verification
+
+- Production individual-liquidation/reservation/menu group: 111 tests run,
+  105 pass and 6 existing/out-of-scope expectation failures.  Direct
+  reservation, start binding, restart expiration, 30-second cleanup, and
+  persistent-menu contracts passed.
+- Mock/operation lifecycle adjacent group: 221 tests run, 219 pass and 2
+  existing/out-of-scope expectation failures.
+- The failures remain unmodified and are classified below; no failure was
+  hidden by changing unrelated production or Mock behavior.
+
+11. 2026-09-12 Out-Of-Scope Findings
+
+- same-day restart `RUNNING`/`MONITORING` expectation mismatch;
+- Mock zero-holding Early Close fixture expectation;
+- ATS `CURRENT_PRICE` virtual-liquidation residual behavior;
+- context-menu policy-read-failure current-marker expectation;
+- existing `RECOVERY_STOCK_CODE_MISSING` fixtures;
+- Windows/PyQt/COM abnormal process-exit behavior in broader GUI runs; and
+- existing Mock auto-close expectations outside this closing scope.
+
+These findings were neither repaired nor used to weaken the current individual-
+liquidation reservation contract.  No next-session startup prompt was created.

@@ -50,3 +50,34 @@ Code Freeze SHA: 0ad5aab1659dbd59c0bccb3451d63958cceafcab
 - Broker/SendOrder/Runtime or stock-data migration: 0.
 
 REGULAR_WINDOW_CHANGELOG_RECORDED
+
+6. 2026-09-12 Individual Liquidation Reservation Closure
+
+- Reinforced Production/Mock functional-semantic parity with independent
+  runtime, writer, execution, Position, and lifecycle ownership.
+- Separated Early Close current-Operation intervention from pre-Operation
+  individual-liquidation configuration.
+- Allowed setting-only individual liquidation before Operation start and with
+  zero holding; execution-time holding remains the SELL/lifecycle decision.
+- Added one-shot `NEXT_OPERATION` reservation binding to the exact
+  `CURRENT_OPERATION`, current-process ownership via existing
+  `PROGRAM_SESSION_ID`, stale restart expiration, and matching active recovery.
+- Normalized display to `N분/시장가`, `N분/현재가`, and `이월`.
+- Corrected Mock menu source selection to active `RUNNING`/`CLOSING`, then
+  current-process pending, then global policy, excluding historical stopped or
+  completed snapshots without deleting history.
+- Preserved one-open-menu continuous changes and carryover time-menu disabling.
+
+7. 2026-09-12 Verification And Deferred Findings
+
+- Focused Production group: 111 run, 105 pass; six failures classified as
+  existing/out-of-scope expectations.
+- Adjacent Mock/lifecycle group: 221 run, 219 pass; two failures classified as
+  existing/out-of-scope expectations.
+- Deferred without modification: same-day state expectation mismatch, Mock
+  zero-holding Early Close fixture, ATS current-price residual, read-failure
+  marker expectation, recovery stock-code fixtures, Windows/PyQt/COM abnormal
+  exit, and existing Mock auto-close expectations.
+- No Runtime, stock, Broker, SendOrder, or user-data migration was performed.
+
+INDIVIDUAL_LIQUIDATION_RESERVATION_CHANGELOG_RECORDED

@@ -1,0 +1,555 @@
+MASTER SPEC CANONICAL SUPPLEMENT
+Close / Liquidation Final Contract Reinforcement
+Date: 2026-09-12
+
+Status:
+- CURRENT SUPPLEMENTAL AUTHORITY
+- Scope: Production and Mock close policy, liquidation boundary, per-stock
+  liquidation override, termination provenance, and the corresponding user
+  interaction semantics.
+- Production and Mock remain independent sibling domains.  They share semantic
+  contracts only; they do not share Runtime, Writer, Order, Fill, Position,
+  PnL, execution permission, or execution authority.
+
+==================================================
+1. Authority And Supersession Boundary
+==================================================
+
+For the scope stated above, authority order is:
+
+1. this Supplemental Canonical;
+2. unaffected provisions of the 2026-09-12 Mock Close Lifecycle Parity
+   Supplement;
+3. unaffected provisions of the 2026-09-11 Operation Mode Close/Liquidation
+   Display Reconciliation;
+4. unaffected provisions of the 2026-08-16 Individual Liquidation Time And
+   Long-Hold Contract;
+5. unaffected provisions of the 2026-08-15 Close Action And Buffer Response
+   Freeze and the 2026-08-01 Close Process Operation Contract.
+
+The following earlier meanings are superseded or clarified only within this
+scope:
+
+- `PROFIT_LOSS` is a close method, not a post-close liquidation method.  The
+  2026-08-01 section 6 list that could be read as including `손/익절` among
+  liquidation-policy execution methods is superseded by sections 5 and 10 of
+  this document.
+- Liquidation-stage `CARRYOVER` must first cancel all Operation-owned pending
+  orders, confirm cancellation and intervening fills, and reconcile actual
+  holding before HOLD.  The 2026-08-16 section 4 wording that individual
+  `이월` performs no cancellation is superseded by sections 7 and 12 of this
+  document when the configured liquidation time boundary is entered.
+- Close-stage CARRYOVER and liquidation-stage CARRYOVER remain continuation
+  routes, but their decision provenance is distinct and must not be collapsed.
+
+No other historical or Current provision is globally retired.
+
+==================================================
+2. Three Independent Concepts
+==================================================
+
+A. Close policy
+
+AUTO or EARLY cause enters a close stage.  `close_source` identifies why the
+stage began.  `close_method` identifies how the close stage proceeds.  Source
+and method are independent evidence.
+
+B. Order execution
+
+Cancellation, cancellation confirmation, fill confirmation, candidate, Queue,
+SendOrder, Chejan, partial fill, order remainder, and Position reconciliation
+belong to the existing execution layer.  Close and liquidation policies call
+that layer; they do not create policy-specific partial-fill or re-quote
+engines.
+
+C. Liquidation policy
+
+Liquidation is a stage after or overriding an unfinished close policy at the
+applicable liquidation start boundary.  It is not merely the continuation of a
+close order.  Close and liquidation must preserve distinct ownership and
+decision provenance.
+
+==================================================
+3. Time Source And Absolute Boundary
+==================================================
+
+The global liquidation start time is derived only from the current Operation
+snapshot of the existing operation policy:
+
+  operation_policy.regular_market.end_time
+  - liquidation.minutes_before_regular_close
+
+Example:
+
+  regular market 09:00-15:20
+  liquidation five minutes before close
+  -> liquidation start 15:15
+
+The applicable per-stock one-Operation override, when present, replaces the
+global minutes/method for that stock only.  Other stocks retain the global
+snapshot.
+
+The applicable liquidation start time is an absolute boundary that outranks an
+unfinished close policy.  Before the boundary, operation or close policy may
+progress.  At the boundary, the current close policy stops or hands off to the
+liquidation stage.  A close policy must not keep its own order lifecycle active
+past the liquidation start boundary.
+
+The regular-market end time is the liquidation end boundary.  Liquidation
+orders must not remain live beyond it.
+
+Mutable settings for a future Operation must not hot-swap the active
+Operation's snapshotted global policy or per-stock override.
+
+==================================================
+4. Liquidation Entry Sequence
+==================================================
+
+At the applicable liquidation start time, the sequence is fixed:
+
+1. stop Routine evaluation;
+2. request cancellation of every non-terminal order owned by the Operation,
+   including Routine and close-policy orders;
+3. confirm cancellation and any fill received during cancellation;
+4. establish final order states;
+5. reconcile actual holding quantity; and
+6. execute the frozen liquidation policy against that actual residual holding.
+
+No liquidation SELL may be created before cancellation confirmation and
+holding reconciliation.  This prevents a late SELL fill from producing an
+over-sell or quantity mismatch.
+
+If holding is zero after the same cancellation and reconciliation sequence, no
+new liquidation order is created and normal completion may proceed.
+
+==================================================
+5. Liquidation Methods
+==================================================
+
+The post-close liquidation methods are exactly:
+
+- MARKET;
+- CURRENT_PRICE; and
+- CARRYOVER.
+
+MARKET uses the existing market-order execution pipeline after the entry
+sequence.  CURRENT_PRICE uses the existing canonical CURRENT_PRICE execution
+boundary after the same sequence.  CARRYOVER creates no new SELL; after all
+orders are cancelled and actual holding is reconciled, the holding is retained.
+
+`PROFIT_LOSS` is not a liquidation method.  It is the close method defined in
+section 10.
+
+==================================================
+6. Liquidation Setting Lock
+==================================================
+
+Before the applicable liquidation start boundary, the global or per-stock
+liquidation setting may be changed through its existing authorized writer.
+
+At boundary entry, the final applicable setting is frozen for the current
+Operation.  After entry, every policy replacement is blocked, including all
+MARKET, CURRENT_PRICE, and CARRYOVER permutations.
+
+The user-facing Toast text is exactly:
+
+  청산설정변경이 불가능합니다.
+
+Detailed evidence remains internal and must use the existing Event contract
+where it can safely express at least timestamp, stock/instance/Operation
+identity, liquidation start time, current policy, requested policy, block
+reason, source, and relevant state.  This contract does not by itself authorize
+a new Event schema.
+
+==================================================
+7. Liquidation End And Termination Classification
+==================================================
+
+At regular-market end:
+
+1. cancel every remaining liquidation order;
+2. confirm cancellation and intervening fills;
+3. reconcile actual holding; and
+4. classify by termination route and provenance.
+
+Holding zero completes normally.
+
+Positive holding is not classified from quantity alone.  The system must first
+determine why the holding remains.
+
+Normal holding-continuation routes, subject to the existing global
+`review_policy.long_term_holding_enabled`, are:
+
+- normal CONTINUOUS/manual or manual+ATS termination with no close or active
+  liquidation execution;
+- close-stage CARRYOVER; and
+- liquidation-stage CARRYOVER after its required cancellation and
+  reconciliation sequence.
+
+The following remain Review regardless of the long-term switch:
+
+- residual holding after active MARKET liquidation;
+- residual holding after active CURRENT_PRICE liquidation;
+- any active-liquidation failure;
+- unresolved pending order or cancellation;
+- Recovery or reconciliation failure;
+- Queue conflict;
+- uncertain or rejected SendOrder;
+- Broker/Runtime, identity, state, or configuration mismatch;
+- forced termination; and
+- any other integrity or safety failure.
+
+Failed liquidation residual and explicit CARRYOVER are never equivalent.
+Close-stage and liquidation-stage CARRYOVER preserve distinct provenance even
+when both ultimately retain holding.
+
+==================================================
+8. ROUTINE Close
+==================================================
+
+ROUTINE close is a soft landing.  After close entry:
+
+- Routine BUY and SELL evaluation continues;
+- new BUY remains permitted by the existing permission contract;
+- existing pending Routine orders are not cancelled merely because close
+  began;
+- the normal Routine path continues; and
+- the final valid SELL boundary and existing completion evidence govern early
+  completion.
+
+Holding zero with no pending or recoverable execution may complete under the
+existing zero-position contract.  At the applicable liquidation start boundary,
+unfinished ROUTINE close yields to section 4.
+
+==================================================
+9. Hard-Landing Close Methods
+==================================================
+
+MARKET, CURRENT_PRICE, and PROFIT_LOSS are hard-landing close methods.  On
+entry they suppress Routine BUY/SELL, cancel relevant pending orders, confirm
+cancellation and intervening fills, and reconcile actual residual holding.
+
+MARKET and CURRENT_PRICE may execute orders during the close stage through the
+existing execution layer.  This is valid and is not itself close/liquidation
+mixing.  Mixing exists only if close-stage and liquidation-stage ownership,
+policy, evidence, or lifecycle remain indistinguishable at or after the
+liquidation boundary.
+
+Already filled quantity is never reversed when a close method changes.
+
+==================================================
+10. PROFIT_LOSS Close
+==================================================
+
+PROFIT_LOSS evaluates only the current open Position return:
+
+  average acquisition price versus realtime current price
+
+Realized PnL and cumulative Operation PnL are excluded.
+
+Profit threshold only, loss threshold only, or both are valid.  Both absent is
+invalid and cannot be saved or confirmed.
+
+After entry, Routine signals are suppressed and pending orders pass through the
+existing cancellation, confirmation, and holding-reconciliation boundary.
+Before a threshold is reached, no new SELL is created.  At a threshold, the
+then-current actual residual holding becomes the full SELL target, using
+CURRENT_PRICE only.  Partial fill and remainder handling remain owned by the
+existing execution layer.
+
+Selecting MARKET is not an option inside PROFIT_LOSS.  It is a close-method
+transition from PROFIT_LOSS to MARKET.
+
+An unfinished PROFIT_LOSS close yields to the liquidation stage at the
+applicable liquidation start boundary.
+
+==================================================
+11. Close-Stage CARRYOVER
+==================================================
+
+Close-stage CARRYOVER performs:
+
+  all-order cancellation
+  -> cancellation/fill confirmation
+  -> actual holding reconciliation
+  -> Routine signal suppression
+  -> no new order
+  -> HOLD
+  -> close completion
+
+It is explicit continuation intent and does not automatically enter
+post-close liquidation.  A later explicit per-stock liquidation setting is
+newer operator intent and may outrank the earlier close-stage CARRYOVER under
+the existing intent-precedence contract.
+
+==================================================
+12. Close-Method Transition
+==================================================
+
+During the close stage the following transitions are allowed:
+
+- ROUTINE to MARKET, CURRENT_PRICE, or PROFIT_LOSS;
+- MARKET, CURRENT_PRICE, and PROFIT_LOSS among one another; and
+- any close method to CARRYOVER.
+
+For hard-landing transitions, the current close orders are cancelled, their
+final cancellation/fill state is confirmed, actual residual holding is
+reconciled, and only then is the new method applied.  A hard landing that has
+entered execution cannot return to ROUTINE.
+
+Changing method never changes `close_source`.
+
+==================================================
+13. AUTO And EARLY Source / Menu Contract
+==================================================
+
+AUTO and EARLY are causes, not methods.
+
+- AUTO method changes preserve source AUTO.
+- EARLY method changes preserve source EARLY.
+- a one-Operation method override never mutates the environment default.
+
+The existing close action/menu slot is reused; no parallel QAction is added.
+
+- before EARLY: `조기마감`;
+- after EARLY entry: `마감변경`;
+- after AUTO entry: `마감변경`.
+
+On first entry, the method is read from the active Operation snapshot's
+corresponding default.  Reopening shows the actually applied current method.
+
+==================================================
+14. EARLY Return To Automatic Timeline
+==================================================
+
+Within the EARLY `마감변경` choices, `자동마감` means withdrawing the EARLY
+intervention and returning to the original automatic-close timeline.  It is not
+a new close method.
+
+Admission requires:
+
+- SCHEDULED operation;
+- the original AUTO trigger time has not arrived;
+- the EARLY close is not complete; and
+- the fill restrictions below are satisfied.
+
+EARLY + ROUTINE may return while incomplete.  EARLY + MARKET,
+CURRENT_PRICE, or PROFIT_LOSS may return only when no SELL quantity has filled.
+An unfilled SELL is cancelled and confirmed before return.  Any partial or full
+SELL fill blocks return.
+
+No past AUTO Event is created retroactively.  CONTINUOUS/manual/manual+ATS has
+no AUTO timeline and therefore no return-to-AUTO action.
+
+==================================================
+15. CONTINUOUS And SCHEDULED Liquidation Policy
+==================================================
+
+Ordinary CONTINUOUS/manual/manual+ATS operation with no legitimate close or
+liquidation route displays `-`, performs no liquidation, and never creates AUTO.
+
+When an operator enters EARLY, the environment's snapshotted default
+liquidation setting becomes the current Operation's post-close liquidation
+policy.  Activating that policy does not execute it immediately; execution
+begins only at the applicable liquidation start boundary.
+
+When SCHEDULED enters AUTO, its active Operation snapshot likewise fixes the
+default post-close liquidation policy.  Close policy progresses until
+completion or the liquidation start boundary.  Holding zero completes;
+positive holding at the boundary enters section 4 unless the proven close-stage
+route is CARRYOVER.
+
+==================================================
+16. Global Default And Per-Stock One-Operation Override
+==================================================
+
+Environment settings are persistent global defaults.  Stock context-menu Early
+Close and individual liquidation choices are volatile overrides for that stock
+and current Operation only.  They do not mutate another stock or the global
+default.
+
+At Operation completion, a per-stock override expires.  A later Operation again
+starts from its then-current global default unless a new authorized override is
+created.
+
+==================================================
+17. Individual Liquidation
+==================================================
+
+Individual liquidation is setting-only.  It stores one per-stock,
+one-Operation override such as N minutes/MARKET, N minutes/CURRENT_PRICE, or
+CARRYOVER.
+
+Setting or replacing it must not cancel an order, create a Candidate or Queue
+record, call SendOrder, enter close, or enter liquidation.  At its calculated
+time boundary, only that stock enters section 4.  Other stocks retain the
+global boundary.
+
+The setting is replaceable only before its boundary.  It is frozen on entry and
+cannot be changed afterward.  This contract adds no separate cancel, reset, or
+default-restore action; an operator who wants the global values must explicitly
+select equivalent values before the boundary.
+
+An individual override expires at Operation completion.
+
+If an individual liquidation boundary arrives during that stock's EARLY close,
+the liquidation boundary wins and the handoff sequence in section 4 applies.
+
+==================================================
+18. UI Availability And Evidence
+==================================================
+
+A policy block should normally be decided by backend authority after click and
+reported through the existing Toast boundary.  A QAction may be disabled when
+the structural target itself does not exist.  This does not authorize UI-only
+admission or a new notification framework.
+
+Internal reason and detailed state remain Event/diagnostic evidence.  User UI
+must not replace backend admission or expose an internal reason token when the
+specified user-facing message exists.
+
+==================================================
+19. Production / Mock Independence
+==================================================
+
+Production and Mock implement the same functional meaning in their own domains.
+Production uses Production Runtime, broker Order/Fill/Position, Queue,
+SendOrder, and Production writers.  Mock uses its Session, virtual
+Order/Fill/Position/PnL, Mock lifecycle, and Mock writers.
+
+Neither domain may read, mutate, or treat the other's authority as its own.
+Domain-neutral pure helpers may be reused only when they own no mutable domain
+state or side effect.
+
+==================================================
+20. Non-Change Boundary
+==================================================
+
+This document records the final contract only.  It does not itself modify or
+authorize mutation of Production or Mock code, tests, Runtime, stock data,
+Queue, Order, Fill, Position, PnL, Event schema, or persisted user data.  It
+does not authorize a new executor, a policy-specific partial-fill engine, a new
+re-quote engine, a new QAction, or a shared Production/Mock state owner.
+
+==================================================
+21. Level-Based Admission And User Response
+==================================================
+
+Stock context-menu Early Close and individual liquidation are one-Operation
+interventions for the selected stock.  They never rewrite the global operation
+policy.  Their override expires at Operation completion, and a later Operation
+starts again from its then-current global default unless the operator creates a
+new authorized override.
+
+For Production user commands, the common user-facing admission precedence is:
+
+1. broker login/basic execution qualification;
+2. positive current holding quantity;
+3. current Operation participation;
+4. feature-specific time admission;
+5. close-transition or liquidation-setting mutation rules; and
+6. Recovery, integrity, emergency, and other safety rules.
+
+Once a higher level blocks the command, a lower-level user message is not
+shown.  The normalized messages are:
+
+- broker qualification: `키움 서버에 로그인되어 있지 않습니다.`;
+- no holding: `보유수량이 없습니다.`;
+- not a current participant: `현재 운영 대상 종목이 아닙니다.`;
+- Early Close time admission: `현재 조기마감 가능한 시간이 아닙니다.`;
+- liquidation-setting lock: `청산설정변경이 불가능합니다.`;
+- disallowed close-method transition: `현재 마감방식으로 변경할 수 없습니다.`;
+- other safety block: `현재 상태에서는 실행할 수 없습니다.`.
+
+The simplified user message does not erase the internal reason.  Existing
+Event evidence retains timestamp, stock and Operation identity, requested
+action and method, admission level, reason code, active operation mode,
+close/liquidation state, relevant time boundary, source, and BLOCKED result.
+No new Event subsystem is authorized.
+
+Individual liquidation remains setting-only and one-Operation scoped, but it
+requires a positive holding in that current Operation.  With zero holding, no
+individual setting is stored and no cancellation, Candidate, Queue, SendOrder,
+close, or liquidation mutation occurs.  Existing execution-stage and manual
+ATS no-holding guards remain unchanged.
+
+A SCHEDULED Operation admits a new Early Close only inside that Operation's
+snapshotted start-to-end operation window and before the applicable liquidation
+start.  A CONTINUOUS/manual or manual+ATS Operation admits a new Early Close
+only from regular-market start up to, but excluding, the applicable liquidation
+start.  Pre-market and post-market ATS sessions are neither AUTO trigger axes
+nor extensions of the Early Close admission window.  In the absence of an
+explicit ATS liquidation intervention, ATS-session passage does not create
+AUTO or EARLY close and retains the existing carryover/long-term classification
+meaning.
+
+AUTO and operator EARLY entry both require a positive holding.  A zero-holding
+AUTO trigger creates no close lifecycle or close order.  A zero-holding EARLY
+request is blocked with the no-holding message and creates no close state,
+order, or cancellation.  At a liquidation boundary, zero reconciled holding
+does not enter a liquidation lifecycle or create a liquidation SELL; only an
+otherwise-required pending-order safety cleanup may continue.
+
+Close-method changes during an active close continue to follow section 12.
+Liquidation-policy replacement remains permitted before its applicable
+boundary and is prohibited after boundary entry under section 6.  Production
+and Mock apply these functional meanings through their independent state,
+writers, evidence, and execution authorities.  Mock never uses Production
+broker-login admission.
+
+==================================================
+22. Individual Liquidation Reservation And UI Source Contract
+==================================================
+
+This section supersedes the section 21 sentence that requires positive holding
+when an individual-liquidation setting is created.  Individual liquidation is
+not an immediate close command.  It may be configured before an Operation and
+with zero current holding.  Early Close remains a current-Operation
+intervention and retains its separate pre-Operation and zero-holding guards.
+
+A pre-Operation individual-liquidation choice is a one-shot
+`NEXT_OPERATION` reservation.  At Operation start it is bound to
+`CURRENT_OPERATION` and to that exact Operation identity.  Reaching the
+effective liquidation time decides execution: positive reconciled holding may
+enter the applicable liquidation route; zero holding creates no new SELL and
+does not start a liquidation lifecycle merely because the setting exists.
+
+The environment liquidation policy is the persistent global default.  A
+context-menu individual-liquidation choice is a one-shot override.  Within one
+program process, the current-value priority is:
+
+1. the active `CURRENT_OPERATION` override for the matching Operation;
+2. a `NEXT_OPERATION` reservation owned by the current program session; and
+3. the global environment policy.
+
+The existing `PROGRAM_SESSION_ID` is the process identity; no new persistent
+source of truth is introduced.  On restart, an unused `NEXT_OPERATION`
+reservation from a prior process expires and the global default is used.
+Startup cleanup and the Operation-start binding guard both enforce this rule.
+A `CURRENT_OPERATION` override is retained for restart recovery only when its
+Operation identity matches the active Operation.  A stale current reservation
+or identity mismatch is not used and fails closed to the applicable global
+fallback.
+
+User display is `N분/시장가` for `MARKET`, `N분/현재가` for
+`CURRENT_PRICE`, and exactly `이월` for `CARRYOVER`.  Carryover has no minute
+attribute; `N분/이월` is invalid.
+
+For the Mock individual-liquidation context menu, current selection is resolved
+from an active `RUNNING`/`CLOSING` Operation snapshot, then a current-process
+pending reservation, then `operation_policy.json` global default.  A
+`VALIDATION_STOPPED`, `ENDED`, `COMPLETED`, or other historical Operation
+snapshot is never a current menu source.  Historical evidence remains intact
+and is not deleted or rewritten.
+
+Production and Mock present equivalent user meaning while remaining independent
+domains.  Production owns Production state, broker execution, SendOrder,
+Chejan, and real Position.  Mock owns Mock Session/lifecycle and virtual
+Order/Fill/Position.  Neither domain uses the other's writer, runtime state, or
+execution authority.
+
+The existing persistent context menu supports multiple non-terminal changes
+from one right-click.  Time or method selection refreshes the same menu instance
+without closing it.  Outside click, Escape, context invalidation, and existing
+terminal actions close it.  Selecting `CARRYOVER` disables the time submenu;
+returning to `MARKET` or `CURRENT_PRICE` enables it again.
