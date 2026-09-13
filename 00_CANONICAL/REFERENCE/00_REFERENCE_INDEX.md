@@ -20,6 +20,7 @@ CURRENT.
 | Production monitoring/operating permission retirement | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT_FREEZE.txt` | Final R0-R8 authority; supersedes the R7 pre-Freeze owner and only the retired switch wording in older Routine/Window/UI contracts |
 | Indicator-follow Routine lifecycle and Main ownership boundary | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-06_MAIN_INDICATOR_FOLLOW_FULL_BOUNDARY_FREEZE.txt` | Latest Production lifecycle, sealed Facts/Decision/Writer ownership, and package capability authority; the 2026-09-05 20-Control Freeze remains immutable supporting evidence |
 | Indicator-follow ordinary settings registration/change | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-08_INDICATOR_FOLLOW_SETTINGS_VALIDATION_ON_COMMIT.txt` | Latest validation-on-click, immediate Applied, atomic read-back, and Mock Operation versioned-rules snapshot authority; supersedes only the older ordinary-settings Pending/Approval prerequisite |
+| Sep-13 Production/Mock close normalization and Indicator-follow read-only Historical Validation Chart | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-13_OPERATION_MOCK_AND_INDICATOR_VALIDATION_FREEZE.txt` | Supplemental owner for later close/auth/shared-boundary normalization and the dedicated current-edit Historical replay chart; validation-on-commit, Mock Validation, and earlier independent owners remain separate |
 | Indicator-follow SELL execution and MULTI_HOGA contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_INDICATOR_FOLLOW_SELL_PHASE1_AND_MULTI_HOGA_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` |
 | Routine package boundary and capability contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt` |
 | Logical Group and Group Pack identity/lifecycle | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-22_LOGICAL_GROUP_PACK_ARCHITECTURE_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt`, `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-22_GROUP_LIFECYCLE_RECOVERY_FREEZE.txt`, `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-22_AUTO_TRADE_SETTING_STRATEGY_WORKSPACE_UI_CLOSURE.txt` |
@@ -67,15 +68,15 @@ does not supersede them.
 ## Current Resume And Changelog
 
 - Latest Frozen Authority:
-  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-11_REGULAR_WINDOW_CLOSING_FREEZE.txt`
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-13_OPERATION_MOCK_AND_INDICATOR_VALIDATION_FREEZE.txt`
 - Latest Local WIP Work Resume:
   `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
 - Latest Local WIP Changelog:
   `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
 - Latest Frozen Work Resume:
-  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-11_REGULAR_WINDOW_CLOSING_FREEZE.txt`
+  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-13_OPERATION_MOCK_AND_INDICATOR_VALIDATION_FREEZE.txt`
 - Latest Frozen Changelog:
-  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-11_REGULAR_WINDOW_CLOSING_FREEZE.txt`
+  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-13_OPERATION_MOCK_AND_INDICATOR_VALIDATION_FREEZE.txt`
 
 Older Work Resumes, Readable variants, Freeze snapshots, and Changelogs are
 historical records. They may explain a past decision but must not be used as a

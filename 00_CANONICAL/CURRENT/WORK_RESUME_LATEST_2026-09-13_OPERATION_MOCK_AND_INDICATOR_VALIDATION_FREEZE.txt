@@ -1,0 +1,113 @@
+WORK RESUME LATEST
+2026-09-13 OPERATION / MOCK AND INDICATOR-FOLLOW VALIDATION FREEZE
+
+Status: FROZEN HANDOFF
+
+======================================================================
+1. BASELINES
+======================================================================
+
+Code repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code local HEAD: 317b18f529c0920528b3373305796fa994a8f391
+Code remote HEAD: 317b18f529c0920528b3373305796fa994a8f391
+
+Docs repository: C:\Users\JIN KWANG CHUL\Documents\docs
+Docs branch: agent/project-prompt-standard
+Docs before-Freeze HEAD: fc78cc5b382c0cf8e4c4b28f3c2ec96d0dc6ad19
+Docs after-HEAD: the single commit containing this document. Its immutable SHA
+is reported by the documentation closeout after push and is intentionally not
+back-written into its own contents.
+
+Both repositories contained protected LOCAL WIP at the start. The Code worktree
+was read only. Docs changes for this Freeze are limited to three new documents
+and separable Reference Index entries; pre-existing Docs WIP is not part of the
+Freeze commit.
+
+======================================================================
+2. COMPLETED PREVIOUS-WINDOW NORMALIZATION
+======================================================================
+
+- Individual-liquidation settings are permitted after authentication before an
+  active Operation, including zero holding and historical trade_started traces.
+- NEXT_OPERATION binds once to the exact active identity as CURRENT_OPERATION,
+  survives only matching recovery, and expires at terminal completion.
+- CONTINUOUS manual/manual+ATS remains "-" with no liquidation or cleanup until
+  Early Close; afterward CURRENT individual override precedes global policy.
+- SCHEDULED timing remains unchanged.
+- Activated CARRYOVER creates/cancels nothing at liquidation_start, then performs
+  the existing regular-end minus 30-second residual-order cleanup without a new
+  SELL and keeps HOLD.
+- Empty profit/loss Early Close input rejects the dialog, shows the parent toast,
+  and performs no mutation; numeric validation remains.
+- Pure ATS meaning and presentation-only UI primitives are shared without
+  sharing Production/Mock runtime or execution state.
+- Mock close edits freshly require api.is_connected() and fail closed before
+  mutation. Production authentication state is not mirrored into Mock.
+
+======================================================================
+3. COMPLETED INDICATOR-FOLLOW VALIDATION PHASES 1-10
+======================================================================
+
+The completed call graph is:
+
+  shared registration/change settings dialog
+    -> current unsaved UI snapshot
+    -> existing rule mapper preview
+    -> immutable settings request
+    -> read-only readiness/stock selection
+    -> Validation flow and host
+    -> broker-owner read-only Historical request (default 300 candles)
+    -> immutable Historical snapshot
+    -> existing evaluator replay and diagnostic trace
+    -> immutable replay snapshot
+    -> modeless read-only candle/BUY/SELL/trace chart
+
+Important operating facts:
+
+- rules.json is not saved or reloaded to produce the preview;
+- Production Candle storage, MarketDataHost, realtime, orders, execution,
+  positions, PnL, Mock runtime, and Production runtime are not mutated;
+- marker authority is evaluation_time/evaluation_index, while signal_time is
+  displayed as the delayed condition evidence bar;
+- provider/request ownership is released and closed chart references are pruned;
+- registration and settings-change callers use the same request flow; and
+- the existing validation-on-commit and Mock Validation domains remain separate.
+
+======================================================================
+4. VERIFICATION
+======================================================================
+
+Phase 10 was a zero-code-change closeout at the stated Code HEAD:
+
+- combined Indicator-Follow Validation regression: 100/100 PASS;
+- eight phase modules standalone: 100/100 PASS;
+- caller GUI wiring: 3/3 PASS;
+- request/provider/chart lifetime and retry probe: PASS;
+- new in-scope defects: 0.
+
+Focused close/liquidation, Mock isolation/coexistence, and manual ATS regression
+coverage established the previous-window contracts summarized above.
+
+======================================================================
+5. PROTECTED WIP AND SCOPE LIMITS
+======================================================================
+
+All pre-existing Code and Docs LOCAL WIP remains user-owned and must be preserved.
+Do not reset, restore, stash, clean, or infer completion from working-tree-only
+files. The local mock_production_boundary_normalization.patch and related
+uncommitted/untracked boundary files are explicitly outside this completed
+Freeze and are not documented as merged behavior.
+
+No Historical-count UI, live validation, trading execution, PnL/backtest return,
+or general order/session lifetime implementation was added by these phases.
+
+======================================================================
+6. RESUME POSITION
+======================================================================
+
+The requested Previous Window and Indicator-Follow Validation Window are closed
+at Code HEAD 317b18f529c0920528b3373305796fa994a8f391. There is no inferred next
+implementation task. Resume only from a new explicit user instruction, while
+continuing to preserve all existing LOCAL WIP and the independent CURRENT owners
+listed in 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md.

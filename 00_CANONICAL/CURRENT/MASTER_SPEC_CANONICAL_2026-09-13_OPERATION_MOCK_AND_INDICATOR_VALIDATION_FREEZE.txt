@@ -1,0 +1,361 @@
+MASTER SPEC CANONICAL
+2026-09-13 OPERATION / MOCK AND INDICATOR-FOLLOW VALIDATION FREEZE
+
+Status: CURRENT SUPPLEMENTAL FREEZE
+Code repository: kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code baseline: 317b18f529c0920528b3373305796fa994a8f391
+
+======================================================================
+1. AUTHORITY AND SCOPE
+======================================================================
+
+This document freezes the verified September 12-13 implementation for:
+
+- Production/Mock regular-market individual-liquidation activation;
+- empty profit/loss Early Close input feedback;
+- shared pure contract and UI primitive boundaries;
+- Mock server-authentication admission; and
+- the Indicator-Follow dedicated read-only Historical Validation Chart.
+
+It is an umbrella supplement, not a wholesale replacement for earlier CURRENT
+owners. Earlier documents keep authority over their independent domains. In
+particular:
+
+- the 2026-09-12 Close/Liquidation reinforcement remains the detailed owner of
+  its established close and cleanup contracts;
+- the 2026-09-11 Regular Window Closing Freeze remains authoritative for the
+  wider regular-window lifecycle;
+- the 2026-09-08 Mock Validation UI/ATS Closure Freeze remains authoritative for
+  the pre-existing Mock execution domain and UI closure;
+- the 2026-09-08 Indicator-Follow Settings Validation-on-Commit document remains
+  authoritative for save/change-time settings validation.
+
+This document owns only the later normalization and the dedicated user-requested
+Historical Validation Chart flow verified at the stated code baseline.
+
+======================================================================
+2. REGULAR-MARKET INDIVIDUAL-LIQUIDATION ACTIVATION
+======================================================================
+
+2.1 Admission and Operation identity
+
+An individual-liquidation setting is policy configuration, not an immediate
+liquidation command. After server authentication it can be set before an active
+Operation and while the current holding quantity is zero.
+
+The implementation distinguishes:
+
+- a historical, already-ended trade_started trace;
+- a genuinely active Operation;
+- an active Operation being recovered;
+- a matching CURRENT_OPERATION identity; and
+- a stale or mismatched CURRENT_OPERATION identity.
+
+A historical trace without an active Operation does not block a new
+NEXT_OPERATION reservation. A genuinely active or recovering Operation keeps
+exact-identity fail-closed protection; a stale or mismatched CURRENT identity is
+not accepted merely because older runtime traces exist.
+
+2.2 One-shot lifetime
+
+Before Operation start, the setting is a NEXT_OPERATION reservation. At start it
+binds once to the exact Operation identity as CURRENT_OPERATION. At terminal
+completion, the CURRENT override expires. A following Operation returns to the
+global environment policy unless it receives its own reservation.
+
+Across restart, an unused reservation from a prior program session expires. A
+matching active CURRENT_OPERATION identity may be retained for recovery, while a
+stale CURRENT identity remains unusable. The existing PROGRAM_SESSION_ID
+contract is preserved; no new persistent source of truth was introduced.
+
+2.3 CONTINUOUS manual and manual+ATS activation
+
+Before Early Close, an individual setting alone does not activate liquidation
+for CONTINUOUS manual or manual+ATS operation:
+
+- the UI liquidation display is "-";
+- liquidation execution count is zero;
+- liquidation SELL creation count is zero; and
+- liquidation-only end-minus-lead cleanup is inactive.
+
+After Early Close, the effective policy is selected in this order:
+
+1. a valid CURRENT_OPERATION individual override;
+2. the Operation's global environment liquidation snapshot.
+
+The display contract is MARKET -> "N분/시장가", CURRENT_PRICE ->
+"N분/현재가", and CARRYOVER -> "이월". "N분/이월" is not valid.
+
+SCHEDULED operation retains its established automatic close/liquidation timing.
+This normalization does not move or weaken that path.
+
+2.4 CARRYOVER
+
+When an actually activated liquidation policy is CARRYOVER, liquidation_start
+does not create a new SELL and does not force-cancel existing orders. Holdings
+remain HOLD.
+
+At the regular-market end cleanup boundary, defined by end_time minus
+pending_order_cancel_lead_seconds (default 30 seconds), remaining unfilled orders
+are cancelled and cancellation/partial-fill results are reconciled against the
+actual holding. No replacement order is created, and the holding remains HOLD.
+
+This liquidation cleanup applies only after the liquidation subsystem has been
+activated. It does not apply to the pre-Early-Close CONTINUOUS "-" state. Any
+general order/session lifetime behavior outside that subsystem remains owned by
+its existing layer and was not newly implemented here.
+
+2.5 Production and Mock parity
+
+Production and Mock expose the same user-visible reservation, activation,
+display, priority, CARRYOVER, and one-shot meanings. They do not share execution
+state. Mock continues to own its Operation identity, virtual orders, fills,
+positions, PnL, and lifecycle; Production continues to own its corresponding
+runtime and broker paths.
+
+Manual ATS MARKET and CURRENT_PRICE direct liquidation remain separate. Neither
+regular-market individual overrides nor Mock state became authority for that
+ATS service.
+
+======================================================================
+3. EMPTY PROFIT/LOSS EARLY CLOSE INPUT
+======================================================================
+
+When both profit and loss inputs are empty, the Early Close dialog closes through
+its reject path and the parent receives the informational toast:
+
+  익절 또는 손절 비율 중 최소 1개 값을 입력하세요.
+
+No Early Close policy mutation occurs. Existing numeric parsing, invalid-number
+feedback, and greater-than-zero validation remain intact when a value is
+provided. Production and Mock use the same presentation primitive, but each
+domain retains its own mutation authority.
+
+======================================================================
+4. SHARED PURE AND MOCK-AUTHENTICATION BOUNDARIES
+======================================================================
+
+4.1 Shared pure contracts and UI primitives
+
+ats_session_contract.py contains side-effect-free normalization of ATS session
+and execution-method meaning. gui_operation_ui_primitives.py contains shared
+presentation-only context-menu/dialog components, including the profit/loss
+dialog behavior.
+
+Sharing stops at pure meaning and UI presentation. Runtime ownership, Operation
+state, repositories, writers, order queues, broker dispatch, fills, positions,
+PnL, and mutation remain separated by domain. Mock does not import the heavy
+Production close/context/runtime modules to obtain these primitives. Isolation
+audits retain explicit forbidden-import protection for those modules.
+
+4.2 Mock server-authentication admission
+
+MockValidationHost reads api.is_connected() freshly at each protected request
+and fails closed if the method is absent, raises, or reports disconnected. The
+check occurs before Early Close, profit/loss Early Close, and individual-
+liquidation mutation.
+
+The UI may read an exposed checker for feedback, but MockValidationHost remains
+the mutation authority. No Production authentication state is mirrored into
+Mock, and no new permission for cancellation or unrelated commands was added.
+
+======================================================================
+5. INDICATOR-FOLLOW DEDICATED HISTORICAL VALIDATION CHART
+======================================================================
+
+5.1 Purpose
+
+The chart is a user-requested, read-only Historical validation flow for the
+currently edited Indicator-Follow settings. It lets the operator inspect past
+candles, evaluator-returned BUY/SELL signals, and evaluator diagnostics before
+saving. It is not live trading, Mock Validation, or validation-on-commit.
+
+5.2 End-to-end call graph
+
+The frozen Indicator-Follow Validation flow is:
+
+  IndicatorFollowRoutineSettingsDialog
+    -> validation_chart_requested(snapshot)
+    -> IndicatorFollowValidationFlow
+    -> IndicatorFollowValidationHost.start(snapshot)
+    -> ValidationSession
+    -> ValidationHistoricalProvider
+    -> existing app-owned owner.kiwoom_api
+    -> request_minute_candles_read_only(...)
+    -> ValidationHistoricalReplay
+    -> immutable ValidationReplaySnapshot
+    -> IndicatorFollowValidationChartWindow
+    -> show()
+
+Both new-registration and settings-change callers bind the same dialog request
+to this same flow.
+
+5.3 Current unsaved settings snapshot
+
+The dialog collects the current widgets, maps them through the existing routine
+rule mapper, deep-copies the preview rules, and creates an immutable settings
+snapshot. It does not save rules.json, reload a registered instance, mutate the
+routine repository, or require the user to commit the edit first.
+
+The chart therefore evaluates exactly the requested edit snapshot, not a later
+filesystem read and not a previously saved configuration.
+
+5.4 Identity contract
+
+Stock code/name, timeframe, settings hash, request identity, Historical response
+identity, and replay identity remain explicit. Host/provider/replay checks fail
+closed when required stock or timeframe identity does not match. A result from
+one request is not silently displayed as another request's result.
+
+5.5 Operation readiness
+
+Operation-state admission is read-only and uses the established neutral reader.
+The validation flow does not create an Operation state, repair an Operation, or
+import a Production mutation module as its authority. A not-ready result is
+routed to existing user-visible status feedback without mutating trading state.
+
+5.6 Broker request ownership
+
+The flow uses the existing app-owned owner.kiwoom_api through the dedicated
+read-only Historical boundary. It creates zero new KiwoomApi() owners.
+Pagination and response parsing stay in the broker layer.
+
+The read-only request returns raw Historical candles with Production commit
+disabled. It does not commit to Production Candle storage, MarketDataHost,
+candle targets, or realtime state.
+
+5.7 Historical candle count
+
+The Phase 9 flow requests 300 candles by default through
+DEFAULT_VALIDATION_HISTORICAL_COUNT = 300. This is a validation-local flow
+constant, not a Trading policy, persisted setting, or new user control. No
+Historical-count UI was added in this window.
+
+5.8 Replay authority
+
+Replay consumes the immutable request settings snapshot and Historical snapshot,
+then invokes the existing Indicator-Follow evaluator and diagnostic observer.
+It does not reconstruct AND/OR/NOT/group semantics, recalculate a substitute
+decision, or introduce a chart-only signal engine.
+
+Each replay entry preserves evaluation_time/evaluation_index separately from
+signal_time. Official chart markers use the evaluator return location,
+evaluation_time/evaluation_index. signal_time remains the condition evidence bar
+shown in details, including delay_bar meaning.
+
+5.9 Chart behavior
+
+The chart consumes only ValidationReplaySnapshot projections. It is modeless and
+display-only. It renders Historical candles, official BUY/SELL markers, bar
+selection, and side-specific reason, evidence time, delay, matched groups,
+details, and trace. BUY and SELL may coexist at one evaluation index.
+
+Candles outside evaluated_start_index/evaluated_end_index remain visible but are
+identified as outside the replay range; the UI does not fabricate entries. The
+chart copies display data so selection and painting do not mutate replay,
+Historical, or settings snapshots.
+
+The chart is independent of the Production chart, Main monitoring, Production
+MarketData, PnL, position, order, execution, Mock, and realtime layers. It does
+not import or inherit StockInstanceCloseChart.
+
+5.10 Window ownership and cleanup
+
+IndicatorFollowValidationFlow owns request/provider lifetime while a request is
+active and holds modeless chart references while windows remain open. Each
+successful request produces one Historical request, one replay, and one chart.
+Provider callback completion releases provider ownership. Closed or destroyed
+charts are removed from the flow's references, and destroyed dialogs release
+their binding. Reopening a dialog does not duplicate the request signal. There
+is no global chart registry and no new persistent source of truth.
+
+Repeated requests and retries do not accumulate active providers or stale chart
+ownership. The verified lifetime probe finished with the expected zero active
+provider/request ownership after completion and correct chart-reference cleanup.
+
+5.11 Failure routing
+
+Snapshot, readiness, Historical request, provider, replay, and chart-creation
+failures converge on validation_failed. Host validation_blocked reaches the same
+failure route. AutoTradeSettingWindow uses statusBarMessage and MainWindow uses
+statusBar().showMessage; no new QMessageBox or toast framework was created. A
+failure stops before later replay/chart stages and does not fall through into
+registration, save, Production Candle commit, order creation, or trading
+mutation. Retry starts from a fresh request snapshot.
+
+5.12 Absolute mutation boundary
+
+The dedicated validation path must not perform or acquire authority over:
+
+- Production or Mock Operation/runtime mutation;
+- Production MarketData/Candle commit or realtime registration;
+- StockRepository or routine rules persistence;
+- Candidate, signal queue, order queue, SendOrder, Chejan, fills, position, or
+  PnL mutation;
+- Mock virtual execution; or
+- live monitoring and automatic trading.
+
+The checked runtime source at the frozen baseline contains no alternate Kiwoom
+owner construction and no normal Production minute-candle request in this flow.
+
+======================================================================
+6. DISTINCT VALIDATION DOMAINS
+======================================================================
+
+Indicator-Follow validation-on-commit remains the save/change admission contract
+owned by its 2026-09-08 document. It is not replaced by this optional chart.
+
+Mock Validation remains an isolated simulated Operation and virtual-execution
+domain. The Historical Validation Chart does not run a Mock Operation and does
+not use Mock state as an evaluator or execution authority.
+
+The dedicated chart is a third, read-only inspection path: current edit snapshot
+plus broker-owned Historical data plus the existing evaluator, ending in a
+display-only replay result.
+
+======================================================================
+7. VERIFIED BASELINE
+======================================================================
+
+The September 13 Phase 10 closeout made no code change. At code HEAD
+317b18f529c0920528b3373305796fa994a8f391 it verified:
+
+- the combined Indicator-Follow Validation suite: 100/100 PASS;
+- the eight phase modules independently: 100/100 PASS;
+- caller GUI wiring: 3/3 PASS;
+- the request/provider/chart lifetime and retry probe: PASS; and
+- newly confirmed in-scope defects: 0.
+
+The preceding Production/Mock normalization commits retained focused regression
+coverage for close/liquidation, operation commands, Mock lifecycle/isolation,
+and direct ATS liquidation boundaries.
+
+======================================================================
+8. PROTECTED LOCAL WORK AND NON-SCOPE
+======================================================================
+
+The local mock_production_boundary_normalization.patch-related work is not wholly
+represented by the frozen code HEAD. In particular, local/untracked boundary
+files observed during this documentation audit are protected working material,
+not completed or committed features. This Freeze makes no completion claim for
+that patch or for any uncommitted Code or Docs worktree content.
+
+Not added by this window:
+
+- a Historical candle-count control;
+- live/realtime validation;
+- order, execution, position, PnL, or backtest-return simulation;
+- a new evaluator, parser, indicator engine, or chart engine;
+- general order/session lifetime behavior; or
+- any Phase 10 code change.
+
+======================================================================
+9. FINAL VERDICT
+======================================================================
+
+At the frozen baseline, Production and Mock expose aligned user meaning for the
+normalized close settings while retaining independent mutation/execution state.
+The Indicator-Follow dedicated Validation Chart is fully wired as a removable,
+read-only Historical inspection flow that evaluates the current unsaved snapshot
+with the existing evaluator and does not cross into trading mutation.

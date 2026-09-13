@@ -1,0 +1,113 @@
+MASTER SPEC CHANGELOG
+2026-09-13 OPERATION / MOCK AND INDICATOR-FOLLOW VALIDATION FREEZE
+
+Status: FROZEN CHANGE RECORD
+Code branch: feat/restore-auto-trade-setting-ui
+Frozen code HEAD: 317b18f529c0920528b3373305796fa994a8f391
+
+======================================================================
+1. VERIFIED CODE COMMIT SEQUENCE
+======================================================================
+
+Previous-window normalization:
+
+- 608cdb5 Normalize production mock liquidation activation contract
+  Aligned the pre-Operation reservation, exact identity binding, manual
+  activation, CARRYOVER cleanup, one-shot lifetime, and Mock-visible meaning
+  while preserving separate execution domains.
+
+- 3c24f87 Normalize empty profit loss early close feedback
+  Made both-empty profit/loss input reject with parent toast and no mutation,
+  retaining existing validation for supplied numeric values.
+
+- dd9c95f Rationalize production mock shared boundaries
+  Added side-effect-free ATS session normalization and shared presentation-only
+  UI primitives; retained independent Production and Mock runtime authority and
+  strengthened forbidden heavy-module imports.
+
+- 6ff8161 Align mock close edits with server authentication
+  Required a fresh fail-closed api.is_connected() result before protected Mock
+  close mutations, without mirroring Production state.
+
+Indicator-Follow dedicated Validation Chart phases:
+
+- ee39766 Add indicator-follow validation foundation
+  Introduced immutable validation request/settings contracts and the settings
+  dialog request foundation.
+
+- bfa353d Add validation chart settings handoff
+  Mapped the current unsaved UI state into a validation-only settings snapshot
+  without saving or reloading rules.
+
+- 4eb99f1 Add validation operation reader and stock picker
+  Added neutral read-only Operation readiness and selection-only stock identity
+  boundaries.
+
+- 8fae710 Add indicator-follow validation host
+  Added request/session orchestration without acquiring Production or Mock
+  mutation authority.
+
+- e377f68 Add read-only historical candle request
+  Added the broker-owner Historical request mode that returns raw candles with
+  Production Candle commit disabled.
+
+- 22d764f Add validation historical provider
+  Added the validation Historical provider with request identity, pagination
+  result handling, and immutable snapshot projection.
+
+- ee825e3 Add historical validation signal replay
+  Replayed immutable Historical/settings snapshots through the existing routine
+  evaluator and diagnostic observer, preserving evaluation and signal times.
+
+- aa978a0 Add indicator-follow validation chart UI
+  Added the independent modeless read-only candle, official BUY/SELL marker, bar
+  selection, and side-specific trace display.
+
+- 317b18f Connect indicator-follow validation flow
+  Connected registration and settings-change dialogs through Host, Historical,
+  replay, modeless chart ownership, cleanup, retry, and existing status seams.
+
+======================================================================
+2. PHASE 10 CLOSEOUT
+======================================================================
+
+Phase 10 intentionally changed no Code files. At 317b18f529c0920528b3373305796fa994a8f391:
+
+- combined validation suite: 100/100 PASS;
+- eight phase modules standalone: 100/100 PASS;
+- caller GUI tests: 3/3 PASS;
+- lifetime/retry probe: PASS;
+- new defects attributable to the completed flow: 0.
+
+The closeout confirmed that current unsaved settings reach the existing
+evaluator and a display-only replay chart, with default Historical count 300,
+exact request identity, no Production Candle commit, and no trading mutation.
+
+======================================================================
+3. DOCUMENTATION CHANGE
+======================================================================
+
+This Docs Freeze adds:
+
+- MASTER_SPEC_CANONICAL_2026-09-13_OPERATION_MOCK_AND_INDICATOR_VALIDATION_FREEZE.txt
+- WORK_RESUME_LATEST_2026-09-13_OPERATION_MOCK_AND_INDICATOR_VALIDATION_FREEZE.txt
+- MASTER_SPEC_CHANGELOG_2026-09-13_OPERATION_MOCK_AND_INDICATOR_VALIDATION_FREEZE.txt
+
+00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md receives only the new supplemental
+owner and latest frozen resume/changelog links. Earlier independent owner files
+are not rewritten.
+
+======================================================================
+4. BOUNDARY AND NON-COMPLETION RECORD
+======================================================================
+
+- Production and Mock share user meaning and pure/presentation primitives, not
+  runtime state, writers, order queues, positions, PnL, or execution.
+- The Historical Validation Chart is distinct from settings validation-on-commit
+  and from Mock Validation.
+- No live/realtime path, order execution, PnL/backtest return, Historical-count
+  control, or general order/session lifetime feature was added.
+- mock_production_boundary_normalization.patch and related local/untracked work
+  are protected working material, not part of the frozen Code HEAD and not
+  claimed as completed by this changelog.
+- Existing Code and Docs LOCAL WIP is excluded from the documentation commit.
