@@ -4,7 +4,7 @@ MASTER SPEC CHANGELOG
 Status: VERIFIED SUPPLEMENTAL CHANGE RECORD
 Code branch: feat/restore-auto-trade-setting-ui
 Base code HEAD: a45fd5c7b01cf36f528bcc753c414155eeeee37c
-Verified code HEAD: d44de79a3d5445b3ea79d5326df2203d4fe6381e
+Verified code HEAD: ee40370402aaee5bf642cda3e17b9bf7a53eb15b
 
 ======================================================================
 1. VERIFIED CODE COMMITS
@@ -29,6 +29,12 @@ Verified code HEAD: d44de79a3d5445b3ea79d5326df2203d4fe6381e
   coverage for cancellation, target-only deletion, assigned-stock protection,
   package preservation, and operation with Indicator-Follow absent.
 
+- ee40370 Strengthen routine package absence isolation test
+  Corrected the package-absence evidence by running tracked source from a
+  temporary executable copy that physically excludes Indicator-Follow and user
+  Runtime data. Added source-origin/path assertions, distinct missing-instance
+  and missing-package-instance gates, and an injected reverse-dependency control.
+
 ======================================================================
 2. ERROR CLOSURE
 ======================================================================
@@ -52,15 +58,30 @@ service are real against a temporary project root.
 3. VERIFICATION RECORD
 ======================================================================
 
-- 409 distinct relevant tests passed.
+- At d44de79, 409 distinct relevant tests passed. This remains the earlier run
+  record and is not combined with the correction run.
+- At ee40370, 26 directly related tests passed: independence, Main deletion core,
+  and Routine package/registry suites.
+- The physical package-absence and injected reverse-dependency control tests
+  both passed; py_compile passed for the changed test module.
 - Final new core scenarios: 4/4 passed.
 - py_compile: passed for both changed test modules.
 - Cancellation: all temporary files byte-identical, service call 0.
 - Allowed deletion: only target instance removed; packages and other instance
   preserved.
 - Assigned-stock protection: rejected before confirmation, mutation 0.
-- Indicator-Follow package absent: generic Main import and independent Routine
-  discovery/evaluation/admission passed; missing instance failed closed.
+- The d44de79 package test omitted Indicator-Follow from a temporary registry
+  root but still imported Main/common source from the original repository. It
+  did not alone prove physical code-package absence.
+- The ee40370 test uses `git archive HEAD`, excludes the physical package,
+  Runtime/stocks/old instances/log/cache data, runs with the copied root as cwd
+  under Python -I, removes PYTHONPATH/PYTHONHOME, and verifies copied-root module
+  origins and no target module load.
+- In the corrected copy, generic Main imports and independent Routine
+  discovery/evaluation/admission passed. Both missing instance and existing
+  instance with missing package failed closed with ROUTINE_GATE_UNAVAILABLE.
+- Injecting the forbidden target import into only the copied Main module caused
+  the expected target-package ModuleNotFoundError, establishing test sensitivity.
 - Broker, login, SendOrder, and actual Production data were not exercised.
 
 Existing OOS reproduced and left unchanged:
@@ -73,7 +94,7 @@ Existing OOS reproduced and left unchanged:
 4. PRESERVATION RECORD
 ======================================================================
 
-No V2 functional/geometry/Replay file changed in d44de79. September 14 V2
+No V2 functional/geometry/Replay file changed in d44de79 or ee40370. September 14 V2
 marker, Tooltip, axis, cycle, aggregate return, settings apply, and Replay
 Phase 2-4 contracts remain unchanged. September 14 performance figures were not
 remeasured in this work.
@@ -90,11 +111,13 @@ because their exact byte procedures could not be recovered.
 5. DOCUMENTATION CHANGE
 ======================================================================
 
-This documentation commit adds only:
+The original documentation commit added only:
 
 - MASTER_SPEC_CANONICAL_2026-09-15_MAIN_ROUTINE_BOUNDARY_AND_VALIDATION_RETIREMENT_SUPPLEMENT.txt
 - MASTER_SPEC_CHANGELOG_2026-09-15_MAIN_ROUTINE_BOUNDARY_AND_VALIDATION_RETIREMENT_SUPPLEMENT.txt
 - one separable Current Primary Owners row in 00_REFERENCE_INDEX.md.
 
-No past Freeze is modified. This is not a Project Freeze, Work Resume, or next
-session startup prompt.
+This correction modifies only the existing Canonical and Changelog above. The
+Reference Index is unchanged, including its protected unstaged WIP. No past
+Freeze is modified. This is not a Project Freeze, Work Resume, or next session
+startup prompt.

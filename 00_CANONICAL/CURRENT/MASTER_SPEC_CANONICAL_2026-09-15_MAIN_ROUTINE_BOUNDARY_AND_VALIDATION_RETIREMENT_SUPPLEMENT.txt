@@ -5,7 +5,7 @@ Status: CURRENT SUPPLEMENTAL CONTRACT
 Code repository: kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
 Previous frozen code HEAD: a45fd5c7b01cf36f528bcc753c414155eeeee37c
-Verified code HEAD: d44de79a3d5445b3ea79d5326df2203d4fe6381e
+Verified code HEAD: ee40370402aaee5bf642cda3e17b9bf7a53eb15b
 
 ======================================================================
 1. AUTHORITY AND SCOPE
@@ -22,6 +22,9 @@ Indicator-Follow Signal Validation V2 Freeze:
 
   d44de79a3d5445b3ea79d5326df2203d4fe6381e
   Verify main routine deletion independence
+
+  ee40370402aaee5bf642cda3e17b9bf7a53eb15b
+  Strengthen routine package absence isolation test
 
 It supplements, and does not rewrite, the September 2 Routine package owner,
 the September 6 Main/Indicator-Follow boundary owner, or the September 14 V2
@@ -131,12 +134,39 @@ Protected deletion:
 - the operator receives the existing protection message; and
 - the complete temporary repository byte snapshot remains unchanged.
 
-Package absence is verified separately in a fresh subprocess and temporary
-package root. With Indicator-Follow absent, generic Main/settings modules import,
-an independent manifest Routine is discovered and evaluated, and its execution
-admission succeeds. A missing Routine Instance remains fail-closed with
-ROUTINE_GATE_UNAVAILABLE. This test does not claim automatic reassignment or
-package removal behavior.
+At d44de79, the package-absence test used a temporary Routine registration root,
+but its subprocess cwd and imported Main/common source still came from the
+original repository. That result proved absence from the selected registration
+store; by itself it did not prove operation from an executable source copy in
+which the Indicator-Follow code package was physically absent.
+
+At ee40370, the test creates an executable copy from `git archive HEAD`. Archive
+extraction excludes routines/지표추종매매, .git, tracked Runtime, stocks,
+pre-existing Routine Instances, log files, bytecode, and cache directories. The
+independent_test package and only the required test instances are then created
+inside that copy.
+
+The subprocess runs with the copied root as cwd, Python isolated mode (-I),
+PYTHONPATH/PYTHONHOME removed, and only the copied root explicitly inserted as
+the project source path. Assertions verify physical package absence, no original
+repository path in sys.path, and copied-root origins for
+gui_auto_trade_setting_window, gui_windows, routine_instance_registry, and
+routine_package_contract. The target Routine and its children remain absent
+from sys.modules.
+
+In that environment, generic Main/settings imports succeed, an independent
+manifest Routine is discovered and evaluated, and its execution admission
+succeeds. Both a nonexistent Routine Instance and an existing instance whose
+definition/package is absent fail closed with ROUTINE_GATE_UNAVAILABLE.
+
+A separate copied-source control injects a forbidden Indicator-Follow import
+into the copied Main settings module. The same subprocess then fails with the
+expected target-package ModuleNotFoundError. This proves that the normal test
+would detect a reintroduced reverse dependency rather than silently resolving
+the original repository package.
+
+These tests do not claim automatic reassignment, package restoration/removal,
+full gui_main.py startup, or a Production/Broker session.
 
 ======================================================================
 5. PRESERVED V2 AND REPLAY CONTRACTS
@@ -159,17 +189,26 @@ restated as a new performance result or SLA.
 6. VERIFICATION EVIDENCE AND LIMITS
 ======================================================================
 
-The deletion/boundary verification completed 409 distinct relevant tests:
+At d44de79, the deletion/boundary verification completed 409 distinct relevant
+tests:
 
 - 369 Main deletion, Routine Instance deletion integrity, group deletion,
   Validation independence, ordinary settings, and Routine tree tests;
 - 39 Routine package/registry and Signal Validation V2 tests; and
 - 1 additional fresh-process package-absence test added after the 369-test run.
 
-The final four new core scenarios and py_compile were rerun successfully in the
-32-bit Python/PyQt environment. The Qt tests executed the actual Main handler in
-an offscreen harness; they did not launch gui_main.py or a Production/Broker
-session.
+That 409-PASS record remains historical evidence for d44de79 and is not added to
+or restated as the current run.
+
+For ee40370, 26 directly related tests passed: the five-test independence
+module, three Main deletion core scenarios, and the Routine package/registry
+suites. The physical package-absence and injected reverse-dependency control
+both passed. py_compile also passed for the changed test module in the 32-bit
+Python/PyQt environment.
+
+The Qt deletion tests execute the actual Main handler in an offscreen harness.
+The package-absence test imports actual tracked Main/common source from the
+temporary copy. Neither run launches gui_main.py or a Production/Broker session.
 
 Current protected-WIP/OOS results were reproduced without modification:
 
@@ -185,7 +224,7 @@ this supplement.
 7. GIT AND PROTECTED WORKING STATE
 ======================================================================
 
-Verified Code HEAD d44de79a3d5445b3ea79d5326df2203d4fe6381e is equal locally
+Verified Code HEAD ee40370402aaee5bf642cda3e17b9bf7a53eb15b is equal locally
 and on origin/feat/restore-auto-trade-setting-ui. The Code worktree still has
 303 protected user-owned paths.
 
@@ -212,10 +251,12 @@ conversion of either historical fingerprint.
 8. FINAL VERDICT
 ======================================================================
 
-The tested Main deletion path now has a valid Qt/repository fixture and evidence
-for cancellation, allowed target-only deletion, assigned-target protection,
-package preservation, and generic operation without Indicator-Follow installed.
-Main/Routine dependency normalization and approved V1 retirement remain in
-force, while Signal Validation V2 and ordinary settings are independently
-available at the verified Code HEAD. No new uninstall, cleanup, reassignment,
-Broker, order, or position policy is created by this supplement.
+The tested Main deletion path retains valid evidence for cancellation, allowed
+target-only deletion, assigned-target protection, and package preservation. The
+corrected executable-copy test now separately verifies generic Main/common
+imports and an independent Routine contract with the Indicator-Follow package
+physically absent and the original source path excluded. Main/Routine dependency
+normalization and approved V1 retirement remain in force, while Signal
+Validation V2 and ordinary settings retain their established optional boundary.
+No new uninstall, cleanup, reassignment, Broker, order, or position policy is
+created by this supplement.
