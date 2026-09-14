@@ -1,0 +1,100 @@
+MASTER SPEC CHANGELOG
+2026-09-15 MAIN-ROUTINE BOUNDARY AND VALIDATION RETIREMENT SUPPLEMENT
+
+Status: VERIFIED SUPPLEMENTAL CHANGE RECORD
+Code branch: feat/restore-auto-trade-setting-ui
+Base code HEAD: a45fd5c7b01cf36f528bcc753c414155eeeee37c
+Verified code HEAD: d44de79a3d5445b3ea79d5326df2203d4fe6381e
+
+======================================================================
+1. VERIFIED CODE COMMITS
+======================================================================
+
+- 8d35be3 Normalize main and routine dependency boundaries
+  Removed an unused Indicator-Follow import from common signal probing, moved
+  effective running-budget projection into Main facts capture, and removed the
+  Routine's direct running_budget_adjustment dependency without changing the
+  continuation result contract.
+
+- 499b006 Retire legacy validation and isolate signal validation V2
+  Removed the approved V1 flow/chart/button/binders, transferred the required
+  canvas behavior to V2, moved SELL selection validation to Routine ownership,
+  made V2 optional at the Routine settings boundary, and retained V2/shared
+  host, picker, replay, and contract components. The removed 41 V1-only tests
+  are retired coverage, not passing tests.
+
+- d44de79 Verify main routine deletion independence
+  Replaced an invalid SimpleNamespace/invalid-instance deletion fixture with an
+  actual QMainWindow plus temporary repository data. Added real handler/service
+  coverage for cancellation, target-only deletion, assigned-stock protection,
+  package preservation, and operation with Indicator-Follow absent.
+
+======================================================================
+2. ERROR CLOSURE
+======================================================================
+
+The original failing method was:
+
+  MainRoutineMonitoringDisplayTest.
+  test_main_routine_delete_no_confirmation_does_not_delete
+
+The invalid instance id caused the real scope collector to raise ValueError.
+The error-report path then passed a types.SimpleNamespace to QMessageBox.warning,
+which raised a PyQt TypeError because argument 1 must be QWidget-compatible.
+Production deletion code and policy were not changed.
+
+The corrected tests use the actual
+MainWindow.delete_routine_instance_from_main_table handler. Confirmation and UI
+output are the only mocked boundaries; the scope collector and allowed deletion
+service are real against a temporary project root.
+
+======================================================================
+3. VERIFICATION RECORD
+======================================================================
+
+- 409 distinct relevant tests passed.
+- Final new core scenarios: 4/4 passed.
+- py_compile: passed for both changed test modules.
+- Cancellation: all temporary files byte-identical, service call 0.
+- Allowed deletion: only target instance removed; packages and other instance
+  preserved.
+- Assigned-stock protection: rejected before confirmation, mutation 0.
+- Indicator-Follow package absent: generic Main import and independent Routine
+  discovery/evaluation/admission passed; missing instance failed closed.
+- Broker, login, SendOrder, and actual Production data were not exercised.
+
+Existing OOS reproduced and left unchanged:
+
+- SELL protected WIP: 2 failures.
+- MockValidationHost UI: 3 failures and 1 error. The error is NO_HOLDING in the
+  early-close lifecycle path.
+
+======================================================================
+4. PRESERVATION RECORD
+======================================================================
+
+No V2 functional/geometry/Replay file changed in d44de79. September 14 V2
+marker, Tooltip, axis, cycle, aggregate return, settings apply, and Replay
+Phase 2-4 contracts remain unchanged. September 14 performance figures were not
+remeasured in this work.
+
+Code protected WIP remains 303 paths. The within-task reproducible protected-WIP
+SHA-256 stayed:
+
+  f16b34b0d44b62099f3900a152db4e8c8b61f6642e25ab69dce703af4ced37d9
+
+The historical 61ce8a and b3f597 fingerprints are not declared comparable
+because their exact byte procedures could not be recovered.
+
+======================================================================
+5. DOCUMENTATION CHANGE
+======================================================================
+
+This documentation commit adds only:
+
+- MASTER_SPEC_CANONICAL_2026-09-15_MAIN_ROUTINE_BOUNDARY_AND_VALIDATION_RETIREMENT_SUPPLEMENT.txt
+- MASTER_SPEC_CHANGELOG_2026-09-15_MAIN_ROUTINE_BOUNDARY_AND_VALIDATION_RETIREMENT_SUPPLEMENT.txt
+- one separable Current Primary Owners row in 00_REFERENCE_INDEX.md.
+
+No past Freeze is modified. This is not a Project Freeze, Work Resume, or next
+session startup prompt.

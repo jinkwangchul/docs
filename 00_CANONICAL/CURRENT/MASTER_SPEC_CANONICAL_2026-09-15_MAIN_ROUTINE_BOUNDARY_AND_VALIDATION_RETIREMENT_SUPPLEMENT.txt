@@ -1,0 +1,221 @@
+MASTER SPEC CANONICAL
+2026-09-15 MAIN-ROUTINE BOUNDARY AND VALIDATION RETIREMENT SUPPLEMENT
+
+Status: CURRENT SUPPLEMENTAL CONTRACT
+Code repository: kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Previous frozen code HEAD: a45fd5c7b01cf36f528bcc753c414155eeeee37c
+Verified code HEAD: d44de79a3d5445b3ea79d5326df2203d4fe6381e
+
+======================================================================
+1. AUTHORITY AND SCOPE
+======================================================================
+
+This supplement records the verified Code commits after the September 14
+Indicator-Follow Signal Validation V2 Freeze:
+
+  8d35be3f5d8f89d4959b2e73245249d4e528f812
+  Normalize main and routine dependency boundaries
+
+  499b006e40b9b865e821df689f90b569bd0c393a
+  Retire legacy validation and isolate signal validation V2
+
+  d44de79a3d5445b3ea79d5326df2203d4fe6381e
+  Verify main routine deletion independence
+
+It supplements, and does not rewrite, the September 2 Routine package owner,
+the September 6 Main/Indicator-Follow boundary owner, or the September 14 V2
+Freeze. It owns only the later boundary normalization, approved V1 retirement,
+V2 optionality, and Main Routine Instance deletion verification stated here.
+
+======================================================================
+2. MAIN-ROUTINE DEPENDENCY NORMALIZATION
+======================================================================
+
+The unused Indicator-Follow-specific _requires_base_bar_entry_projection()
+bridge was removed from routine_signal_probe.py. The Routine-owned
+market_bar_projection_request remains the source used by its direct contract
+test; no specific Routine name or fallback policy was added to common Main.
+
+Main now applies project_running_budget_adjustment_config() while capturing
+stock configuration into RoutineMainFacts. The projected effective config is
+sealed with the rest of the Main-owned facts. Indicator-Follow
+routine_buy_execution.py validates and consumes those facts without importing
+or executing running_budget_adjustment itself.
+
+The established continuation meanings remain covered: active effective limit,
+WAIT_SELL previous-limit retention, assignment identity, and limit rejection.
+This removed the recorded Mock isolation forbidden import from the Routine. It
+did not grant the Routine Runtime read/write ownership or change the sealed
+facts schema/revision policy.
+
+======================================================================
+3. LEGACY VALIDATION V1 RETIREMENT AND V2 OPTIONALITY
+======================================================================
+
+The approved legacy Indicator-Follow Validation V1 entry surface is retired:
+
+- gui_indicator_follow_validation_flow.py was deleted;
+- gui_indicator_follow_validation_chart_window.py was deleted;
+- the V1 button, signal, binders, and user-reachable entry paths were removed;
+- V1-only chart/flow/entry tests were deleted; and
+- 41 V1-only tests are retired tests, not passing regression results.
+
+The Candle canvas behavior needed by Signal Validation V2 is now V2-owned in
+gui_indicator_follow_signal_validation_window.py. SELL price-selection
+validation moved to the Routine-owned gui_indicator_follow_sell_controls.py
+boundary. Main callers no longer import either the V1 or V2 binder.
+
+The ordinary Indicator-Follow settings dialog owns an optional V2 connection.
+When V2 modules are unavailable, only the V2 action is disabled; ordinary
+settings creation, load, validation, save, and Runtime handoff remain usable.
+Unexpected nested import errors are not hidden as optional absence.
+
+V2-required Historical host/provider/replay, stock picker/browser, immutable
+contracts, projection, presentation, recent-stock storage, and evaluator
+performance hooks remain installed. V1 retirement does not mean deletion of
+shared files whose remaining consumer is V2 or another current domain.
+
+======================================================================
+4. MAIN ROUTINE INSTANCE DELETION VERIFICATION
+======================================================================
+
+4.1 Original error and classification
+
+The former test
+MainRoutineMonitoringDisplayTest.
+test_main_routine_delete_no_confirmation_does_not_delete constructed a
+types.SimpleNamespace as the Main window and passed an invalid instance id.
+The real deletion-scope collector first raised ValueError("삭제할 등록 루틴을
+찾을 수 없습니다."). The handler then attempted QMessageBox.warning(window,
+...), and PyQt rejected the SimpleNamespace as argument 1 because it was not a
+QWidget. The error was a test-fixture/type and repository-data defect, not
+evidence that the Production handler required a changed deletion policy.
+
+4.2 Corrected fixture boundary
+
+The tests now construct a real gui_windows.MainWindow/QMainWindow object without
+running Production initialization. Each test uses a temporary project root with
+valid Routine package, Routine Instance, stock, and Runtime JSON fixtures. The
+actual Main handler is:
+
+  gui_windows.MainWindow.delete_routine_instance_from_main_table
+
+The actual deletion-scope collector and, for allowed deletion, the actual
+routine_instance_deletion_service are exercised. Only operator confirmation,
+UI refresh/event output, and other external presentation effects are mocked.
+No Broker, login, SendOrder, position writer, or user repository is invoked.
+
+4.3 Verified outcomes
+
+Cancellation:
+
+- QMessageBox.No leaves the target instance present;
+- the deletion service is not called;
+- refresh is not called; and
+- a byte snapshot of all temporary package, instance, stock, order-queue, and
+  position files is identical before and after.
+
+Allowed deletion:
+
+- the real service removes only the approved target Routine Instance;
+- its Routine package remains installed;
+- an independent Routine Instance and both Routine packages remain unchanged;
+- the Main refresh/event boundary is invoked after success; and
+- no package auto-uninstall or unrelated data cleanup is introduced.
+
+Protected deletion:
+
+- an instance assigned to a stock is rejected by the real scope before the
+  confirmation dialog;
+- the operator receives the existing protection message; and
+- the complete temporary repository byte snapshot remains unchanged.
+
+Package absence is verified separately in a fresh subprocess and temporary
+package root. With Indicator-Follow absent, generic Main/settings modules import,
+an independent manifest Routine is discovered and evaluated, and its execution
+admission succeeds. A missing Routine Instance remains fail-closed with
+ROUTINE_GATE_UNAVAILABLE. This test does not claim automatic reassignment or
+package removal behavior.
+
+======================================================================
+5. PRESERVED V2 AND REPLAY CONTRACTS
+======================================================================
+
+No V2 production file changed in the deletion-verification commit. The existing
+marker/evaluation location, evidence Tooltip, fixed axis, completed-cycle table,
+cost-weighted top estimated return, settings-apply whitelist, stock/MRU flow,
+and window geometry remain governed by the September 14 Freeze.
+
+Replay Phase 2 frozen-Entry reuse, Phase 3 same-prefix indicator reuse, Phase 4
+default read-only fast path, custom evaluator/provider isolation, snapshot
+immutability, and Price Box past-only evaluation are preserved.
+
+The representative 0.100/0.297/1.493 second results for 100/200/500 candles are
+September 14 measurements. They were not remeasured by this closure and are not
+restated as a new performance result or SLA.
+
+======================================================================
+6. VERIFICATION EVIDENCE AND LIMITS
+======================================================================
+
+The deletion/boundary verification completed 409 distinct relevant tests:
+
+- 369 Main deletion, Routine Instance deletion integrity, group deletion,
+  Validation independence, ordinary settings, and Routine tree tests;
+- 39 Routine package/registry and Signal Validation V2 tests; and
+- 1 additional fresh-process package-absence test added after the 369-test run.
+
+The final four new core scenarios and py_compile were rerun successfully in the
+32-bit Python/PyQt environment. The Qt tests executed the actual Main handler in
+an offscreen harness; they did not launch gui_main.py or a Production/Broker
+session.
+
+Current protected-WIP/OOS results were reproduced without modification:
+
+- SELL normalization: 2 failures;
+- MockValidationHost UI: 3 failures and 1 error;
+- the Mock error is MockValidationError("NO_HOLDING") from the early-close
+  lifecycle path, not the original Main deletion QWidget fixture error.
+
+These OOS results are not reclassified as completed and were not repaired in
+this supplement.
+
+======================================================================
+7. GIT AND PROTECTED WORKING STATE
+======================================================================
+
+Verified Code HEAD d44de79a3d5445b3ea79d5326df2203d4fe6381e is equal locally
+and on origin/feat/restore-auto-trade-setting-ui. The Code worktree still has
+303 protected user-owned paths.
+
+The earlier reported fingerprint 61ce8a37f9671056e22f5923ce0a89584f381fcc9420f94d4d0ae1dc1f4a3dee
+could not be independently reproduced because its byte procedure was not
+available. The older b3f597 value likewise has no recoverable procedure, so
+neither is claimed comparable.
+
+For this closure, a reproducible before/after SHA-256 was computed from:
+
+1. raw `git diff --binary --no-ext-diff` bytes excluding the two intended test
+   paths while they were uncommitted; then
+2. every `git ls-files --others --exclude-standard -z` path in sorted order,
+   followed by NUL and that file's raw bytes.
+
+The protected-WIP result was identical before and after the Code commit/push:
+
+  f16b34b0d44b62099f3900a152db4e8c8b61f6642e25ab69dce703af4ced37d9
+
+This is a within-task preservation proof under the stated procedure, not a
+conversion of either historical fingerprint.
+
+======================================================================
+8. FINAL VERDICT
+======================================================================
+
+The tested Main deletion path now has a valid Qt/repository fixture and evidence
+for cancellation, allowed target-only deletion, assigned-target protection,
+package preservation, and generic operation without Indicator-Follow installed.
+Main/Routine dependency normalization and approved V1 retirement remain in
+force, while Signal Validation V2 and ordinary settings are independently
+available at the verified Code HEAD. No new uninstall, cleanup, reassignment,
+Broker, order, or position policy is created by this supplement.
