@@ -1,0 +1,178 @@
+MASTER SPEC CHANGELOG
+2026-09-14 INDICATOR-FOLLOW SIGNAL VALIDATION V2 FREEZE
+
+Status: FROZEN CHANGE RECORD
+Code branch: feat/restore-auto-trade-setting-ui
+Previous frozen code HEAD: 317b18f529c0920528b3373305796fa994a8f391
+Frozen code HEAD: a45fd5c7b01cf36f528bcc753c414155eeeee37c
+
+======================================================================
+1. VERIFIED CODE COMMIT SEQUENCE
+======================================================================
+
+Stock picker, entry, and settings presentation:
+
+- 5089c4c Align validation stock picker with stock registration browser
+  Extracted the shared read-only stock search/filter/column/projection boundary
+  while retaining separate registration and Validation shells.
+- a24c507 Align validation picker lifecycle and geometry
+  Normalized shared browser presentation/lifetime without moving mutation into
+  the Validation picker.
+- 863d254 Match validation picker presentation to registration
+  Completed operator-facing column, filter, sizing, and selection parity.
+- b5b1b6e Block validation chart before broker authentication
+  Added fresh fail-closed broker authentication before Validation entry.
+- b1d6862 Decouple validation UI from control window owner
+  Separated lifetime owner, requester parent, and modeless chart ownership.
+- b6634ea Set focused defaults for indicator follow settings
+  Made registration/edit start with Basic visible, BUY expanded, SELL collapsed.
+- 73d9cc5 Open indicator follow settings in focused normal mode
+  Replaced initial maximization with the existing normal content-fit path.
+- 37a76de Center indicator follow settings window
+  Centered the fitted normal window on owner/dialog/primary available screen.
+
+Signal Validation V2 foundation and operator workflow:
+
+- 83cf7e5 Add independent indicator signal validation V2
+  Added the signal-only settings projection, flow, window, and actual Historical
+  replay evaluator path.
+- a2f3efe Normalize signal validation V2 operator workflow
+  Added the compact operator workflow, default request controls, presentation
+  projection, and apply/run boundaries.
+- 61ab866 Improve signal validation operator results
+  Reworked results into operator-readable BUY/SELL evidence and full display.
+- 797a6e3 Normalize sell price filters and V2 signal evidence
+  Normalized the committed SELL price-selection/evidence contracts across mapper,
+  projection, evaluator, V2, and validation-on-commit tests.
+- 22b1cf4 Fix V2 signal evidence status mapping
+  Corrected trace-to-operator result status projection.
+- 2c489ce Fix V2 unresolved sell price entry flow
+  Kept legacy unresolved selections visible while enforcing the intended run,
+  apply, and save gates.
+- ca08e9f Normalize V2 stock selection workflow
+  Added empty-entry selection, same-stock no-op, stock-change invalidation, and
+  stale Historical callback rejection.
+- 06c06e5 Persist V2 recent stock selection
+  Added the V2-only QSettings MRU, restart restore, and recent-selection flow.
+- 777b63d Match V2 stock tooltip format
+  Matched the operator three-line stock tooltip field order and normalization.
+- 3613247 Replace V2 stock combo with recent popup
+  Replaced the stock ComboBox presentation with a plain stock display and
+  floating recent-stock selection UI.
+- abb240e Match V2 tooltip presentation
+  Isolated tooltip font weight/size from the bold stock label.
+- 87c4e95 Normalize V2 basic header recent stocks
+  Moved recent stocks into the expandable Basic row with the existing picker.
+- 8bbc981 Normalize V2 collapsed entry layout
+  Made Basic, BUY, and SELL initially collapsed with all headers visible.
+- 544367e Normalize V2 collapsed section geometry
+  Unified collapsed heights/edges and separated initial natural fit from later
+  user-owned width.
+- 1e8c65d Normalize V2 header internal alignment
+  Unified title/separator geometry and the Stock Selection button presentation.
+- aaee02f Fix V2 header interaction regressions
+  Restored title-arrow interaction and section expansion behavior.
+- c5eec36 Fix V2 header centerline and tooltip snapshot
+  Aligned the full header widget centerline and merged the read-only market
+  snapshot into stock metadata with generation/identity protection.
+- 12d742a Fix V2 header vertical alignment
+  Completed the Windows-style header centerline correction.
+- e5d58ab Normalize V2 chart and validation actions
+  Normalized chart display and the Validate-to-Apply state machine.
+- 4966f56 Replace V2 filter table with signal evidence tooltips
+  Replaced duplicated developer rows with marker evidence tooltips containing
+  all direct surviving decision paths.
+
+Runtime meaning, chart/cycle result, and performance:
+
+- 47568be Normalize empty SELL expression semantics
+  Excluded UI SELL A/B/C from final aggregation/evidence without a valid
+  expression while preserving independent SELL signals and UI values.
+- 0f866c5 Normalize V2 chart axis and cycle summary
+  Added fixed price axis, real timestamp projection, completed-cycle table, and
+  average-price-aligned cycle calculation.
+- 22f9817 Normalize V2 result layout and geometry persistence
+  Fixed five-row cycle-table geometry/ratios and preserved user-owned window
+  size and position across result and control changes.
+- 3cf194d Normalize signal validation replay copy boundaries
+  Reused frozen prior entries behind a fresh list container instead of deep
+  recreating them for every prefix.
+- db48d8f Normalize V2 aggregate estimated return
+  Replaced latest-cycle top return with completed-cycle cost-weighted aggregate.
+- 458b27b Normalize validation replay indicator reuse
+  Built base indicators once per prefix and reused them through isolated SELL
+  and BUY mapping views without future data.
+- a45fd5c Add validation replay read-only fast path
+  Removed redundant prefix/rules/context/trace JSON round-trips only for the
+  proven default evaluator/provider path and retained custom isolation.
+
+======================================================================
+2. CURRENT CONTRACT DELTAS
+======================================================================
+
+- V2 is an independent signal-only Historical replay window using the current
+  unsaved settings snapshot and default 100-candle request.
+- Stock selection is operator-oriented, single-selection, MRU-aware, generation
+  guarded, and separated from Production registration mutation.
+- Initial V2 Basic/BUY/SELL sections are all collapsed; user window geometry is
+  preserved after the one-time available-screen fit.
+- Marker evidence shows all direct surviving AND/OR paths and omits failed paths
+  and NOT obstacles without changing immutable evaluator evidence.
+- Empty UI SELL expression produces no UI A/B/C SELL, while independent SELL
+  signals retain their own meaning and metadata.
+- Completed-cycle projection owns the lower table; the top return is the
+  sum(cycle profit) divided by sum(cycle cost), not the latest cycle or an
+  arithmetic/compound return.
+- Replay Phases 2-4 remove repeated Entry reconstruction, duplicate same-prefix
+  indicator builds, and trusted-default JSON round-trips without changing
+  canonical results, custom isolation, or past-only evaluation.
+
+======================================================================
+3. PERFORMANCE AND VERIFICATION RECORD
+======================================================================
+
+Representative initial-to-final Replay timings on the same fixture/PC:
+
+  100 candles: 1.025 s -> 0.100 s
+  200 candles: 4.160 s -> 0.297 s
+  500 candles: 26.610 s -> 1.493 s
+
+Phase 3 standard build_indicator_series calls are 98/198/498 for
+100/200/500 candles. Phase 4 retains that call contract while reducing default
+JSON defensive-copy cost.
+
+The final focused/regression run completed 444 tests successfully. Canonical
+equivalence, default input immutability, custom evaluator/provider mutation
+isolation, side-local context, and extreme-future-suffix leakage tests passed.
+
+Existing OOS results remain unchanged:
+
+- protected SELL LOCAL WIP: 2 failures;
+- Mock isolation: 1 failure and 2 errors; and
+- known source: routine_buy_execution.py line 156,
+  running_budget_adjustment import boundary.
+
+======================================================================
+4. DOCUMENTATION CHANGE
+======================================================================
+
+This Docs Freeze adds:
+
+- MASTER_SPEC_CANONICAL_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt
+- MASTER_SPEC_CHANGELOG_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt
+- WORK_RESUME_LATEST_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt
+
+00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md receives only the new V2 owner and
+latest Frozen Authority/Work Resume/Changelog pointers. The existing September
+13 documents and AGENT_WORKFLOW_REFERENCE are not modified.
+
+======================================================================
+5. NON-COMPLETION AND WIP RECORD
+======================================================================
+
+- Protected Code WIP contains 303 paths and remains user-owned.
+- The protected working-tree SELL default edits and their two known failures are
+  not part of the frozen commit range.
+- No Replay worker/chunking Phase 5, live trading, execution PnL, fee/tax,
+  budget, compound-return, or backtest expansion was implemented.
+- No Code file is changed or recommitted by this documentation Freeze.

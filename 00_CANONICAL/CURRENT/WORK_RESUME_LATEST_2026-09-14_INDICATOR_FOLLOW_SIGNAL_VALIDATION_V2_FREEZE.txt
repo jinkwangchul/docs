@@ -1,0 +1,152 @@
+WORK RESUME LATEST
+2026-09-14 INDICATOR-FOLLOW SIGNAL VALIDATION V2 FREEZE
+
+Status: FROZEN HANDOFF
+
+======================================================================
+1. BASELINES
+======================================================================
+
+Code repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code previous frozen HEAD: 317b18f529c0920528b3373305796fa994a8f391
+Code final local HEAD: a45fd5c7b01cf36f528bcc753c414155eeeee37c
+Code final remote HEAD: a45fd5c7b01cf36f528bcc753c414155eeeee37c
+Code local/remote equality: verified
+
+Docs repository: C:\Users\JIN KWANG CHUL\Documents\docs
+Docs branch: agent/project-prompt-standard
+Docs before-Freeze HEAD: 923c1a2c7a1ac43590eb039726553c8d4deaf2f1
+Docs after-HEAD: the single commit containing this document. Its immutable SHA
+is reported by the documentation closeout after push and is intentionally not
+back-written into its own contents.
+
+The Code worktree has 303 protected user-owned WIP paths. The recorded protected
+fingerprint is:
+
+  b3f597281c34296569b135b39a66f7b5ab80d8cb8a0bf01ef551cd01ea00d79d
+
+Do not reset, restore, stash, clean, rewrite, stage, or commit those paths.
+Docs also had extensive pre-existing WIP. This Freeze owns only three new files
+and separable Reference Index entries.
+
+======================================================================
+2. RECENT COMPLETED WORK
+======================================================================
+
+The completed Git range after the September 13 Freeze contains 35 commits:
+
+  317b18f529c0920528b3373305796fa994a8f391
+  ..
+  a45fd5c7b01cf36f528bcc753c414155eeeee37c
+
+Completed operator entry work:
+
+- shared read-only stock browser for the Production registration shell and
+  separate single-selection Validation picker;
+- existing injected read-only market snapshots, with no new broker owner or
+  registration/realtime mutation;
+- fresh broker-authentication entry gate and requester-specific feedback;
+- decoupled modeless Validation UI ownership; and
+- registration/edit settings windows opening normal, content-fitted, centered,
+  Basic visible, BUY expanded, and SELL collapsed.
+
+Completed Signal Validation V2 work:
+
+- independent current-edit signal-only Historical replay window;
+- timeframe plus Validation-only candle count, default 100;
+- single-selection picker, recent-stock MRU, restart restore, width-fitted recent
+  row, same-stock no-op, and stale stock/Historical callback rejection;
+- static library plus read-only market snapshot three-line stock tooltip;
+- initially collapsed Basic/BUY/SELL sections with normalized headers;
+- one-time screen fit followed by user size/position preservation;
+- Validate/Apply fingerprint gate and signal-only apply whitelist;
+- real Candle/time axes, official BUY/SELL markers, selected-Candle summary, and
+  operator signal evidence tooltips;
+- all surviving OR paths and all AND collaborators, failed-path and NOT-obstacle
+  exclusion, and identical evidence de-duplication;
+- fixed price axis plus scrolling Candle/time axis;
+- seven-column completed trade-cycle table with five visible rows, always-on
+  vertical scrollbar, fixed Windows harness height, and stable column ratios;
+- empty/missing/whitespace UI SELL expression excluding UI A/B/C from final SELL
+  aggregation/evidence while preserving independent SELL signals; and
+- completed-cycle cost-weighted top estimated return.
+
+Completed Replay performance work:
+
+- Phase 2: fresh prior-entry list container with frozen Entry reuse;
+- Phase 3: one base indicator build per prefix shared through isolated SELL/BUY
+  mapping views, with 98/198/498 builds for 100/200/500 candles;
+- Phase 4: read-only prefix/rules/context/trace fast path only for the exact
+  default evaluator and default/no provider; and
+- custom evaluator/provider defensive-copy behavior, canonical output, side
+  isolation, and future-data/Price-Box prefix isolation preserved.
+
+======================================================================
+3. FINAL PERFORMANCE AND RESULT CONTRACTS
+======================================================================
+
+Representative final Replay measurements:
+
+  100 candles: approximately 0.100 seconds
+  200 candles: approximately 0.297 seconds
+  500 candles: approximately 1.493 seconds
+
+Representative initial measurements:
+
+  100 candles: approximately 1.025 seconds
+  200 candles: approximately 4.160 seconds
+  500 candles: approximately 26.610 seconds
+
+The top estimated return uses only completed cycles:
+
+  cycle_cost = average_buy_price * buy_count
+  cycle_profit = cycle_cost * estimated_return_percent / 100
+  aggregate = sum(cycle_profit) / sum(cycle_cost) * 100
+
+The lower Cycle calculation is unchanged. BUY/SELL positions, signal/index/time,
+delay_bar, matched_groups, details, trace, average-price context, trailing SELL,
+marker tooltip, fixed axis, completed cycles, V2 geometry, and settings-apply
+scope remain preserved.
+
+======================================================================
+4. VERIFICATION AND KNOWN OOS
+======================================================================
+
+At the final Code HEAD, the Phase 4 focused/regression run completed 444 tests
+successfully. Canonical equivalence, mutation isolation, custom-boundary
+protection, and future-data leakage tests passed.
+
+Known pre-existing/OOS results retained without modification:
+
+- SELL LOCAL WIP: 2 failures;
+- Mock isolation: 1 failure and 2 errors;
+- confirmed source: routines/지표추종매매/routine_buy_execution.py line 156,
+  running_budget_adjustment import boundary.
+
+These are protected working-state facts, not completed contracts and not a
+license to fix them without a new explicit user instruction.
+
+======================================================================
+5. PROTECTED BOUNDARIES
+======================================================================
+
+- Code WIP: 303 paths, fingerprint above, user-owned.
+- Working-tree SELL default edits are not frozen or documented as completed.
+- Existing Production/Mock runtime, broker, order, execution, MarketData, and
+  persistence owners remain independent.
+- No Phase 5 Replay worker/chunking, live Validation, execution-return, fee/tax,
+  budget, compounding, or backtest extension is authorized.
+- Do not infer completion or authority from dirty/untracked files.
+
+======================================================================
+6. NEXT START POINT
+======================================================================
+
+There is currently no user-authorized next implementation task.
+
+Next Start Point: wait for a new explicit user instruction.
+
+Do not select Phase 5, an OOS repair, SELL WIP completion, or any other feature
+as the next task. Continue to preserve all protected Code/Docs LOCAL WIP and use
+00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md to resolve independent owners.

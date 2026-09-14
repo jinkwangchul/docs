@@ -1,0 +1,379 @@
+MASTER SPEC CANONICAL
+2026-09-14 INDICATOR-FOLLOW SIGNAL VALIDATION V2 FREEZE
+
+Status: CURRENT SUPPLEMENTAL FREEZE
+Code repository: kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Previous frozen code HEAD: 317b18f529c0920528b3373305796fa994a8f391
+Frozen code HEAD: a45fd5c7b01cf36f528bcc753c414155eeeee37c
+
+======================================================================
+1. AUTHORITY AND SCOPE
+======================================================================
+
+This document freezes the committed Indicator-Follow work after the September
+13 Freeze through the stated code HEAD. Its verified Git range is:
+
+  317b18f529c0920528b3373305796fa994a8f391
+  ..
+  a45fd5c7b01cf36f528bcc753c414155eeeee37c
+
+The range contains 35 commits and 32 changed Code/test files. It covers:
+
+- the operator-oriented read-only stock browser and Validation picker;
+- settings-window entry presentation used by registration and edit;
+- the independent Indicator-Follow Signal Validation V2 flow and UI;
+- SELL empty-expression Runtime normalization;
+- signal evidence, chart axes, completed trade cycles, and V2 geometry;
+- aggregate estimated return based on completed cycles; and
+- Replay performance normalization Phases 2, 3, and 4.
+
+This is a supplemental owner. It does not replace the September 13 Operation,
+Mock, and read-only Historical Validation Chart Freeze or earlier independent
+Production, Mock Validation, settings-validation-on-commit, broker, execution,
+and lifecycle owners. It owns only the later committed V2 contracts described
+below.
+
+The Code worktree contains protected user-owned WIP. Working-tree-only changes,
+including the current SELL control default edits, are not part of this Freeze
+and are not claimed as completed behavior.
+
+======================================================================
+2. ENTRY, SETTINGS, AUTHENTICATION, AND STOCK SELECTION
+======================================================================
+
+2.1 Shared read-only stock browser
+
+The Production Indicator-Follow stock-registration dialog and the Validation
+stock picker use a shared read-only browser boundary for stock-library search,
+sorting, filters, columns, row projection, formatting, and injected market
+snapshot projection. Registration remains a separate shell that owns its
+existing registration mutation. The Validation picker is a separate
+single-selection shell returning ValidationStockRef with Select/Cancel and
+double-click selection; it does not register, delete, or modify stocks.
+
+The shared browser exposes the established operator columns and filters without
+moving append_base_stock, StockRepository writes, routine registration, config
+writes, changelog writes, realtime registration, order, or execution authority
+into the shared layer.
+
+Dynamic market values use the existing injected read-only snapshot surface.
+Neither the picker nor V2 creates a KiwoomApi owner, a new TR pipeline, or a new
+realtime registration.
+
+2.2 Entry authentication and ownership
+
+Signal Validation entry freshly reads broker is_connected() and fails closed
+before opening the V2 window when the server is not authenticated. Feedback is
+shown on the requesting settings dialog. The Validation flow and host retain
+their lifetime owner without making the control window the owner of modeless
+Validation UI. A requester closing does not implicitly destroy an already-open
+independent chart/window.
+
+2.3 Registration and edit presentation
+
+Both Indicator-Follow registration and settings-change dialogs start as normal,
+content-fitted windows centered on the applicable available screen. Basic
+settings remain visible, BUY starts expanded, and SELL starts collapsed. Loaded
+edit values and serialization are independent of section visibility. No new
+section-state persistence was introduced.
+
+======================================================================
+3. SIGNAL VALIDATION V2 DOMAIN
+======================================================================
+
+3.1 Purpose and source of truth
+
+IndicatorFollowSignalValidationWindow is a modeless, independent working copy
+for repeated Historical signal-only replay. It starts from the current unsaved
+Indicator-Follow settings snapshot, projects only the approved signal controls,
+requests Historical candles, calls the existing evaluator, and displays the
+immutable replay result.
+
+V2 does not acquire Production or Mock Runtime state, MarketDataHost, normal
+Candle commit, realtime registration, Candidate/Signal Queue, order, SendOrder,
+Chejan, position, PnL, or execution authority. It does not alter V1 or the
+September 13 read-only chart contract.
+
+3.2 Header and controls
+
+The V2 compact header contains current stock, timeframe in supported minute
+bars, and a Validation-only candle count. The default candle count is 100 in
+both the visible control and the flow's initial Historical request. Direct
+numeric entry is supported without spin arrows. Candle count is not applied
+back to the source routine settings.
+
+Basic, BUY, and SELL sections are all collapsed on first entry while all three
+headers remain visible. Their outer collapsed height, header height, title and
+separator geometry, and vertical centerline are normalized inside V2 without
+changing the common registration/edit builders. Expanding a section adds only
+its detail body.
+
+The initial normal-window fit uses current available screen geometry. Initial
+centering runs once. After the operator owns the geometry, validation, settings
+apply, stock changes, and section toggles preserve user size and position.
+
+3.3 Stock workflow and metadata
+
+The current stock is a plain display rather than a ComboBox. The basic section
+expands an inline one-row recent-stock projection and a Stock Selection button.
+The button uses the existing IndicatorFollowValidationStockPicker. Recent-stock
+items select through the same activation path.
+
+The existing QSettings MRU contract is retained: recent-first order,
+de-duplication, restart restoration, and a maximum of 15 stored records. The
+inline projection keeps complete code/name pairs that fit the actual available
+width and removes oldest hidden records through the existing store contract.
+
+Selecting the current stock again does not issue a redundant Historical
+request. Selecting another stock invalidates the prior request generation,
+clears the old result, requests a fresh read-only market snapshot and Historical
+replay, and rejects stale market/Historical callbacks by generation and stock
+identity.
+
+The stock tooltip is a three-line operator projection: identity/market/status/
+NXT; current/open/high/low; and change rate/previous-day rate/execution
+strength. It merges verified static library metadata with the existing
+read-only initial market snapshot. Missing safe values remain "-". Hover does
+not itself issue a broker request.
+
+3.4 Validation and apply lifecycle
+
+Initial validation and every explicit re-run use the current timeframe, candle
+count, and current signal settings. A changed candle count causes a fresh
+Historical request and replay. V2 tracks a canonical signal-UI fingerprint.
+Settings Apply is enabled only for a successful result matching the current
+signal settings; later edits return the primary action to Validate.
+
+Apply writes only the approved signal-control whitelist back to the still-live
+source registration/edit dialog. It does not apply candle count, execution
+method, Runtime policy, or other non-signal settings. A closed or unavailable
+source fails closed.
+
+======================================================================
+4. SELL SIGNAL SEMANTICS
+======================================================================
+
+The Runtime meaning of an empty, missing, or whitespace-only UI SELL expression
+is normalized in routine_macd_engine.py.
+
+The configured/evaluated UI conditions ui_condition_a, ui_condition_b, and
+ui_condition_c may retain all of their settings and diagnostic observations,
+but without a valid common signal_expression they are excluded from the final
+SELL aggregation participating set. They cannot create a fallback OR SELL and
+cannot contribute final matched groups, details, signal index, delay, or
+aggregation cause metadata.
+
+Independent SELL signals such as macd_sell and profit_rate_sell remain eligible
+when their own conditions pass. A SELL caused by an independent signal does not
+inherit non-participating UI A/B/C evidence. Valid UI expressions, including
+AND, OR, parentheses, and supported NOT forms, retain their established
+expression-centric evaluation.
+
+The normalization changes participation, not stored UI data. It does not erase
+A/B/C values, add a default expression, or migrate rules.json.
+
+======================================================================
+5. SIGNAL EVIDENCE AND CHART CONTRACT
+======================================================================
+
+Official BUY/SELL markers remain located at evaluation_index/evaluation_time.
+signal_index/signal_time and delay_bar remain the condition-evidence location
+and do not replace the official marker position.
+
+Marker tooltips contain the signal side/time followed only by operator evidence
+lines in the form:
+
+  BUY or SELL + evaluation time
+  ▪ filter-name actual-value
+
+Evidence selection follows the final decision structure:
+
+- AND includes all cooperating filters;
+- OR includes direct filters from every surviving branch;
+- NOT excludes the rejected obstacle and shows only the surviving signal side;
+- a filter belonging only to a failed path is excluded; and
+- only identical condition plus identical evaluation evidence is de-duplicated.
+
+Internal A/B/C identifiers, PASS/FAIL wording, raw trace paths, and duplicated
+group/aggregation rows are not operator tooltip content. The underlying reason,
+matched_groups, details, trace, and aggregation observations remain intact.
+
+The chart uses real Historical timestamps for approximately readable major
+ticks and does not synthesize dates. The price axis remains fixed while the
+candles and time axis scroll. BUY and SELL marker positions, marker tooltips,
+bar selection, and the selected-Candle summary remain separate projections of
+the immutable replay snapshot.
+
+======================================================================
+6. COMPLETED TRADE CYCLES AND ESTIMATED RETURN
+======================================================================
+
+6.1 Completed cycle projection
+
+completed_validation_cycles() is the source of truth for the lower table. A
+cycle contains:
+
+- cycle_number;
+- contributing BUY indexes and buy_count;
+- average_buy_price from the established Validation average-price context;
+- SELL index and sell_price; and
+- estimated_return_percent =
+  (sell_price - average_buy_price) / average_buy_price * 100.
+
+Leading SELL, BUY-less SELL, trailing SELL, and the final BUY segment without a
+SELL do not create a completed cycle. A BUY at the same evaluation bar as a SELL
+does not enter the cycle closed by that SELL. Cycle-row selection moves to the
+matching SELL candle without changing marker or signal meaning.
+
+The lower table has seven operator columns: cycle, BUY range, BUY count,
+estimated average, SELL time, SELL price, and estimated return. It keeps five
+visible rows, an always-visible vertical scrollbar, no horizontal scrollbar,
+and the verified fixed presentation height (264 px on the Windows harness) with
+column ratios independent of row count.
+
+6.2 Top aggregate estimated return
+
+The top Estimated Return no longer displays only the latest completed cycle.
+It reads self._completed_cycles and computes a cost-weighted aggregate:
+
+  cycle_cost = average_buy_price * buy_count
+  cycle_profit = cycle_cost * estimated_return_percent / 100
+  aggregate = sum(cycle_profit) / sum(cycle_cost) * 100
+
+No completed cycle or total cost <= 0 displays "-". This is not a simple mean,
+sum, compound return, reinvestment model, budget model, or execution PnL. It
+does not reread candles or recompute cycle averages/SELL prices. The lower-cycle
+calculation and every cycle field remain unchanged.
+
+======================================================================
+7. REPLAY PERFORMANCE NORMALIZATION
+======================================================================
+
+7.1 Phase 2: frozen Entry reuse
+
+The context provider receives a new prior-entry list container, but the already
+frozen ValidationReplayEntry values are reused instead of being reconstructed
+through deep JSON conversion on every prefix. Mutating the container or a
+detached property projection does not mutate stored entries. Canonical replay
+output remains byte-equivalent to the former deep-recreation reference.
+
+7.2 Phase 3: same-prefix indicator reuse
+
+For the default evaluator, one context-independent base indicator series is
+built per eligible Historical prefix and reused for SELL then BUY evaluation.
+Each side receives its own shallow mapping view before context enrichment, so
+AVG_PRICE/ORDER_PRICE additions do not mutate the shared base mapping or leak
+between sides. The underlying MACD, RSI, moving-average, Bollinger, and Price
+Box lists remain read-only in this path.
+
+Custom evaluators keep their existing API and call order. No whole-series
+future lookup, incremental indicator formula, worker, timer batch, or event-loop
+pumping was introduced. build_indicator_series calls for the standard fixture
+were reduced to 98/198/498 for 100/200/500 candles, approximately half of the
+former SELL-plus-BUY duplicate count.
+
+7.3 Phase 4: default read-only fast path
+
+The read-only fast path is restricted to the exact default Production evaluator
+and either no context provider or the exact default Validation average-price
+provider. At each evaluation index it reuses the detached rules mapping and the
+current prefix list for base-series build, context, SELL, BUY, signal-time
+lookup, and entry construction. SELL and BUY still receive independent context
+dictionaries.
+
+Default evaluator, default average-price provider, trace observer, and entry
+construction were verified not to mutate candle, rules, prior-entry, supplied
+context, signal, or trace inputs. ValidationReplayEntry and
+ValidationReplaySnapshot continue canonical defensive storage and detached
+public projections.
+
+Any custom evaluator or custom context provider stays on the prior JSON
+defensive-copy path. A custom evaluator/provider that mutates nested candle or
+rules data cannot mutate the Replay source or the following evaluation.
+
+7.4 Equivalence and past-only isolation
+
+Reference and optimized results remain canonically identical for:
+
+- replay success/failure identity and metadata;
+- candles and evaluation range;
+- BUY/SELL evaluation index/time and signal index/time;
+- delay_bar, matched_groups, details, and trace;
+- average-price context and completed-cycle inputs; and
+- MACD/OSC, RSI, moving averages, Bollinger, and Price Box configurations.
+
+Appending extreme future candles after an identical first 100-candle prefix
+does not change index 99 indicator values, BUY/SELL signals, or trace. Price Box
+continues to use only the Historical prefix visible at that evaluation index.
+
+7.5 Representative performance
+
+The final representative measurements on the same fixture/PC are:
+
+  100 candles: approximately 0.100 seconds
+  200 candles: approximately 0.297 seconds
+  500 candles: approximately 1.493 seconds
+
+The representative initial measurements before the completed Replay
+normalization were:
+
+  100 candles: approximately 1.025 seconds
+  200 candles: approximately 4.160 seconds
+  500 candles: approximately 26.610 seconds
+
+These figures are measured evidence, not a timing SLA. Correctness, immutable
+public results, custom-boundary isolation, and past-only evaluation remain the
+controlling contract.
+
+======================================================================
+8. PRESERVED BOUNDARIES
+======================================================================
+
+The completed range preserves:
+
+- BUY/SELL locations, signal_index/time, delay_bar, matched_groups, details,
+  trace, and average-price context;
+- trailing-SELL and completed-cycle meanings;
+- marker tooltip and fixed-axis meanings;
+- V2 window geometry and source-settings apply scope;
+- Phase 2 Entry reuse and Phase 3 indicator reuse;
+- the September 13 read-only Historical provider/replay identities; and
+- Production, Mock, broker-owner, Runtime, order, and execution separation.
+
+No Phase 5 worker/chunking implementation, live signal processing, trading
+return model, budget, quote, fee, tax, compound-return, or backtest extension is
+part of this Freeze.
+
+======================================================================
+9. VERIFICATION AND KNOWN OUT-OF-SCOPE RESULTS
+======================================================================
+
+The final Phase 4 focused/regression run at the frozen Code HEAD completed 444
+tests successfully. The optimized/default and reference/custom Replay tests
+cover input mutation, canonical equivalence, side isolation, and future-data
+leakage.
+
+The following pre-existing protected-WIP/OOS results were not changed or
+reclassified as completed:
+
+- SELL LOCAL WIP: 2 existing failures;
+- Mock isolation: 1 existing failure and 2 existing errors; and
+- the confirmed isolation source remains
+  routines/지표추종매매/routine_buy_execution.py line 156 importing
+  running_budget_adjustment.
+
+Those results are not caused by the documentation Freeze and were not fixed in
+this scope.
+
+======================================================================
+10. FINAL VERDICT
+======================================================================
+
+At Code HEAD a45fd5c7b01cf36f528bcc753c414155eeeee37c, Indicator-Follow
+Signal Validation V2 is a read-only, operator-oriented Historical replay domain
+with explicit stock/request identity, evidence-rich signal display, completed
+trade-cycle projection, cost-weighted aggregate estimated return, and optimized
+default Replay boundaries. The same output and past-only contracts are retained
+while custom evaluators/providers remain defensively isolated. Protected LOCAL
+WIP is outside this authority.
