@@ -1,0 +1,53 @@
+MASTER SPEC CHANGELOG
+2026-09-16 SIGNAL VALIDATION V2 UI NORMALIZATION SUPPLEMENT
+
+Canonical owner:
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt
+
+Code baseline:
+403b0a347405a96aba920bd1b5aa32ebfe387a13
+
+======================================================================
+1. CONFIRMED CHANGES
+======================================================================
+
+- SELL input validation now checks expression syntax, referenced groups,
+  active filters, and only then required detailed price references.
+- Unreferenced or disabled SELL price-gap filters no longer block validation.
+- SELL validation errors keep the existing gui_toast boundary and do not
+  overwrite the chart result summary.
+- Successful Settings Apply no longer leaves "설정 적용 완료" in the V2 status
+  label; the Candidate handoff and parent Working update remain unchanged.
+- Normal Replay completion no longer leaves "검증 완료" in the V2 status label;
+  progress and real errors remain visible.
+- Candle tooltip timestamps remain present but the redundant "평가 시각:"
+  prefix is removed.
+- The top result summary now uses Korean operator labels: 캔들, 매수신호,
+  매도신호, and 기간내 추정손익.
+- Estimated-return display uses +x.xx%, -x.xx%, or 0.00%; a missing aggregate
+  displays 0.00% rather than "-".
+- Summary typography is unified and the estimated-return-only bold emphasis is
+  removed.
+- Marker Evidence priority is retained. Tooltip misses and tooltip-content
+  transitions dispatch QToolTip.hideText() through the V2-owned path.
+
+======================================================================
+2. SUPERSEDED WORDING
+======================================================================
+
+This supplement supersedes only conflicting current-use interpretations that
+allowed a persistent "설정 적용 완료", a normal "검증 완료", an unavailable
+return shown as "-", the English Candle/BUY/SELL top summary, or the prior
+"평가 시각:" Candle-tooltip label.
+
+Older Canonical/Freeze documents remain immutable historical evidence. All V2
+contracts outside this narrow normalization remain owned by the September 14
+and September 15 documents.
+
+======================================================================
+3. NOT IMPLEMENTED
+======================================================================
+
+No Filter Visualization, Indicator pane, Crosshair, Click Pin, Vertical Price
+Pan, custom tooltip widget, realtime diagnostic cleanup, Broker behavior, or
+Runtime/Production/Mock change is part of this Changelog.

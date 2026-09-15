@@ -1,0 +1,152 @@
+MASTER SPEC CANONICAL
+2026-09-16 SIGNAL VALIDATION V2 UI NORMALIZATION SUPPLEMENT
+
+Status: CURRENT SUPPLEMENTAL CANONICAL
+Code repository: kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Frozen code HEAD: 403b0a347405a96aba920bd1b5aa32ebfe387a13
+Previous V2 owners:
+- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt
+- 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-15_SIGNAL_VALIDATION_V2_CHART_INTERACTION_SUPPLEMENT.txt
+
+======================================================================
+1. AUTHORITY AND SCOPE
+======================================================================
+
+This document owns only the committed Signal Validation V2 validation and UI
+normalizations from commits 8029845 through 403b0a3. It supersedes conflicting
+wording in the earlier V2 owners only for:
+
+- SELL expression-aware input validation;
+- successful Settings Apply and normal Replay completion status messages;
+- Candle tooltip timestamp labeling;
+- the top result-summary wording, estimated-return display, and typography; and
+- tooltip dismissal dispatch on marker/Candle misses and tooltip transitions.
+
+All other September 14 and September 15 V2 contracts remain in force. This
+supplement does not authorize Filter Visualization, Indicator panes, Crosshair,
+Click Pin, Vertical Price Pan, realtime diagnostic cleanup, Broker activity, or
+any Production/Mock/Runtime mutation.
+
+======================================================================
+2. SELL EXPRESSION-AWARE VALIDATION
+======================================================================
+
+SELL UI validation follows this order:
+
+  expression syntax
+  -> referenced groups
+  -> active filters
+  -> detailed price-reference requirements needed by those active filters
+
+An unreferenced ui_condition_a/b/c group does not block validation because of
+its price-reference state. A referenced group whose price-gap check is disabled
+also does not require a price-reference selection. Only a referenced, active
+filter that actually needs the price reference may fail on an unresolved
+selection.
+
+SELL input failures continue through the existing gui_toast boundary. They do
+not replace the chart's validation result summary. This changes validation
+admission only; it does not change SELL expression evaluation, Runtime signal
+meaning, rules persistence, Candidate payload, or price-comparison arithmetic.
+
+======================================================================
+3. SILENT SUCCESS AND NORMAL COMPLETION
+======================================================================
+
+A successful [설정적용] remains fully functional: it validates the current V2
+state, emits the detached Candidate through the existing handoff, updates the
+parent Working UI, and preserves repeatable apply behavior. Success is silent.
+It does not persist the action acknowledgement "설정 적용 완료" in
+validation_status_label or move that acknowledgement to another UI surface.
+
+A normal Historical Replay completion is also silent:
+
+  validation_status_label == ""
+
+The label remains responsible for active Historical/Replay progress and real
+errors. Failed apply/validation and user-actionable errors retain their existing
+Toast/error behavior. Silent success does not alter Candidate emission,
+fingerprints, strict SELL validation, persistence boundaries, or Replay state.
+
+======================================================================
+4. CANDLE AND MARKER TOOLTIP CONTRACT
+======================================================================
+
+The Candle hover tooltip keeps the actual timestamp and OHLC values. Its first
+line is the timestamp value itself; the redundant label "평가 시각:" is not
+shown. Tooltip position, style, High-to-Low hit range, current time/price scale,
+and Candle data source are unchanged.
+
+Marker Evidence remains the first hit-test priority. A marker hit shows Marker
+Evidence; otherwise a valid Candle hit shows Candle timestamp/OHLC; otherwise
+the V2 path requests tooltip dismissal with QToolTip.hideText(). When visible
+tooltip content changes, the existing tooltip is hidden before the replacement
+is shown.
+
+The contract distinguishes dispatch from native visibility timing:
+
+  QToolTip.hideText() requested
+  != proof that the operating-system tooltip became invisible immediately
+
+Qt 5.15 may apply an internal hide delay. Actual immediate disappearance must
+therefore be verified from the real visible Qt runtime, not solely from a mock
+hideText call count. No V2-owned replacement tooltip widget is approved here.
+
+======================================================================
+5. TOP RESULT SUMMARY
+======================================================================
+
+The normal result summary uses the operator-facing Korean form:
+
+  005930 삼성전자 | 5분봉 | 100캔들 | 매수신호 n | 매도신호 n |
+  기간내 추정손익 x.xx%
+
+The displayed line does not use the previous English result labels Candle,
+BUY, or SELL. It does not use the prior label "추정 손익률".
+
+Estimated-return formatting is:
+
+- positive: +1.23%
+- negative: -0.05%
+- zero: 0.00%
+- no completed-cycle aggregate available: 0.00%
+
+The underlying aggregate remains the completed-cycle cost-weighted return
+defined by the September 14 owner. Only the no-result display changes from "-"
+to 0.00%; no cycle, Candle, BUY/SELL, or return calculation changes.
+
+The result summary and estimated-return segment use the same normal-weight
+presentation. The separate estimated-return bold emphasis is retired. Font,
+weight, and color are unified without changing result ownership or layout.
+
+======================================================================
+6. PRESERVED BOUNDARIES
+======================================================================
+
+These normalizations preserve:
+
+- Historical request, Replay, evaluator, trace, and snapshot immutability;
+- BUY/SELL decisions, marker positions, Evidence selection, and cycle results;
+- completed-cycle aggregate arithmetic;
+- Settings Apply payload, parent Working update, repeated apply, and writers;
+- Candle hover High-to-Low and visible-range hit testing;
+- time and price zoom/drag/scroll transforms and Fixed Axis;
+- V2 window geometry and reset/entry baseline behavior; and
+- Production, Mock, Broker, Runtime, order, and execution independence.
+
+======================================================================
+7. VERIFIED COMMIT RANGE
+======================================================================
+
+- 802984573aae21b4acd6f2424bff10a104f372f6
+  Normalize SELL expression-aware validation
+- ac4c40baa8ad0cc1cd6c5ac5f5c7f9c407e17f6e
+  Clean up V2 redundant UI messages
+- 6746aa689f4acc9cb548f9b1c677a08d66aa2e10
+  Remove V2 completed status message
+- 403b0a347405a96aba920bd1b5aa32ebfe387a13
+  Normalize V2 summary text and candle hover dismissal
+
+The Code Local and Remote branch heads were both verified at
+403b0a347405a96aba920bd1b5aa32ebfe387a13 during this Freeze.

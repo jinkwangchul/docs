@@ -1,0 +1,259 @@
+SIGNAL VALIDATION V2 FILTER VISUALIZATION IMPLEMENTATION REFERENCE
+2026-09-16
+
+Status: PLANNING / REFERENCE / NOT IMPLEMENTED
+Gate: USER_DECISION_REQUIRED
+
+Implementation is deferred because the remaining Codex token budget in the
+closing conversation was insufficient for safe implementation and verification.
+This document is design evidence only. It is not Canonical, does not authorize
+implementation, and does not make this work the mandatory next task.
+
+======================================================================
+1. PURPOSE AND BOUNDARY
+======================================================================
+
+The candidate feature would visualize the actual configured and replayed signal
+evidence in Signal Validation V2 while preserving possible reuse by future
+Routine packages. Candidate capabilities are:
+
+- actual signal-evidence visualization from the current Settings/Replay result;
+- price-series overlays;
+- independent-axis indicator panes;
+- Crosshair;
+- Click Pin; and
+- a fixed-height Indicator Inspector.
+
+It must not turn the entire V2 window into a generic framework in one refactor,
+or expand into common BUY/SELL execution-method architecture. The current V2,
+Replay, and signal evaluator remain the calculation owners.
+
+======================================================================
+2. FILTER DISPLAY CANDIDATES
+======================================================================
+
+The discussed eight filter families are:
+
+1. moving average;
+2. moving-average arrangement;
+3. Bollinger Band;
+4. Price Box;
+5. price comparison;
+6. RSI;
+7. MACD / Signal; and
+8. OCR / OSC.
+
+Price-axis overlay candidates:
+
+- moving average;
+- moving-average arrangement;
+- Bollinger Band;
+- Price Box; and
+- price comparison.
+
+Independent lower-axis candidates:
+
+- RSI;
+- MACD / Signal; and
+- OCR / OSC.
+
+OCR uses the existing Engine OSC series, MACD minus Signal. No new indicator
+formula is approved.
+
+======================================================================
+3. MARKER EVIDENCE SOURCE
+======================================================================
+
+A marker hover would show only filters that directly contributed to that final
+signal, not every configured filter. The source must be structured data before
+tooltip string formatting:
+
+  Replay Entry
+  + result Settings snapshot
+  + existing structured Evidence / trace
+  -> final-decision evidence
+  -> surviving/cooperating filters
+  -> visualization descriptors and data
+  -> chart
+
+Tooltip strings must not be parsed back into filter semantics. Tooltip and
+visualization should consume the same structured evidence selection.
+
+Decision meaning remains:
+
+- AND: all cooperating conditions;
+- OR: direct filters from every surviving branch;
+- NOT: retain the project's existing exclusion meaning and omit the obstacle;
+- failed paths: excluded; and
+- unreferenced or inactive filters: excluded.
+
+The signal calculation must not be rerun for visualization.
+
+======================================================================
+4. EVALUATION-TIME CORRECTNESS
+======================================================================
+
+Official marker position is evaluation_index/evaluation_time. Condition
+evidence may be at signal_index/signal_time or a condition-specific offset.
+Visualization must not falsely place condition evidence on the marker Candle
+when those times differ.
+
+Price Box requires special temporal isolation. The current price_box() uses the
+deviation statistics of the complete dataset passed to it, while Replay builds
+indicators from candles[:evaluation_index + 1]. A historical marker's Price Box
+must therefore use the same evaluation cutoff/prefix. A series built once from
+the full current 500-Candle result cannot be presented as past evidence. Future
+Candle leakage is prohibited.
+
+======================================================================
+5. PRICE COMPARISON
+======================================================================
+
+Price comparison belongs on the price chart, not in a lower pane. Candidate
+elements are the reference price, compared price, configured threshold boundary,
+and actual evaluation point.
+
+Validation AVG_PRICE is the Replay-local estimated average. Production account
+holding average must not be read. A single evaluation average must not be drawn
+as though it were the actual average-price line for the entire period.
+
+======================================================================
+6. FIXED INDICATOR AREA AND REPRESENTATIVE INDICATOR
+======================================================================
+
+The proposed lower indicator area uses one fixed total height H. It does not
+open and close on hover or move price-chart geometry:
+
+- one pane: H;
+- two panes: H / 2 each;
+- three panes: H / 3 each.
+
+Filter count and pane count are different. For example, MA20 + Bollinger + RSI
++ MACD produces two price overlays and two lower panes.
+
+If a selected signal has no independent-axis evidence, a predefined Routine
+representative indicator may occupy H as a reference indicator, explicitly
+distinguished from signal evidence. The representative kind and parameters are
+not decided. RSI(14) is not an approved default.
+
+======================================================================
+7. CROSSHAIR, CLICK PIN, AND CANDLE CURSOR PRICE
+======================================================================
+
+The Crosshair candidate has one time-aligned vertical line spanning the price
+chart and every lower pane. A horizontal line is meaningful only in the pane
+containing the pointer and uses that pane's own unit; price, RSI, and MACD axes
+must not share one Y value.
+
+Click Pin should store logical identity rather than screen pixels:
+
+- result identity;
+- Candle index/time;
+- pane identity; and
+- price or indicator value.
+
+Resize, zoom, and scroll would reproject that logical value. The existing
+selected-Candle vertical line should not be duplicated. Whether Marker Click
+also pins the signal's indicator composition remains undecided.
+
+For Candle hover, the discussed candidate converts pointer Y through the
+current price_for_y() and prepends "가격: <cursor price>" only when the pointer
+is within the actual Candle High-to-Low hit. This is pointer Crosshair price,
+not Candle close or marker Y.
+
+======================================================================
+8. FOUR-PHASE SAFE IMPLEMENTATION ORDER
+======================================================================
+
+Phase 1 — Fixed Display Area
+
+- fixed-height Indicator Inspector;
+- one/two/three-way division;
+- representative indicator boundary;
+- shared time-axis preparation; and
+- invariant price-chart geometry as pane count changes.
+
+Phase 2 — Evidence And Eight-Filter Visualization
+
+- shared structured Evidence selection;
+- display data/cache;
+- price overlays;
+- RSI, MACD, and OCR lower panes;
+- marker hover integration;
+- Price Box prefix correctness; and
+- price-comparison boundaries.
+
+Phase 3 — Crosshair, Click Pin, And Value Integration
+
+- automatic Crosshair;
+- vertical line across panes;
+- pane-local horizontal line;
+- logical Click Pin;
+- Candle cursor price; and
+- conflict prevention with existing drag, wheel, selection, and tooltips.
+
+Phase 4 — Integration, Verification, And Close
+
+- reset and apply;
+- stock change and stale request;
+- multiple windows;
+- performance and independence;
+- actual Windows Qt GUI verification; and
+- final documentation.
+
+These phases are an internal safety order. If approved, the Big Feature is not
+complete until the operator-usable integrated flow is complete.
+
+======================================================================
+9. TOOLTIP DISMISSAL INVESTIGATION
+======================================================================
+
+Current V2 dispatches QToolTip.hideText() on a hit-test miss. Qt 5.15 may use an
+internal hide timer, so a mock proving hideText was called is not proof that the
+native tooltip disappeared immediately.
+
+Future verification must confirm the actual user-runtime Qt version and visible
+tooltip state. A V2-owned information widget may be investigated if necessary,
+but it is not approved or implemented by this Reference.
+
+======================================================================
+10. PENDING VERTICAL PRICE PAN
+======================================================================
+
+Vertical Price Pan is separately pending and not implemented:
+
+- horizontal drag: time-scale navigation;
+- wheel: price-scale zoom; and
+- vertical drag candidate: price-chart position movement.
+
+Whether it belongs in the Filter Visualization integration remains undecided.
+
+======================================================================
+11. REUSE DIRECTION
+======================================================================
+
+A possible common chart/display layer may own generic Candle, line, band,
+reference-line rendering, fixed pane layout, time synchronization, Crosshair,
+Click Pin, and generic value projection.
+
+A Routine-specific adapter should own final Evidence selection, filter and
+parameter interpretation, visualization descriptors, and representative-
+indicator choice. Main/common code must not hardcode Indicator-Follow A/B/C,
+RSI semantics, or MACD-condition meaning.
+
+This is a direction for later design, not approval for a large generic rewrite.
+
+======================================================================
+12. USER DECISIONS REQUIRED BEFORE IMPLEMENTATION
+======================================================================
+
+1. fixed lower-area total height H;
+2. representative indicator kind;
+3. representative indicator period/parameters;
+4. whether Marker Click pins indicator composition;
+5. Pin release action;
+6. whether Crosshair X snaps to Candle center;
+7. whether Vertical Price Pan is included; and
+8. final separation between common Chart and Indicator-Follow adapter.
+
+Until these decisions are made, the Gate remains USER_DECISION_REQUIRED.

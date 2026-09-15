@@ -1,0 +1,138 @@
+WORK RESUME LATEST
+2026-09-16 SIGNAL VALIDATION V2 UI NORMALIZATION FREEZE
+
+Status: LATEST RECOVERY BASELINE
+
+======================================================================
+1. REPOSITORY BASELINE
+======================================================================
+
+Code repository:
+- Local: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Remote: https://github.com/jinkwangchul/kiwoom_auto.git
+- Branch: feat/restore-auto-trade-setting-ui
+- Final Local HEAD: 403b0a347405a96aba920bd1b5aa32ebfe387a13
+- Final Remote HEAD: 403b0a347405a96aba920bd1b5aa32ebfe387a13
+- Local/Remote: equal at Freeze verification
+
+Docs repository:
+- Local: C:\Users\JIN KWANG CHUL\Documents\docs
+- Remote: https://github.com/jinkwangchul/docs.git
+- Branch: agent/project-prompt-standard
+- Starting HEAD: e3eed13c86a6af9834a28beae34be7a46cf33ae7
+- Final Freeze HEAD: the Docs commit containing this Work Resume; use the
+  verified Closing Completion Report and git rev-parse HEAD. A Git commit cannot
+  contain its own cryptographic SHA as a literal self-reference.
+
+======================================================================
+2. LATEST CURRENT OWNERS
+======================================================================
+
+- Base V2/cycle/performance:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt
+- V2 chart interaction/reset:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-15_SIGNAL_VALIDATION_V2_CHART_INTERACTION_SUPPLEMENT.txt
+- V2 validation/status/summary/tooltip normalization:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt
+- Deferred visualization design:
+  00_CANONICAL/REFERENCE/SIGNAL_VALIDATION_V2_FILTER_VISUALIZATION_IMPLEMENTATION_REFERENCE_2026-09-16.txt
+
+======================================================================
+3. COMPLETED CODE IN THIS CONVERSATION
+======================================================================
+
+- 802984573aae21b4acd6f2424bff10a104f372f6:
+  SELL validation became expression-aware. Only referenced and active filters
+  require their detailed price-reference selections; failures retain gui_toast.
+- ac4c40baa8ad0cc1cd6c5ac5f5c7f9c407e17f6e:
+  removed the Candle tooltip "평가 시각:" prefix and made successful Settings
+  Apply silent without changing Candidate handoff.
+- 6746aa689f4acc9cb548f9b1c677a08d66aa2e10:
+  removed persistent normal-completion "검증 완료"; normal status is empty.
+- 403b0a347405a96aba920bd1b5aa32ebfe387a13:
+  normalized the Korean result summary, 0.00% unavailable-return display,
+  summary typography, and tooltip miss/transition dismissal dispatch.
+
+======================================================================
+4. CURRENT V2 OPERATOR CONTRACT
+======================================================================
+
+- Successful Settings Apply and normal Replay completion are silent.
+- validation_status_label is empty after normal completion and is reserved for
+  active progress and real errors.
+- Normal result summary uses 종목 | 분봉 | n캔들 | 매수신호 | 매도신호 |
+  기간내 추정손익.
+- Return display is signed when nonzero and 0.00% for zero or unavailable.
+- Candle tooltip first line is the timestamp without "평가 시각:"; OHLC remains.
+- Marker Evidence keeps priority over Candle hover.
+- V2 calls QToolTip.hideText() on misses and before tooltip-content replacement,
+  while native immediate disappearance remains a runtime visibility question.
+- Existing Historical, Replay, Evidence, Axis, Cycle, geometry, reset, apply,
+  performance, and Production/Mock/Broker independence contracts remain intact.
+
+======================================================================
+5. PROTECTED LOCAL WIP AND KNOWN OUT-OF-SCOPE STATE
+======================================================================
+
+At Freeze start, Code contained 172 porcelain-status paths with fingerprint:
+
+  ed22d5c825bac0db6a8382a0ffecbfb69d392a47152eff9101b278e831c08db8
+
+This is user-owned WIP and must not be reset, restored, stashed, cleaned,
+auto-formatted, broadly staged, or mixed into later commits.
+
+At Freeze start, Docs contained 135 porcelain-status paths with fingerprint:
+
+  b9cebcfe42d68c87c35451e4374f319877ab4bede37a630562ad000366be268d
+
+Those pre-existing Docs changes, including the prior Reference Index hunk, are
+also user-owned. Only the new closing documents and the new Index pointer hunks
+belong to this Freeze.
+
+Known pre-existing/OOS evidence remains:
+
+- protected SELL LOCAL WIP: two existing failures;
+- Mock isolation: one existing failure and two existing errors;
+- known Qt test-process symptom: a full V2 test-module run can exit with code 1
+  after the last test without a unittest failure summary, while split execution
+  passed all 45 tests; treat this as a teardown/runtime symptom, not proof of a
+  functional failure or success; and
+- no OOS issue was modified by this documentation Freeze.
+
+======================================================================
+6. DEFERRED AND PENDING ITEMS
+======================================================================
+
+Filter Visualization / Indicator Visualization:
+- Status: NOT IMPLEMENTED
+- Gate: USER_DECISION_REQUIRED
+- Classification: deferred future candidate, not a mandatory next task
+- Reason for this conversation's deferral: insufficient remaining Codex token
+  budget for safe implementation and verification
+- Reference:
+  00_CANONICAL/REFERENCE/SIGNAL_VALIDATION_V2_FILTER_VISUALIZATION_IMPLEMENTATION_REFERENCE_2026-09-16.txt
+
+Vertical Price Pan:
+- NOT IMPLEMENTED
+- separate pending item; integration with visualization remains undecided
+
+REALTIME_BOUNDARY_DIAGNOSTIC cleanup:
+- DEFERRED — parent WIP commit pending
+- do not force a separate commit from the uncommitted realtime-observer parent
+  WIP; remove the obsolete LOGGER.warning calls and their call-count test only
+  when that parent WIP is formally completed
+- GetPCIdentity appears to be external OCX/native output and remains out of scope
+
+======================================================================
+7. NEXT RECOVERY POINT
+======================================================================
+
+No next implementation is authorized by this Freeze. Wait for a new explicit
+user instruction.
+
+If the user later selects Filter Visualization, first resolve the eight user
+decisions listed in its Reference and rerun the targeted contract audit. Do not
+treat the Reference as implementation authority or assume it is the next task.
+
+Do not create the Next Session Startup Prompt during this Codex closing step.
+It is written exactly once only after ChatGPT verifies Closing Step 4.

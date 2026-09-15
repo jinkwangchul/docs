@@ -23,6 +23,7 @@ CURRENT.
 | Indicator-follow ordinary settings registration/change | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-08_INDICATOR_FOLLOW_SETTINGS_VALIDATION_ON_COMMIT.txt` | Latest validation-on-click, immediate Applied, atomic read-back, and Mock Operation versioned-rules snapshot authority; supersedes only the older ordinary-settings Pending/Approval prerequisite |
 | Sep-13 Production/Mock close normalization and Indicator-follow read-only Historical Validation Chart | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-13_OPERATION_MOCK_AND_INDICATOR_VALIDATION_FREEZE.txt` | Supplemental owner for later close/auth/shared-boundary normalization and the dedicated current-edit Historical replay chart; validation-on-commit, Mock Validation, and earlier independent owners remain separate |
 | Indicator-follow Signal Validation V2, completed cycles, aggregate return, and Replay performance | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt` | Latest supplemental owner for the independent operator V2, empty SELL-expression meaning, evidence/axis/cycle UI, completed-cycle aggregate return, and Replay optimization Phases 2-4 |
+| Signal Validation V2 validation, silent status, result summary, and tooltip normalization | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt` | Supersedes only conflicting Sep-14/Sep-15 wording for expression-aware SELL admission, silent apply/completion, Korean summary/0.00% display, timestamp label, and tooltip dismissal dispatch |
 | Indicator-follow SELL execution and MULTI_HOGA contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_INDICATOR_FOLLOW_SELL_PHASE1_AND_MULTI_HOGA_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` |
 | Routine package boundary and capability contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt` |
 | Logical Group and Group Pack identity/lifecycle | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-22_LOGICAL_GROUP_PACK_ARCHITECTURE_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt`, `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-22_GROUP_LIFECYCLE_RECOVERY_FREEZE.txt`, `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-22_AUTO_TRADE_SETTING_STRATEGY_WORKSPACE_UI_CLOSURE.txt` |
@@ -62,6 +63,8 @@ does not supersede them.
   `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-06_MAIN_INDICATOR_FOLLOW_FULL_BOUNDARY_FREEZE.txt`
 - Indicator Follow latest Local Working-State Checkpoint (not a Freeze):
   `00_CANONICAL/REFERENCE/WORKING_STATE_BACKUP_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
+- Signal Validation V2 deferred Filter/Indicator Visualization plan (NOT IMPLEMENTED; USER_DECISION_REQUIRED):
+  `00_CANONICAL/REFERENCE/SIGNAL_VALIDATION_V2_FILTER_VISUALIZATION_IMPLEMENTATION_REFERENCE_2026-09-16.txt`
 - Production monitoring/operating permission retirement:
   `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT_FREEZE.txt`
 - Post-Freeze current project handoff and recovery entry point:
@@ -70,15 +73,15 @@ does not supersede them.
 ## Current Resume And Changelog
 
 - Latest Frozen Authority:
-  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt`
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt`
 - Latest Local WIP Work Resume:
   `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
 - Latest Local WIP Changelog:
   `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
 - Latest Frozen Work Resume:
-  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt`
+  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_FREEZE.txt`
 - Latest Frozen Changelog:
-  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt`
+  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt`
 
 Older Work Resumes, Readable variants, Freeze snapshots, and Changelogs are
 historical records. They may explain a past decision but must not be used as a
