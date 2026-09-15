@@ -141,29 +141,44 @@ not itself issue a broker request.
 
 3.4 Validation and final-candidate handoff lifecycle
 
-Initial validation and every explicit re-run use the current timeframe, candle
-count, and current signal settings. A changed candle count causes a fresh
-Historical request and replay. V2 tracks a canonical signal-UI fingerprint.
-[검증적용] is enabled only for a successful result matching the current signal
-settings; later edits return the primary action to Validate.
+Initial validation uses the current timeframe, candle count, and signal
+settings. Thereafter the validation Context and Routine strategy controls have
+different refresh semantics. A confirmed timeframe change immediately starts a
+fresh Historical request and Replay. A confirmed candle-count edit does the
+same, using the count directly as the read-only Historical request size. Spin
+editing does not issue a request for every intermediate digit. These automatic
+Context refreshes update only V2 and emit no parent Candidate. Candle count
+remains Validation-only; timeframe remains a Routine setting included in a
+later Candidate.
 
-[검증적용] sends one detached canonical Candidate through the existing
-Flow/Binder to the still-live source registration/edit dialog. The Candidate
-contains only the approved signal-control whitelist and is applied to the
-parent Settings Working UI through the existing canonical UI-state loader. It
-does not include candle count, selected Validation stock, chart/view state,
-Replay identity/result, execution method, Runtime policy, or other non-signal
-state. A closed or unavailable source fails closed.
+BUY/SELL expressions and detail/filter controls do not auto-Replay while the
+operator edits them. They invalidate the canonical signal-UI fingerprint and
+mark the displayed result stale. The single primary action is always presented
+as [설정적용]. If the current result already matches the current V2 state, the
+action emits one detached Candidate without a duplicate Replay. If the result
+is stale, the action first validates the current final state; only a successful
+result with the same fingerprint emits the Candidate once. A failed validation
+emits nothing and leaves the parent Working UI unchanged. Existing per-window
+request generation and request identity ensure that a late older Historical
+result cannot replace the newest Context result.
 
-V2 is a Routine Configuration Validation Workspace. The parent dialog's current
-unsaved Working settings are snapshotted when V2 opens; V2 does not reread the
-disk for its seed. Any number of edits, validation runs, stock changes, candle-
-count changes, and chart interactions remain inside the V2 Working Copy.
-Candidate emission count remains zero until [검증적용]. A successful click
-emits only the final Candidate once, changes the button to disabled
-"적용 완료", and does not create/update an Instance or write rules.json,
-Runtime, Broker, or order state. Closing or cancelling V2 without that click
-changes neither parent Working UI nor any undo target.
+The Candidate passes through the existing Flow/Binder to the still-live source
+registration/edit dialog. It contains only the approved signal-control
+whitelist and is applied to the parent Settings Working UI through the existing
+canonical UI-state loader. It does not include candle count, selected
+Validation stock, chart/view state, Replay identity/result, execution method,
+Runtime policy, or other non-signal state. A closed or unavailable source fails
+closed.
+
+V2 is a Routine Configuration Validation Workspace. Its seed is the parent
+dialog's current unsaved Working settings; V2 does not reread disk. Any number
+of edits, validation runs, stock changes, candle-count changes, and chart
+interactions remain inside the V2 Working Copy until [설정적용] succeeds. The
+button remains enabled and labelled [설정적용] after success, so B, C, and D may
+each be validated and handed off in sequence; N successful actions produce N
+Candidate handoffs. A separate status may report "설정 적용 완료". No handoff
+creates/updates an Instance or writes rules.json, Runtime, Broker, or order
+state. Registration and edit/save remain the sole persistent writers.
 
 3.5 Settings Working Copy undo contract
 
@@ -172,18 +187,19 @@ The Settings dialog button formerly labelled "다시 불러오기" is now
 canonical in-memory snapshot through the established UI-state apply helper. It
 does not reread rules, registry, or another persistent source.
 
-For an existing Instance edit dialog, the immutable undo baseline is captured
-once after the saved settings have been loaded at dialog open. Manual edits and
-one or more successful V2 Candidate handoffs do not replace that baseline.
-[되돌리기] always restores the dialog-open saved baseline.
+Registration and edit dialogs now use one identical fixed-baseline contract.
+After the dialog's initial/template settings (registration) or saved settings
+(edit) have been loaded into the UI, one detached
+_initial_settings_undo_snapshot is captured. It is immutable for that dialog
+lifetime. Manual edits, opening or closing V2, Context refreshes, successful or
+failed Replay, and any number of successful Candidate handoffs do not replace
+it. [되돌리기] always restores that dialog-open snapshot through the canonical
+loader without rereading persistent rules.
 
-For a new registration dialog, the initial template/default state is captured
-once at dialog open. Before any successful V2 handoff, [되돌리기] restores that
-initial baseline. Each V2 launch also retains its parent pre-validation Working
-snapshot temporarily. Only a successful [검증적용] promotes that launch
-snapshot to the registration undo target. A cancelled/closed V2 does not alter
-the target. A later successful V2 launch replaces it, yielding one-step undo
-with no history stack and no redo.
+There is no registration-only undo target, no V2-launch snapshot promotion, no
+history stack, and no redo. Thus registration A -> manual B -> V2 C/D/E ->
+[되돌리기] returns to A; edit saved A -> V2 B/C/D -> [되돌리기] likewise
+returns to A.
 
 Candidate handoff remains distinct from persistence. The existing registration
 and edit/save actions remain the sole writers and build their payload from the
@@ -376,7 +392,8 @@ The completed range preserves:
   trace, and average-price context;
 - trailing-SELL and completed-cycle meanings;
 - marker tooltip and fixed-axis meanings;
-- V2 window geometry, final-candidate handoff, and one-step undo scope;
+- V2 window geometry, repeatable final-candidate handoff, and fixed dialog-open
+  undo baseline;
 - Phase 2 Entry reuse and Phase 3 indicator reuse;
 - the September 13 read-only Historical provider/replay identities; and
 - Production, Mock, broker-owner, Runtime, order, and execution separation.
@@ -410,13 +427,15 @@ this scope.
 10. FINAL VERDICT
 ======================================================================
 
-At latest Code HEAD ac09e33c13eb68c2157bd92b3036a39df64c227b,
+At latest Code HEAD 2cf278c4fcf880fc939a8279d27e31b58a587ff5,
 Indicator-Follow
 Signal Validation V2 is a read-only, operator-oriented Historical replay domain
 with explicit stock/request identity, evidence-rich signal display, completed
 trade-cycle projection, cost-weighted aggregate estimated return, and optimized
-default Replay boundaries. It now also hands the final validated Candidate to
-the parent Settings Working Copy exactly once and provides context-specific
-in-memory one-step undo without acquiring persistence authority. The same output
-and past-only contracts are retained while custom evaluators/providers remain
-defensively isolated. Protected LOCAL WIP is outside this authority.
+default Replay boundaries. It immediately refreshes V2 for confirmed timeframe
+or candle-count changes, keeps strategy editing explicit, and hands off each
+successfully validated [설정적용] Candidate once. Registration and edit dialogs
+share one immutable dialog-open in-memory undo baseline without acquiring
+persistence authority. The same output and past-only contracts are retained
+while custom evaluators/providers remain defensively isolated. Protected LOCAL
+WIP is outside this authority.
