@@ -51,8 +51,16 @@ Hovering a valid Candle displays only the Candle's existing replay data:
   low
   close
 
-No value is recalculated and no Replay is run for hover. A pointer outside the
-actual first-to-last Candle span does not clamp to a false first/last Candle.
+No value is recalculated and no Replay is run for hover. Candle X hit testing
+uses the current visible-time transform and existing Candle slot semantics; a
+pointer outside the actual first-to-last Candle span does not clamp to a false
+first/last Candle. Candle Y hit testing uses the current Price Scale's
+y_for_price() result for the Candle's actual High and Low wick endpoints. The
+hit interval is the intersection of that High-to-Low pixel range and the
+current plot area. A missing/non-finite High or Low, a fully clipped Candle, or
+a pointer in empty plot space above/below the visible wick produces no Candle
+tooltip. Price zoom therefore changes the hover hit range through the same live
+transform used for rendering; no old Y coordinate is cached.
 
 BUY/SELL marker Evidence remains a separate projection and has priority over
 the Candle tooltip. A marker hit displays the existing operator Evidence; a
@@ -192,6 +200,14 @@ Focused regression evidence:
 - the two protected SELL local-WIP failures and the existing Mock operation
   boundary error were reproduced separately and were not modified.
 
+The High-to-Low hover correction passed 4 focused boundary/transform/priority
+tests, all 29 V2 tests in isolated 32-bit Qt batches, all 8 axis/cycle tests,
+and all 22 operator UI tests. The boundary coverage includes exact High/Low,
+both wick segments, body, empty vertical space, X miss, non-visible Candle,
+upper/lower partial clipping, fully clipped price ranges, current wheel-price
+transform, current drag-time transform, marker Evidence priority, and zero
+Replay evaluate calls.
+
 An isolated Windows Qt harness, without Production/Broker or SendOrder startup,
 verified:
 
@@ -236,11 +252,17 @@ and show no meaningful algorithmic regression. Repeated wheel zoom, time-scale
 drag, logical scrollbar movement, Candle hover, and resize were verified to make
 zero Replay evaluate calls.
 
+The follow-up Windows 32-bit Qt hover harness showed an actual V2 Window and
+injected widget mouse, wheel, and drag events. Body and wick hover displayed
+OHLC, same-X space above High and below Low displayed nothing, wheel zoom used
+the new Price Scale position, time drag used the new Candle X position, marker
+hover returned Evidence first, and Replay evaluate call count remained zero.
+
 ======================================================================
 8. FINAL VERDICT
 ======================================================================
 
-At Code HEAD 408f9e4a5d91c7018300a3dfc6cb01228fbfd22c, Signal Validation V2
+At Code HEAD ff914595e1f6bfaa14eb8b5f3017be04f2d3d928, Signal Validation V2
 uses the full result width and a physical Canvas fixed to the chart viewport.
 Horizontal drag controls cursor-anchored time scale; the logical horizontal
 scrollbar navigates the full timeline; and wheel input controls cursor-anchored
