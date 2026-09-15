@@ -5,7 +5,7 @@ Status: CURRENT SUPPLEMENTAL CONTRACT
 Code repository: kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
 Previous verified code HEAD: ee40370402aaee5bf642cda3e17b9bf7a53eb15b
-Verified code HEAD: ea3f9607e3a4258c747e6d92fea67f473903fb86
+Verified code HEAD: 743dbf5f839a35e1861deef98b18bf81a7b5f970
 
 ======================================================================
 1. AUTHORITY AND SCOPE
@@ -28,6 +28,9 @@ work in these Code commits:
 
   ea3f9607e3a4258c747e6d92fea67f473903fb86
   Normalize V2 price axis labels
+
+  743dbf5f839a35e1861deef98b18bf81a7b5f970
+  Add V2 entry-state reset
 
 The fixed-viewport and price-scale commits supersede the physical-content-width
 and wheel-X-zoom contract recorded for
@@ -307,10 +310,61 @@ selection, hover/Evidence priority, and zero Replay re-evaluation during these
 rendering interactions.
 
 ======================================================================
-9. FINAL VERDICT
+9. V2 ENTRY-STATE RESET
 ======================================================================
 
-At Code HEAD ea3f9607e3a4258c747e6d92fea67f473903fb86, Signal Validation V2
+The lower action row is:
+
+  [초기화] [설정적용] [닫기]
+
+The reset button is immediately left of Settings Apply and uses the same normal
+button-height contract. It does not replace or weaken Settings Apply.
+
+The V2 Window captures one immutable entry baseline after the Flow has injected
+the initial Historical Candle count. This baseline is never updated during the
+Window lifetime, including after repeated Settings Apply operations. It contains
+the signal-validation UI projection supplied when V2 was opened, the entry
+timeframe, the V2-only Candle count, and the launch stock identity when present.
+
+The first successful Replay Snapshot separately captures the minimum logical
+chart-view state required for reset: visible start, visible span, default and
+current price bounds, manual time/price-scale flags, and selected evaluation
+index. Pixel geometry is not stored. Reset therefore preserves the operator's
+current Window position, width, and height while restoring the chart view on the
+new Canvas created by the reset Replay.
+
+On each reset, the Flow first increments the existing request generations. The
+Window then restores its immutable entry UI, timeframe, Candle count, BUY/SELL
+conditions, and launch stock; clears the old result and validation fingerprint;
+and issues exactly one new Historical/Replay request. A response belonging to a
+pre-reset generation cannot replace the reset result. When the reset Replay
+succeeds, the stored logical chart view is restored and Settings Apply remains
+available.
+
+The reset action sends the entry Candidate through the existing signal-only,
+in-memory Flow apply boundary to the living parent Settings Dialog. It writes no
+rules.json, registration, Runtime, Broker, or order state. The two undo sources
+remain deliberately distinct:
+
+  V2 [초기화] = parent Working state at this V2 Window's open time
+  Settings Dialog [되돌리기] = Settings Dialog state at dialog-open time
+
+Thus dialog-open A, edited B, then V2-open produces V2 reset B and parent undo A.
+Repeated V2 resets always return to the same B baseline.
+
+Verification at Code HEAD 743dbf5f839a35e1861deef98b18bf81a7b5f970
+included all 37 Signal Validation V2 tests, 8 axis/cycle tests, 26 operator UI
+tests, 28 Replay tests, 8 empty-SELL-expression tests, and 4 Settings section
+default tests. An isolated Windows Qt run, without Production/Broker startup,
+also passed entry settings/context/stock restoration, stale-generation rejection,
+logical time/price/selection restoration, Window geometry preservation, parent
+Working B restoration, parent undo A restoration, and action-row placement.
+
+======================================================================
+10. FINAL VERDICT
+======================================================================
+
+At Code HEAD 743dbf5f839a35e1861deef98b18bf81a7b5f970, Signal Validation V2
 uses the full result width and a physical Canvas fixed to the chart viewport.
 Horizontal drag controls cursor-anchored time scale; the logical horizontal
 scrollbar navigates the full timeline; and wheel input controls cursor-anchored
@@ -320,4 +374,7 @@ from pixels_per_candle while keeping a small visual gap and the same physical
 Canvas. Replay, signals, Cycles, aggregate return, settings apply, and
 Production/Mock/Broker boundaries remain unchanged. The Fixed Axis displays
 comma-separated integer won labels while preserving its floating-point scale and
-tick geometry.
+tick geometry. The V2-only reset action restores the immutable V2-open Working
+state and its first successful logical chart view through a fresh generation-
+protected Replay, without changing Window geometry or persistent state; the
+parent Settings Dialog retains its separate dialog-open undo baseline.
