@@ -5,7 +5,7 @@ Status: CURRENT SUPPLEMENTAL CONTRACT
 Code repository: kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
 Previous verified code HEAD: ee40370402aaee5bf642cda3e17b9bf7a53eb15b
-Verified code HEAD: 743dbf5f839a35e1861deef98b18bf81a7b5f970
+Verified code HEAD: 7cb89ac53c8552b1ad6787dc8344f5837e115b51
 
 ======================================================================
 1. AUTHORITY AND SCOPE
@@ -31,6 +31,9 @@ work in these Code commits:
 
   743dbf5f839a35e1861deef98b18bf81a7b5f970
   Add V2 entry-state reset
+
+  7cb89ac53c8552b1ad6787dc8344f5837e115b51
+  Fix V2 entry reset restore boundary
 
 The fixed-viewport and price-scale commits supersede the physical-content-width
 and wheel-X-zoom contract recorded for
@@ -341,10 +344,26 @@ pre-reset generation cannot replace the reset result. When the reset Replay
 succeeds, the stored logical chart view is restored and Settings Apply remains
 available.
 
-The reset action sends the entry Candidate through the existing signal-only,
-in-memory Flow apply boundary to the living parent Settings Dialog. It writes no
-rules.json, registration, Runtime, Broker, or order state. The two undo sources
-remain deliberately distinct:
+Entry Reset is not Candidate Apply. The reset action sends a detached immutable
+IndicatorFollowSignalValidationRestorePayload through the dedicated Flow restore
+boundary to the living parent Settings Dialog. Its projection is exactly the
+existing V2-visible entry projection and does not invoke final-Candidate SELL
+price reapproval. A SELL price selection that was unresolved but permitted when
+the V2 Entry Snapshot was created can therefore be restored exactly. The restore
+boundary writes no rules.json, registration, Runtime, Broker, or order state and
+does not report or enter the "settings applied" state.
+
+The Settings Dialog keeps two explicit in-memory paths. Strict Settings Apply
+continues to use project_signal_validation_apply_ui_state(), Candidate whitelist
+validation, require_resolved_sell_price_selections(), and fail-closed emission.
+Entry Restore uses project_signal_validation_restore_ui_state() and the shared
+projected-widget writer without weakening the strict Apply path. The Flow likewise
+keeps _apply_to_source() and _restore_entry_state_to_source() separate. If the
+parent Settings Dialog is no longer a valid restore target, reset fails before
+mutating the local V2 controls whenever the synchronous ownership check can make
+that determination.
+
+The two undo sources remain deliberately distinct:
 
   V2 [초기화] = parent Working state at this V2 Window's open time
   Settings Dialog [되돌리기] = Settings Dialog state at dialog-open time
@@ -352,19 +371,27 @@ remain deliberately distinct:
 Thus dialog-open A, edited B, then V2-open produces V2 reset B and parent undo A.
 Repeated V2 resets always return to the same B baseline.
 
-Verification at Code HEAD 743dbf5f839a35e1861deef98b18bf81a7b5f970
-included all 37 Signal Validation V2 tests, 8 axis/cycle tests, 26 operator UI
+Verification at Code HEAD 7cb89ac53c8552b1ad6787dc8344f5837e115b51
+included all 40 Signal Validation V2 tests, 8 axis/cycle tests, 26 operator UI
 tests, 28 Replay tests, 8 empty-SELL-expression tests, and 4 Settings section
-default tests. An isolated Windows Qt run, without Production/Broker startup,
-also passed entry settings/context/stock restoration, stale-generation rejection,
-logical time/price/selection restoration, Window geometry preservation, parent
-Working B restoration, parent undo A restoration, and action-row placement.
+default tests. The focused reset coverage reproduces an unresolved SELL Entry,
+restores it without Candidate approval, issues exactly one reset request, rejects
+the stale pre-reset callback, restores the first logical chart view, preserves
+registration/edit rules.json bytes, and confirms that strict Settings Apply still
+emits no Candidate for the unresolved selection. The two pre-existing protected
+SELL local-WIP failures remain outside this correction.
+
+An isolated Windows Qt run, without Production/Broker or SendOrder startup,
+passed unresolved Entry restoration, registration/edit parent Working restoration,
+stale-generation rejection, logical time/price/selection restoration, and strict
+Settings Apply rejection. No persistent mutation or settings-apply completion
+state was introduced by reset.
 
 ======================================================================
 10. FINAL VERDICT
 ======================================================================
 
-At Code HEAD 743dbf5f839a35e1861deef98b18bf81a7b5f970, Signal Validation V2
+At Code HEAD 7cb89ac53c8552b1ad6787dc8344f5837e115b51, Signal Validation V2
 uses the full result width and a physical Canvas fixed to the chart viewport.
 Horizontal drag controls cursor-anchored time scale; the logical horizontal
 scrollbar navigates the full timeline; and wheel input controls cursor-anchored
@@ -375,6 +402,8 @@ Canvas. Replay, signals, Cycles, aggregate return, settings apply, and
 Production/Mock/Broker boundaries remain unchanged. The Fixed Axis displays
 comma-separated integer won labels while preserving its floating-point scale and
 tick geometry. The V2-only reset action restores the immutable V2-open Working
-state and its first successful logical chart view through a fresh generation-
-protected Replay, without changing Window geometry or persistent state; the
-parent Settings Dialog retains its separate dialog-open undo baseline.
+state through its dedicated detached Restore projection/payload, then restores
+the first successful logical chart view through one fresh generation-protected
+Replay. It neither reuses nor weakens strict Candidate Apply, changes Window
+geometry or persistent state, nor replaces the parent Settings Dialog's separate
+dialog-open undo baseline.
