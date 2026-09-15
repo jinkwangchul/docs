@@ -6,6 +6,8 @@ Code repository: kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
 Previous frozen code HEAD: 317b18f529c0920528b3373305796fa994a8f391
 Frozen code HEAD: a45fd5c7b01cf36f528bcc753c414155eeeee37c
+Latest final-candidate handoff contract HEAD:
+ac09e33c13eb68c2157bd92b3036a39df64c227b
 
 ======================================================================
 1. AUTHORITY AND SCOPE
@@ -137,18 +139,56 @@ strength. It merges verified static library metadata with the existing
 read-only initial market snapshot. Missing safe values remain "-". Hover does
 not itself issue a broker request.
 
-3.4 Validation and apply lifecycle
+3.4 Validation and final-candidate handoff lifecycle
 
 Initial validation and every explicit re-run use the current timeframe, candle
 count, and current signal settings. A changed candle count causes a fresh
 Historical request and replay. V2 tracks a canonical signal-UI fingerprint.
-Settings Apply is enabled only for a successful result matching the current
-signal settings; later edits return the primary action to Validate.
+[검증적용] is enabled only for a successful result matching the current signal
+settings; later edits return the primary action to Validate.
 
-Apply writes only the approved signal-control whitelist back to the still-live
-source registration/edit dialog. It does not apply candle count, execution
-method, Runtime policy, or other non-signal settings. A closed or unavailable
-source fails closed.
+[검증적용] sends one detached canonical Candidate through the existing
+Flow/Binder to the still-live source registration/edit dialog. The Candidate
+contains only the approved signal-control whitelist and is applied to the
+parent Settings Working UI through the existing canonical UI-state loader. It
+does not include candle count, selected Validation stock, chart/view state,
+Replay identity/result, execution method, Runtime policy, or other non-signal
+state. A closed or unavailable source fails closed.
+
+V2 is a Routine Configuration Validation Workspace. The parent dialog's current
+unsaved Working settings are snapshotted when V2 opens; V2 does not reread the
+disk for its seed. Any number of edits, validation runs, stock changes, candle-
+count changes, and chart interactions remain inside the V2 Working Copy.
+Candidate emission count remains zero until [검증적용]. A successful click
+emits only the final Candidate once, changes the button to disabled
+"적용 완료", and does not create/update an Instance or write rules.json,
+Runtime, Broker, or order state. Closing or cancelling V2 without that click
+changes neither parent Working UI nor any undo target.
+
+3.5 Settings Working Copy undo contract
+
+The Settings dialog button formerly labelled "다시 불러오기" is now
+[되돌리기]. It preserves its existing location and restores a detached
+canonical in-memory snapshot through the established UI-state apply helper. It
+does not reread rules, registry, or another persistent source.
+
+For an existing Instance edit dialog, the immutable undo baseline is captured
+once after the saved settings have been loaded at dialog open. Manual edits and
+one or more successful V2 Candidate handoffs do not replace that baseline.
+[되돌리기] always restores the dialog-open saved baseline.
+
+For a new registration dialog, the initial template/default state is captured
+once at dialog open. Before any successful V2 handoff, [되돌리기] restores that
+initial baseline. Each V2 launch also retains its parent pre-validation Working
+snapshot temporarily. Only a successful [검증적용] promotes that launch
+snapshot to the registration undo target. A cancelled/closed V2 does not alter
+the target. A later successful V2 launch replaces it, yielding one-step undo
+with no history stack and no redo.
+
+Candidate handoff remains distinct from persistence. The existing registration
+and edit/save actions remain the sole writers and build their payload from the
+current parent Working UI, including the accepted Candidate when the operator
+chooses to commit it.
 
 ======================================================================
 4. SELL SIGNAL SEMANTICS
@@ -336,7 +376,7 @@ The completed range preserves:
   trace, and average-price context;
 - trailing-SELL and completed-cycle meanings;
 - marker tooltip and fixed-axis meanings;
-- V2 window geometry and source-settings apply scope;
+- V2 window geometry, final-candidate handoff, and one-step undo scope;
 - Phase 2 Entry reuse and Phase 3 indicator reuse;
 - the September 13 read-only Historical provider/replay identities; and
 - Production, Mock, broker-owner, Runtime, order, and execution separation.
@@ -370,10 +410,13 @@ this scope.
 10. FINAL VERDICT
 ======================================================================
 
-At Code HEAD a45fd5c7b01cf36f528bcc753c414155eeeee37c, Indicator-Follow
+At latest Code HEAD ac09e33c13eb68c2157bd92b3036a39df64c227b,
+Indicator-Follow
 Signal Validation V2 is a read-only, operator-oriented Historical replay domain
 with explicit stock/request identity, evidence-rich signal display, completed
 trade-cycle projection, cost-weighted aggregate estimated return, and optimized
-default Replay boundaries. The same output and past-only contracts are retained
-while custom evaluators/providers remain defensively isolated. Protected LOCAL
-WIP is outside this authority.
+default Replay boundaries. It now also hands the final validated Candidate to
+the parent Settings Working Copy exactly once and provides context-specific
+in-memory one-step undo without acquiring persistence authority. The same output
+and past-only contracts are retained while custom evaluators/providers remain
+defensively isolated. Protected LOCAL WIP is outside this authority.
