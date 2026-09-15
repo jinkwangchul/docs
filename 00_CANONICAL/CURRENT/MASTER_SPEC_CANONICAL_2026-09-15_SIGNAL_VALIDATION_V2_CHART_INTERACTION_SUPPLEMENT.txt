@@ -5,7 +5,7 @@ Status: CURRENT SUPPLEMENTAL CONTRACT
 Code repository: kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
 Previous verified code HEAD: ee40370402aaee5bf642cda3e17b9bf7a53eb15b
-Verified code HEAD: 408f9e4a5d91c7018300a3dfc6cb01228fbfd22c
+Verified code HEAD: ea3f9607e3a4258c747e6d92fea67f473903fb86
 
 ======================================================================
 1. AUTHORITY AND SCOPE
@@ -26,9 +26,13 @@ work in these Code commits:
   408f9e4a5d91c7018300a3dfc6cb01228fbfd22c
   Add interactive V2 price scale zoom
 
-The last two commits supersede the physical-content-width and wheel-X-zoom
-contract recorded for 845004400aaf224ee0aa4bf38fb42ab5965d359a. The earlier
-commit remains in Git history, but it is not the current interaction authority.
+  ea3f9607e3a4258c747e6d92fea67f473903fb86
+  Normalize V2 price axis labels
+
+The fixed-viewport and price-scale commits supersede the physical-content-width
+and wheel-X-zoom contract recorded for
+845004400aaf224ee0aa4bf38fb42ab5965d359a. The earlier commit remains in Git
+history, but it is not the current interaction authority.
 
 It supplements, and does not rewrite, the September 14 Indicator-Follow Signal
 Validation V2 Freeze or the September 15 Main-Routine boundary and Validation
@@ -161,6 +165,14 @@ refreshes its five tick labels and required width immediately. Marker Y meaning
 is unchanged: BUY/SELL Evidence markers remain attached to the plot boundary,
 not converted into price markers.
 
+The Price Scale minimum, maximum, and five raw tick prices remain floating-point
+values and continue to drive y_for_price(), price_for_y(), Candle placement, and
+cursor anchoring without rounding. Only the operator-facing Fixed Axis label is
+formatted to the nearest integer won with thousands separators. This display
+rounding does not snap raw ticks to KRX quote units and does not change geometry,
+wheel zoom, or anchor semantics. The existing font-metrics width calculation uses
+the integer label text; no fixed axis width is introduced.
+
 Wheel input does not change visible_start_index, visible_candle_span, Canvas
 size, selection, or replay data. Window resize preserves manually adjusted
 price bounds. A new Replay Snapshot resets price bounds to the existing whole-
@@ -180,7 +192,7 @@ This work does not change:
 - Historical request, Replay, Projection, or settings mapping;
 - BUY/SELL decisions, evaluation_index/time, signal_index/time, or delay_bar;
 - matched_groups, details, trace, average-price context, or marker Evidence;
-- the existing five-tick Fixed Axis placement and price-label formatting;
+- the existing five-tick Fixed Axis placement and internal floating-point prices;
 - Completed Cycle calculation/table or top cost-weighted aggregate return;
 - settings-apply scope, stock/MRU workflow, Window ownership, or Runtime state;
 - Main, Routine, Production, Mock, Broker, order, or SendOrder boundaries; or
@@ -298,7 +310,7 @@ rendering interactions.
 9. FINAL VERDICT
 ======================================================================
 
-At Code HEAD 70f7ed6e96757f8c6b76d7e1ea8d28ce983f4cf6, Signal Validation V2
+At Code HEAD ea3f9607e3a4258c747e6d92fea67f473903fb86, Signal Validation V2
 uses the full result width and a physical Canvas fixed to the chart viewport.
 Horizontal drag controls cursor-anchored time scale; the logical horizontal
 scrollbar navigates the full timeline; and wheel input controls cursor-anchored
@@ -306,4 +318,6 @@ price scale synchronized with the Fixed Axis. Candle hover and marker Evidence
 remain aligned to the same visible-range transform. Candle bodies now scale
 from pixels_per_candle while keeping a small visual gap and the same physical
 Canvas. Replay, signals, Cycles, aggregate return, settings apply, and
-Production/Mock/Broker boundaries remain unchanged.
+Production/Mock/Broker boundaries remain unchanged. The Fixed Axis displays
+comma-separated integer won labels while preserving its floating-point scale and
+tick geometry.
