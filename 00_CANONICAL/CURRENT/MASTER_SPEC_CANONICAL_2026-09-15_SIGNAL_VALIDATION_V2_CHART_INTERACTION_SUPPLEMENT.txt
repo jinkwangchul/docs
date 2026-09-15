@@ -5,7 +5,7 @@ Status: CURRENT SUPPLEMENTAL CONTRACT
 Code repository: kiwoom_auto
 Code branch: feat/restore-auto-trade-setting-ui
 Previous verified code HEAD: ee40370402aaee5bf642cda3e17b9bf7a53eb15b
-Verified code HEAD: 845004400aaf224ee0aa4bf38fb42ab5965d359a
+Verified code HEAD: 408f9e4a5d91c7018300a3dfc6cb01228fbfd22c
 
 ======================================================================
 1. AUTHORITY AND SCOPE
@@ -19,6 +19,16 @@ work in these Code commits:
 
   845004400aaf224ee0aa4bf38fb42ab5965d359a
   Add interactive V2 candle scaling and zoom
+
+  a7d40750dd4879b008358f77fd53e1384bcf86be
+  Replace V2 content zoom with fixed time viewport
+
+  408f9e4a5d91c7018300a3dfc6cb01228fbfd22c
+  Add interactive V2 price scale zoom
+
+The last two commits supersede the physical-content-width and wheel-X-zoom
+contract recorded for 845004400aaf224ee0aa4bf38fb42ab5965d359a. The earlier
+commit remains in Git history, but it is not the current interaction authority.
 
 It supplements, and does not rewrite, the September 14 Indicator-Follow Signal
 Validation V2 Freeze or the September 15 Main-Routine boundary and Validation
@@ -51,58 +61,110 @@ The removal of the fixed panel does not delete reason, matched_groups, details,
 trace, marker, or immutable replay data.
 
 ======================================================================
-3. ADAPTIVE X-AXIS DENSITY
+3. FIXED VIEWPORT AND TIME SCALE
 ======================================================================
 
-The Canvas owns one current_candle_slot_width used by every X-coordinate
-consumer: Candle body and wick, marker, selection, time labels, hit testing,
-index conversion, and content width. _x_for_index remains the common coordinate
-source.
+The chart Canvas is always the physical size of the chart viewport. Candle
+count and scale interaction never increase the Canvas width or height. The old
+large child-widget content width, current_candle_slot_width, and native
+QScrollArea child scrolling are not part of the current contract.
 
-Default density uses a 100-Candle reference, not the current result count:
+The Window owns three distinct timeline facts:
 
-  usable_width = viewport width - left margin - right margin
-  base slot = usable_width / 100
+  candle_count
+  visible_start_index
+  visible_candle_span
 
-The slot is clamped by V2-local minimum and maximum values. With 100 Candles the
-first-to-last Candle span uses the available chart width without the former
-large right-side blank. A 200- or 500-Candle result does not divide the slot by
-its own count. It keeps the current 100-reference density, increases content
-width, and uses the native horizontal scrollbar.
+Initial visible_candle_span is min(100, candle_count). The initial range is
+right-anchored so evaluated_end_index is visible. For 100, 200, and 500 Candle
+results the physical Canvas width remains equal to the current viewport width;
+only the logical visible range differs.
 
-Before manual zoom, viewport resize recalculates base/current density from the
-100-Candle reference. After manual zoom, viewport resize updates layout and
-scroll range without discarding the operator's current slot width. Changing
-Candle count also preserves current density and manual-zoom state. No new scale
-persistence is introduced; a new Window starts from default density.
+Every X-coordinate consumer uses the same fixed-viewport transform:
 
-======================================================================
-4. WHEEL ZOOM AND NAVIGATION
-======================================================================
+  plot_width = Canvas width - left margin - right margin
+  pixels_per_candle = plot_width / visible_candle_span
+  x(index) = left margin
+             + ((index - visible_start_index) + 0.5)
+             * pixels_per_candle
 
-Vertical wheel input over the chart changes X-axis Candle density only:
+Only the visible index range is painted and hit-tested. Candle body and wick,
+marker, selection, time labels, Candle hover, Evidence hit testing, and inverse
+mouse-X-to-index mapping share this transform. Time labels are selected again
+from actual Candle timestamps in the current visible range; no time is invented
+or interpolated.
 
-- wheel up increases slot width;
-- wheel down decreases slot width; and
-- V2-local clamps prevent unusable extreme widths.
-
-Zoom is cursor-centered. The pre-zoom continuous Candle position beneath the
-cursor is projected through the new slot width and the horizontal scrollbar is
-adjusted, within its legal range, so that the same Candle remains under the
-cursor within pixel rounding tolerance.
-
-Navigation uses the native horizontal scrollbar. New left-button drag panning
-is not part of this contract because Candle click selection already owns that
-interaction. Wheel zoom does not change Y-axis _ValidationPriceScale, Fixed
-Axis, marker size, selected index, marker index, time-label index, or Evidence
-identity.
-
-Hover, wheel, scrollbar movement, and viewport resize only redraw existing
-results. They do not call ValidationHistoricalReplay.evaluate, rebuild
-indicators, recalculate completed cycles, or recalculate aggregate return.
+Window resize changes physical viewport pixels but preserves the logical
+visible span. A new Replay Snapshot resets the time view to its initial
+min(100, candle_count), evaluated-end-anchored state. No new scale persistence
+is introduced.
 
 ======================================================================
-5. PRESERVED DOMAIN CONTRACTS
+4. TIME-SCALE DRAG AND LOGICAL NAVIGATION
+======================================================================
+
+Horizontal left-button drag changes the X-axis time scale inside the fixed
+viewport. Right drag decreases visible_candle_span and zooms in; left drag
+increases visible_candle_span and zooms out. The scale factor is a smooth
+exponential function of drag distance relative to plot width. V2-local clamps
+limit the span to at least 10 Candles, or all available Candles when fewer than
+10 exist, and at most candle_count.
+
+At press time the continuous Candle position and its cursor ratio within the
+plot are recorded. While scaling:
+
+  new_start = anchor_index + 0.5 - anchor_ratio * new_span
+
+The result is clamped to the available timeline, keeping the press anchor at the
+same screen X whenever the dataset boundary permits. Movement below the click
+threshold remains normal Candle selection; an actual scale drag does not emit a
+selection click.
+
+Navigation is a separate QScrollBar under the fixed viewport. It changes only
+visible_start_index. Its range is zero when all Candles fit and otherwise maps
+the fractional start to 1000 integer units per Candle; pageStep represents the
+current visible span. It never changes time scale or price scale. The internal
+QScrollArea horizontal scrollbar remains disabled with a zero range.
+
+Selecting a Candle or Completed Cycle outside the visible range minimally moves
+visible_start_index so the target appears without changing visible span.
+
+======================================================================
+5. WHEEL PRICE SCALE AND FIXED AXIS
+======================================================================
+
+Vertical wheel input over the chart changes only the Y-axis price range:
+
+- wheel up divides the current range by 1.15 per wheel step and zooms in;
+- wheel down multiplies the current range by 1.15 per wheel step and zooms out;
+- minimum range is 0.001 of the Snapshot's default OHLC range; and
+- maximum range is 100 times the Snapshot's default OHLC range.
+
+_ValidationPriceScale provides price_for_y(), the exact inverse of y_for_price().
+The price beneath the cursor before zoom remains at the same Y coordinate after
+zoom whenever the range clamps do not require boundary normalization:
+
+  anchor_price = price_for_y(cursor_y)
+  new_max = anchor_price + cursor_ratio * new_range
+  new_min = new_max - new_range
+
+The Fixed Axis reads the same current price scale as Candle/grid rendering and
+refreshes its five tick labels and required width immediately. Marker Y meaning
+is unchanged: BUY/SELL Evidence markers remain attached to the plot boundary,
+not converted into price markers.
+
+Wheel input does not change visible_start_index, visible_candle_span, Canvas
+size, selection, or replay data. Window resize preserves manually adjusted
+price bounds. A new Replay Snapshot resets price bounds to the existing whole-
+Snapshot OHLC minimum/maximum contract.
+
+Hover, wheel, time-scale drag, logical scrollbar movement, and viewport resize
+only redraw existing results. They do not call
+ValidationHistoricalReplay.evaluate, rebuild indicators, recalculate completed
+cycles, or recalculate aggregate return.
+
+======================================================================
+6. PRESERVED DOMAIN CONTRACTS
 ======================================================================
 
 This work does not change:
@@ -110,62 +172,79 @@ This work does not change:
 - Historical request, Replay, Projection, or settings mapping;
 - BUY/SELL decisions, evaluation_index/time, signal_index/time, or delay_bar;
 - matched_groups, details, trace, average-price context, or marker Evidence;
-- Y-axis Fixed Axis behavior;
+- the existing five-tick Fixed Axis placement and price-label formatting;
 - Completed Cycle calculation/table or top cost-weighted aggregate return;
 - settings-apply scope, stock/MRU workflow, Window ownership, or Runtime state;
 - Main, Routine, Production, Mock, Broker, order, or SendOrder boundaries; or
 - the approved Validation V1 retirement.
 
 ======================================================================
-6. VERIFICATION EVIDENCE
+7. VERIFICATION EVIDENCE
 ======================================================================
 
 Focused regression evidence:
 
-- 97 V2, operator UI, axis/cycle, Replay, empty-SELL-expression, and
-  independence tests passed;
-- the final V2/operator/axis-cycle confirmation passed 56 tests;
-- 86 of 88 adjacent stock/settings/Validation/package tests passed; and
-- the remaining two failures are the same protected SELL local-WIP failures,
-  not failures introduced by these commits.
+- the X fixed-viewport commit passed 97 V2, operator UI, axis/cycle, Replay,
+  empty-SELL-expression, and independence tests;
+- the final X/Y implementation passed 98 tests in the same core scope;
+- recent-stock regression passed 8 tests and section-default regression passed
+  4 tests; and
+- the two protected SELL local-WIP failures and the existing Mock operation
+  boundary error were reproduced separately and were not modified.
 
 An isolated Windows Qt harness, without Production/Broker or SendOrder startup,
 verified:
 
 - no fixed right panel and full-width chart use;
-- exact Candle OHLC/time hover and marker Evidence priority;
-- 100 Candles at slot 20.20 px with scrollbar range 0/0;
-- wheel zoom to slot 34.12 px while retaining the cursor Candle;
-- 200 and 500 Candles retaining slot 20.20 px with increasing native scroll
-  ranges;
-- manual slot retention across resize/maximize;
-- automatic 100-reference recalculation when manual zoom was reset; and
-- the existing Settings Apply signal path.
+- 100/200/500-Candle transitions produced logical starts 0/100/400 and spans
+  100/100/100; Canvas and viewport widths were equal at 2092 px in every case,
+  while logical scrollbar maxima were 0/100000/400000 respectively;
+- 500 Candles initially at start 400 and span 100 with Canvas width exactly
+  equal to viewport width;
+- right drag changed span from 100 to 74.69 and left drag changed it from 74.69
+  to 104.98 while physical Canvas width remained unchanged;
+- logical scrollbar movement changed start to 176.95 while preserving span and
+  Canvas width;
+- wheel-up changed the displayed price range from 501.00 to approximately
+  284.63 and wheel-down restored it to 501.00 while time labels were unchanged;
+- horizontal drag changed time labels while the five price labels remained
+  unchanged; and
+- logical navigation moved the Candle interval while preserving price labels.
 
-Replay wall-time medians on the same fixture/PC were:
+Automated geometry tests additionally verified that 100-, 200-, and 500-Candle
+results use the same physical Canvas width, with initial spans 100/100/100 and
+logical starts 0/100/400 respectively. Candle hover, marker Evidence priority,
+marker/index alignment, selection, Completed Cycle selection, resize retention,
+Snapshot reset, and the existing Settings Apply path remain covered.
 
-  Before interactive scaling:
-    100 candles: 0.084326 seconds
-    200 candles: 0.265326 seconds
-    500 candles: 1.330454 seconds
+The earlier interaction measurement before this correction was:
 
-  After interactive scaling:
-    100 candles: 0.085486 seconds
-    200 candles: 0.254474 seconds
-    500 candles: 1.322802 seconds
+  100 candles: 0.085486 seconds
+  200 candles: 0.254474 seconds
+  500 candles: 1.322802 seconds
 
-These measurements show no meaningful Replay regression and are not a timing
-SLA. Twenty wheel operations, repeated Candle hover, and scrollbar movement
-were additionally verified to make zero Replay evaluate calls.
+After the fixed-viewport and price-scale correction, three-run Replay wall-time
+medians on a valid sequential-timestamp fixture and the same PC were:
+
+  100 candles: 0.098740 seconds
+  200 candles: 0.280761 seconds
+  500 candles: 1.554734 seconds
+
+The Replay/indicator implementation files are byte-unchanged by these chart
+commits. The measurements remain within the established non-SLA operating range
+and show no meaningful algorithmic regression. Repeated wheel zoom, time-scale
+drag, logical scrollbar movement, Candle hover, and resize were verified to make
+zero Replay evaluate calls.
 
 ======================================================================
-7. FINAL VERDICT
+8. FINAL VERDICT
 ======================================================================
 
-At Code HEAD 845004400aaf224ee0aa4bf38fb42ab5965d359a, Signal Validation
-V2 uses the full result width, provides Candle OHLC/time hover while preserving
-marker Evidence, fits default X density to a 100-Candle reference, and retains
-that density for larger results through native scrolling. Cursor-centered wheel
-zoom changes rendering geometry only. Replay, signal, Fixed Axis, Cycle,
-aggregate-return, settings-apply, and Production/Mock/Broker boundaries remain
+At Code HEAD 408f9e4a5d91c7018300a3dfc6cb01228fbfd22c, Signal Validation V2
+uses the full result width and a physical Canvas fixed to the chart viewport.
+Horizontal drag controls cursor-anchored time scale; the logical horizontal
+scrollbar navigates the full timeline; and wheel input controls cursor-anchored
+price scale synchronized with the Fixed Axis. Candle hover and marker Evidence
+remain aligned to the same visible-range transform. Replay, signals, Cycles,
+aggregate return, settings apply, and Production/Mock/Broker boundaries remain
 unchanged.
