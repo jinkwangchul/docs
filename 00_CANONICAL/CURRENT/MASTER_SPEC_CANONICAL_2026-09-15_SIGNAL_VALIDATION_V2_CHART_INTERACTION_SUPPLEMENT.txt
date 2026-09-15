@@ -259,14 +259,51 @@ the new Price Scale position, time drag used the new Candle X position, marker
 hover returned Evidence first, and Replay evaluate call count remained zero.
 
 ======================================================================
-8. FINAL VERDICT
+8. CANDLE BODY WIDTH FOLLOWS THE TIME VIEW
 ======================================================================
 
-At Code HEAD ff914595e1f6bfaa14eb8b5f3017be04f2d3d928, Signal Validation V2
+visible_candle_span remains the X-axis Time Scale source of truth, and
+pixels_per_candle is the current visual slot width derived from that span and
+the fixed physical Canvas viewport. Candle body width is no longer a fixed
+6 px value. It is derived only from the current slot width:
+
+  effective_gap = min(2 px, max(0 px, pixels_per_candle - 1 px))
+  body_width = max(1 px, pixels_per_candle - effective_gap)
+
+This keeps the inter-Candle visual gap at a small fixed level whenever the
+slot is wide enough. Horizontal Time Scale zoom-in reduces the visible span,
+increases pixels_per_candle, and therefore widens the Candle body. Zoom-out
+increases the visible span and narrows the body. The extra zoom space is used
+primarily by the Candle body rather than becoming an expanding empty gap.
+
+The physical Canvas width and height do not change. Wheel Price Scale changes
+only the Y transform and does not change body X width. Logical navigation
+scroll changes only visible_start_index and likewise does not change body
+width. Candle center X, marker/index domain meaning, time labels, selection
+slot, Candle-hover X selection, High-to-Low hover bounds, and marker Evidence
+priority remain on their existing transforms.
+
+The isolated Windows Qt measurement used the same 2092 x 594 Canvas throughout:
+
+  baseline: span 100.00, slot 20.56 px, body 18.56 px, gap 2.00 px
+  zoom-in:  span 82.32,  slot 24.98 px, body 22.98 px, gap 2.00 px
+  zoom-out: span 115.71, slot 17.77 px, body 15.77 px, gap 2.00 px
+
+Wheel Price Scale and logical scrollbar movement both preserved the zoom-out
+body width of 15.77 px. Automated tests also preserve marker indexes,
+selection, hover/Evidence priority, and zero Replay re-evaluation during these
+rendering interactions.
+
+======================================================================
+9. FINAL VERDICT
+======================================================================
+
+At Code HEAD 70f7ed6e96757f8c6b76d7e1ea8d28ce983f4cf6, Signal Validation V2
 uses the full result width and a physical Canvas fixed to the chart viewport.
 Horizontal drag controls cursor-anchored time scale; the logical horizontal
 scrollbar navigates the full timeline; and wheel input controls cursor-anchored
 price scale synchronized with the Fixed Axis. Candle hover and marker Evidence
-remain aligned to the same visible-range transform. Replay, signals, Cycles,
-aggregate return, settings apply, and Production/Mock/Broker boundaries remain
-unchanged.
+remain aligned to the same visible-range transform. Candle bodies now scale
+from pixels_per_candle while keeping a small visual gap and the same physical
+Canvas. Replay, signals, Cycles, aggregate return, settings apply, and
+Production/Mock/Broker boundaries remain unchanged.
