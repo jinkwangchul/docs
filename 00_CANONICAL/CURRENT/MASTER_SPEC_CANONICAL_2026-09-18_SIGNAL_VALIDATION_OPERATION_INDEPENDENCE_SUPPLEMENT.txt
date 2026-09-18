@@ -97,13 +97,18 @@ authority and are not consulted.
 
 Staged-only focused verification at the code baseline:
 
-- Validation foundation: 7 PASS
+- Validation foundation: 8 PASS
 - Validation host: 10 PASS
 - Historical provider: 15 PASS
 - Historical replay: 29 PASS
 - Validation stock-picker / operation-boundary tests: 22 PASS
 
-Focused total: 83 PASS.
+Focused total: 84 PASS.
+
+The foundation suite now contains an explicit anti-regression guard that rejects
+any reintroduction of operation_state.json, routine_validation_operation_reader,
+is_operation_active, or REASON_OPERATION_ACTIVE into the Signal Validation
+admission/replay path.
 
 A direct runtime probe also verified that an existing
 runtime/operation_state.json with operation_status=RUNNING does not block the
