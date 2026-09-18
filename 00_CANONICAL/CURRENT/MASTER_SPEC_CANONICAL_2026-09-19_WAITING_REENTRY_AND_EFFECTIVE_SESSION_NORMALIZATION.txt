@@ -1,0 +1,182 @@
+# MASTER SPEC CANONICAL SUPPLEMENT
+# WAITING REENTRY AND EFFECTIVE SESSION NORMALIZATION
+# Date: 2026-09-19
+
+[Status]
+- Canonical supplement for Operation participation / re-entry semantics.
+- Code implementation: kiwoom_auto commit b43ef17bf7f1097310879bce4a25f54d0ea03c1e
+- Branch: feat/restore-auto-trade-setting-ui
+- This supplement does not replace unrelated canonical contracts.
+
+1. 목적
+
+이번 정상화는 다음 개념의 혼선을 제거한다.
+- UI/종목 분류의 "대기"
+- current-session Operation participant
+- 실제 거래소 거래 가능 시간
+- 사용자가 환경설정에서 지정한 Program Operation 시간
+- 마감 완료와 재진입
+- 최종 세션 종료
+
+중심 계약:
+
+대기 = 현재 Operation에는 참여하지 않지만,
+해당 종목의 Start Guard와 유효 운영시간 조건을 충족하면
+명시적 운영시작으로 다시 참여할 수 있는 상태이다.
+
+대기는 terminal 상태가 아니다.
+그러나 대기라는 이유만으로 무조건 시작되는 것도 아니다.
+Recovery / Review / Runtime Guard와 현재 또는 미래의 effective session 조건을 모두 통과해야 한다.
+
+2. Operation Start 진입 경로
+
+2.1 하단 전역 운영시작
+- 통상 해당 거래일의 최초/전체 운영 개시 기능이다.
+- 그 시점의 전체 시작 대상 종목을 일괄 시작한다.
+- 당일 global NORMAL_ENDED는 기존 계약대로 하단 전역 재시작을 차단한다.
+
+2.2 선택적 운영시작
+- 개별 또는 복수 선택 후 우클릭/관제 경로의 운영시작이다.
+- 거래일 전체 운영이 이미 시작된 이후에도 사용한다.
+- 다음과 같은 대기 종목은 선택적 재참여 후보가 된다.
+  * 조기마감 완료 후 대기로 돌아온 종목
+  * 운영 제외에서 다시 대기로 편입한 종목
+  * 전체 운영 시작 이후 신규 등록된 대기 종목
+  * 당일 global NORMAL_ENDED 이후 새로 재참여 조건을 충족한 종목
+- selective source에는 auto_trade_context_menu, main_monitoring_window,
+  main_routine_start, auto_trade_status_indicator가 포함된다.
+- 선택적 재시작은 선택하지 않은 다른 대기 종목을 자동으로 제외 처리하지 않는다.
+
+3. 시간운영(SCHEDULED) 재진입
+
+- 대기 종목은 해당 종목의 effective Scheduled session이 끝나기 전까지 재시작 후보이다.
+- 자동마감 시작 경계(end_buy_time) 이전이면 재시작 가능하다.
+- 경계 정각부터 FINAL_SESSION_ENDED이며 재시작 불가이다.
+
+예: 09:00~13:30
+- 11:00 조기마감 완료 -> participant retire -> 대기
+- 11:01~13:29:59 명시적 재시작 가능
+- 13:30:00부터 FINAL_SESSION_ENDED -> 재시작 차단
+
+Scheduled configured window는 Program regular window와 실제 KRX session을 넘어
+재진입 또는 주문 유효시간을 확장할 수 없다.
+
+4. 수동운영(CONTINUOUS) / ATS 재진입
+
+수동운영의 재진입은 자동마감/청산 설정시간 자체로 차단하지 않는다.
+
+- 정규장 사용 시 Program regular session의 effective 구간 안에서 재시작 가능하다.
+- 선택 ATS가 있으면 BEFORE_FIRST_SESSION / BETWEEN_SESSIONS도
+  오늘 앞으로 선택된 effective session이 남아 있는 동안 재시작 가능하다.
+- gap에서 시작하면 participant는 등록되지만 주문은 차단된 감시/대기 상태이다.
+- 다음 effective session이 시작되면 별도 재클릭 없이 거래 가능 상태로 전환된다.
+- 마지막 effective selected session 종료 후 FINAL_SESSION_ENDED에서는 재시작 불가이다.
+
+예:
+- NXT_PRE 종료 08:50 이후 정규 Program session 시작 전 gap
+  -> 미래 regular session이 있으면 시작 가능, 주문 불가.
+- Program regular 종료 후 NXT_AFTER 시작 전 gap
+  -> 선택된 미래 ATS session이 있으면 시작 가능, 주문 불가.
+- 마지막 선택 ATS 종료 후
+  -> FINAL_SESSION_ENDED, 재시작 불가.
+
+5. Actual Exchange Time vs Program Operation Time
+
+시간 Source of Truth는 두 축을 분리한다.
+
+A. Actual Exchange Availability
+현재 코드의 exchange presentation ranges:
+- KRX: 09:00:00~15:30:00
+- NXT_PRE: 08:00:00~08:50:00
+- NXT_AFTER: 15:40:00~20:00:00
+
+B. Program Operation Configuration
+operation_policy.json의:
+- regular_market
+- extra_sessions
+- scheduled_operation
+- per-stock effective schedule
+
+실제 주문 가능시간은 개념적으로:
+Program Operation Window ∩ Actual Exchange Session
+
+재참여 horizon은 현재 또는 미래 effective session의 존재 여부로 판단한다.
+
+따라서:
+- Program 시작이 실제 exchange open보다 빠르면 participant 등록은 가능할 수 있으나
+  실제 open 전 주문은 차단한다.
+- Program 종료가 실제 exchange close보다 빠르면 Program 종료 이후 주문/재진입 horizon을
+  연장하지 않는다.
+- Program 종료가 실제 exchange close보다 늦어도 실제 exchange close를 넘어 주문 허가하지 않는다.
+- ATS Program time이 실제 NXT session보다 먼저 시작하면 gap에서 참여는 가능하지만
+  actual NXT open 전 주문은 차단한다.
+
+종목별 NXT eligibility의 Source of Truth 자체는 이번 변경에서 재설계하지 않는다.
+기존 ATS 선택/적용 계약을 유지한다.
+
+6. 조기마감 완료
+
+Production:
+- EARLY_CLOSED + EARLY_CLOSE_COMPLETED의 정상 완료는
+  current-session participant에서 즉시 retire한다.
+- participant retire 이후 해당 종목은 execution universe에서 빠진다.
+- close 완료 증거가 명확하고 미해결 보유/주문/Runtime obligation이 없으면
+  같은 날 effective re-entry horizon 안에서 선택적 재시작이 가능하다.
+- 재시작 시 과거 early-close runtime metadata는 기존 start path를 통해 정리하고
+  새 operation identity / trade_started_at 기준으로 시작한다.
+- 완료 증거가 없거나 active close/liquidation evidence가 남아 있으면 fail-closed한다.
+
+7. Mock parity
+
+- 조기마감 완료 시 operation record의 ENDED evidence는 유지할 수 있지만
+  instance execution은 WAITING으로 복귀한다.
+- effective re-entry horizon 안에서는 새 operation_session_id로 재시작 가능하다.
+- 정상 final completion의 execution ENDED는 terminal이며 재시작 불가이다.
+- 과거 operation object의 ENDED 값 자체만으로 재시작을 막지 않는다.
+  현재 execution lifecycle과 effective session admission이 권한을 결정한다.
+- FINAL_SESSION_ENDED / invalid effective session은 시작 차단한다.
+
+8. Canonical start admission
+
+Core Operation Start는 UI host의 split_start_targets 구현만 신뢰하지 않는다.
+
+각 후보에 대해 canonical per-stock start decision을 다시 적용한다.
+따라서 UI caller가 느슨하더라도 다음은 core boundary에서 fail-closed한다.
+- FINAL_SESSION_ENDED
+- SESSION_EVIDENCE_INVALID
+- OVERNIGHT_SESSION_UNRESOLVED
+- NO_EFFECTIVE_SESSION
+
+반대로 유효 미래 세션이 존재하는 BEFORE_FIRST_SESSION / BETWEEN_SESSIONS는
+선택적 시작을 허용한다.
+
+9. Validation
+
+Exact staged-index snapshot validation:
+- py_compile: PASS
+- waiting re-entry + phase precedence + time-end retirement + Mock lifecycle:
+  103 tests PASS
+- completed early-close restart focused:
+  4 tests PASS
+- close-completion focused:
+  5 tests PASS
+- changed scheduled boundary focused:
+  1 test PASS
+- Main selective-start focused:
+  4 tests PASS
+
+Known unrelated / pre-existing observations:
+- Operation projection broad module retains 2 historical liquidation-display failures.
+- same-day restart broad module retains 1 wall-clock-sensitive historical expectation mismatch.
+- global operation button HEAD baseline contains a wall-clock-sensitive stale-early-close
+  expectation mismatch; HEAD baseline reproduces the same failure.
+- broad Mock GUI tests can still hit the known native Qt crash path.
+These were not modified as part of this normalization.
+
+10. Safety / Scope
+
+- No real Broker/Login/TR/SendOrder was invoked for validation.
+- Existing protected LOCAL WIP was preserved.
+- No reset/restore/stash/clean/force operation was used.
+- Production and Mock changes are limited to waiting/re-entry/session admission semantics
+  and focused regression coverage.
