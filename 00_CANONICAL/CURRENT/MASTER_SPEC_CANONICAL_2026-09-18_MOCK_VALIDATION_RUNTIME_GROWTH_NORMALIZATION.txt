@@ -1,0 +1,153 @@
+MASTER SPEC CANONICAL SUPPLEMENT
+Mock Validation Runtime Growth Normalization
+Date: 2026-09-18
+Code baseline: 624646b15aa1931feb5bb57cf06d1d754d4b439e
+
+======================================================================
+1. PURPOSE
+======================================================================
+
+This supplement freezes the bounded-persistence normalization for Mock
+Validation runtime state.
+
+The problem was not the previously-fixed UI projection/reentry churn. That
+normalization remains valid. The newly confirmed failure mode was long-running
+session growth: high-frequency market/evaluation checkpoints accumulated inside
+the durable session JSON until otherwise-normal one-second Mock cycles became
+expensive enough to block the GUI event loop.
+
+This supplement owns only that runtime-growth normalization. Existing Mock /
+Production isolation, operation lifecycle, UI projection, order/fill evidence,
+and read-only market-data boundary contracts remain unchanged.
+======================================================================
+2. CANONICAL PERSISTENCE CONTRACT
+======================================================================
+
+2.1 applied_commands
+
+applied_commands is durable command/idempotency evidence for meaningful Mock
+mutations. High-frequency mark-to-market observations are not durable commands.
+
+Legacy entries with:
+    operation = VIRTUAL_MARK_TO_MARKET
+are transient compatibility evidence and are removed at the Mock repository
+mutation boundary.
+
+Mark-to-market PnL remains current-state data in the per-instance PnL ledger.
+Recent mark command identities are retained only as a bounded dedupe checkpoint.
+
+2.2 mark-to-market dedupe checkpoint
+
+The per-instance PnL ledger keeps at most:
+    64 recent mark-to-market command identities.
+
+This checkpoint preserves recent replay/idempotency protection without allowing
+market observations to grow the durable command ledger without bound.
+
+When holding quantity is zero, a fresh mark-to-market observation does not
+persist a PnL mutation. A legacy oversized session is compacted once when needed;
+later zero-holding mark observations remain write-free.
+2.3 evaluation-cycle checkpoint
+
+Indicator-Follow Mock evaluation_cycles is a runtime dedupe/checkpoint ledger,
+not an unlimited historical journal.
+
+The canonical persisted maximum is:
+    512 evaluation-cycle checkpoints per Routine Instance.
+
+When the maximum is exceeded, the repository retains the latest checkpoints by
+recorded_at ordering. Meaningful signal/order/fill/lifecycle evidence remains in
+its existing durable structures and event journal.
+
+2.4 Canonical Writer
+
+MockValidationRepository.mutate_session is the normalization boundary.
+
+Every accepted session mutation:
+- validates the candidate;
+- removes legacy transient mark-to-market applied_commands;
+- bounds evaluation-cycle checkpoints;
+- preserves meaningful durable command/event/order/fill evidence; and
+- writes the resulting canonical session atomically.
+
+Existing oversized sessions are therefore normalized on their next legitimate
+Mock session mutation. No separate migration writer or Production writer is
+introduced.
+======================================================================
+3. PERFORMANCE RESULT
+======================================================================
+
+A local diagnostic copy of the observed 2026-09-18 oversized session contained:
+
+- session size: 1,618,131 bytes;
+- applied_commands: 4,094;
+- VIRTUAL_MARK_TO_MARKET commands: 4,089;
+- evaluation cycles: 4,174.
+
+After one canonical repository compaction:
+
+- session size: 134,249 bytes;
+- size reduction: approximately 91.7%;
+- VIRTUAL_MARK_TO_MARKET durable commands: 0;
+- evaluation cycles: 512;
+- recent mark dedupe checkpoint: bounded to 64.
+
+Measured on the same machine/session shape:
+
+- read_session improved from roughly 40-46 ms to about 9 ms average;
+- no-op mutation improved from about 151 ms to about 23 ms average;
+- ordinary changed-session write was previously about 299 ms and measured
+  about 57 ms after compaction in the focused diagnostic.
+
+The first legacy compaction itself is a one-time heavier mutation; subsequent
+runtime cost remains bounded instead of increasing with operation duration.
+======================================================================
+4. SAFETY / NON-GOALS
+======================================================================
+
+This normalization does not:
+
+- move Mock work into Production state;
+- weaken Mock / Production mutation isolation;
+- remove order/fill/lifecycle durable evidence;
+- change Broker/SendOrder/Chejan boundaries;
+- change Mock operation admission;
+- change the existing UI projection-change dedupe contract;
+- authorize unrelated cleanup of existing LOCAL WIP; or
+- introduce a new background worker/thread contract.
+
+The one-second host-cycle architecture remains unchanged in this step. The
+purpose of this normalization is to remove the unbounded persistence cost first.
+Thread/off-main-loop work should be considered only if measured latency remains
+unacceptable after bounded persistence is active.
+
+======================================================================
+5. VERIFIED REGRESSION COVERAGE
+======================================================================
+
+New focused tests verify:
+
+- legacy high-frequency ledgers compact on the next mutation;
+- durable non-MTM commands are preserved;
+- evaluation-cycle persistence is bounded to 512;
+- legacy mark identities migrate into the bounded dedupe checkpoint;
+- mark-to-market no longer grows applied_commands;
+- mark dedupe remains bounded to 64; and
+- zero-holding mark observations compact once and then remain write-free.
+
+Focused and adjacent Mock tests passed for repository/virtual execution,
+Indicator-Follow adapter, continuation, operation lifecycle, isolation,
+market-data, and Production coexistence boundaries.
+
+======================================================================
+6. FINAL RULE
+======================================================================
+
+High-frequency Mock observations must remain bounded current-state/checkpoint
+data. They must not make the durable Mock session grow in proportion to elapsed
+operation time.
+
+The permanent rule is:
+
+    MOCK RUNTIME COST MUST BE BOUNDED BY CURRENT STATE,
+    NOT BY THE NUMBER OF PAST MARKET/EVALUATION TICKS.
