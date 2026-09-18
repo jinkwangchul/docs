@@ -1,0 +1,127 @@
+﻿MASTER SPEC CANONICAL SUPPLEMENT
+Signal Validation V2 Operation Independence
+Date: 2026-09-18
+Code baseline: 9db2ddc63720b462092f53f91fb60fb0a98b1bc1
+
+======================================================================
+1. SCOPE AND SUPERSESSION
+======================================================================
+
+This supplement changes only the Production-Operation admission contract of the
+Indicator-Follow dedicated Signal Validation / Historical Validation Chart.
+
+It supersedes Section 5.5 "Operation readiness" of:
+MASTER_SPEC_CANONICAL_2026-09-13_OPERATION_MOCK_AND_INDICATOR_VALIDATION_FREEZE.txt
+
+and any later wording that treats Production Operation activity as an admission
+gate for Signal Validation V2.
+
+All non-conflicting contracts remain in force, including:
+- current unsaved settings snapshot authority;
+- Broker-owned read-only Historical data;
+- existing evaluator / replay semantics;
+- Main-Routine separation;
+- zero Production trading mutation from Validation;
+- save/change validation-on-commit as a separate contract.
+
+======================================================================
+2. NEW CANONICAL CONTRACT
+======================================================================
+
+Signal Validation V2 availability is independent of Production Operation state.
+
+The chart and its Historical replay may operate while Production is:
+- not started;
+- RUNNING;
+- CLOSING;
+- recovered from a prior durable Operation state; or
+- otherwise carrying persisted Operation evidence.
+
+Production Operation activity is not an admission condition for opening the
+Validation window, requesting read-only Historical candles, running replay, or
+viewing the result.
+
+Validation must not read runtime/operation_state.json in order to decide whether
+the chart is available.
+
+A persisted RUNNING/CLOSING state, current-session Operation participation, and
+Production Recovery status therefore have no authority over Validation
+availability.
+
+======================================================================
+3. BOUNDARY AND SAFETY CONTRACT
+======================================================================
+
+Operation independence does not grant Validation any Production mutation
+authority.
+
+Validation remains read-only with respect to Production trading state:
+- no Operation start/stop/change;
+- no order or execution creation;
+- no SendOrder/Chejan mutation path;
+- no Production Queue/Runtime/Position write;
+- no Production Candle commit;
+- no MarketDataHost mutable-state ownership;
+- no routine-to-Main direct import for Operation authority.
+
+The existing app-owned Broker API may still be used through the dedicated
+read-only request boundaries required by Validation, including Historical candle
+TR requests and read-only market snapshot projection.
+
+Broker connection/authentication requirements needed to perform those Broker
+requests remain unchanged. This supplement removes only Production Operation
+state as a Validation gate.
+
+======================================================================
+4. IMPLEMENTATION NORMALIZATION
+======================================================================
+
+At the code baseline above:
+
+1. Signal Validation Flow no longer defaults to a Production Operation reader.
+2. IndicatorFollowValidationHost preflight validates the settings snapshot and
+   timeframe only; it does not block on Operation activity.
+3. ValidationSession readiness is Operation-independent.
+4. Historical provider and Replay therefore continue while Production is
+   RUNNING/CLOSING.
+5. The obsolete routine-local operation_state.json reader was removed so
+   Validation cannot recreate a second Operation Source of Truth.
+
+Compatibility constructor arguments named operation_active_reader may remain
+temporarily accepted by existing callers/tests, but they carry no admission
+authority and are not consulted.
+
+======================================================================
+5. VERIFIED CONTRACT
+======================================================================
+
+Staged-only focused verification at the code baseline:
+
+- Validation foundation: 7 PASS
+- Validation host: 10 PASS
+- Historical provider: 15 PASS
+- Historical replay: 29 PASS
+- Validation stock-picker / operation-boundary tests: 22 PASS
+
+Focused total: 83 PASS.
+
+A direct runtime probe also verified that an existing
+runtime/operation_state.json with operation_status=RUNNING does not block the
+Validation preflight.
+
+======================================================================
+6. FINAL RULE
+======================================================================
+
+Signal Validation V2 is an operator inspection/replay tool, not a Production
+Operation participant.
+
+Production Operation state must never be used to decide whether the Validation
+Chart can open or run.
+
+The permanent rule is:
+
+    VALIDATION AVAILABILITY != PRODUCTION OPERATION ACTIVITY
+
+while the existing read-only isolation and Broker request safety boundaries
+remain mandatory.
