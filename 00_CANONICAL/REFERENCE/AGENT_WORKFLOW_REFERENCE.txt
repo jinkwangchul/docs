@@ -27,7 +27,7 @@ Rules:
 
 ### Role-Specific First / Second Principle
 
-AI work is divided into two distinct role layers. Do not confuse them.
+AI work has two responsibility layers and three assignable operating roles. Do not confuse the layers. The `Integrated Development Orchestrator` may perform both layers sequentially in one session, but it must preserve the investigation/design/plan gate before implementation and the independent criticism gate after implementation.
 
 First Principle — Execution Agent:
 - Applies to Codex and any other agent that performs approved code, document,
@@ -70,12 +70,46 @@ Current-state investigation
   instruction until `IMPLEMENTATION_ALLOWED` is confirmed. When the user asks
   for investigation only, stop after the investigation result and Gate verdict.
 
+Integrated Development Orchestrator:
+- This is the default end-to-end role when one current AI is responsible for
+  understanding the user request, investigating the project, designing the
+  change, selecting the implementation executor, implementing, criticizing the
+  result, and deciding completion.
+- Its mandatory top-level sequence is:
+
+```text
+제1원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판
+```
+
+- The First Principle is a continuous scope guard across every stage, not only
+  the implementation stage.
+- The investigation, analysis, design, and planning stages follow the Second
+  Principle discipline: do not guess, confirm current state and impact, and
+  issue the existing Gate verdict before implementation.
+- `IMPLEMENTATION_ALLOWED` permits the same Orchestrator to enter the
+  implementation stage; a separate Execution Agent is not mandatory unless the
+  user or the Orchestrator deliberately delegates the work.
+- The criticism stage is independent from the implementation success report.
+  Re-check the approved requirement, design, plan, actual diff, tests, Runtime,
+  state, and logs as applicable. Do not treat the implementer's own success
+  statement as verification.
+- If criticism finds a defect, return to the earliest stage that is wrong:
+  analysis for a wrong cause, design for a wrong contract or approach, planning
+  for an omitted path, implementation for a code defect, or verification for an
+  evidence gap. Do not silently expand scope while fixing it.
+- Completion is allowed only after criticism and fresh evidence support the
+  result.
+
 Role boundary:
 - The Design / Audit / Manager role investigates, analyzes, audits contracts,
   confirms cause and impact, determines minimum scope, plans implementation,
   issues the Gate verdict, and only then writes the Execution Agent instruction.
 - The Execution Agent implements the approved instruction, tests it, verifies
   it, and reports the result.
+- The Integrated Development Orchestrator may perform both responsibility layers
+  sequentially in one conversation. It must not collapse them: investigation,
+  analysis, design, planning, and Gate remain distinct from implementation, and
+  implementation remains distinct from criticism and completion judgment.
 - The Design / Audit / Manager role must not skip evidence gathering and behave
   as though implementation directions were already proven. The Execution Agent
   must not behave as the Design / Audit / Manager by redefining the user's
@@ -212,6 +246,9 @@ Execution Environment
 ```
 
 Environment A: local Git execution available.
+- ChatGPT Web counts as Environment A when a connected and verified Desktop
+  Commander can access the local repositories and execute the required Git
+  commands.
 - Examples: Codex CLI, local Codex, VSCode, or an agent with direct access to
   the user's local repositories.
 - Actually run, when relevant:
@@ -236,6 +273,43 @@ Environment B: local Git execution unavailable.
   that is not locally verifiable.
 - If local state is required, ask the user to run the local commands or move the
   work to a local-execution agent.
+
+Development Tool Routing Policy:
+- The current ChatGPT model is the default Orchestrator when the Startup Prompt
+  assigns the Integrated Development Orchestrator role.
+- Desktop Commander is the default local implementation and verification path
+  when it is connected and verified. Use it for local file inspection and
+  edits, PowerShell, the required Python runtime, GUI/process checks, Runtime,
+  logs, and Git evidence.
+- Before implementation, classify execution weight as `LIGHT`, `MEDIUM`, or
+  `HEAVY` from scope, coupling, uncertainty, regression risk, and safety impact.
+  File count alone does not determine the class.
+- `LIGHT`: the target and existing pattern are clear and the change is bounded;
+  use Desktop Commander directly.
+- `MEDIUM`: several files, GUI/state flow, or call-chain coordination is needed
+  but the structure is understood; keep Desktop Commander as the primary path
+  and use Codex only when analysis or an independent audit materially helps.
+- `HEAVY`: cross-layer structural work, unclear or broad call graphs, repeated
+  direct-fix failure, or high-risk boundary changes are involved; Codex CLI may
+  be selected for implementation or independent audit when the extra usage is
+  justified.
+- Codex CLI is an optional higher-cost specialist, not a mandatory hop. Escalate
+  to it when coordinated multi-file reasoning, difficult call-graph work,
+  repeated direct-fix failure, complex structural implementation, or an
+  independent high-intensity audit materially justifies the extra usage.
+- A Codex success report is not final evidence. The Orchestrator must inspect
+  the resulting diff and run the applicable local verification independently.
+- Codex quota exhaustion or unavailability does not stop ordinary project work;
+  continue with the Orchestrator plus Desktop Commander when safe.
+- ChatGPT Work is not part of this project workflow unless the user explicitly
+  reverses that restriction.
+- Superpowers is a selective quality-gate layer, not the project workflow. Use
+  systematic debugging for failure analysis, design/brainstorming discipline
+  when it adds value, code-review discipline during criticism, and fresh
+  verification before completion. Do not automatically introduce worktrees,
+  parallel/subagent development, tiny commit cycles, or extra spec/plan files.
+- Project Canonical, this Workflow Reference, and the latest explicit user
+  instruction override Superpowers defaults.
 
 Computer Use / KOA Studio Session Handoff Policy:
 - One Phase should be performed from start to finish inside one Codex task by default.
@@ -281,12 +355,40 @@ Every task starts with one fixed problem statement or Big Feature Goal.
 
 Default work flow:
 
-1. Define the actual problem
-2. Trace the real call path
-3. Confirm the actual stop point
-4. Make the smallest necessary change
-5. Verify through execution, tests, Runtime evidence, or logs
-6. Report only the result and remaining real stop points
+```text
+제1원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판
+```
+
+1. 제1원칙 준수: lock the user-authorized target and forbidden scope before
+   acting. The scope guard remains active through every later stage.
+2. 조사: inspect only the relevant Canonical/Reference, actual code, Git state,
+   Runtime, logs, GUI path, and execution evidence needed to establish facts.
+3. 분석: identify the real call path, stop point, cause, impact scope, and what
+   remains unconfirmed. Do not solve from guesswork.
+4. 설계: define the minimum safe approach and boundaries. Present material
+   choices to the user when a new contract, policy, architecture, or scope
+   decision is required.
+5. 계획: define change locations, execution order, verification method, and the
+   implementation executor. Issue the existing Gate verdict before implementation.
+6. 구현: use Desktop Commander by default or selectively escalate to Codex CLI
+   under the Development Tool Routing Policy. Stay inside the approved scope.
+7. 비판: independently challenge requirement coverage, design compliance, diff,
+   regressions, boundary violations, tests, Runtime/log evidence, and unsupported
+   success claims. Classify findings as `BLOCKER`, `IMPORTANT`, `MINOR`, or
+   `EVIDENCE_GAP`, and run fresh verification before completion.
+
+Criticism finding meaning:
+- `BLOCKER`: required behavior, contract, scope protection, or safety boundary is
+  broken; completion is blocked.
+- `IMPORTANT`: meaningful regression or required-path omission exists; correct it
+  before completion unless the user explicitly defers it.
+- `MINOR`: non-blocking observation; do not expand scope merely to clean it up.
+- `EVIDENCE_GAP`: the implementation may be correct but proof is insufficient;
+  rerun or strengthen verification before completion.
+
+Completion is a verdict after the criticism stage, not a substitute for it. If
+criticism exposes an earlier error, return to the earliest incorrect stage and
+repeat forward from there.
 
 Do not change the problem during the task. New findings are reported separately unless the user explicitly expands scope.
 
@@ -664,24 +766,27 @@ This means:
 
 Do not create a Next Session Startup Prompt at this step.
 
-Step 2. Run The Codex Work Closing Prompt
+Step 2. Integrated Closing Execution
 
-Run the user-approved Codex closing prompt.
+The current AI responsible for Conversation Closing performs the close-out work directly. The former Codex-specific closing prompt is retired and its duties are absorbed into this procedure.
 
-This step performs the defined close-out work, including as applicable:
+The Closing AI performs, as applicable:
 - Git status inspection
 - Commit
 - Push
 - Canonical update
 - Changelog update
 - Work Resume update
-- Other close-out work defined by the operation manuals
+- Development Environment handoff refresh
+- Other close-out work explicitly required by this Workflow Reference
+
+Codex CLI may be used as an optional specialist during Closing only when it adds material value. It is never required for Closing, and Codex quota exhaustion or unavailability must not block Project Freeze when the current AI can complete and verify the work through Desktop Commander and available Git evidence.
 
 Do not create a Next Session Startup Prompt during this step.
 
-Step 3. Codex Completion Report
+Step 3. Integrated Closing Report
 
-Codex reports the close-out result.
+The same Closing AI reports the close-out result from actual evidence.
 
 The report must include:
 - Commit SHA
@@ -689,12 +794,13 @@ The report must include:
 - Updated documents
 - Git status
 - Any protected dirty/untracked files that intentionally remain
+- Development Environment state needed by the next session
 
 Do not create a Next Session Startup Prompt in the completion report unless Steps 2 through 4 have already completed.
 
-Step 4. Result Verification
+Step 4. Independent Result Verification
 
-Verify the close-out result before declaring Conversation Closing complete.
+The Closing AI must independently re-check the close-out result before declaring Conversation Closing complete.
 
 Required checks:
 - Commit SHA
@@ -707,6 +813,10 @@ Required checks:
 - Protected dirty/untracked files remain protected
 
 Conversation Closing is complete only after these checks pass or an unresolved blocker is explicitly reported.
+
+The Closing AI must not rely on an implementation agent, Codex report, previous
+message, or assumed tool state as proof. Re-read the final Git/document/tool
+evidence directly before moving to Step 5.
 
 Step 5. Create The Next Session Startup Prompt
 
@@ -740,10 +850,10 @@ Current AI Role
 ==================================================
 
 Role:
-<Execution Agent / Design-Audit-Manager / Must Confirm>
+<Integrated Development Orchestrator / Execution Agent / Design-Audit-Manager / Must Confirm>
 
 Applicable Principle:
-<제1원칙 / 제2원칙 / Must Confirm>
+<제1원칙 상시 + 제2원칙 조사·분석·설계·계획 규율 / 제1원칙 / 제2원칙 / Must Confirm>
 
 ==================================================
 ```
@@ -765,11 +875,18 @@ Role declaration rules:
   the Gate verdict, and may write an Execution Agent implementation instruction
   only after `IMPLEMENTATION_ALLOWED`. It must not confuse itself with the
   Execution Agent role.
+- For `Role: Integrated Development Orchestrator`, declare the combined
+  applicable principle exactly as shown above. The AI owns the end-to-end flow
+  `제1원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판`, uses the existing
+  Gate before implementation, selects Desktop Commander or Codex according to
+  the Development Tool Routing Policy, and performs independent criticism and
+  fresh verification before completion.
 - This role declaration does not replace the independent First Principle block
   or any other existing mandatory Startup Prompt content below.
 
-A Design / Audit / Manager AI that writes a Startup Prompt is itself governed
-by the Second Principle. Before writing the Startup Prompt, its author must
+Any AI that writes a Startup Prompt is governed by the Second Principle for
+Closing/handoff verification, including an Integrated Development Orchestrator.
+Before writing the Startup Prompt, its author must
 verify in this order:
 1. final Closing result
 2. actual Branch and Commit
@@ -784,6 +901,28 @@ verify in this order:
 Do not invent the next task or role from inference.
 
 The final prompt must include:
+- The following independent Mandatory Development Workflow block. It must be
+  reproduced explicitly whenever the next-session role is Integrated Development
+  Orchestrator, and it must not be replaced by a reference to this file:
+
+```text
+==================================================
+Mandatory Development Workflow
+==================================================
+
+제1원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판
+
+- 제1원칙은 모든 단계에서 계속 적용한다.
+- 조사·분석에서는 추측하지 않고 실제 근거를 확인한다.
+- 설계·계획에서 새 계약/정책/범위 결정이 필요하면 사용자 확인을 받는다.
+- 계획 후 기존 Gate verdict를 통과해야 구현으로 진입한다.
+- 구현 도구는 Development Tool Routing Policy에 따라 선택한다.
+- 구현 완료 보고를 그대로 신뢰하지 않고 비판 단계에서 독립 재검토한다.
+- 비판 결과는 BLOCKER / IMPORTANT / MINOR / EVIDENCE_GAP으로 구분한다.
+- 비판 후 fresh verification 근거가 있어야 완료로 판정한다.
+==================================================
+```
+
 - The following independent `제1원칙 — 작업 범위 절대 보호` block, reproduced
   explicitly in every final Next Session Startup Prompt. It must not be omitted,
   shortened, summarized, buried inside another rule, or replaced by an indirect
@@ -875,6 +1014,50 @@ NO
 - Recently completed work
 - Current implementation location
 - The first concrete next implementation task, if one is defined by the Source of Truth
+
+Every final Next Session Startup Prompt must include this verified Development
+Environment block. Fill it from the actual Closing state; use `Must Verify`
+instead of guessing any value:
+
+```text
+==================================================
+Development Environment
+==================================================
+
+- Primary Orchestrator: <current verified ChatGPT model / role>
+- Desktop Commander: <Available / Not Available / Must Verify>
+- Connected Device: <verified device name / Must Verify>
+- Automatic Trading Repository: <Project Identity local path>
+- Documentation Repository: <Project Identity local path>
+- Python Runtime: <verified executable path, version, bitness / Must Verify>
+- Codex CLI: <Available / Not Available / Must Verify>
+- Codex CLI Executable: <verified path / Must Verify>
+- Codex Authentication: <verified state / Must Verify>
+- Codex Model / Reasoning: <verified current setting / Must Verify>
+- Superpowers: <Available / Not Available / Must Verify>
+- ChatGPT Work: Do Not Use unless the user explicitly re-enables it
+
+Tool Routing:
+- Classify implementation weight as LIGHT / MEDIUM / HEAVY before implementation.
+- LIGHT: Desktop Commander direct implementation.
+- MEDIUM: Desktop Commander primary; Codex only when analysis or independent
+  audit materially helps.
+- HEAVY: Codex CLI may be used for implementation or independent audit when the
+  extra usage is justified; Desktop Commander remains the local verification path.
+- Default local implementation and verification: Desktop Commander.
+- Escalate selectively to Codex CLI only when complexity or independent audit
+  value justifies the additional usage.
+- Codex output is not final evidence; the Orchestrator independently verifies
+  the diff and applicable tests, Runtime, logs, state, or GUI result.
+- If Codex quota is exhausted or Codex is unavailable, continue through
+  ChatGPT + Desktop Commander when safe.
+- Superpowers is used only as a selective quality gate: systematic debugging
+  for failures, design discipline when useful, critical review after
+  implementation, and fresh verification before completion. Do not introduce
+  worktrees, parallel/subagent development, tiny commit cycles, or extra
+  spec/plan files by default.
+==================================================
+```
 
 The Next Session Startup Prompt must hand off not only Repository Information
 and Work Resume state, but also the currently confirmed External Tool
@@ -1074,7 +1257,11 @@ independent `제1원칙 — 작업 범위 절대 보호` block specified in Step
 it may not abbreviate the block or replace it with a reference to this document.
 It must also begin with the mandatory `Current AI Role` block, declare the
 applicable role-specific principle, and include the corresponding explicit
-role instructions required by Step 5. These Startup Prompt requirements are
+role instructions required by Step 5. Every final Startup Prompt must include
+  the verified Development Environment block. When the role is Integrated Development
+Orchestrator, it must additionally reproduce the Mandatory Development Workflow
+block. These Startup Prompt
+requirements are
 explicit exceptions to the ordinary Task Prompt non-repetition rule.
 
 Default prompt length should stay small:
