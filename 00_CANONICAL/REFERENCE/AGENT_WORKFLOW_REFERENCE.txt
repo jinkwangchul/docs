@@ -297,6 +297,48 @@ Development Tool Routing Policy:
   to it when coordinated multi-file reasoning, difficult call-graph work,
   repeated direct-fix failure, complex structural implementation, or an
   independent high-intensity audit materially justifies the extra usage.
+
+Codex CLI Invocation Contract:
+- ChatGPT Web does not treat Codex as a directly callable web-app tool in this
+  project workflow.
+- The normal automated invocation path is exactly:
+
+```text
+ChatGPT Web Orchestrator
+-> Desktop Commander
+-> connected Windows device
+-> PowerShell/local process execution
+-> local codex.exe
+-> Codex CLI task
+-> local file/diff result
+-> Desktop Commander evidence return
+-> ChatGPT Web independent criticism and verification
+```
+
+- Desktop Commander is the execution bridge between ChatGPT Web and the local
+  Codex CLI. When the Orchestrator chooses Codex, it must use Desktop Commander
+  to run the CLI on the user's connected computer; it must not claim or assume a
+  direct web-app Codex invocation occurred.
+- Before a Codex CLI call, resolve the currently installed `codex.exe` path when
+  needed, because the VS Code extension directory may change after an update.
+  Do not edit, restore, or reinstall project files merely because a previously
+  recorded executable path changed.
+- Verify the local Codex login state and, when relevant, the configured model and
+  reasoning effort before relying on them as current facts.
+- Invoke the local CLI from the intended repository/work directory, normally by
+  Desktop Commander running PowerShell and `codex.exe exec`. Use a noninteractive
+  input path such as piped stdin or a prompt file when appropriate so the call
+  does not remain waiting for additional terminal input.
+- After Codex returns, the Orchestrator must use Desktop Commander to inspect the
+  actual changed files/diff and perform the applicable local Python, GUI,
+  Runtime, state, log, and Git verification. Codex's own completion message is
+  not final evidence.
+- If Desktop Commander is unavailable, do not pretend that ChatGPT Web directly
+  invoked the local Codex CLI. Mark the local Codex invocation path unavailable
+  until a verified local execution bridge exists, unless the user explicitly
+  selects another execution environment.
+- If Codex quota is exhausted or Codex CLI is unavailable, continue through
+  ChatGPT Web + Desktop Commander when safe.
 - A Codex success report is not final evidence. The Orchestrator must inspect
   the resulting diff and run the applicable local verification independently.
 - Codex quota exhaustion or unavailability does not stop ordinary project work;
@@ -1059,6 +1101,45 @@ Tool Routing:
 ==================================================
 ```
 
+Every final Next Session Startup Prompt must also include this independent
+Codex CLI Invocation Path block. It must be reproduced explicitly and must not
+be replaced by a generic statement such as `Codex available` or `use Codex when
+needed`:
+
+```text
+==================================================
+Codex CLI Invocation Path
+==================================================
+
+Codex CLI is not called directly from ChatGPT Web.
+
+Normal automated path:
+
+ChatGPT Web Orchestrator
+-> Desktop Commander
+-> connected Windows PC
+-> PowerShell/local process
+-> local codex.exe exec
+-> Codex CLI result / file changes
+-> Desktop Commander diff and local evidence
+-> ChatGPT Web independent criticism and verification
+
+Rules:
+- Desktop Commander is the bridge used to launch local Codex CLI.
+- Do not describe this as a direct web-app Codex call.
+- Resolve the current codex.exe path when necessary because the VS Code
+  extension directory can change after updates.
+- Verify Codex login/model/reasoning when those values matter to the task.
+- Run Codex in the intended repository/work directory.
+- Codex completion text is not final evidence; inspect the actual diff and run
+  the required local verification through Desktop Commander.
+- If Desktop Commander is unavailable, do not pretend the local Codex CLI was
+  called directly from the web app.
+- If Codex quota is exhausted or Codex is unavailable, continue with
+  ChatGPT Web + Desktop Commander when safe.
+==================================================
+```
+
 The Next Session Startup Prompt must hand off not only Repository Information
 and Work Resume state, but also the currently confirmed External Tool
 Environment and Computer Use / KOA Studio operating rules when they are needed
@@ -1258,11 +1339,11 @@ it may not abbreviate the block or replace it with a reference to this document.
 It must also begin with the mandatory `Current AI Role` block, declare the
 applicable role-specific principle, and include the corresponding explicit
 role instructions required by Step 5. Every final Startup Prompt must include
-  the verified Development Environment block. When the role is Integrated Development
+  the verified Development Environment block and the independent Codex CLI
+Invocation Path block. When the role is Integrated Development
 Orchestrator, it must additionally reproduce the Mandatory Development Workflow
-block. These Startup Prompt
-requirements are
-explicit exceptions to the ordinary Task Prompt non-repetition rule.
+block. These Startup Prompt requirements are explicit exceptions to the
+ordinary Task Prompt non-repetition rule.
 
 Default prompt length should stay small:
 - Analysis: about 10-20 lines when possible
