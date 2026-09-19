@@ -1,0 +1,144 @@
+WORK RESUME LATEST
+2026-09-19 WAITING REENTRY AND VERIFIED NXT ELIGIBILITY FREEZE
+
+Status: LATEST RECOVERY BASELINE
+
+======================================================================
+1. REPOSITORY BASELINE
+======================================================================
+
+Code repository:
+- Local: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Remote: https://github.com/jinkwangchul/kiwoom_auto.git
+- Branch: feat/restore-auto-trade-setting-ui
+- Final Local HEAD before Docs Freeze: 1d58e20270c14cefb3a7631ae1e11d0dc9b9627b
+- Final Remote HEAD before Docs Freeze: 1d58e20270c14cefb3a7631ae1e11d0dc9b9627b
+- Local/Remote: equal
+
+Docs repository:
+- Local: C:\Users\JIN KWANG CHUL\Documents\docs
+- Remote: https://github.com/jinkwangchul/docs.git
+- Branch: agent/project-prompt-standard
+- Starting HEAD: 56038a0299b3c13378c76fa6ec3479f92a372af8
+- Final Freeze HEAD: the Docs commit containing this Work Resume; use the
+  verified Closing Completion Report and git rev-parse HEAD because a commit
+  cannot contain its own cryptographic SHA as a literal self-reference.
+
+======================================================================
+2. CURRENT TECHNICAL OWNERS
+======================================================================
+
+- Signal Validation while Production operation is active:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-18_SIGNAL_VALIDATION_OPERATION_INDEPENDENCE_SUPPLEMENT.txt
+- Mock Validation bounded runtime growth:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-18_MOCK_VALIDATION_RUNTIME_GROWTH_NORMALIZATION.txt
+- Waiting/re-entry and effective-session semantics:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-19_WAITING_REENTRY_AND_EFFECTIVE_SESSION_NORMALIZATION.txt
+- Per-stock verified NXT eligibility for ATS admission:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-19_VERIFIED_NXT_ELIGIBILITY_ATS_GATE_SUPPLEMENT.txt
+- Signal Validation V2 UI normalization outside the later supplements:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt
+
+No later supplement should be interpreted as replacing unrelated independent
+Current Canonical owners.
+
+======================================================================
+3. RECENTLY COMPLETED OPERATING-CONTRACT CHAIN
+======================================================================
+
+Code:
+- 9db2ddc63720b462092f53f91fb60fb0a98b1bc1
+  Allow signal validation during operation.
+- 60bb412e2db050c160caef56ca19cf64b4944258
+  Lock validation operation independence.
+- 624646b15aa1931feb5bb57cf06d1d754d4b439e
+  Bound Mock Validation runtime growth.
+- b43ef17bf7f1097310879bce4a25f54d0ea03c1e
+  Normalize waiting re-entry operation semantics.
+- a13db89c6b402dc1711522b2ee4e94854c1743f0
+  Distinguish waiting/re-enterable state from terminal operation state.
+- 1d58e20270c14cefb3a7631ae1e11d0dc9b9627b
+  Gate ATS sessions by verified per-stock NXT eligibility.
+
+Docs commits already completed before this Freeze:
+- 0112586 Document validation operation independence
+- f81bcc8 Add validation operation regression guard
+- 644ce58 Document mock runtime growth normalization
+- 56038a0 Document waiting reentry session contract
+
+======================================================================
+4. CURRENT NXT / WAITING CONTRACT AT RECOVERY
+======================================================================
+
+- WAITING is re-enterable only while a valid future effective session remains;
+  it is not equivalent to terminal final-session completion.
+- Effective session is the configured Program window intersected with the
+  actual exchange session and the applicable per-stock admission boundary.
+- For ATS/NXT windows, verified Master Stock Library `nxt_available=true` is
+  required.
+- False, null, absent, invalid, or unverified NXT eligibility fails closed.
+- An unavailable NXT session is not a future re-entry horizon.
+- Manual ATS selection/liquidation for such a stock is blocked with
+  `NXT_NOT_AVAILABLE`.
+- Regular KRX semantics are unchanged.
+- The 2026-09-11 NXT realtime contract remains display-only and separate.
+- No NXT execution engine, SOR policy, Broker writer, or new persisted schema
+  was authorized by this work.
+
+Validation evidence for 1d58e20:
+- exact staged-index tree 73b1cebf2fb5306041dd61155755a5ba37c347a5
+- changed-module py_compile PASS
+- focused/adjacent suite 295 tests PASS
+- no Broker side effects
+
+======================================================================
+5. PROTECTED LOCAL WIP
+======================================================================
+
+At this Closing start, the Code repository had 313 porcelain-status paths.
+Snapshot fingerprint:
+  aee24f42c664d10973037ba7441790c351641d58dbd4a7a488841f289a5de9a9
+
+Every one of those paths is protected user-owned LOCAL WIP for this Freeze.
+Do not reset, restore, stash, clean, auto-format, broadly stage, or mix it into
+a closing commit.
+
+At this Closing start, the Docs repository had 138 porcelain-status paths.
+Excluding the already-dirty Reference Index, the other 137 protected paths had:
+  1b543048b61ace549dd304fa1bb129897c0ee60e28beae6f92ccf08d18f9d7e9
+
+The Reference Index already contained one pre-existing unstaged hunk adding
+MASTER_SPEC_CANONICAL_2026-09-03_MOCK_VALIDATION_CONCEPT_CONTRACT.txt under
+Other Independent Current Contracts. That pre-existing hunk is protected and
+must remain outside this Freeze commit.
+
+Only the three new 2026-09-19 closing documents and the new Reference Index
+pointer hunks created by this Closing belong to the Docs Freeze commit.
+
+======================================================================
+6. EXECUTION ENVIRONMENT HANDOFF
+======================================================================
+
+- Codex: unavailable for this Closing because the user reported the current
+  Codex usage limit was exhausted.
+- Closing agent: current ChatGPT model using Desktop Commander.
+- Desktop Commander: available and connected to the original local repositories.
+- Local Git command execution: available.
+- GitHub remote access through local Git push: available.
+- Computer Use / KOA Studio state: not required and not re-evaluated for this
+  documentation/Git Freeze.
+- No Broker login or Broker-side action is authorized by this handoff.
+
+======================================================================
+7. NEXT RECOVERY POINT
+======================================================================
+
+No next implementation is authorized by this Freeze.
+
+The next session must restore from the final verified Code and Docs baselines,
+preserve all protected LOCAL WIP, read the current owners above, and wait for
+the user's explicit implementation instruction.
+
+Do not infer a new Production gap from PR history, merge history, dirty files,
+or this Work Resume. Do not create an implementation task merely because Codex
+becomes available again.

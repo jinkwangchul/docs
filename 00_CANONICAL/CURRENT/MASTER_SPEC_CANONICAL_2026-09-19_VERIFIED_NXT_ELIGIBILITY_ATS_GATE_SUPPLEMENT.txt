@@ -1,0 +1,112 @@
+# MASTER SPEC CANONICAL SUPPLEMENT
+# VERIFIED NXT ELIGIBILITY ATS GATE
+# Date: 2026-09-19
+
+[Status]
+- CURRENT supplemental contract for per-stock NXT eligibility in ATS operation.
+- Production code baseline: kiwoom_auto commit 1d58e20270c14cefb3a7631ae1e11d0dc9b9627b
+- Branch: feat/restore-auto-trade-setting-ui
+- This supplement closes only the NXT-eligibility gap left open by the
+  2026-09-19 Waiting Re-entry and Effective Session Normalization supplement.
+- Unrelated Current Canonical contracts remain unchanged.
+
+1. Purpose
+
+The prior waiting/re-entry contract established that configured ATS windows must
+be intersected with actual exchange availability, but intentionally did not
+redefine the per-stock NXT eligibility Source of Truth.
+
+The confirmed Production implementation now resolves that missing boundary:
+an ATS session is effective for a stock only when verified Master Stock Library
+evidence explicitly says `nxt_available=true`.
+
+This is an eligibility gate. It is not a new order method, NXT execution engine,
+SOR policy, Broker writer, or realtime-price authority.
+
+2. Authoritative eligibility evidence
+
+- Per-stock eligibility is read through `stock_nxt_availability(stock_code)`.
+- The reader is backed only by `load_stock_library_snapshot()`.
+- The runtime Master Library is accepted only when metadata reports READY and
+  the strict runtime file passes final-count and SHA-256 verification.
+- `nxt_available=true` means NXT-eligible.
+- `nxt_available=false` means not NXT-eligible.
+- Missing, invalid, unverified, absent-stock, or explicit null evidence returns
+  unknown and is treated as not authorized for ATS.
+- False and unknown both fail closed for ATS authority.
+- The process cache is invalidated by the runtime Stock Library and metadata
+  file signatures. No new persisted cache, Runtime schema, or writer is added.
+
+3. Effective-session semantics
+
+- KRX regular-session semantics are unchanged.
+- Configured extra/ATS sessions are effective only for an NXT-eligible stock.
+- A non-eligible or unknown stock cannot obtain a future ATS re-entry horizon.
+- When eligibility removes all configured ATS windows, the session classifier
+  may report `NXT_SESSION_UNAVAILABLE` rather than treating the ATS window as
+  a valid current or future session.
+- Program Operation Window intersection with actual exchange ranges remains the
+  governing time rule; eligibility is an additional per-stock admission gate.
+
+4. Production boundaries covered
+
+The same verified eligibility is propagated through the current Production
+boundaries that can otherwise treat an ATS window as usable:
+
+- canonical Routine BUY/SELL order-time permission
+- continuous-operation activation/session projection
+- manual ATS runtime selection for a stock
+- manual ATS liquidation target eligibility
+- close/liquidation availability
+- final-session/time-end retirement classification
+- Main/AutoTradeSetting status and table projection paths that consume the
+  canonical session result
+
+Manual ATS selection or liquidation for a non-eligible/unknown stock is blocked
+with the existing explicit reason `NXT_NOT_AVAILABLE`.
+
+5. Mock and projection parity
+
+Mock/reference projection receives the stock's NXT eligibility as read-only
+reference evidence. Mock must not manufacture ATS availability when Production
+would fail closed. This does not give Mock authority over the Production Stock
+Library writer or Production market-data state.
+
+6. Waiting versus terminal follow-up
+
+Commit a13db89c6b402dc1711522b2ee4e94854c1743f0 refined the already-confirmed
+2026-09-19 waiting/re-entry contract by distinguishing a waiting/re-enterable
+operation state from a terminal final-session state. It introduces no separate
+new contract and remains governed by the Waiting Re-entry Canonical.
+
+7. Validation evidence
+
+Exact staged-index snapshot used before the Production commit:
+- Git tree: 73b1cebf2fb5306041dd61155755a5ba37c347a5
+- py_compile of the changed Production/Mock modules: PASS
+- focused and adjacent unittest set: 295 tests PASS
+- final test exit: 0
+
+The focused suite covered waiting re-entry, ATS operations, ATS visibility,
+close/liquidation, time-end retirement, operation-mode boundaries, same-day
+restart, global operation button behavior, projection precedence, Mock
+operation lifecycle, and stock tooltip persistence.
+
+No Broker login, TR request, realtime registration, SendOrder, modification,
+cancellation, or other Broker side effect was used for this validation.
+
+8. Explicitly not authorized by this supplement
+
+- NXT Production order execution as a new execution path
+- SOR or simultaneous KRX/NXT source-priority policy
+- NXT orderbook execution logic
+- `_AL` integrated identity
+- new Runtime/Queue/Position/Fill writer
+- changing the 2026-09-11 NXT display-only realtime contract
+- changing the user's configured ATS windows
+
+9. Scope protection
+
+The implementation and this supplement are limited to verified per-stock NXT
+eligibility as an ATS admission/session gate. Existing protected LOCAL WIP is
+outside this contract and must remain untouched.

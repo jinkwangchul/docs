@@ -24,6 +24,8 @@ CURRENT.
 | Sep-13 Production/Mock close normalization and Indicator-follow read-only Historical Validation Chart | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-13_OPERATION_MOCK_AND_INDICATOR_VALIDATION_FREEZE.txt` | Supplemental owner for later close/auth/shared-boundary normalization and the dedicated current-edit Historical replay chart; validation-on-commit, Mock Validation, and earlier independent owners remain separate |
 | Indicator-follow Signal Validation V2, completed cycles, aggregate return, and Replay performance | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt` | Latest supplemental owner for the independent operator V2, empty SELL-expression meaning, evidence/axis/cycle UI, completed-cycle aggregate return, and Replay optimization Phases 2-4 |
 | Signal Validation V2 validation, silent status, result summary, and tooltip normalization | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt` | Supersedes only conflicting Sep-14/Sep-15 wording for expression-aware SELL admission, silent apply/completion, Korean summary/0.00% display, timestamp label, and tooltip dismissal dispatch |
+| Signal Validation operation independence while Production operation is active | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-18_SIGNAL_VALIDATION_OPERATION_INDEPENDENCE_SUPPLEMENT.txt` | Validation remains an independent operator workflow and does not acquire Production operation mutation authority |
+| Mock Validation bounded runtime growth | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-18_MOCK_VALIDATION_RUNTIME_GROWTH_NORMALIZATION.txt` | Current owner for bounded process-local Mock runtime/evidence growth without Production persistence authority |
 | Indicator-follow SELL execution and MULTI_HOGA contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_INDICATOR_FOLLOW_SELL_PHASE1_AND_MULTI_HOGA_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` |
 | Routine package boundary and capability contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt` |
 | Logical Group and Group Pack identity/lifecycle | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-22_LOGICAL_GROUP_PACK_ARCHITECTURE_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt`, `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-08-22_GROUP_LIFECYCLE_RECOVERY_FREEZE.txt`, `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-22_AUTO_TRADE_SETTING_STRATEGY_WORKSPACE_UI_CLOSURE.txt` |
@@ -32,6 +34,8 @@ CURRENT.
 | Mock Validation implementation | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-08_MOCK_VALIDATION_UI_ATS_CLOSURE_FREEZE.txt` | Sep-03 foundation remains supporting authority; Sep-08 owns current UI/Event closure and overlay/zero-base clarification |
 | ATS generic order-method retirement | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-08_MOCK_VALIDATION_UI_ATS_CLOSURE_FREEZE.txt` | ATS sessions and legitimate liquidation remain preserved; only generic Routine BUY/SELL execution_method mapping is superseded |
 | Operation-mode admission, close/liquidation display, Quick Chart live projection, and TR capacity gauge | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-11_REGULAR_WINDOW_CLOSING_FREEZE.txt` | Detailed display matrix: `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-11_OPERATION_MODE_CLOSE_LIQUIDATION_DISPLAY_RECONCILIATION.txt`; older independent execution owners remain unchanged |
+| Operation waiting/re-entry and effective-session semantics | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-19_WAITING_REENTRY_AND_EFFECTIVE_SESSION_NORMALIZATION.txt` | Current owner for re-enterable waiting, final-session terminal distinction, Program/actual-session intersection, and canonical start admission |
+| Per-stock verified NXT eligibility for ATS admission | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-19_VERIFIED_NXT_ELIGIBILITY_ATS_GATE_SUPPLEMENT.txt` | Closes the NXT-eligibility gap: only verified Master Stock Library `nxt_available=true` authorizes an ATS session; false/unknown fail closed |
 | PAPER Trading architecture | `00_CANONICAL/REFERENCE/PAPER_TRADING_ISOLATED_EXECUTION_DOMAIN_REFERENCE.md` | Deferred architecture only; implementation has not started |
 
 ## Other Independent Current Contracts
@@ -73,15 +77,15 @@ does not supersede them.
 ## Current Resume And Changelog
 
 - Latest Frozen Authority:
-  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt`
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-19_VERIFIED_NXT_ELIGIBILITY_ATS_GATE_SUPPLEMENT.txt`
 - Latest Local WIP Work Resume:
   `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
 - Latest Local WIP Changelog:
   `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
 - Latest Frozen Work Resume:
-  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_FREEZE.txt`
+  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-19_WAITING_REENTRY_AND_NXT_ELIGIBILITY_FREEZE.txt`
 - Latest Frozen Changelog:
-  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt`
+  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-19_VERIFIED_NXT_ELIGIBILITY_ATS_GATE_SUPPLEMENT.txt`
 
 Older Work Resumes, Readable variants, Freeze snapshots, and Changelogs are
 historical records. They may explain a past decision but must not be used as a

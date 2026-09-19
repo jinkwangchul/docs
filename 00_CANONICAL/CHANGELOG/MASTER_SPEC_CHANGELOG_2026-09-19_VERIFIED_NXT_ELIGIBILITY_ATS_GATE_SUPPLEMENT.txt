@@ -1,0 +1,57 @@
+MASTER SPEC CHANGELOG
+2026-09-19 VERIFIED NXT ELIGIBILITY ATS GATE SUPPLEMENT
+
+Canonical owner:
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-19_VERIFIED_NXT_ELIGIBILITY_ATS_GATE_SUPPLEMENT.txt
+
+Production code baseline:
+1d58e20270c14cefb3a7631ae1e11d0dc9b9627b
+
+======================================================================
+1. CONFIRMED CHANGES
+======================================================================
+
+- Verified runtime Master Stock Library evidence is now the per-stock NXT
+  eligibility authority used by ATS session admission.
+- Only explicit `nxt_available=true` authorizes an ATS window.
+- False, null, absent, invalid, or unverified evidence fails closed.
+- Continuous-operation session projection no longer treats an unavailable NXT
+  window as a valid current/future re-entry horizon.
+- Routine order permission, manual ATS selection, ATS liquidation,
+  close/liquidation availability, and time-end retirement now consume the same
+  per-stock eligibility boundary.
+- Non-eligible/unknown manual ATS targets use `NXT_NOT_AVAILABLE`.
+- Mock/reference projection receives NXT eligibility as read-only parity
+  evidence without gaining Production writer authority.
+
+======================================================================
+2. SUPERSEDED WORDING
+======================================================================
+
+This supplement supersedes only the sentence in
+MASTER_SPEC_CANONICAL_2026-09-19_WAITING_REENTRY_AND_EFFECTIVE_SESSION_NORMALIZATION.txt
+that left the NXT eligibility Source of Truth intentionally undesigned.
+
+The waiting/re-entry/session contract itself remains current. The
+2026-09-11 NXT display-only realtime contract also remains current and separate.
+
+Commit a13db89c6b402dc1711522b2ee4e94854c1743f0 is recorded as a refinement of
+the existing waiting-versus-terminal semantics, not as a separate new policy.
+
+======================================================================
+3. VERIFICATION
+======================================================================
+
+- exact staged-index tree: 73b1cebf2fb5306041dd61155755a5ba37c347a5
+- changed-module py_compile: PASS
+- focused/adjacent unittest set: 295 PASS
+- test exit: 0
+- no Broker-side effect was used
+
+======================================================================
+4. NOT CHANGED
+======================================================================
+
+No new NXT execution engine, SOR, Broker writer, Runtime/Queue schema,
+orderbook policy, integrated `_AL` identity, or KRX/NXT display-priority policy
+is introduced. Existing protected LOCAL WIP is outside this Changelog.
