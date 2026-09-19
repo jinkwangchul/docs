@@ -284,19 +284,57 @@ Development Tool Routing Policy:
 - Before implementation, classify execution weight as `LIGHT`, `MEDIUM`, or
   `HEAVY` from scope, coupling, uncertainty, regression risk, and safety impact.
   File count alone does not determine the class.
+- Core orchestration rule: `Parallel Reasoning, Serialized Mutation`.
+  Investigation, analysis, verification preparation, and criticism may run in
+  parallel across ChatGPT + Desktop Commander and Codex CLI. The same mutation
+  boundary must have only one writer at a time.
 - `LIGHT`: the target and existing pattern are clear and the change is bounded;
-  use Desktop Commander directly.
-- `MEDIUM`: several files, GUI/state flow, or call-chain coordination is needed
-  but the structure is understood; keep Desktop Commander as the primary path
-  and use Codex only when analysis or an independent audit materially helps.
+  default to `DC_ONLY`. Codex participation is optional.
+- `MEDIUM`: several files, GUI/state flow, call-chain coordination, or meaningful
+  regression risk exists while the structure is understood. Default to
+  `HYBRID_PARALLEL`: ChatGPT + Desktop Commander performs the real local-state,
+  Runtime, Log, GUI, Git, and code investigation while Codex CLI performs an
+  independent read-only analysis or criticism in parallel. If Codex is skipped,
+  the Orchestrator must state a short `CODEX_SKIPPED_REASON` in the planning
+  declaration.
 - `HEAVY`: cross-layer structural work, unclear or broad call graphs, repeated
-  direct-fix failure, or high-risk boundary changes are involved; Codex CLI may
-  be selected for implementation or independent audit when the extra usage is
-  justified.
-- Codex CLI is an optional higher-cost specialist, not a mandatory hop. Escalate
-  to it when coordinated multi-file reasoning, difficult call-graph work,
-  repeated direct-fix failure, complex structural implementation, or an
-  independent high-intensity audit materially justifies the extra usage.
+  direct-fix failure, or high-risk boundary changes are involved. When Codex is
+  available, active Codex participation is the default. Use ChatGPT + Desktop
+  Commander for local evidence and verification, Codex for structural analysis,
+  implementation when selected, and/or independent criticism.
+- Codex CLI remains an optional higher-cost specialist in the sense that quota
+  or availability must never block safe progress. However, for `MEDIUM` and
+  `HEAVY` work the Orchestrator must actively consider and normally use Codex
+  according to the defaults above rather than waiting for an exceptional case.
+
+Mandatory Hybrid Orchestration Declaration:
+- Before implementation, the Orchestrator must record the following planning
+  fields in the user-visible plan or execution note:
+
+```text
+Execution Weight: LIGHT / MEDIUM / HEAVY
+Orchestration Mode: DC_ONLY / HYBRID_PARALLEL / CODEX_PRIMARY
+Codex Role: NONE / ANALYSIS / IMPLEMENTATION / CRITIC / ANALYSIS_AND_CRITIC
+Mutation Owner: CHATGPT_DC / CODEX
+Verification Owner: CHATGPT_WEB + DESKTOP_COMMANDER
+CODEX_SKIPPED_REASON: <required only when MEDIUM/HEAVY skips Codex>
+```
+
+- `HYBRID_PARALLEL` means Codex CLI may run while the Orchestrator continues
+  non-conflicting read-only investigation, evidence gathering, test-scope
+  analysis, Runtime/Log review, GUI-path tracing, and verification preparation
+  through Desktop Commander.
+- Do not idle merely because a Codex CLI process is running if safe,
+  non-conflicting work remains available.
+- Before any write, assign exactly one `Mutation Owner` for the affected
+  mutation boundary. ChatGPT/Desktop Commander and Codex must not concurrently
+  edit the same file, state, schema, Writer, Runtime mutation path, or other
+  overlapping write surface.
+- A later handoff of Mutation Owner is allowed only after the previous writer
+  has stopped, its diff/state is inspected, and the new owner receives the
+  current actual baseline.
+- Verification ownership remains with the ChatGPT Web Orchestrator plus Desktop
+  Commander even when Codex is the Mutation Owner.
 
 Codex CLI Invocation Contract:
 - ChatGPT Web does not treat Codex as a directly callable web-app tool in this
@@ -1080,24 +1118,59 @@ Development Environment
 - ChatGPT Work: Do Not Use unless the user explicitly re-enables it
 
 Tool Routing:
+- Core rule: Parallel Reasoning, Serialized Mutation.
 - Classify implementation weight as LIGHT / MEDIUM / HEAVY before implementation.
-- LIGHT: Desktop Commander direct implementation.
-- MEDIUM: Desktop Commander primary; Codex only when analysis or independent
-  audit materially helps.
-- HEAVY: Codex CLI may be used for implementation or independent audit when the
-  extra usage is justified; Desktop Commander remains the local verification path.
-- Default local implementation and verification: Desktop Commander.
-- Escalate selectively to Codex CLI only when complexity or independent audit
-  value justifies the additional usage.
-- Codex output is not final evidence; the Orchestrator independently verifies
-  the diff and applicable tests, Runtime, logs, state, or GUI result.
+- LIGHT -> default `DC_ONLY`; Codex optional.
+- MEDIUM -> default `HYBRID_PARALLEL`; ChatGPT + Desktop Commander investigates
+  actual local evidence while Codex CLI performs independent read-only analysis
+  and/or criticism. If Codex is skipped, state `CODEX_SKIPPED_REASON`.
+- HEAVY -> active Codex participation is the default when available; combine
+  ChatGPT + Desktop Commander local evidence with Codex structural analysis,
+  implementation when selected, and/or independent criticism.
+- Before any write, select exactly one Mutation Owner for each overlapping write
+  surface. Do not let ChatGPT/Desktop Commander and Codex modify the same
+  mutation boundary concurrently.
+- While Codex runs, continue safe non-conflicting read-only investigation,
+  Runtime/Log review, GUI-path tracing, test-scope analysis, or verification
+  preparation instead of idling.
+- Required planning declaration:
+  Execution Weight / Orchestration Mode / Codex Role / Mutation Owner /
+  Verification Owner, plus CODEX_SKIPPED_REASON when MEDIUM/HEAVY skips Codex.
+- Verification Owner remains ChatGPT Web + Desktop Commander.
+- Codex output is not final evidence; independently verify the actual diff and
+  applicable tests, Runtime, logs, state, or GUI result.
 - If Codex quota is exhausted or Codex is unavailable, continue through
-  ChatGPT + Desktop Commander when safe.
-- Superpowers is used only as a selective quality gate: systematic debugging
-  for failures, design discipline when useful, critical review after
-  implementation, and fresh verification before completion. Do not introduce
-  worktrees, parallel/subagent development, tiny commit cycles, or extra
-  spec/plan files by default.
+  ChatGPT Web + Desktop Commander when safe.
+- Superpowers is used only as a selective quality gate. Do not introduce
+  Superpowers-managed worktrees, Superpowers parallel/subagent development,
+  tiny commit cycles, or extra spec/plan files by default. This does not prohibit
+  the explicit ChatGPT Web + Desktop Commander + local Codex CLI hybrid policy
+  defined above.
+==================================================
+```
+
+Every final Next Session Startup Prompt must also reproduce this independent
+Mandatory Hybrid Orchestration block:
+
+```text
+==================================================
+Mandatory Hybrid Orchestration
+==================================================
+Core rule: Parallel Reasoning, Serialized Mutation.
+LIGHT -> DC_ONLY by default; Codex optional.
+MEDIUM -> HYBRID_PARALLEL by default; ChatGPT+DC investigates actual local
+state while Codex performs independent analysis and/or criticism.
+HEAVY -> active Codex participation by default when available.
+Before implementation record:
+Execution Weight / Orchestration Mode / Codex Role / Mutation Owner /
+Verification Owner.
+If MEDIUM or HEAVY skips Codex, record CODEX_SKIPPED_REASON.
+Only one Mutation Owner may write an overlapping mutation boundary at a time.
+While Codex runs, continue safe non-conflicting read-only investigation and
+verification preparation through Desktop Commander rather than idling.
+Verification Owner remains CHATGPT_WEB + DESKTOP_COMMANDER.
+Codex quota or availability failure falls back to ChatGPT Web + Desktop
+Commander without blocking safe progress.
 ==================================================
 ```
 
@@ -1339,11 +1412,11 @@ it may not abbreviate the block or replace it with a reference to this document.
 It must also begin with the mandatory `Current AI Role` block, declare the
 applicable role-specific principle, and include the corresponding explicit
 role instructions required by Step 5. Every final Startup Prompt must include
-  the verified Development Environment block and the independent Codex CLI
-Invocation Path block. When the role is Integrated Development
-Orchestrator, it must additionally reproduce the Mandatory Development Workflow
-block. These Startup Prompt requirements are explicit exceptions to the
-ordinary Task Prompt non-repetition rule.
+the verified Development Environment block, the Mandatory Hybrid Orchestration
+block, and the independent Codex CLI Invocation Path block. When the role is
+Integrated Development Orchestrator, it must additionally reproduce the
+Mandatory Development Workflow block. These Startup Prompt requirements are
+explicit exceptions to the ordinary Task Prompt non-repetition rule.
 
 Default prompt length should stay small:
 - Analysis: about 10-20 lines when possible
