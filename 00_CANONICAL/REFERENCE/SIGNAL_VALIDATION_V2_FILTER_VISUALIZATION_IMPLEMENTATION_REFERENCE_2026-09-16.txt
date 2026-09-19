@@ -1,13 +1,17 @@
 SIGNAL VALIDATION V2 FILTER VISUALIZATION IMPLEMENTATION REFERENCE
 2026-09-16
 
-Status: PLANNING / REFERENCE / NOT IMPLEMENTED
-Gate: USER_DECISION_REQUIRED
+Status: HISTORICAL DESIGN REFERENCE / IMPLEMENTED 2026-09-19
+Gate: CLOSED BY IMPLEMENTATION
 
-Implementation is deferred because the remaining Codex token budget in the
-closing conversation was insufficient for safe implementation and verification.
-This document is design evidence only. It is not Canonical, does not authorize
-implementation, and does not make this work the mandatory next task.
+This document is retained as pre-implementation design evidence. Its unresolved
+decisions, NOT IMPLEMENTED status, and USER_DECISION_REQUIRED gate are
+superseded by:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-19_SIGNAL_VALIDATION_V2_FILTER_VISUALIZATION_AND_VIRTUAL_EXECUTION_SUPPLEMENT.txt
+
+The Canonical supplement owns the implemented contract. This Reference remains
+useful only for design history and rationale.
 
 ======================================================================
 1. PURPOSE AND BOUNDARY

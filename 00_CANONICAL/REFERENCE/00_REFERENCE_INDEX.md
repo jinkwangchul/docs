@@ -25,6 +25,7 @@ CURRENT.
 | Indicator-follow Signal Validation V2, completed cycles, aggregate return, and Replay performance | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt` | Latest supplemental owner for the independent operator V2, empty SELL-expression meaning, evidence/axis/cycle UI, completed-cycle aggregate return, and Replay optimization Phases 2-4 |
 | Signal Validation V2 validation, silent status, result summary, and tooltip normalization | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt` | Supersedes only conflicting Sep-14/Sep-15 wording for expression-aware SELL admission, silent apply/completion, Korean summary/0.00% display, timestamp label, and tooltip dismissal dispatch |
 | Signal Validation operation independence while Production operation is active | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-18_SIGNAL_VALIDATION_OPERATION_INDEPENDENCE_SUPPLEMENT.txt` | Validation remains an independent operator workflow and does not acquire Production operation mutation authority |
+| Signal Validation V2 virtual execution, configured-filter visualization, Evidence interaction, and Candle-snapped Crosshair | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-19_SIGNAL_VALIDATION_V2_FILTER_VISUALIZATION_AND_VIRTUAL_EXECUTION_SUPPLEMENT.txt` | Current supplemental owner for completed-Candle admission, OHLC/4 virtual fills, simplified weighted-average execution, 8-family visualization/cache, fixed lower-pane H, Evidence styling, Marker Pin/release, Crosshair, and cached value lookup; Git checkpoint remains separate |
 | Mock Validation bounded runtime growth | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-18_MOCK_VALIDATION_RUNTIME_GROWTH_NORMALIZATION.txt` | Current owner for bounded process-local Mock runtime/evidence growth without Production persistence authority |
 | Indicator-follow SELL execution and MULTI_HOGA contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_INDICATOR_FOLLOW_SELL_PHASE1_AND_MULTI_HOGA_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` |
 | Routine package boundary and capability contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt` |
@@ -67,7 +68,7 @@ does not supersede them.
   `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-06_MAIN_INDICATOR_FOLLOW_FULL_BOUNDARY_FREEZE.txt`
 - Indicator Follow latest Local Working-State Checkpoint (not a Freeze):
   `00_CANONICAL/REFERENCE/WORKING_STATE_BACKUP_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
-- Signal Validation V2 deferred Filter/Indicator Visualization plan (NOT IMPLEMENTED; USER_DECISION_REQUIRED):
+- Signal Validation V2 pre-implementation Filter/Indicator Visualization design history (IMPLEMENTED; current owner is the 2026-09-19 Canonical supplement):
   `00_CANONICAL/REFERENCE/SIGNAL_VALIDATION_V2_FILTER_VISUALIZATION_IMPLEMENTATION_REFERENCE_2026-09-16.txt`
 - Production monitoring/operating permission retirement:
   `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-04_MONITORING_OPERATING_MODE_RETIREMENT_FREEZE.txt`

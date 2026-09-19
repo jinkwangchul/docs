@@ -1,0 +1,410 @@
+MASTER SPEC CANONICAL SUPPLEMENT
+2026-09-19 SIGNAL VALIDATION V2 FILTER VISUALIZATION AND VIRTUAL EXECUTION
+
+Status: CURRENT SUPPLEMENTAL CANONICAL
+Code repository: kiwoom_auto
+Branch: feat/restore-auto-trade-setting-ui
+Frozen code commit: 2ce08978c28f0c105c6b68d00f839d41e9db76af
+Previous code base HEAD: 1d58e20270c14cefb3a7631ae1e11d0dc9b9627b
+Repository state note: this checkpoint is committed locally; push, PR, and merge
+remain separate explicit actions.
+
+Previous owners / evidence:
+- MASTER_SPEC_CANONICAL_2026-09-14_INDICATOR_FOLLOW_SIGNAL_VALIDATION_V2_FREEZE.txt
+- MASTER_SPEC_CANONICAL_2026-09-15_SIGNAL_VALIDATION_V2_CHART_INTERACTION_SUPPLEMENT.txt
+- MASTER_SPEC_CANONICAL_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt
+- MASTER_SPEC_CANONICAL_2026-09-18_SIGNAL_VALIDATION_OPERATION_INDEPENDENCE_SUPPLEMENT.txt
+- SIGNAL_VALIDATION_V2_FILTER_VISUALIZATION_IMPLEMENTATION_REFERENCE_2026-09-16.txt
+
+======================================================================
+1. AUTHORITY AND SCOPE
+======================================================================
+
+This supplement owns the completed local implementation contract for:
+
+- Historical completed-Candle admission used by V2 Replay;
+- Validation-only virtual fill / position / weighted-average simulation;
+- configured-filter visualization data projection and prefix-correct cache;
+- static price overlays and lower indicator panes;
+- Evidence-driven active/inactive/unsupported/error visualization;
+- Marker Hover / Click Pin / blank-chart Pin release; and
+- synchronized Candle-snapped Crosshair and cached value lookup.
+
+The 2026-09-16 Filter Visualization Reference remains design history only. Its
+PLANNING / NOT IMPLEMENTED / USER_DECISION_REQUIRED status is superseded by this
+supplement. Non-conflicting earlier Signal Validation V2 contracts remain in
+force.
+
+This supplement does not authorize Production order execution, Runtime mutation,
+Broker order submission, Chejan ownership, MarketDataHost mutable ownership, or
+a generic chart-framework rewrite.
+
+======================================================================
+2. HISTORICAL CANDLE AND VIRTUAL PRICE CONTRACT
+======================================================================
+
+Validation operates only on completed Historical Candle rows.
+
+The latest row is excluded only when it is identified as the currently forming
+Seoul-time timeframe bucket under the existing 09:00 market-bucket anchor.
+The implementation does not blindly drop the final row. A latest row belonging
+to an already completed bucket remains eligible. After the regular-session
+closing boundary, the last regular-session bucket is not removed merely because
+it is the latest row.
+
+Virtual execution price is Validation-only:
+
+    virtual_fill_price = (OPEN + HIGH + LOW + CLOSE) / 4
+
+The same representative price is used for virtual BUY and virtual SELL. All four
+OHLC values must be finite and positive. Missing/invalid OHLC does not silently
+fall back to Close.
+
+This is Historical OHLC-based approximate validation. It is not an assertion of
+the broker's actual historical execution price.
+
+Signal-indicator evaluation keeps its existing price semantics except where the
+approved Validation average-price context is explicitly supplied.
+
+======================================================================
+3. SIMPLIFIED VALIDATION EXECUTION / AVERAGE CONTRACT
+======================================================================
+
+The Validation execution model is intentionally smaller than Production.
+
+Approved Validation execution semantics:
+
+- first BUY quantity: exactly 1 share;
+- BUY hoga mode: SINGLE only;
+- SELL hoga mode: SINGLE only;
+- repeated BUY modes:
+  - ROUND;
+  - BUDGET;
+  - ACTIVE_BUY;
+- SELL closes the entire Validation virtual holding;
+- same evaluation index with both SELL and BUY is SELL-first and does not
+  immediately reopen BUY on that same index.
+
+Repeat-mode quantity calculation reuses the existing pure
+buy_execution_policy.py evaluator. Validation does not invoke Production Runtime,
+queue, broker, or writer ownership.
+
+After each virtual BUY:
+
+    weighted_average =
+        (previous_average * previous_quantity + fill_price * buy_quantity)
+        / new_quantity
+
+SELL return uses the same quantity-weighted average and OHLC/4 virtual fill.
+
+The V2 "간이 평단관리 검증" controls are Validation-local. They may enter the
+Validation Run Snapshot and Reset baseline, but they are removed from the
+Settings Apply payload and do not overwrite the source dialog's Production
+execution configuration.
+
+Not included:
+
+- multi-hoga execution;
+- pending-order / cancel simulation;
+- actual broker fill replay;
+- Production quantity/budget mutation;
+- fees, tax, spread, or slippage modeling;
+- SendOrder / Chejan.
+
+======================================================================
+4. AVG_PRICE REPLAY CONTEXT
+======================================================================
+
+The same incremental ValidationVirtualPositionTracker owns:
+
+- Replay-local AVG_PRICE supplied to evaluation;
+- position quantity;
+- contributing filled BUY indexes; and
+- completed virtual cycles.
+
+Therefore SELL conditions that compare against AVG_PRICE use the same
+quantity-weighted OHLC/4 virtual position average shown by Validation cycle
+results.
+
+The earlier simple equal-weight BUY-close average is not the owner when the
+Validation execution policy is present.
+
+======================================================================
+5. CONFIGURED FILTER UNIVERSE
+======================================================================
+
+The chart does not display all possible filters unconditionally.
+
+The persistent visualization universe is the union of filters actually configured
+for BUY or SELL in the Validation snapshot:
+
+    configured universe = BUY used filters ∪ SELL used filters
+
+The eight supported visualization families are:
+
+1. MOVING_AVERAGE;
+2. MA_ARRANGEMENT;
+3. BOLLINGER;
+4. PRICE_BOX;
+5. PRICE_COMPARISON;
+6. RSI;
+7. MACD_SIGNAL;
+8. OCR_OSC.
+
+A filter series identity includes calculation family and parameters. Therefore,
+for example:
+
+- MA20 and MA60 are different identities;
+- RSI9 and RSI14 are different identities.
+
+If BUY and SELL use the exact same calculation identity, the displayed series
+may be shared while BUY/SELL Evidence ownership remains distinct.
+
+Disabled / unconfigured filters are not shown.
+
+======================================================================
+6. SUPPORTED VS UNSUPPORTED VISUALIZATION
+======================================================================
+
+Visualization availability and signal-evaluation support are separate facts.
+
+A configured series may be visually projectable while one side is not currently
+evaluated by V2. The descriptor therefore preserves supported_sides and
+unsupported_sides.
+
+Current important case:
+
+- BUY execution-price-dependent Price Comparison remains outside current V2
+  signal evaluation;
+- it may still be displayed from Validation data;
+- ORDER_PRICE visualization uses the approved OHLC/4
+  VIRTUAL_FILL_PRICE channel;
+- it must appear as unsupported for BUY rather than as contributing Evidence.
+
+Unsupported or error states must never be presented as ordinary non-contributing
+Evidence.
+
+======================================================================
+7. PREFIX-CORRECT VISUALIZATION CACHE
+======================================================================
+
+Visualization uses immutable precomputed data derived from the Replay result.
+Mouse Hover, Click, Wheel, Drag, Resize, Crosshair movement, and logical scrolling
+must not re-run Replay, signal evaluation, or indicator construction.
+
+Price Box is prefix-sensitive. Historical Price Box display values are therefore
+constructed at each historical prefix/cutoff. Appending future Candle values must
+not alter already-computed earlier Price Box points.
+
+The cache is descriptor-scoped so parameter-distinct series do not overwrite one
+another.
+
+======================================================================
+8. STATIC CHART LAYOUT
+======================================================================
+
+Price-axis overlays include configured:
+
+- Moving Average;
+- MA Arrangement;
+- Bollinger;
+- Price Box;
+- Price Comparison.
+
+Independent lower-axis families are:
+
+- RSI;
+- MACD / Signal;
+- OCR / OSC.
+
+Lower-area geometry contract:
+
+- zero configured lower families -> no lower area;
+- one lower family -> H;
+- two lower families -> H / 2 each;
+- three lower families -> H / 3 each.
+
+The current V2 UI implementation constant is:
+
+    H = 180 px
+
+H is a presentation constant, not a signal or calculation contract.
+
+No Volume fallback and no representative indicator is inserted when there are
+zero lower families.
+
+Once lower-pane composition is determined from the Validation snapshot, Marker
+Hover/Click changes styling only. It does not create/remove panes or change H.
+
+======================================================================
+9. EVIDENCE VISUAL STATE
+======================================================================
+
+Without a focused Marker, configured supported series remain normally visible.
+
+With Marker Hover or Pin:
+
+- ACTIVE:
+  the descriptor contributed to the already-produced final signal Evidence;
+  use its assigned normal color with stronger emphasis;
+- INACTIVE:
+  configured and supported but did not contribute to this signal;
+  remain visible as faint gray;
+- UNSUPPORTED:
+  configured/displayable but outside the current V2 evaluation boundary for the
+  focused side;
+  use distinct gray/dashed treatment and "[미지원]" labeling;
+- ERROR:
+  required display series is unavailable/invalid;
+  use distinct error treatment and "[오류]" labeling.
+
+Evidence selection comes from the existing structured Trace / final expression
+survivor logic. Tooltip strings are not parsed back into Evidence and filters are
+not re-evaluated on Hover.
+
+======================================================================
+10. MARKER HOVER AND CLICK PIN
+======================================================================
+
+Marker identity is logical:
+
+    (evaluation_index, side)
+
+Marker Hover temporarily focuses that Marker's Evidence.
+
+Marker Click pins the same logical identity. A Pin has priority over subsequent
+Hover styling.
+
+Clicking a non-Marker / blank chart location releases the Evidence Pin and
+returns filters to the normal configured-universe display state.
+
+Pin state is per Canvas / per V2 window. It is not shared between windows and
+does not mutate Replay or Production state.
+
+======================================================================
+11. CROSSHAIR CONTRACT
+======================================================================
+
+Crosshair X is Candle-center snapped.
+
+Normal pointer Hover uses the nearest visible Candle index. Marker Hover uses the
+Marker evaluation index. Marker Pin fixes the Crosshair lookup index to the
+pinned Marker identity.
+
+The vertical Crosshair line spans the price chart and all configured lower
+panes using the same logical Candle index.
+
+The horizontal Crosshair exists only for the pane containing the pointer:
+
+- price pane -> price-axis unit;
+- RSI pane -> RSI unit;
+- MACD / Signal pane -> its local indicator unit;
+- OCR / OSC pane -> its local indicator unit.
+
+Different panes never share one Y value.
+
+Pin stores logical identity, not screen pixels. Resize, time Zoom, logical
+Scroll, and repaint reproject X from the stored index. If the pinned index moves
+outside the visible logical range, the Pin remains but the Crosshair is not
+drawn until that index becomes visible again.
+
+Leaving the chart removes ordinary Hover Crosshair state. A pinned vertical
+Crosshair remains logically owned by the Pin.
+
+======================================================================
+12. CROSSHAIR VALUE LOOKUP
+======================================================================
+
+Crosshair lookup reads only existing Candle and immutable visualization cache
+data.
+
+At the active Crosshair index, lookup may expose:
+
+- Candle time;
+- OPEN / HIGH / LOW / CLOSE;
+- configured price-overlay channel values;
+- RSI;
+- MACD;
+- Signal;
+- OCR / OSC; and
+- other configured cached channels.
+
+When Marker Evidence focus is active, lookup state may annotate values as
+"[유효]" or "[비기여]".
+
+UNSUPPORTED and ERROR descriptors are reported as "[미지원]" and "[오류]"
+instead of presenting a numeric value as if it were validated Evidence.
+
+Value lookup does not trigger Replay or indicator recomputation.
+
+======================================================================
+13. SAFETY / OWNERSHIP BOUNDARY
+======================================================================
+
+Signal Validation V2 remains read-only with respect to Production trading state.
+
+This feature must not:
+
+- start/stop/change Production Operation;
+- write runtime/operation state;
+- create Runtime execution or order records;
+- write order_queue;
+- call SendOrder;
+- claim broker dispatch;
+- consume Chejan as execution ownership;
+- mutate Production MarketDataHost;
+- write Production position/account state.
+
+Read-only Historical broker access under the existing V2 contract remains
+allowed.
+
+======================================================================
+14. VERIFICATION EVIDENCE
+======================================================================
+
+Focused and adjacent verification completed against the local WIP included:
+
+- Validation virtual execution: PASS;
+- filter visualization data: PASS;
+- Production pure BUY policy regression: PASS;
+- Historical Replay: PASS;
+- static Axis/Cycle geometry and rendering: PASS;
+- Evidence Hover / Pin / blank-release interaction: PASS;
+- Candle-snapped Crosshair / pane-local horizontal values / value lookup:
+  PASS;
+- Historical provider: PASS;
+- Validation independence: PASS;
+- Validation Host boundary: PASS;
+- Operation / Stock Picker boundary: PASS;
+- V2 logical scroll, time zoom, price zoom, Reset, stale-result rejection,
+  stock change, and repeated-run focused regressions: PASS;
+- py_compile: PASS;
+- git diff --check: PASS.
+
+Representative local performance on the tested Windows / Python 3.11.9 32-bit
+environment:
+
+- 500-Candle visualization cache: approximately 0.118 seconds;
+- base 100-visible-Candle paint: approximately 0.015 seconds per render;
+- Crosshair + Pin active paint: approximately 0.019 seconds per render.
+
+These timings are implementation evidence, not a permanent performance SLA.
+
+======================================================================
+15. FINAL STATUS
+======================================================================
+
+The Filter Visualization feature is no longer PLANNING / NOT IMPLEMENTED.
+
+The implemented local WIP now contains the full intended sequence:
+
+Historical completed-Candle boundary
+-> OHLC/4 virtual fill
+-> simplified virtual position / weighted average
+-> configured-filter universe and immutable cache
+-> static overlays / lower panes
+-> Evidence active/inactive/unsupported/error styling
+-> Marker Hover / Pin / blank release
+-> Candle-snapped Crosshair and cached value lookup.
+
+Git checkpoint / commit / push remains a separate explicit repository action.
