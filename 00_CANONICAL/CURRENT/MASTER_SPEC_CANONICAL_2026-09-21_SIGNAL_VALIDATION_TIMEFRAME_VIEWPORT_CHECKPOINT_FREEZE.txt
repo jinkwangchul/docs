@@ -1,0 +1,241 @@
+MASTER SPEC CANONICAL SUPPLEMENT
+Signal Validation Timeframe / Viewport / Entry Identity Checkpoint Freeze
+Date: 2026-09-21
+
+Code repository: kiwoom_auto
+Branch: feat/restore-auto-trade-setting-ui
+Checkpoint code commit:
+10ed8f167d592d22ea0bcc3118704e03d365e515
+Remote push:
+origin/feat/restore-auto-trade-setting-ui confirmed at the same commit.
+
+Previous direct chart/history/cache owner:
+- MASTER_SPEC_CANONICAL_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FREEZE.txt
+
+======================================================================
+1. AUTHORITY AND SCOPE
+======================================================================
+
+This supplement owns only the post-2026-09-20 Signal Validation changes
+confirmed in the 2026-09-20/21 implementation windows for:
+- Validation timeframe identity and operator combo behavior;
+- Registration/Edit -> Validation -> explicit Apply timeframe round trip;
+- read-only historical provider/replay timeframe identity;
+- day/week/year semantic candle-period handling;
+- Validation entry/seed identity preservation;
+- chart visible-span defaults of 250 and maximum 4,000 candles.
+
+The 2026-09-20 chart/history/persistent-cache Freeze remains authoritative for
+the other completed chart, replay, visualization, marker, virtual execution,
+and persistent-cache behavior that this supplement does not change.
+
+This supplement does not grant Validation any Production market-data,
+operation, order, Mock, or canonical candle mutation authority.
+
+======================================================================
+2. CURRENT USER-CONFIRMED TIMEFRAME CONTRACT
+======================================================================
+
+The operator timeframe choices are:
+- 1분, 3분, 5분, 10분, 15분, 30분, 60분, 120분, 240분, 일, 주, 년.
+
+Identity rules:
+- minute choices use M1/M3/M5/M10/M15/M30/M60/M120/M240 internally;
+- 일 = D1, 주 = W1, 년 = Y1;
+- D1/W1/Y1 must never be represented by fake minute integers;
+- minute UI-state compatibility remains numeric strings such as "15";
+- day/week/year UI state uses the period label identity.
+
+Source-dialog round trip:
+- the current Registration/Edit timeframe enters Validation unchanged;
+- changing the Validation timeframe causes a new validation run on that
+  timeframe's actual historical candles;
+- indicators and BUY/SELL results are recalculated from that validation data;
+- explicit Settings Apply returns the validated timeframe/UI candidate to the
+  source Registration/Edit dialog;
+- Validation Apply is not direct Production activation.
+
+Request identity:
+- explicit top-level validation_timeframe metadata is authoritative;
+- for a legacy request without that metadata, explicit request
+  timeframe_minutes maps to M{n};
+- Production bar.bar_minutes must not silently redefine a Validation request.
+
+======================================================================
+3. READ-ONLY HISTORICAL CONTRACT
+======================================================================
+
+Broker source mapping:
+- minute -> OPT10080;
+- D1 -> OPT10081;
+- W1 -> OPT10082;
+- Y1 -> OPT10094.
+
+Period broker rows are normalized into stable 14-digit Validation candle times.
+The Validation provider/cache/replay identity includes the explicit timeframe
+key so D1/W1/Y1 cannot collide solely because Production bar_minutes is equal.
+
+Completed-candle admission is semantic:
+- minute candles use their minute bucket;
+- D1 uses the trading-day period;
+- W1 uses the ISO-week period;
+- Y1 uses the calendar-year period.
+
+These paths are read-only Validation paths. They do not authorize a Production
+candle writer or mutation of Production MarketDataHost state.
+
+======================================================================
+4. VIEWPORT AND HISTORY-LOADING CONTRACT
+======================================================================
+
+Latest explicit operator direction:
+- default visible chart span is 250 candles;
+- maximum visible chart span is 4,000 candles;
+- moving/dragging toward older history should obtain additional historical
+  candles as needed using a low-lag incremental strategy;
+- visible span and retained/fetched historical data amount are separate concepts.
+
+Current committed checkpoint:
+- _REFERENCE_CANDLE_COUNT = 250;
+- _MAX_VISIBLE_CANDLE_SPAN = 4,000;
+- the existing fixed historical base request count remains 5,000 in current
+  implementation.
+
+Important interpretation:
+- 5,000 is a current implementation value, not an approved "preload contract";
+- the older 10,000 preload direction is not the latest operator direction;
+- the current latest direction is demand-driven older-history extension;
+- no completed implementation of drag-triggered history extension beyond the
+  currently retained pool was verified in this closeout.
+
+Therefore the Big Feature is not declared complete on history growth.
+
+======================================================================
+5. ENTRY / SEED IDENTITY CORRECTION
+======================================================================
+
+Independent criticism found a post-timeframe-expansion identity defect:
+- an explicit D1/W1/Y1 snapshot could be projected through stale or missing
+  embedded UI state and become M5 at immutable seed/request entry.
+
+The defect was reproduced on Python 3.11.9 32-bit:
+- source=D1;
+- UI=일;
+- projected seed=M5;
+- request=M5.
+
+The bounded correction in project_signal_validation_rules now preserves an
+explicit validation_timeframe mapping when no live ui_state is supplied.
+When a live ui_state is explicitly supplied, the current operator selection
+continues to take precedence. Legacy rules with no explicit metadata retain
+their embedded-UI fallback.
+
+No global precedence rewrite or Production bar_minutes change was introduced.
+
+======================================================================
+6. CODE CHECKPOINT BOUNDARY
+======================================================================
+
+Checkpoint commit:
+10ed8f167d592d22ea0bcc3118704e03d365e515
+
+The commit contains the safely separable timeframe/viewport/entry-identity
+contract and tests across 18 paths.
+
+The following current local task dependencies were deliberately NOT committed
+because their timeframe changes overlap older protected WIP in the same files:
+- gui_indicator_follow_signal_validation_flow.py
+- indicator_follow_signal_validation_historical_cache.py
+- kiwoom_api.py
+- tests/test_indicator_follow_signal_validation_historical_cache.py
+- tests/test_kiwoom_api_read_only_minute_candles.py
+
+Consequences:
+- complete local end-to-end period broker/cache runtime behavior still depends
+  on protected local WIP;
+- the remote checkpoint must not be described as a complete standalone
+  end-to-end period-runtime freeze.
+
+Pre-existing baseline dependency evidence also remains:
+- HEAD gui_indicator_follow_signal_validation_window.py imports
+  chart_operand_label;
+- HEAD indicator_follow_signal_validation_presentation.py does not define it;
+- current local presentation WIP supplies the dependency.
+This condition existed in the prior checkpoint baseline and was not introduced
+by the 2026-09-21 timeframe checkpoint.
+
+======================================================================
+7. VERIFICATION
+======================================================================
+
+Final current-worktree verification after the entry identity correction:
+- 209 scoped tests PASS;
+- failed batches: 0;
+- compile errors: 0;
+- scoped diff check: PASS;
+- protected-file change detection during that verification: 0.
+
+Staged/index-only checkpoint verification:
+- exported index tree;
+- timeframe/historical/replay/rule-mapper focused modules: 267 tests PASS.
+
+A broader staged-tree run executed 301 tests and reported 10 failures plus
+1 error in pre-existing protected settings/Mock areas. The failures were
+Bollinger compatibility expectations and a Mock host attribute dependency,
+outside this checkpoint's approved scope.
+
+Targeted staged-tree Operator UI/V2 imports could not start because the prior
+remote HEAD itself imports chart_operand_label while its committed presentation
+module lacks that symbol. This is recorded as a pre-existing remote-baseline
+dependency, not converted into a pass.
+
+No live-broker GUI verification was performed in this closeout.
+
+Known historical Operator UI exclusions remain unclaimed as fixed:
+- test_registration_undo_is_unavailable_without_canonical_defaults
+- test_parent_v2_context_apply_and_fixed_undo_workflow
+- test_flow_apply_uses_source_weakref_and_closed_source_fails_closed
+
+The stored 2026-09-19 failure evidence for these tests predates this checkpoint.
+They were excluded from the 209-test final scoped run and were not reclassified.
+
+======================================================================
+8. PROTECTED LOCAL WIP
+======================================================================
+
+After the code checkpoint commit and push, the code worktree remains
+intentionally dirty:
+- status entries: 190
+- NUL-safe status SHA-256:
+  21c173a5b7f9fd5aaf3af1781db2f1208179466f510c7adcb8e7d7efdf29882c
+
+This fingerprint covers the current protected local state after the checkpoint.
+It includes older unrelated WIP and the explicitly omitted overlapping
+timeframe runtime dependencies.
+
+Protection rules:
+- do not reset, restore, stash, clean, or broad-stage this state;
+- do not infer that every dirty path belongs to Signal Validation;
+- inspect the exact task boundary before any future staging.
+
+======================================================================
+9. CURRENT COMPLETION JUDGMENT
+======================================================================
+
+Completed/frozen in the checkpoint:
+- explicit Validation timeframe identity model;
+- minute + D1/W1/Y1 operator contract;
+- ValidationRequest/provider/replay identity core;
+- semantic D/W/Y forming-period behavior;
+- source-dialog Validation round-trip contract;
+- explicit-entry identity correction;
+- visible-span default 250 and maximum 4,000.
+
+Not declared complete:
+- standalone remote end-to-end period broker/cache runtime because overlapping
+  local dependencies remain uncommitted;
+- drag-triggered incremental older-history extension beyond the retained pool;
+- the three historical baseline Operator UI exclusions;
+- live-broker GUI verification.
+
+No next implementation is authorized by this Freeze itself.

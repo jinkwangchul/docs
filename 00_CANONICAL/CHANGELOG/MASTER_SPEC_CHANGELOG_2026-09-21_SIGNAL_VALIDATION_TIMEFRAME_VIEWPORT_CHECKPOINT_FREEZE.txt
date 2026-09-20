@@ -1,0 +1,158 @@
+MASTER SPEC CHANGELOG
+Signal Validation Timeframe / Viewport / Entry Identity Checkpoint Freeze
+Date: 2026-09-21
+
+Code checkpoint:
+- repository: kiwoom_auto
+- branch: feat/restore-auto-trade-setting-ui
+- commit: 10ed8f167d592d22ea0bcc3118704e03d365e515
+- push: origin branch confirmed at same commit
+
+Canonical owner added:
+- MASTER_SPEC_CANONICAL_2026-09-21_SIGNAL_VALIDATION_TIMEFRAME_VIEWPORT_CHECKPOINT_FREEZE.txt
+
+======================================================================
+CHANGED / ADDED
+======================================================================
+
+- Added one shared Validation timeframe identity model:
+  M1/M3/M5/M10/M15/M30/M60/M120/M240/D1/W1/Y1.
+- Added operator labels:
+  1분/3분/5분/10분/15분/30분/60분/120분/240분/일/주/년.
+- Preserved numeric-string minute UI serialization compatibility while period
+  identities remain non-minute labels.
+- Normalized ValidationRequest identity:
+  explicit validation_timeframe metadata wins; otherwise explicit request
+  minutes map to M{n}.
+- Extended Historical provider/replay identity around timeframe_key.
+- Added semantic completed-period handling for day/week/year.
+- Added stable date-row -> 14-digit Validation time normalization.
+- Added source Registration/Edit <-> Validation timeframe round-trip coverage.
+- Set chart reference/default visible span to 250.
+- Set maximum visible span to 4,000.
+- Corrected immutable seed/request entry so stale embedded UI cannot overwrite
+  an explicit D1/W1/Y1 snapshot when no live ui_state is supplied.
+
+======================================================================
+LATEST OPERATOR DIRECTION NORMALIZATION
+======================================================================
+
+The closeout corrects earlier wording that described 5,000 as "preloading".
+
+Latest direction:
+- 250 default visible;
+- 4,000 maximum visible;
+- load older history incrementally as the operator drags toward it;
+- minimize drag-time lag.
+
+Current fixed 5,000 historical count remains an implementation fact only.
+It is not frozen as the desired loading policy.
+The earlier 10,000 preload direction is not used as the latest policy.
+
+Drag-triggered older-history expansion beyond the current retained pool is
+not declared implemented by this checkpoint.
+
+======================================================================
+ENTRY IDENTITY CRITIC FIX
+======================================================================
+
+Criticism reproduced:
+source D1 -> visible UI 일 -> immutable seed/request M5.
+
+Cause:
+project_signal_validation_rules used projected embedded UI to resolve timeframe
+even when an explicit validation_timeframe existed and no live ui_state was
+provided.
+
+Correction:
+- explicit validation_timeframe is preserved when no live ui_state is supplied;
+- explicit live ui_state retains operator-selection precedence;
+- legacy embedded UI fallback remains for rules without explicit metadata.
+
+Focused regression coverage was added for D1/W1/Y1 seed clone/request identity,
+explicit current-UI changes, legacy fallback, and input immutability.
+
+======================================================================
+SELECTIVE CHECKPOINT / PROTECTED OVERLAP
+======================================================================
+
+18 safely separable paths/hunks were committed.
+
+Task-related overlapping local dependencies intentionally left uncommitted:
+- gui_indicator_follow_signal_validation_flow.py
+- indicator_follow_signal_validation_historical_cache.py
+- kiwoom_api.py
+- tests/test_indicator_follow_signal_validation_historical_cache.py
+- tests/test_kiwoom_api_read_only_minute_candles.py
+
+Reason:
+their timeframe changes are intertwined with older protected pool/cache/TR/
+realtime work. Broad-staging those files would violate the existing WIP
+protection boundary.
+
+Pre-existing remote-baseline dependency confirmed:
+- committed window imports chart_operand_label;
+- committed presentation module does not define it;
+- local protected presentation WIP supplies the symbol.
+
+This was already true before the 2026-09-21 checkpoint.
+
+======================================================================
+VERIFICATION
+======================================================================
+
+Current local final state:
+- 209 scoped tests PASS
+- failed batches: 0
+- compile errors: 0
+- diff check: PASS
+
+Checkpoint-index-only tree:
+- 267 focused timeframe/historical/replay/rule-mapper tests PASS.
+
+Broader staged-tree evidence:
+- 301 tests executed
+- 10 failures + 1 error in protected Bollinger/Mock settings dependencies.
+
+Targeted staged-tree Operator UI/V2:
+- could not import because of the pre-existing remote chart_operand_label
+  dependency; not counted as pass or as a new checkpoint defect.
+
+Historical baseline exclusions remain unclaimed:
+- test_registration_undo_is_unavailable_without_canonical_defaults
+- test_parent_v2_context_apply_and_fixed_undo_workflow
+- test_flow_apply_uses_source_weakref_and_closed_source_fails_closed
+
+No live-broker GUI verification was performed.
+
+======================================================================
+PROTECTED STATE
+======================================================================
+
+After code commit/push:
+- code dirty/untracked entries: 190
+- NUL-safe status SHA-256:
+  21c173a5b7f9fd5aaf3af1781db2f1208179466f510c7adcb8e7d7efdf29882c
+
+No reset, restore, stash, clean, broad-stage, or unrelated cleanup was used.
+
+======================================================================
+COMPLETION STATUS
+======================================================================
+
+Checkpointed:
+- timeframe identity/operator contract;
+- request/provider/replay core identity;
+- semantic D/W/Y replay period handling;
+- source-dialog round trip;
+- entry identity fix;
+- visible 250 / max 4,000.
+
+Still open:
+- low-lag incremental older-history loading on drag;
+- remote standalone end-to-end period broker/cache wiring;
+- pre-existing remote presentation dependency;
+- three historical Operator UI exclusions;
+- live-broker GUI verification.
+
+This changelog does not authorize the next implementation task.

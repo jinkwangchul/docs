@@ -1,0 +1,257 @@
+WORK RESUME LATEST
+Signal Validation Timeframe / Viewport / Entry Identity Checkpoint Freeze
+Date: 2026-09-21
+
+==================================================
+Current Big Feature Goal
+==================================================
+
+Normalize Signal Validation timeframe handling across:
+Registration/Edit -> Validation -> Historical Provider -> Replay -> explicit Apply,
+while preserving Production isolation and the operator's chart-navigation contract.
+
+Current code checkpoint:
+10ed8f167d592d22ea0bcc3118704e03d365e515
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Remote:
+origin/feat/restore-auto-trade-setting-ui is pushed to the same code commit.
+
+Current supplemental Canonical owner:
+MASTER_SPEC_CANONICAL_2026-09-21_SIGNAL_VALIDATION_TIMEFRAME_VIEWPORT_CHECKPOINT_FREEZE.txt
+
+Previous chart/history/cache owner remains:
+MASTER_SPEC_CANONICAL_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FREEZE.txt
+
+==================================================
+Completed / Checkpointed
+==================================================
+
+- Validation timeframe choices:
+  1/3/5/10/15/30/60/120/240 minutes plus day/week/year.
+- Explicit identities:
+  minute M*, day D1, week W1, year Y1.
+- D/W/Y are not fake minute values.
+- Minute display uses the operator label such as 15분 while compatible stored
+  UI value remains "15".
+- Day/week/year UI values remain period labels.
+- Registration/Edit current timeframe enters Validation.
+- Validation timeframe selection participates in replay/request identity.
+- Explicit Apply returns the Validation candidate to the source dialog without
+  becoming direct Production activation.
+- ValidationRequest uses explicit validation_timeframe metadata when present;
+  otherwise the explicit request minute value becomes M{n}.
+- Historical provider/replay core uses timeframe_key identity.
+- D/W/Y completed-candle admission uses semantic period rules.
+- Stable 14-digit Validation time normalization exists for date-based rows.
+- Default/reference visible chart span is 250.
+- Maximum visible chart span is 4,000.
+- Current-session criticism found and corrected stale embedded-UI overwrite of
+  explicit D1/W1/Y1 at immutable seed/request entry.
+
+==================================================
+Important Current-State Distinction
+==================================================
+
+The latest operator direction is NOT "preload 5,000" or "preload 10,000".
+
+Current operator direction:
+- display 250 candles by default;
+- permit up to 4,000 visible candles;
+- when the operator drags toward older data, obtain more historical candles as
+  needed using a low-lag incremental method.
+
+Current implementation still contains:
+- fixed historical base request count 5,000.
+
+Therefore:
+- 5,000 is implementation state, not approved policy;
+- visible span and fetched/retained history are separate;
+- drag-triggered incremental older-history expansion beyond the current pool
+  is NOT closed by this checkpoint.
+
+==================================================
+Code Commit Boundary
+==================================================
+
+The code checkpoint selectively committed 18 safely separable paths/hunks.
+
+The following task-related current local dependencies were deliberately left
+uncommitted because their required timeframe changes overlap older protected
+WIP in the same files:
+- gui_indicator_follow_signal_validation_flow.py
+- indicator_follow_signal_validation_historical_cache.py
+- kiwoom_api.py
+- tests/test_indicator_follow_signal_validation_historical_cache.py
+- tests/test_kiwoom_api_read_only_minute_candles.py
+
+Do not broad-stage these files in a future session.
+
+The complete current local end-to-end D/W/Y broker/cache path can work with the
+protected local state, but the remote checkpoint alone is not claimed as a
+standalone complete period-runtime implementation.
+
+==================================================
+Pre-existing Remote Baseline Dependency
+==================================================
+
+The prior remote checkpoint has a known recovery dependency:
+- committed gui_indicator_follow_signal_validation_window.py imports
+  chart_operand_label;
+- committed indicator_follow_signal_validation_presentation.py does not define
+  that symbol;
+- current protected local presentation WIP supplies it.
+
+This was confirmed during staged/index-only verification and was already true
+at the prior HEAD. It was not introduced by code commit 10ed8f1.
+
+Do not "fix" this by broad-staging the presentation file without a separate
+targeted audit of the older protected WIP.
+
+==================================================
+Verification
+==================================================
+
+Current worktree, after the entry identity correction:
+- scoped verification: 209 tests PASS
+- failed batches: 0
+- compile errors: 0
+- scoped diff check: PASS
+- protected-file mutations detected by the verification boundary: 0
+
+Index-only exported checkpoint tree:
+- timeframe + historical + replay + rule-mapper focused modules:
+  267 tests PASS.
+
+Additional staged-tree broad evidence:
+- 301 tests executed;
+- 10 failures + 1 error occurred in pre-existing protected
+  Bollinger/Mock settings dependencies outside this checkpoint.
+
+Targeted staged-tree Operator UI/V2 tests:
+- could not import because of the pre-existing remote baseline
+  chart_operand_label dependency described above;
+- this is recorded as baseline evidence, not a checkpoint PASS.
+
+No live-broker GUI verification was performed during this closeout.
+
+==================================================
+Known Historical Baseline Exclusions
+==================================================
+
+The following Operator UI tests remain explicitly unclaimed as fixed:
+- test_registration_undo_is_unavailable_without_canonical_defaults
+- test_parent_v2_context_apply_and_fixed_undo_workflow
+- test_flow_apply_uses_source_weakref_and_closed_source_fails_closed
+
+Stored 2026-09-19 evidence:
+- registration undo expected unavailable but returned available;
+- parent V2 context test had the same registration undo mismatch and an older
+  edit-mode fixture expecting 200 candles but receiving 0;
+- the source-weakref test failed earlier on the same undo mismatch before
+  proving the closed-source branch defective.
+
+These tests were excluded from the final 209 scoped run and were not rerun as
+part of this closeout. Do not describe them as current confirmed failures
+without fresh execution.
+
+==================================================
+Protected Local WIP
+==================================================
+
+Code repository after code checkpoint commit/push:
+- dirty/untracked status entries: 190
+- NUL-safe status SHA-256:
+  21c173a5b7f9fd5aaf3af1781db2f1208179466f510c7adcb8e7d7efdf29882c
+
+This includes older unrelated WIP and the overlapping local dependencies named
+above.
+
+Protection:
+- no reset
+- no restore
+- no stash
+- no clean
+- no broad add
+- no arbitrary deletion or rewrite
+- stage only explicitly audited task hunks.
+
+==================================================
+Development Environment
+==================================================
+
+- Primary Orchestrator: GPT-5.6 Sol
+- Operating role in this closeout: Integrated Development Orchestrator
+- Desktop Commander: Available
+- Connected Device: KWANGS-LP
+- Automatic Trading Repository:
+  C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Documentation Repository:
+  C:\Users\JIN KWANG CHUL\Documents\docs
+- Python Runtime:
+  C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+- Python Version / Bitness: 3.11.9 / 32-bit
+- PyQt verification environment: QT_QPA_PLATFORM=offscreen
+- Codex CLI:
+  C:\Users\JIN KWANG CHUL\.vscode\extensions\openai.chatgpt-26.5908.31748-win32-x64\bin\windows-x86_64\codex.exe
+- Codex CLI Version: 0.154.0-alpha.6.1
+- Codex Authentication: Logged in using ChatGPT
+- Codex model/reasoning used in this workflow: gpt-5.6-sol / medium
+- Desktop Commander is the local verification boundary.
+- ChatGPT Work: Do Not Use unless the user explicitly reverses that restriction.
+- Superpowers: selective process layer only; project Canonical and user
+  instructions remain higher authority.
+
+==================================================
+Recovery / First Checks
+==================================================
+
+Code repository:
+- git branch --show-current
+- git rev-parse HEAD
+- git rev-parse @{u}
+- git rev-list --left-right --count HEAD...@{u}
+- git status --short
+
+Expected code checkpoint:
+10ed8f167d592d22ea0bcc3118704e03d365e515
+
+Expected branch:
+feat/restore-auto-trade-setting-ui
+
+Documentation repository:
+- git branch --show-current
+- git rev-parse HEAD
+- git rev-parse @{u}
+- git status --short
+
+Read first:
+1) 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+2) 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-21_SIGNAL_VALIDATION_TIMEFRAME_VIEWPORT_CHECKPOINT_FREEZE.txt
+3) this Work Resume
+4) 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-21_SIGNAL_VALIDATION_TIMEFRAME_VIEWPORT_CHECKPOINT_FREEZE.txt
+5) previous 2026-09-20 Signal Validation chart/history/cache Freeze only for
+   areas not superseded by the 2026-09-21 supplement.
+
+==================================================
+Current Blocker / Next Start Point
+==================================================
+
+No next implementation is authorized merely by this Work Resume.
+
+Confirmed unresolved work:
+1. The operator-directed older-history behavior is not closed:
+   250 default visible / 4,000 max visible are implemented, but fixed 5,000
+   retained history remains and drag-triggered low-lag incremental expansion
+   beyond the current pool is not verified.
+2. Complete remote standalone D/W/Y broker/cache operation is not frozen because
+   flow/cache/Kiwoom task hunks overlap older protected WIP and remain local.
+3. The prior remote baseline has the chart_operand_label presentation dependency.
+4. Three historical Operator UI exclusions remain unclaimed as fixed.
+5. No live-broker GUI verification was performed.
+
+Next session must begin with role/task confirmation and a targeted contract
+audit. It must not infer that "implement the next gap" is automatically
+authorized by this Work Resume.
