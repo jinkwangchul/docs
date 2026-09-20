@@ -30,7 +30,8 @@ mutation authority to Validation.
 2. HISTORICAL POOL AND CHART VIEW CONTRACT
 ======================================================================
 
-- Default Signal Validation Historical base pool target is 5,000 candles.
+- Actual committed Signal Validation Historical base pool default is 5,000 candles.
+- Earlier explicit operator direction requested 10,000-candle preload. This Freeze records the committed implementation state only; it does not treat 5,000 as approval of, or a supersession of, that 10,000 direction. The 5,000 vs 10,000 difference remains an unresolved recovery item requiring user decision before any implementation change.
 - Required indicator warmup may increase the broker fetch count above that base.
 - After the loaded pool is installed, the initial visible viewport is the latest 100 candles.
 - There is no operator candle-count input in the V2 chart.
@@ -136,11 +137,11 @@ The code repository still contains substantial pre-existing dirty/untracked work
 It is intentionally not reset, restored, stashed, cleaned, broadly staged, or included in the checkpoint.
 
 Pre-stage protected status evidence for non-target code paths:
-- protected status entries: 184
+- protected status entries: 182
 - SHA-256 fingerprint:
-  0f1e63893abcfada4cc00b1dd713f240905bcc15c9669728f6012e40f3f05516
+  1e5e775fbf1f6a86dfbf69330fba540393e2b0af4556a4af5042337c50c7ca
 
-This fingerprint is closeout evidence, not a Canonical content identity.
+The earlier provisional count of 184 included two Unicode-quoted target files (routine_macd_engine.py and routine_validation_replay.py); independent verification corrected the non-target count to 182. This fingerprint is closeout evidence, not a Canonical content identity.
 
 ======================================================================
 10. CURRENT AUTHORITY

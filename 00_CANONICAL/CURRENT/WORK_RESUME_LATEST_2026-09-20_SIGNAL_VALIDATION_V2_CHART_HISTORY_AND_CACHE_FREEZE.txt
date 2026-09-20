@@ -22,7 +22,8 @@ MASTER_SPEC_CANONICAL_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FR
 Completed In The Closed Implementation Windows
 ==================================================
 
-- 5,000-candle Validation Historical base pool with latest-100 initial viewport.
+- Actual committed Validation Historical base pool is 5,000 candles with latest-100 initial viewport.
+- Earlier explicit operator direction requested 10,000-candle preload. This Freeze does not approve or supersede that direction; 5,000 vs 10,000 remains an unresolved recovery item requiring user decision before any code change.
 - Local wheel/pan reuse without repeat Historical request inside the loaded pool.
 - Explicit click range validation and viewport preservation across settings apply.
 - Replay/full-pool signal-scan performance path with causal PRICE_BOX handling.
@@ -56,9 +57,10 @@ Protected Local WIP
 ==================================================
 
 The repository is intentionally not clean outside this closed feature scope.
-Pre-stage code protected-state evidence:
-- 184 non-target dirty/untracked status entries
-- SHA-256: 0f1e63893abcfada4cc00b1dd713f240905bcc15c9669728f6012e40f3f05516
+Independent closeout code protected-state evidence:
+- 182 non-target dirty/untracked status entries
+- SHA-256: 1e5e775fbf1f1f6a86dfbf69330fba540393e2b0af4556a4af5042337c50c7ca
+- The earlier provisional count of 184 included two Unicode-quoted target files and was corrected during independent verification.
 
 Pre-close documentation protected-state evidence, excluding this closeout's
 new documents and Reference Index path:
@@ -90,6 +92,9 @@ Development Environment
   C:\Users\JIN KWANG CHUL\.vscode\extensions\openai.chatgpt-26.5908.31748-win32-x64\bin\windows-x86_64\codex.exe
 - Codex CLI Version: 0.154.0-alpha.6.1
 - Codex Authentication: Logged in using ChatGPT
+- Codex Model / Reasoning: gpt-5.6-sol / medium
+- Superpowers: Must Verify
+- ChatGPT Work: Do Not Use unless the user explicitly re-enables it
 
 No development-tool installation or access contract changed during this closeout.
 ==================================================
@@ -123,5 +128,6 @@ Current Blocker / Next Start Point
 ==================================================
 
 No next feature or implementation task has been authorized by the user.
+The unresolved 5,000-vs-10,000 Historical preload discrepancy must be surfaced to the user before any implementation change.
 The next AI must use Must Confirm for role/task selection and must not invent
 a follow-on implementation from open ideas or old conversation proposals.
