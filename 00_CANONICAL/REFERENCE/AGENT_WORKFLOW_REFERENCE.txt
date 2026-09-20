@@ -380,6 +380,19 @@ Desktop Commander Latency Policy:
   Owner serialization, or required local verification. It changes round-trip
   structure, not evidence standards.
 
+Evidence And Verification Efficiency Policy:
+- Core rule: Single Evidence Pass, Scoped Verification, No Full Re-audit.
+- At task start, create one Task Boundary Snapshot covering task files, relevant functions or call paths, required tests, known pre-existing failures, and protected unrelated WIP.
+- The Task Boundary Snapshot is the default evidence boundary for ChatGPT, Desktop Commander, Codex implementation, verification, and criticism. Expand it only when concrete new evidence shows an external dependency.
+- Once a fact has been freshly established with adequate evidence, later stages reuse it instead of repeating the same Git, Runtime, Log, GUI, or call-graph investigation. Re-check only when state could have changed, evidence is stale or contradictory, or materially different proof is required.
+- Carry a compact evidence handoff between stages: confirmed facts, unresolved questions, changed files/functions, tests already executed, failures, and remaining unverified items.
+- During implementation, run only the direct RED/GREEN checks needed to guide the change. After implementation, run the required focused regression set once as a batch. Do not rerun the same broad regression group after each intermediate stage unless a later mutation makes the prior result stale.
+- Fresh final verification remains mandatory, but freshness means verifying the final mutated state; it does not require replaying every earlier evidence-collection step when that evidence remains valid.
+- Final criticism receives the Task Boundary Snapshot, actual task diff, confirmed evidence, final verification results, and unresolved questions. It must not restart a repository-wide call-graph, diff, or test audit by default.
+- Existing dirty worktree size is not justification for broad re-audit. Treat unrelated WIP as protected context unless a concrete dependency is found.
+- If verification or criticism discovers an out-of-bound dependency, report SCOPE_EXPANSION_REQUIRED with the exact dependency before expanding investigation.
+- Do not impose an arbitrary maximum test count. Remove duplicated or stale-proof work while preserving every test genuinely required by scope, regression risk, safety, and Canonical contracts.
+
 Execution Efficiency Rules:
 - Codex continuity: when Codex has already read the relevant files and call path
   deeply enough to establish the code change, keep the same Codex task moving
@@ -1318,6 +1331,39 @@ Desktop Commander Latency Control
 ```
 
 Every final Next Session Startup Prompt must also reproduce this independent
+Evidence And Verification Efficiency block:
+
+```text
+==================================================
+Evidence And Verification Efficiency
+==================================================
+Core rule: Single Evidence Pass, Scoped Verification, No Full Re-audit.
+At task start create one Task Boundary Snapshot containing:
+- TASK FILES
+- TASK FUNCTIONS / CALL PATHS
+- TASK TESTS
+- PRE-EXISTING FAILURES
+- PROTECTED WIP
+Reuse freshly confirmed evidence across stages instead of repeating the same Git,
+Runtime, Log, GUI, call-graph, or repository investigation.
+Carry forward confirmed facts, unresolved questions, actual changed files/functions,
+tests already executed, failures, and remaining unverified items.
+During implementation run only direct RED/GREEN checks needed to guide the change.
+After implementation run the required focused regression set once as a batch.
+Do not rerun the same broad regression group unless a later mutation makes its
+prior result stale.
+Final criticism receives the Task Boundary Snapshot, actual task diff, confirmed
+evidence, final verification results, and unresolved questions. It must not restart
+a repository-wide call-graph/diff/test audit by default.
+Unrelated dirty WIP is protected context, not automatic audit scope.
+If a concrete dependency crosses the boundary, report SCOPE_EXPANSION_REQUIRED
+before widening investigation.
+No arbitrary test-count cap: preserve every genuinely required safety/regression
+check while eliminating duplicated verification work.
+==================================================
+```
+
+Every final Next Session Startup Prompt must also reproduce this independent
 Execution Efficiency Rules block:
 
 ```text
@@ -1608,7 +1654,8 @@ It must also begin with the mandatory `Current AI Role` block, declare the
 applicable role-specific principle, and include the corresponding explicit
 role instructions required by Step 5. Every final Startup Prompt must include
 the verified Development Environment block, the Mandatory Hybrid Orchestration
-block, the Desktop Commander Latency Control block, the Execution Efficiency
+block, the Desktop Commander Latency Control block, the Evidence And Verification
+Efficiency block, the Execution Efficiency
 Rules block, the Codex Scope Discipline block, and the independent Codex CLI
 Invocation Path block. When the role is
 Integrated Development Orchestrator, it must additionally reproduce the
