@@ -139,9 +139,9 @@ It is intentionally not reset, restored, stashed, cleaned, broadly staged, or in
 Pre-stage protected status evidence for non-target code paths:
 - protected status entries: 182
 - SHA-256 fingerprint:
-  1e5e775fbf1f6a86dfbf69330fba540393e2b0af4556a4af5042337c50c7ca
+  3d7bc9a1479388e2186f358345f6f11a47e37e5b879bc02564f6a79214b12963
 
-The earlier provisional count of 184 included two Unicode-quoted target files (routine_macd_engine.py and routine_validation_replay.py); independent verification corrected the non-target count to 182. This fingerprint is closeout evidence, not a Canonical content identity.
+The earlier provisional count of 184 included two Unicode-quoted target files (routine_macd_engine.py and routine_validation_replay.py); independent verification corrected the non-target count to 182. Final fingerprinting uses NUL-safe `git status --porcelain=v1 -z` path parsing so quoted/non-ASCII paths do not alter evidence encoding. Earlier provisional hash values are superseded by the value above. This fingerprint is closeout evidence, not a Canonical content identity.
 
 ======================================================================
 10. CURRENT AUTHORITY

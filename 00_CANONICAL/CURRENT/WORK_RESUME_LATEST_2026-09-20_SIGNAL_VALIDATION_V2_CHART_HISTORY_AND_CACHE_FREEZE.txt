@@ -59,13 +59,14 @@ Protected Local WIP
 The repository is intentionally not clean outside this closed feature scope.
 Independent closeout code protected-state evidence:
 - 182 non-target dirty/untracked status entries
-- SHA-256: 1e5e775fbf1f1f6a86dfbf69330fba540393e2b0af4556a4af5042337c50c7ca
+- SHA-256: 3d7bc9a1479388e2186f358345f6f11a47e37e5b879bc02564f6a79214b12963
 - The earlier provisional count of 184 included two Unicode-quoted target files and was corrected during independent verification.
+- Final fingerprinting uses NUL-safe `git status --porcelain=v1 -z` parsing; earlier provisional hash values are superseded.
 
 Pre-close documentation protected-state evidence, excluding this closeout's
 new documents and Reference Index path:
 - 134 non-target dirty/untracked status entries
-- SHA-256: 5432aedef50cdd9d250c5f7f8bd529d53f9683a3125ac6df30e58bac19f7c2a1
+- SHA-256: 070bb9378e8aaa57da83fd02f93189581df7fcef4fb35cb4ccafd1cc0e68f4fc
 
 Protection rule:
 - Do not reset, restore, stash, clean, broad-stage, or overwrite unrelated WIP.

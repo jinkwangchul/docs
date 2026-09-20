@@ -67,4 +67,5 @@ SCOPE PROTECTION
 
 The code commit selectively included 16 Signal Validation implementation/test files only.
 Pre-existing unrelated dirty/untracked code state was preserved.
+Final independent evidence uses NUL-safe `git status --porcelain=v1 -z` parsing: code non-target WIP = 182 entries / SHA-256 3d7bc9a1479388e2186f358345f6f11a47e37e5b879bc02564f6a79214b12963; docs non-target WIP excluding this closeout and Reference Index = 134 entries / SHA-256 070bb9378e8aaa57da83fd02f93189581df7fcef4fb35cb4ccafd1cc0e68f4fc. Earlier provisional fingerprint hashes are superseded.
 No reset, restore, stash, clean, broad add, or unrelated cleanup was performed.
