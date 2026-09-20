@@ -350,6 +350,39 @@ CODEX_SKIPPED_REASON: <required only when MEDIUM/HEAVY skips Codex>
   round trips as practical. Do not serialize trivial file/status/test queries
   merely out of habit.
 
+Codex Mutation Enforcement Gate:
+- This is a hard execution gate for `MEDIUM` and `HEAVY` work, not a preference.
+- When Codex is available and the declared `Mutation Owner` is `CODEX`, ChatGPT
+  + Desktop Commander must remain read-only on `TASK FILES` and the overlapping
+  mutation boundary until Codex finishes or ownership is explicitly transferred.
+- If an authorized Codex implementation task returns analysis, design, or a
+  proposed patch without actually completing the approved substantial mutation,
+  resume the same Codex task immediately and instruct it to finish the authorized
+  implementation. Do not replace that unfinished Codex mutation with a large
+  sequence of Desktop Commander edits.
+- `Mutation Owner` may transfer from `CODEX` to `CHATGPT_DC` only when at least
+  one of these conditions is true: Codex is unavailable or quota-blocked; the
+  user explicitly selects DC implementation; the remaining correction is small,
+  bounded, and clearly faster/safer through DC; or Codex has failed the same
+  authorized implementation path and the Orchestrator has evidence that a local
+  environment limitation prevents completion.
+- Before any such ownership transfer, declare:
+
+```text
+CODEX_FALLBACK_REASON: <concrete reason>
+Mutation Owner: CHATGPT_DC
+Remaining Mutation Boundary: <small bounded remainder or approved fallback scope>
+```
+
+- `DC is convenient`, `the code is already open`, or `Codex returned a design`
+  are not valid fallback reasons for substantial MEDIUM/HEAVY mutation.
+- Before post-implementation verification begins, confirm that the declared
+  Mutation Owner actually performed the substantial mutation. If not, return to
+  the implementation stage instead of treating the task as implemented.
+- This gate does not prevent Desktop Commander from running local tests,
+  inspecting Runtime/Log/GUI state, gathering evidence, or applying a genuinely
+  small bounded correction after an explicit ownership transfer.
+
 Desktop Commander Latency Policy:
 - Desktop Commander is a local execution and verification boundary, not the
   default iterative inner loop for code reasoning on MEDIUM or HEAVY work.
@@ -1304,6 +1337,36 @@ Commander without blocking safe progress.
 ```
 
 Every final Next Session Startup Prompt must also reproduce this independent
+Codex Mutation Enforcement Gate block:
+
+```text
+==================================================
+Codex Mutation Enforcement Gate
+==================================================
+This is a hard gate for MEDIUM / HEAVY work.
+If Codex is available and Mutation Owner = CODEX:
+- ChatGPT + Desktop Commander remain read-only on TASK FILES and the overlapping
+  mutation boundary.
+- If Codex returns analysis/design without completing the authorized substantial
+  implementation, resume the SAME Codex task immediately and make it finish the
+  implementation. Do not substitute a large DC implementation.
+Mutation Owner may transfer to CHATGPT_DC only when:
+- Codex is unavailable or quota-blocked;
+- the user explicitly selects DC implementation;
+- only a genuinely small bounded correction remains; or
+- a verified local-environment limitation prevents Codex completion.
+Before transfer declare:
+CODEX_FALLBACK_REASON: <concrete reason>
+Mutation Owner: CHATGPT_DC
+Remaining Mutation Boundary: <bounded remainder or approved fallback scope>
+`DC is convenient`, `the code is already open`, and `Codex returned a design`
+are not valid fallback reasons for substantial MEDIUM/HEAVY mutation.
+Before verification, confirm the declared Mutation Owner actually performed the
+substantial mutation. If not, return to implementation.
+==================================================
+```
+
+Every final Next Session Startup Prompt must also reproduce this independent
 Desktop Commander Latency Control block:
 
 ```text
@@ -1654,7 +1717,8 @@ It must also begin with the mandatory `Current AI Role` block, declare the
 applicable role-specific principle, and include the corresponding explicit
 role instructions required by Step 5. Every final Startup Prompt must include
 the verified Development Environment block, the Mandatory Hybrid Orchestration
-block, the Desktop Commander Latency Control block, the Evidence And Verification
+block, the Codex Mutation Enforcement Gate block, the Desktop Commander Latency
+Control block, the Evidence And Verification
 Efficiency block, the Execution Efficiency
 Rules block, the Codex Scope Discipline block, and the independent Codex CLI
 Invocation Path block. When the role is
