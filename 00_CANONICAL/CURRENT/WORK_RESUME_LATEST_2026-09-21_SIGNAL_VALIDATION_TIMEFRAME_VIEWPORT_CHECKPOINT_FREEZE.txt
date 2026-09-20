@@ -135,6 +135,12 @@ Targeted staged-tree Operator UI/V2 tests:
   chart_operand_label dependency described above;
 - this is recorded as baseline evidence, not a checkpoint PASS.
 
+Final post-commit clean-HEAD export verification:
+- 16 direct non-GUI timeframe/historical/replay/rule-mapper contract tests PASS;
+- changed production Python files compile successfully;
+- GUI Operator/V2 import remains blocked by the same pre-existing
+  chart_operand_label baseline dependency, so no standalone GUI PASS is claimed.
+
 No live-broker GUI verification was performed during this closeout.
 
 ==================================================
@@ -168,6 +174,15 @@ Code repository after code checkpoint commit/push:
 
 This includes older unrelated WIP and the overlapping local dependencies named
 above.
+
+Documentation repository after the closeout documentation commit:
+- dirty/untracked status entries: 134
+- NUL-safe raw `git status --porcelain=v1 -z` SHA-256:
+  151eda9148921aa74aa3d7a5ed4947f72ed8cc4c5166026747810c67a1d4280c
+
+This documentation status contains only pre-existing protected WIP after the
+2026-09-21 closeout files are committed. Preserve it under the same no-reset /
+no-clean rule.
 
 Protection:
 - no reset

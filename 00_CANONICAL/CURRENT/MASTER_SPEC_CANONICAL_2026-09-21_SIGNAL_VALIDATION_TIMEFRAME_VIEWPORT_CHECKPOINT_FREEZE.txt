@@ -189,6 +189,12 @@ remote HEAD itself imports chart_operand_label while its committed presentation
 module lacks that symbol. This is recorded as a pre-existing remote-baseline
 dependency, not converted into a pass.
 
+Final post-commit clean-HEAD export verification adds:
+- 16 direct non-GUI timeframe/historical/replay/rule-mapper contract tests PASS;
+- changed production Python files compile successfully;
+- standalone GUI Operator/V2 remains blocked by the same pre-existing
+  chart_operand_label baseline dependency and is not counted as PASS.
+
 No live-broker GUI verification was performed in this closeout.
 
 Known historical Operator UI exclusions remain unclaimed as fixed:

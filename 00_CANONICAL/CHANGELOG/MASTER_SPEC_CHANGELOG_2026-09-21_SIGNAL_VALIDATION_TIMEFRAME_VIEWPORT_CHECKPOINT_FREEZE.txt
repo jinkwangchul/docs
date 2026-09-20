@@ -118,6 +118,12 @@ Targeted staged-tree Operator UI/V2:
 - could not import because of the pre-existing remote chart_operand_label
   dependency; not counted as pass or as a new checkpoint defect.
 
+Final post-commit clean-HEAD export:
+- 16 direct non-GUI timeframe/historical/replay/rule-mapper contract tests PASS;
+- changed production Python files compile successfully;
+- GUI Operator/V2 remains blocked by the same pre-existing chart_operand_label
+  baseline dependency, so no standalone GUI PASS is claimed.
+
 Historical baseline exclusions remain unclaimed:
 - test_registration_undo_is_unavailable_without_canonical_defaults
 - test_parent_v2_context_apply_and_fixed_undo_workflow
@@ -133,6 +139,11 @@ After code commit/push:
 - code dirty/untracked entries: 190
 - NUL-safe status SHA-256:
   21c173a5b7f9fd5aaf3af1781db2f1208179466f510c7adcb8e7d7efdf29882c
+
+After closeout documentation commit:
+- documentation dirty/untracked entries: 134
+- NUL-safe raw `git status --porcelain=v1 -z` SHA-256:
+  151eda9148921aa74aa3d7a5ed4947f72ed8cc4c5166026747810c67a1d4280c
 
 No reset, restore, stash, clean, broad-stage, or unrelated cleanup was used.
 
