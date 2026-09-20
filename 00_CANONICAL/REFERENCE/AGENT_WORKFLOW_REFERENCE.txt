@@ -350,6 +350,36 @@ CODEX_SKIPPED_REASON: <required only when MEDIUM/HEAVY skips Codex>
   round trips as practical. Do not serialize trivial file/status/test queries
   merely out of habit.
 
+Desktop Commander Latency Policy:
+- Desktop Commander is a local execution and verification boundary, not the
+  default iterative inner loop for code reasoning on MEDIUM or HEAVY work.
+- Target the normal MEDIUM/HEAVY orchestration around three Desktop Commander
+  phases when practical: (1) one batched initial reality check, (2) one Codex CLI
+  launch/handoff, and (3) one batched post-implementation verification pass.
+  Additional DC calls are allowed only when new local evidence is actually needed.
+- Initial DC investigation should collect the minimum complete local evidence in
+  one batch when possible: repository/dirty-state facts needed for safety, the
+  reproduced symptom, focused Runtime/Log state, and any machine-specific fact
+  that Codex cannot establish itself.
+- Once that minimum evidence is established, codebase exploration, call-graph
+  tracing, repeated source searches, and substantial code implementation should
+  normally remain inside the Codex task rather than alternating repeatedly
+  between ChatGPT and Desktop Commander.
+- Post-implementation DC verification should batch the actual diff inspection,
+  required Python32/PyQt execution, focused tests, Runtime/Log/state checks, and
+  other applicable local evidence into as few round trips as practical.
+- Do not split a known verification set into many sequential DC calls merely to
+  observe progress. Start the bounded verification batch and collect its result.
+- Do not poll a running Codex or local verification process repeatedly without a
+  concrete need. Prefer a bounded wait or completion/result-file handoff, then
+  retrieve the result once; inspect intermediate output only for timeout,
+  suspected hang, interactive prompt, safety concern, or explicit user request.
+- If a single DC call can safely gather several independent read-only facts or
+  run several predetermined verification commands, batch them in that call.
+- This latency policy never weakens First Principle scope protection, Mutation
+  Owner serialization, or required local verification. It changes round-trip
+  structure, not evidence standards.
+
 Execution Efficiency Rules:
 - Codex continuity: when Codex has already read the relevant files and call path
   deeply enough to establish the code change, keep the same Codex task moving
@@ -1261,6 +1291,33 @@ Commander without blocking safe progress.
 ```
 
 Every final Next Session Startup Prompt must also reproduce this independent
+Desktop Commander Latency Control block:
+
+```text
+==================================================
+Desktop Commander Latency Control
+==================================================
+- Desktop Commander is the local execution/verification boundary, not the
+  MEDIUM/HEAVY code-reasoning inner loop.
+- Normal MEDIUM/HEAVY target when practical:
+  1. one batched DC initial reality check;
+  2. one DC launch/handoff to local Codex CLI;
+  3. one batched DC post-implementation verification pass.
+- After minimum local evidence is established, let Codex keep code exploration,
+  call-graph tracing, repeated source search, and substantial implementation in
+  one continuous task instead of alternating repeatedly with DC.
+- Batch known initial evidence and known final verification work. Do not split
+  predetermined Git/diff/test/Runtime/Log checks into many sequential DC calls.
+- Do not repeatedly poll Codex or a verification process. Prefer bounded wait or
+  completion/result-file handoff and retrieve once; inspect intermediate output
+  only for timeout, hang, interactive prompt, safety concern, or user request.
+- Extra DC calls are allowed when genuinely new local evidence is required.
+- This reduces round trips only; it does not weaken scope protection, serialized
+  mutation ownership, or required real-environment verification.
+==================================================
+```
+
+Every final Next Session Startup Prompt must also reproduce this independent
 Execution Efficiency Rules block:
 
 ```text
@@ -1551,8 +1608,9 @@ It must also begin with the mandatory `Current AI Role` block, declare the
 applicable role-specific principle, and include the corresponding explicit
 role instructions required by Step 5. Every final Startup Prompt must include
 the verified Development Environment block, the Mandatory Hybrid Orchestration
-block, the Execution Efficiency Rules block, the Codex Scope Discipline block,
-and the independent Codex CLI Invocation Path block. When the role is
+block, the Desktop Commander Latency Control block, the Execution Efficiency
+Rules block, the Codex Scope Discipline block, and the independent Codex CLI
+Invocation Path block. When the role is
 Integrated Development Orchestrator, it must additionally reproduce the
 Mandatory Development Workflow block. These Startup Prompt requirements are
 explicit exceptions to the ordinary Task Prompt non-repetition rule.
