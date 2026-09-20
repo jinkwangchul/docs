@@ -297,12 +297,14 @@ Development Tool Routing Policy:
 - `MEDIUM`: several files, GUI/state flow, call-chain coordination, or meaningful
   regression risk exists while the structure is understood. Default to
   `HYBRID_PARALLEL`. ChatGPT + Desktop Commander establishes actual local state,
-  Runtime, Log, GUI, Git, and execution evidence; Codex CLI should normally take
-  the primary code-analysis and code-implementation role after the plan/Gate,
-  unless the implementation is clearly faster and safer as a small DC edit.
-  Codex may also perform independent criticism after implementation. If Codex is
-  skipped, the Orchestrator must state a short `CODEX_SKIPPED_REASON` in the
-  planning declaration.
+  Runtime, Log, GUI, Git, and execution evidence; after the plan/Gate, Codex CLI
+  is the default primary owner for code analysis and substantial implementation.
+  Do not let Desktop Commander complete a substantial MEDIUM implementation first
+  and attach Codex only as a late critic unless Codex is unavailable, the user
+  explicitly chose that route, or the remaining mutation is genuinely a small
+  bounded correction. Codex may also perform independent criticism after
+  implementation. If Codex is skipped, the Orchestrator must state a short
+  `CODEX_SKIPPED_REASON` in the planning declaration.
 - `HEAVY`: cross-layer structural work, unclear or broad call graphs, repeated
   direct-fix failure, or high-risk boundary changes are involved. When Codex is
   available, default to `CODEX_PRIMARY` for code analysis and implementation.
@@ -386,6 +388,30 @@ ChatGPT + Desktop Commander
   verification when that is clearly faster and safer. Re-escalate structural,
   cross-file, design-level, or repeated failures to Codex instead of expanding a
   long sequence of manual DC edits.
+
+Codex Scope Discipline:
+- Codex implementation tasks should receive the smallest complete code boundary
+  that can solve the approved problem: target files, relevant call paths,
+  confirmed evidence, required tests, and explicit protected WIP boundaries.
+- A post-implementation Codex Critic is a focused audit, not a repository-wide
+  rediscovery pass. By default, give it the actual changed files/diff, named
+  functions or call paths, the relevant tests, and the specific questions to
+  answer.
+- Do not ask a Critic to scan unrelated dirty files, historical WIP, broad Git
+  diffs, unrelated subsystems, or large test surfaces unless the approved change
+  has a demonstrated dependency on them.
+- Existing unrelated WIP appearing in `git status` or a broad repository diff is
+  context to protect, not automatic audit scope.
+- If the Critic discovers evidence that the defect crosses the supplied boundary,
+  it may report `SCOPE_EXPANSION_REQUIRED` with the concrete dependency and stop.
+  The Orchestrator then decides whether to expand the audit; Codex must not widen
+  scope silently.
+- For MEDIUM work, prefer one strong Codex analysis+implementation task followed
+  by ChatGPT+Desktop Commander verification. Add a separate Codex Critic only
+  when regression risk, safety boundaries, or unresolved evidence justify it.
+- For HEAVY or safety-boundary work, a separate focused Codex Critic is normally
+  appropriate after local verification, but it still follows the narrow-scope
+  rule above.
 
 Codex CLI Invocation Contract:
 - ChatGPT Web does not treat Codex as a directly callable web-app tool in this
@@ -1213,8 +1239,10 @@ Mandatory Hybrid Orchestration
 Core rule: Parallel Reasoning, Serialized Mutation.
 LIGHT -> DC_ONLY by default; Codex optional; small direct edits may use DC.
 MEDIUM -> HYBRID_PARALLEL by default; ChatGPT+DC establishes actual local
-state/evidence, while Codex normally owns primary code analysis and implementation
-after plan/Gate and may also perform criticism.
+state/evidence, then Codex is the default primary owner of code analysis and
+substantial implementation after plan/Gate. Do not finish a substantial MEDIUM
+implementation in DC first and attach Codex only as a late critic unless Codex
+is unavailable or only a small bounded correction remains.
 HEAVY -> CODEX_PRIMARY by default when Codex is available for code analysis and
 implementation; ChatGPT+DC owns local execution evidence and final verification.
 Before implementation record:
@@ -1255,6 +1283,32 @@ Execution Efficiency Rules
 - Use DC for small bounded post-verification corrections when clearly faster;
   re-escalate structural, cross-file, design-level, or repeated failures to
   Codex instead of expanding long manual DC edit sequences.
+==================================================
+```
+
+Every final Next Session Startup Prompt must also reproduce this independent
+Codex Scope Discipline block:
+
+```text
+==================================================
+Codex Scope Discipline
+==================================================
+- Codex implementation receives the smallest complete boundary needed for the
+  approved problem: target files, relevant call paths, confirmed evidence,
+  required tests, and protected WIP boundaries.
+- A post-implementation Codex Critic is a focused audit, not repository-wide
+  rediscovery. Give it the actual changed files/diff, named functions or call
+  paths, relevant tests, and explicit questions.
+- Unrelated dirty files, historical WIP, broad Git diffs, unrelated subsystems,
+  and large test surfaces are outside critic scope unless a concrete dependency
+  is demonstrated.
+- If evidence crosses the supplied boundary, report `SCOPE_EXPANSION_REQUIRED`
+  and the dependency, then stop; do not widen scope silently.
+- MEDIUM: prefer one strong Codex analysis+implementation task plus ChatGPT+DC
+  verification. Add a separate Codex Critic only when regression risk, safety
+  boundaries, or unresolved evidence justify it.
+- HEAVY/safety-boundary work: a separate focused Codex Critic is normally useful
+  after local verification, but the same narrow-scope rule still applies.
 ==================================================
 ```
 
@@ -1497,8 +1551,8 @@ It must also begin with the mandatory `Current AI Role` block, declare the
 applicable role-specific principle, and include the corresponding explicit
 role instructions required by Step 5. Every final Startup Prompt must include
 the verified Development Environment block, the Mandatory Hybrid Orchestration
-block, the Execution Efficiency Rules block, and the independent Codex CLI
-Invocation Path block. When the role is
+block, the Execution Efficiency Rules block, the Codex Scope Discipline block,
+and the independent Codex CLI Invocation Path block. When the role is
 Integrated Development Orchestrator, it must additionally reproduce the
 Mandatory Development Workflow block. These Startup Prompt requirements are
 explicit exceptions to the ordinary Task Prompt non-repetition rule.
