@@ -1,0 +1,69 @@
+MASTER SPEC CHANGELOG
+Signal Validation V2 Chart / History / Persistent Cache Freeze
+Date: 2026-09-20
+
+Code checkpoint:
+- repository: kiwoom_auto
+- branch: feat/restore-auto-trade-setting-ui
+- commit: bbe0046eac2da7f6f21b1155a669bc5d12812b86
+- push: origin branch confirmed
+
+Canonical owner added:
+- MASTER_SPEC_CANONICAL_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FREEZE.txt
+
+======================================================================
+CHANGED
+======================================================================
+
+- Historical base pool normalized to 5,000 candles with indicator warmup as needed.
+- Initial chart viewport shows latest 100 candles while retaining the loaded pool.
+- Time navigation no longer implicitly replaces the initialized price-axis range.
+- Settings apply preserves operator chart viewport for the current validation context.
+- Large-pool signal scanning reuses safe read-only series where semantics permit.
+- Validation averaging management defaults OFF on fresh V2 state.
+- OFF execution uses one virtual share for each valid BUY.
+- ON execution retains weighted repeat-management behavior and extended financial summary.
+======================================================================
+ADDED / NORMALIZED
+======================================================================
+
+- Validation-owned persistent historical cache under runtime/signal_validation_v2_history_cache/.
+- Cache identity, validation, atomic write, restart incremental merge, and full-request fallback.
+- Price-plot marker clipping and matching hit-test boundary.
+- Compact chart filter captions with line swatches sourced from actual rendering pens.
+- Full-pool signal scan path with prefix-causal PRICE_BOX handling.
+- V2-local weighted per-share estimated sell-price summary when averaging is enabled.
+- Regression coverage for cache persistence, restart fallback, chart axes, marker clipping, legend swatches, evidence interaction, and replay fast paths.
+
+======================================================================
+CLOSEOUT FIXES
+======================================================================
+
+- Restored fixed price-axis behavior during later time-axis movement.
+- Updated weighted-average replay fixture to explicitly enable averaging management under the new default-OFF contract.
+- Updated evidence-hover fixture so the tested marker is inside the enforced price-plot boundary.
+
+======================================================================
+VERIFICATION
+======================================================================
+
+- Core closeout modules: 91/91 OK.
+- Signal Validation V2 approved scope: 67/67 OK, with one known baseline test excluded.
+- Operator UI approved scope: 25/25 OK, with three known baseline tests excluded.
+- py_compile: OK.
+- git diff --check: OK.
+- New-file trailing whitespace: 0.
+- Persistent-cache forbidden Production/Mock boundary hits: 0.
+Known baseline exclusions remain documented, not silently converted to passes:
+- test_v2_entry_reset_and_parent_undo_keep_distinct_baselines
+- test_registration_undo_is_unavailable_without_canonical_defaults
+- test_parent_v2_context_apply_and_fixed_undo_workflow
+- test_flow_apply_uses_source_weakref_and_closed_source_fails_closed
+
+======================================================================
+SCOPE PROTECTION
+======================================================================
+
+The code commit selectively included 16 Signal Validation implementation/test files only.
+Pre-existing unrelated dirty/untracked code state was preserved.
+No reset, restore, stash, clean, broad add, or unrelated cleanup was performed.

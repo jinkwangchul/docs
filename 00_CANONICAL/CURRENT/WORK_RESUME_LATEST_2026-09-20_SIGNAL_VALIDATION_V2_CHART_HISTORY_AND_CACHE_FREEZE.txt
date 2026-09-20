@@ -1,0 +1,127 @@
+WORK RESUME LATEST
+Signal Validation V2 Chart / History / Persistent Cache Freeze
+Date: 2026-09-20
+
+==================================================
+Current Big Feature Goal
+==================================================
+
+Signal Validation V2 operator chart/history rework is frozen at:
+bbe0046eac2da7f6f21b1155a669bc5d12812b86
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Remote:
+origin/feat/restore-auto-trade-setting-ui is pushed to the same code commit.
+
+Current Canonical owner:
+MASTER_SPEC_CANONICAL_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FREEZE.txt
+
+==================================================
+Completed In The Closed Implementation Windows
+==================================================
+
+- 5,000-candle Validation Historical base pool with latest-100 initial viewport.
+- Local wheel/pan reuse without repeat Historical request inside the loaded pool.
+- Explicit click range validation and viewport preservation across settings apply.
+- Replay/full-pool signal-scan performance path with causal PRICE_BOX handling.
+- V2 averaging-management default OFF and weighted ON behavior.
+- Marker price-plot clipping and matching hit-testing.
+- Compact filter captions and actual-rendering-pen line swatches.
+- Validation-owned persistent history cache with restart incremental refresh/fallback.
+- Closeout regression fixes for price-axis invariance and two stale test fixtures.
+
+==================================================
+Fresh Verification
+==================================================
+
+- Core regression modules: 91/91 OK.
+- V2 approved scope: 67/67 OK excluding the known baseline test below.
+- Operator UI approved scope: 25/25 OK excluding the three known baseline tests below.
+- py_compile: OK.
+- diff check: OK.
+- persistent-cache Production/Mock forbidden-boundary hits: 0.
+
+Known baseline exclusions:
+- test_v2_entry_reset_and_parent_undo_keep_distinct_baselines
+- test_registration_undo_is_unavailable_without_canonical_defaults
+- test_parent_v2_context_apply_and_fixed_undo_workflow
+- test_flow_apply_uses_source_weakref_and_closed_source_fails_closed
+
+These exclusions are not declared fixed by this freeze.
+
+==================================================
+Protected Local WIP
+==================================================
+
+The repository is intentionally not clean outside this closed feature scope.
+Pre-stage code protected-state evidence:
+- 184 non-target dirty/untracked status entries
+- SHA-256: 0f1e63893abcfada4cc00b1dd713f240905bcc15c9669728f6012e40f3f05516
+
+Pre-close documentation protected-state evidence, excluding this closeout's
+new documents and Reference Index path:
+- 134 non-target dirty/untracked status entries
+- SHA-256: 5432aedef50cdd9d250c5f7f8bd529d53f9683a3125ac6df30e58bac19f7c2a1
+
+Protection rule:
+- Do not reset, restore, stash, clean, broad-stage, or overwrite unrelated WIP.
+- Stage only files explicitly authorized by the next user task.
+- The current runtime-generated Validation cache is derived data, not a canonical ledger.
+
+==================================================
+Development Environment
+==================================================
+
+- Primary Orchestrator: GPT-5.6 Sol / current closing orchestrator
+- Desktop Commander: Available
+- Connected Device: KWANGS-LP
+- Automatic Trading Repository:
+  C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- Documentation Repository:
+  C:\Users\JIN KWANG CHUL\Documents\docs
+- Python Runtime:
+  C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+- Python Version / Bitness: 3.11.9 / 32-bit
+- PyQt environment used for verification: QT_QPA_PLATFORM=offscreen
+- Codex CLI: Available
+- Codex CLI Executable:
+  C:\Users\JIN KWANG CHUL\.vscode\extensions\openai.chatgpt-26.5908.31748-win32-x64\bin\windows-x86_64\codex.exe
+- Codex CLI Version: 0.154.0-alpha.6.1
+- Codex Authentication: Logged in using ChatGPT
+
+No development-tool installation or access contract changed during this closeout.
+==================================================
+Recovery / First Checks
+==================================================
+
+Code repository:
+- git branch --show-current
+- git rev-parse HEAD
+- git rev-parse @{u}
+- git status --short
+- git rev-list --left-right --count HEAD...@{u}
+
+Expected frozen code baseline:
+bbe0046eac2da7f6f21b1155a669bc5d12812b86
+
+Documentation repository:
+- git branch --show-current
+- git rev-parse HEAD
+- git rev-parse @{u}
+- git status --short
+
+Read first:
+1) 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+2) 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FREEZE.txt
+3) this Work Resume
+4) 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FREEZE.txt
+
+==================================================
+Current Blocker / Next Start Point
+==================================================
+
+No next feature or implementation task has been authorized by the user.
+The next AI must use Must Confirm for role/task selection and must not invent
+a follow-on implementation from open ideas or old conversation proposals.

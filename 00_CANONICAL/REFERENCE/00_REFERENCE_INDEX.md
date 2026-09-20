@@ -26,6 +26,7 @@ CURRENT.
 | Signal Validation V2 validation, silent status, result summary, and tooltip normalization | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-16_SIGNAL_VALIDATION_V2_UI_NORMALIZATION_SUPPLEMENT.txt` | Supersedes only conflicting Sep-14/Sep-15 wording for expression-aware SELL admission, silent apply/completion, Korean summary/0.00% display, timestamp label, and tooltip dismissal dispatch |
 | Signal Validation operation independence while Production operation is active | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-18_SIGNAL_VALIDATION_OPERATION_INDEPENDENCE_SUPPLEMENT.txt` | Validation remains an independent operator workflow and does not acquire Production operation mutation authority |
 | Signal Validation V2 virtual execution, configured-filter visualization, Evidence interaction, and Candle-snapped Crosshair | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-19_SIGNAL_VALIDATION_V2_FILTER_VISUALIZATION_AND_VIRTUAL_EXECUTION_SUPPLEMENT.txt` | Current supplemental owner for completed-Candle admission, OHLC/4 virtual fills, simplified weighted-average execution, 8-family visualization/cache, fixed lower-pane H, Evidence styling, Marker Pin/release, Crosshair, and cached value lookup; Git checkpoint remains separate |
+| Signal Validation V2 chart/history/persistent-cache freeze | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FREEZE.txt` | Latest owner for 5,000-history pool/latest-100 viewport, local chart navigation, replay scan optimization, V2 averaging defaults, marker clipping/legend normalization, and Validation-owned restart-persistent history cache |
 | Mock Validation bounded runtime growth | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-18_MOCK_VALIDATION_RUNTIME_GROWTH_NORMALIZATION.txt` | Current owner for bounded process-local Mock runtime/evidence growth without Production persistence authority |
 | Indicator-follow SELL execution and MULTI_HOGA contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_INDICATOR_FOLLOW_SELL_PHASE1_AND_MULTI_HOGA_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` |
 | Routine package boundary and capability contract | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-02_ROUTINE_BOUNDARY_ISOLATION_AND_PACKAGE_CONTRACT_FREEZE.txt` | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-07-19_ROUTINE_INSTANCE_OPERATION_CONTRACT.txt` |
@@ -78,15 +79,15 @@ does not supersede them.
 ## Current Resume And Changelog
 
 - Latest Frozen Authority:
-  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-19_VERIFIED_NXT_ELIGIBILITY_ATS_GATE_SUPPLEMENT.txt`
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FREEZE.txt`
 - Latest Local WIP Work Resume:
   `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
 - Latest Local WIP Changelog:
   `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
 - Latest Frozen Work Resume:
-  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-19_WAITING_REENTRY_AND_NXT_ELIGIBILITY_FREEZE.txt`
+  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FREEZE.txt`
 - Latest Frozen Changelog:
-  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-19_VERIFIED_NXT_ELIGIBILITY_ATS_GATE_SUPPLEMENT.txt`
+  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FREEZE.txt`
 
 Older Work Resumes, Readable variants, Freeze snapshots, and Changelogs are
 historical records. They may explain a past decision but must not be used as a

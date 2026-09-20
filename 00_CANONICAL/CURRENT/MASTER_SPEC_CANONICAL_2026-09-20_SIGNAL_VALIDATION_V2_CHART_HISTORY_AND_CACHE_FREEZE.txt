@@ -1,0 +1,152 @@
+MASTER SPEC CANONICAL SUPPLEMENT
+Signal Validation V2 Chart / History / Persistent Cache Freeze
+Date: 2026-09-20
+
+Code repository: kiwoom_auto
+Branch: feat/restore-auto-trade-setting-ui
+Frozen code commit: bbe0046eac2da7f6f21b1155a669bc5d12812b86
+Remote push: origin/feat/restore-auto-trade-setting-ui confirmed
+Previous direct owner:
+- MASTER_SPEC_CANONICAL_2026-09-19_SIGNAL_VALIDATION_V2_FILTER_VISUALIZATION_AND_VIRTUAL_EXECUTION_SUPPLEMENT.txt
+
+======================================================================
+1. AUTHORITY AND SCOPE
+======================================================================
+
+This supplement freezes the completed implementation left across the two
+unclosed Signal Validation V2 implementation conversations.
+
+It owns only these completed areas:
+- Validation chart navigation and fixed operator viewport behavior;
+- large read-only Historical pool with latest-100 initial display;
+- local replay/signal-scan performance path and causality preservation;
+- V2-local averaging-management execution controls and summaries;
+- marker clipping / evidence hit-testing / chart legend presentation;
+- Validation-owned persistent historical cache and restart reuse.
+
+It does not grant Production operation, order, Mock, or canonical market-data
+mutation authority to Validation.
+======================================================================
+2. HISTORICAL POOL AND CHART VIEW CONTRACT
+======================================================================
+
+- Default Signal Validation Historical base pool target is 5,000 candles.
+- Required indicator warmup may increase the broker fetch count above that base.
+- After the loaded pool is installed, the initial visible viewport is the latest 100 candles.
+- There is no operator candle-count input in the V2 chart.
+- Wheel zoom and pan inside the loaded pool are local chart operations and must not issue additional Historical/TR requests.
+- Same-process stock + timeframe pool reuse is permitted and must not change first-load semantics.
+- Settings re-application for the current chart does not reset the operator's chosen time/price viewport.
+- Moving or zooming the time axis does not implicitly replace the current price-axis range after initial chart scale initialization.
+- Price-axis zoom/pan and time-axis zoom/pan remain independent controls.
+- Validation range selection remains explicit point selection and survives history prepend by candle identity/time where applicable.
+
+======================================================================
+3. REPLAY / SIGNAL-SCAN CONTRACT
+======================================================================
+
+- Historical replay evaluates completed candles only.
+- Full-pool signal scanning may reuse precomputed base indicator series.
+- PRICE_BOX evaluation remains prefix-causal; future candles must not change earlier signal results.
+- ValidationVirtualPositionTracker provides detached Validation context only.
+- Fast-path average-price series may be reused only under the explicit read-only Validation path.
+- These optimizations do not authorize mutation of Production market data, operation state, orders, or Mock state.
+======================================================================
+4. V2 AVERAGING-MANAGEMENT CONTRACT
+======================================================================
+
+- Fresh V2 averaging management defaults to OFF.
+- OFF means each valid BUY contributes exactly one virtual share and repeat management detail values are ignored.
+- ON preserves the configured Validation repeat policy and weighted virtual position accounting.
+- V2 execution controls remain Validation-local and are not a Production order-execution permission.
+- Completed-cycle profit calculation uses total proceeds/cost.
+- When averaging management is ON, the additional operator summary includes invested amount, profit amount, weighted average buy price, and weighted per-share estimated sell price.
+
+======================================================================
+5. MARKER / EVIDENCE / LEGEND CONTRACT
+======================================================================
+
+- BUY/SELL marker painting is clipped to the same price-plot rectangle as price candles.
+- A marker outside that price plot is not hover/hit-testable.
+- Visible marker Y semantics remain BUY below low and SELL above high.
+- Marker hover/pin evidence remains cached; hover does not rebuild evidence.
+- Filter captions are compact operator-facing labels.
+- Any displayed line swatch is derived from the actual series rendering pen.
+- Caption color/style follows ACTIVE/NORMAL/INACTIVE/UNSUPPORTED/ERROR rendering state rather than a duplicate color map.
+- OCR histogram itself is not represented as a line swatch.
+======================================================================
+6. VALIDATION-OWNED PERSISTENT HISTORY CACHE
+======================================================================
+
+- Cache root: runtime/signal_validation_v2_history_cache/
+- Cache identity: stock code + timeframe_minutes + requested_count.
+- Payload contains normalized Validation candles, not broker raw rows.
+- Cache reads validate schema, identity, and candle shape; invalid/corrupt data is treated as a cache miss.
+- Writes use same-directory temporary file + flush/fsync + atomic replace, followed by read-back validation.
+- On process restart, a valid cache may be loaded and refreshed using a bounded incremental overlap request, then merged by candle time.
+- If incremental refresh cannot produce sufficient valid history, the flow falls back to the existing full read-only Historical request.
+- A failed refresh does not destroy the last valid cache.
+- Same-process in-memory/shared-pool reuse still takes precedence.
+- This cache must not read or mutate Production stocks/<stock>/candles.json, MarketDataHost mutable state, operation candle writers, order/runtime production state, or Mock state.
+
+======================================================================
+7. FRESH VERIFICATION AT CLOSEOUT
+======================================================================
+
+Core regression modules:
+- routine_validation_replay: 37/37 OK
+- signal_validation_execution: 11/11 OK
+- signal_validation_visualization: 12/12 OK
+- signal_validation_axis_cycles: 18/18 OK
+- signal_validation_evidence_interaction: 6/6 OK
+- signal_validation_historical_cache: 4/4 OK
+- signal_validation_persistent_history_flow: 3/3 OK
+Total core: 91/91 OK.
+Signal Validation V2:
+- 67/67 OK after excluding one already-known baseline test:
+  test_v2_entry_reset_and_parent_undo_keep_distinct_baselines
+
+Operator UI:
+- 25/25 OK after excluding three already-known baseline tests:
+  test_registration_undo_is_unavailable_without_canonical_defaults
+  test_parent_v2_context_apply_and_fixed_undo_workflow
+  test_flow_apply_uses_source_weakref_and_closed_source_fails_closed
+
+Additional closeout checks:
+- py_compile: OK
+- tracked diff check: OK
+- new-file trailing whitespace: 0
+- persistent-cache forbidden Production/Mock boundary hits: 0
+
+======================================================================
+8. CLOSEOUT CORRECTIONS FOUND BY FRESH VERIFICATION
+======================================================================
+
+Fresh closeout verification corrected only directly scoped contract/test mismatches:
+1) Time-view movement had begun recomputing price bounds. The chart now initializes visible price bounds once and preserves them through later time navigation.
+2) A weighted-average replay test still relied on the former implicit averaging-management default ON. The test now explicitly enables averaging management.
+3) An evidence-hover test used a SELL marker outside the newly enforced price-plot clipping boundary. The fixture now supplies a price view where the marker is actually visible.
+
+No unrelated implementation was modified for these closeout corrections.
+======================================================================
+9. PROTECTED OUT-OF-SCOPE STATE
+======================================================================
+
+The code repository still contains substantial pre-existing dirty/untracked work outside this freeze.
+It is intentionally not reset, restored, stashed, cleaned, broadly staged, or included in the checkpoint.
+
+Pre-stage protected status evidence for non-target code paths:
+- protected status entries: 184
+- SHA-256 fingerprint:
+  0f1e63893abcfada4cc00b1dd713f240905bcc15c9669728f6012e40f3f05516
+
+This fingerprint is closeout evidence, not a Canonical content identity.
+
+======================================================================
+10. CURRENT AUTHORITY
+======================================================================
+
+For the areas named in Section 1, this supplement supersedes conflicting earlier wording.
+Independent owners for Production operation, Mock, MarketDataHost, routine package boundaries, and other unrelated features remain in force.
+
+No next feature or implementation scope is authorized by this freeze.
