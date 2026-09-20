@@ -348,6 +348,45 @@ CODEX_SKIPPED_REASON: <required only when MEDIUM/HEAVY skips Codex>
   round trips as practical. Do not serialize trivial file/status/test queries
   merely out of habit.
 
+Execution Efficiency Rules:
+- Codex continuity: when Codex has already read the relevant files and call path
+  deeply enough to establish the code change, keep the same Codex task moving
+  from analysis into implementation unless there is a concrete reason to stop.
+  Do not routinely end Codex at analysis and then make ChatGPT + Desktop
+  Commander rediscover and reimplement the same substantial change from scratch.
+- No duplicate investigation: facts already confirmed by ChatGPT + Desktop
+  Commander, such as Runtime values, Log evidence, visible GUI paths, Git state,
+  or reproduced symptoms, should be handed to Codex as confirmed evidence.
+  Codex should focus on unresolved code cause, call graph, implementation, or
+  independent criticism instead of repeating the same local investigation.
+- Separate confirmed facts from open questions in Codex instructions so Codex
+  knows what it may rely on and what it still needs to prove.
+- Local-environment stop rule: if Codex sandbox/runtime cannot execute the
+  required Python, Python32, PyQt, GUI, Kiwoom, permission-sensitive, or other
+  machine-specific verification, do not spend the task repeatedly searching for
+  alternate runtimes or workarounds.
+- After two failed attempts of the same local-environment class, stop further
+  environment workaround attempts. Codex returns the code result, the exact
+  failed verification, and the remaining unverified items. Desktop Commander
+  then performs the real local verification in the user's environment.
+- Preferred MEDIUM/HEAVY flow:
+
+```text
+ChatGPT + Desktop Commander
+-> minimum real symptom / environment / contract evidence
+-> Codex CLI continues code analysis + implementation in one task
+|| ChatGPT + Desktop Commander performs non-conflicting verification preparation
+-> Codex returns
+-> Orchestrator inspects actual diff
+-> Desktop Commander runs Python32 / GUI / Runtime / Log / state verification
+-> ChatGPT performs independent criticism
+```
+
+- Re-escalation: use Desktop Commander for a small bounded correction after
+  verification when that is clearly faster and safer. Re-escalate structural,
+  cross-file, design-level, or repeated failures to Codex instead of expanding a
+  long sequence of manual DC edits.
+
 Codex CLI Invocation Contract:
 - ChatGPT Web does not treat Codex as a directly callable web-app tool in this
   project workflow.
@@ -1193,6 +1232,32 @@ Commander without blocking safe progress.
 ==================================================
 ```
 
+Every final Next Session Startup Prompt must also reproduce this independent
+Execution Efficiency Rules block:
+
+```text
+==================================================
+Execution Efficiency Rules
+==================================================
+- If Codex has already analyzed the relevant files/call path deeply enough,
+  continue the same Codex task into implementation when safe instead of ending
+  at analysis and making ChatGPT+DC redo the same substantial work.
+- Do not make Codex repeat Runtime/Log/GUI/Git/local-state investigation already
+  confirmed by ChatGPT+Desktop Commander. Pass confirmed facts and unresolved
+  questions separately.
+- If Codex hits the same Python/Python32/PyQt/GUI/Kiwoom/permission/local-runtime
+  class failure twice, stop environment workaround attempts. Return the code
+  result and unverified items; Desktop Commander performs the real local check.
+- Preferred MEDIUM/HEAVY flow:
+  ChatGPT+DC minimum real evidence -> Codex analysis+implementation in one task
+  -> actual diff inspection -> DC Python32/GUI/Runtime/Log/state verification
+  -> ChatGPT independent criticism.
+- Use DC for small bounded post-verification corrections when clearly faster;
+  re-escalate structural, cross-file, design-level, or repeated failures to
+  Codex instead of expanding long manual DC edit sequences.
+==================================================
+```
+
 Every final Next Session Startup Prompt must also include this independent
 Codex CLI Invocation Path block. It must be reproduced explicitly and must not
 be replaced by a generic statement such as `Codex available` or `use Codex when
@@ -1432,7 +1497,8 @@ It must also begin with the mandatory `Current AI Role` block, declare the
 applicable role-specific principle, and include the corresponding explicit
 role instructions required by Step 5. Every final Startup Prompt must include
 the verified Development Environment block, the Mandatory Hybrid Orchestration
-block, and the independent Codex CLI Invocation Path block. When the role is
+block, the Execution Efficiency Rules block, and the independent Codex CLI
+Invocation Path block. When the role is
 Integrated Development Orchestrator, it must additionally reproduce the
 Mandatory Development Workflow block. These Startup Prompt requirements are
 explicit exceptions to the ordinary Task Prompt non-repetition rule.
