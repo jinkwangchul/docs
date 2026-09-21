@@ -410,10 +410,11 @@ Remote-First Source Routing Policy:
 Desktop Commander Latency Policy:
 - Desktop Commander is a local execution and verification boundary, not the
   default iterative inner loop for code reasoning on MEDIUM or HEAVY work.
-- Target the normal MEDIUM/HEAVY orchestration around three Desktop Commander
-  phases when practical: (1) one batched initial reality check, (2) one Codex CLI
-  launch/handoff, and (3) one batched post-implementation verification pass.
-  Additional DC calls are allowed only when new local evidence is actually needed.
+- Organize normal MEDIUM/HEAVY orchestration around three Desktop Commander
+  phases when practical: (1) initial local reality evidence, (2) Codex CLI
+  launch/handoff, and (3) post-implementation real-environment verification.
+  These are phases, not a three-call cap; use as many high-value DC calls inside
+  them as the local evidence genuinely requires.
 - Initial DC investigation should collect the minimum complete local evidence in
   one batch when possible: repository/dirty-state facts needed for safety, the
   reproduced symptom, focused Runtime/Log state, and any machine-specific fact
@@ -436,6 +437,26 @@ Desktop Commander Latency Policy:
 - This latency policy never weakens First Principle scope protection, Mutation
   Owner serialization, or required local verification. It changes round-trip
   structure, not evidence standards.
+
+Desktop Commander High-Value Utilization Policy:
+- Core rule: `DC_USAGE_TARGET = MINIMIZE_WASTE, NOT MINIMIZE_USAGE`.
+- Do not treat lower Desktop Commander call count as a success metric by itself.
+  The objective is to remove low-value search/poll/read repetition and spend DC
+  capacity on evidence that only the real local machine can prove.
+- Use Desktop Commander actively for high-value local work: dirty-WIP snapshots,
+  Python32/PyQt execution, GUI smoke checks, Kiwoom-connected verification,
+  Runtime/Log/cache inspection, real-data comparisons, local process state,
+  Codex CLI launch/result recovery, focused post-implementation regression, and
+  final Git/diff/state verification.
+- Prefer fewer, denser calls when the same evidence can be safely batched, but do
+  not omit useful local verification merely to reduce call count.
+- Replace low-value DC activity first: repeated source search, committed-source
+  rereads, broad `rg` loops, unnecessary progress polling, and repeated reads of
+  evidence already captured elsewhere.
+- If additional DC calls materially improve confidence in local runtime, GUI,
+  broker, cache, state, or verification evidence, those calls are encouraged.
+- Evaluate DC efficiency by `useful local evidence per round trip`, not by raw
+  call-count minimization.
 
 Evidence And Verification Efficiency Policy:
 - Core rule: Single Evidence Pass, Scoped Verification, No Full Re-audit.
@@ -1445,10 +1466,12 @@ Desktop Commander Latency Control
 ==================================================
 - Desktop Commander is the local execution/verification boundary, not the
   MEDIUM/HEAVY code-reasoning inner loop.
-- Normal MEDIUM/HEAVY target when practical:
-  1. one batched DC initial reality check;
-  2. one DC launch/handoff to local Codex CLI;
-  3. one batched DC post-implementation verification pass.
+- Normal MEDIUM/HEAVY structure when practical:
+  1. DC initial local-reality evidence phase;
+  2. DC launch/handoff to local Codex CLI;
+  3. DC post-implementation real-environment verification phase.
+  These are phases, not a three-call cap. Use additional high-value DC calls when
+  the local evidence genuinely requires them.
 - After minimum local evidence is established, let Codex keep code exploration,
   call-graph tracing, repeated source search, and substantial implementation in
   one continuous task instead of alternating repeatedly with DC.
@@ -1460,6 +1483,32 @@ Desktop Commander Latency Control
 - Extra DC calls are allowed when genuinely new local evidence is required.
 - This reduces round trips only; it does not weaken scope protection, serialized
   mutation ownership, or required real-environment verification.
+==================================================
+```
+
+Every final Next Session Startup Prompt must also reproduce this independent
+Desktop Commander High-Value Utilization block:
+
+```text
+==================================================
+Desktop Commander High-Value Utilization
+==================================================
+DC_USAGE_TARGET = MINIMIZE_WASTE, NOT MINIMIZE_USAGE.
+Do not optimize for a lower DC call count by itself.
+Reduce low-value DC work first:
+- repeated source search / broad rg loops
+- rereading committed remote source
+- unnecessary process polling
+- repeated reads of already-confirmed evidence
+Use DC actively for high-value local evidence:
+- dirty/untracked WIP and local-only diffs
+- Python32 / PyQt / GUI / Kiwoom execution
+- Runtime / Log / cache / real-data inspection
+- local process and permission state
+- Codex CLI launch and result recovery
+- focused regression and final real-environment verification
+Batch when safe, but never skip useful local verification just to save calls.
+Judge efficiency by useful local evidence per round trip, not raw call count.
 ==================================================
 ```
 
@@ -1815,7 +1864,8 @@ role instructions required by Step 5. Every final Startup Prompt must include
 the verified Development Environment block, the Mandatory Hybrid Orchestration
 block, the Codex Mutation Enforcement Gate block, the Remote-First Source Routing
 block, the Desktop Commander Latency
-Control block, the Evidence And Verification
+Control block, the Desktop Commander High-Value Utilization block, the Evidence
+And Verification
 Efficiency block, the Execution Efficiency
 Rules block, the Checkpoint Commit And Push Gate block, the Codex Scope Discipline
 block, and the independent Codex CLI
