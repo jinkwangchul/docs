@@ -1,0 +1,104 @@
+﻿MASTER SPEC CHANGELOG
+2026-09-22 Production Candle Standby / MarketData Boundary Closure
+
+Type: Big Feature checkpoint / Conversation Closing / retroactive previous-window close
+Code checkpoint: 1c2258b0cd6428fc772a152a4041e14bbaec4725
+
+A. WHY THIS CHANGELOG EXISTS
+
+The immediately preceding conversation completed Candle/MarketData work but did
+not execute the required Conversation Closing procedure. The user explicitly
+required the missing close to be applied retroactively in the current window and
+requested documentation reinforcement. This changelog records both periods
+separately.
+
+B. RETROACTIVE PREVIOUS-WINDOW RECORD
+
+Recorded as completed from the prior window:
+- projection contract: COMPLETED_TIMEFRAME / FORMING_BASE_BAR;
+- Routine-owned active-path warmup declaration;
+- 10 percent warmup margin and 200,000 minute-candle maximum;
+- Production execution/observation/standby candle separation;
+- login-time registered-stock standby discovery and bootstrap;
+- forming realtime bar supply without historical commit;
+- optional candle capability for non-candle Routines;
+- approved-rule Production apply now resyncs monitoring after successful commit;
+- Mock-owned candle projection and Production mutable callback isolation;
+- automatic candle refresh batching/round-robin and session handling.
+
+C. CURRENT-WINDOW CORRECTIONS
+
+1. Mock display semantics
+- FINAL_END while still RUNNING: `감시/대기`, not `운영종료`.
+- ordinary actual ENDED remains `운영종료`.
+- ATS_FINAL_NO_TERMINATION: `감시/대기` because no termination action executed.
+
+2. Standby transient-failure preservation
+- preserve previous valid requirement only for explicitly failed current stocks;
+- replace successfully recalculated stocks;
+- remove stale/non-Candle/unregistered requirements;
+- expose preserved_stock_codes diagnostics;
+- preserved-only login target still triggers drain-all bootstrap.
+
+3. Checkpoint dependency closure
+- added operation-cycle defer handling for CANDLE_REFRESH_ALREADY_RUNNING;
+- included current Mock Indicator adapter/continuation contract and matching tests;
+- added Mock execution chart read model and Quick Chart read-cache integration;
+- staged only two required common-chart presentation hunks rather than unrelated
+  whole-file chart WIP.
+
+D. FINAL AUDIT FINDINGS
+
+Closed:
+- no remaining Main strategy-semantic parsing was found in the Candle boundary;
+- non-Candle Routine path remains valid;
+- Mock/Production mutable MarketData boundary remains isolated;
+- login/reconnect/15-target batching/operation defer paths verified;
+- transient standby deletion gap reproduced and corrected.
+
+Not claimed:
+- live broker SOR reconciliation proof;
+- completion of unrelated chart/filter/live-price WIP;
+- cleanup of Runtime/user-data/stock-folder or other dirty local state.
+
+E. VERIFICATION
+
+Independent staged-index snapshots were used to prevent unstaged dependencies
+from masking checkpoint incompleteness.
+
+Passing focused groups:
+- 88 tests: login/MarketData/automatic candle refresh;
+- 42 tests: Production candle/Mock boundary/package/reconnect/projection;
+- 47 tests: Main-Routine ownership/aggregation/lifecycle;
+- 134 tests: Mock Indicator adapter/continuation;
+- 22 tests: Mock stop/Quick Chart;
+- 9 tests: Mock execution chart read model.
+
+Total: 342 focused tests OK across isolated Python32 processes.
+Production py_compile OK. Staged diff check OK.
+
+F. GIT CHECKPOINT
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Commit:
+1c2258b0cd6428fc772a152a4041e14bbaec4725
+
+Push:
+successful; origin/feat/restore-auto-trade-setting-ui equals local HEAD.
+
+29 paths entered the checkpoint. Large unrelated local WIP remains intentionally
+unstaged and protected.
+
+G. DOCUMENT AUTHORITY EFFECT
+
+New supplemental Canonical:
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_PRODUCTION_CANDLE_STANDBY_MARKETDATA_BOUNDARY_CLOSURE.txt
+
+New Work Resume:
+00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-22_PRODUCTION_CANDLE_STANDBY_MARKETDATA_BOUNDARY_CLOSURE.txt
+
+This closure supersedes only conflicting/incomplete wording for this candle,
+standby, Mock MarketData, and related read-model boundary. Independent older
+owners remain authoritative outside this scope.

@@ -1,0 +1,185 @@
+﻿WORK RESUME LATEST
+2026-09-22 Production Candle Standby / MarketData Boundary Closure
+
+1. RECOVERY BASELINE
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Branch: feat/restore-auto-trade-setting-ui
+Checkpoint commit: 1c2258b0cd6428fc772a152a4041e14bbaec4725
+Remote: origin/feat/restore-auto-trade-setting-ui
+Close-out verification: local HEAD == remote HEAD
+
+Documentation repository:
+C:\Users\JIN KWANG CHUL\Documents\docs
+Branch: agent/project-prompt-standard
+Documentation base before this close document set: d6ff5af99e59e235d4e3a8f5b469df4f9185ecf9
+The final docs close commit is recorded by the Closing report / next-session handoff
+after this document set is committed and pushed.
+
+Procedural authority:
+00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+
+Current closure authority:
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_PRODUCTION_CANDLE_STANDBY_MARKETDATA_BOUNDARY_CLOSURE.txt
+
+2. RETROACTIVE PREVIOUS-WINDOW CLOSEOUT
+
+The previous conversation ended without Conversation Closing. This close-out
+retroactively captures its completed Candle/MarketData work rather than pretending
+that work was performed only in the current window.
+
+Previous-window completion now checkpointed:
+- generic Routine candle projection/warmup declaration;
+- active-evaluator warmup sizing;
+- 10 percent margin / 200,000 minute-candle cap;
+- separate execution/observation/standby requirements;
+- login standby discovery and bootstrap;
+- realtime forming-bar projection without historical commit;
+- optional candle capability for external-information Routines;
+- Mock-owned candle read projection and Production mutable-boundary isolation;
+- successful registration/edit/approved-apply monitoring resync;
+- bounded automatic refresh and reconnect/session coordination.
+
+3. CURRENT-WINDOW COMPLETION
+
+The current conversation first completed the missing final feature/boundary audit,
+then corrected the audit findings.
+
+Completed corrections:
+- Mock `RUNNING + FINAL_END` display stays `감시/대기`.
+- ordinary actual ENDED remains `운영종료`.
+- `ATS_FINAL_NO_TERMINATION` terminal provenance remains operator waiting display,
+  not a false claim that a termination action was executed.
+- transient per-stock standby calculation failure preserves only that still-current
+  stock's last valid requirement.
+- stale/unregistered/non-Candle requirements are still removed.
+- preserved-only login standby still triggers drain-all bootstrap.
+- operation cycle defers while login candle bootstrap is already running.
+- Mock execution read model / Quick Chart dependency set was isolated so the
+  checkpoint does not require unrelated whole-chart WIP.
+
+4. FINAL AUDIT RESULT
+
+Function-loss audit:
+No remaining blocker was found in the closed Candle/MarketData unit after the
+standby preservation correction.
+
+Main/Routine boundary audit:
+- Main does not parse RSI/MACD/Bollinger/OCR/MA or equivalent Routine semantics
+  for candle capacity.
+- Routine declares generic projection/warmup need.
+- Main/MarketData owns Production acquisition/retention/refresh.
+- non-Candle Routine support remains optional and valid.
+
+Mock/Production audit:
+- Mock does not retain Production MarketData mutable callbacks.
+- Mock read projection does not require Production host mutation.
+- execution/observation/standby ownership remains separated.
+
+Login/reconnect/load audit:
+- login sync precedes recovery;
+- drain-all bootstrap covers >15 targets by batches;
+- operation signal processing defers behind an inflight bootstrap;
+- reconnect clears transient coordination and re-establishes current session
+  monitoring without deleting declared standby requirements by accident.
+
+5. INDEPENDENT CHECKPOINT VERIFICATION
+
+The checkpoint was not tested only in the dirty worktree. The Git index was
+exported into fresh temporary directories with `git checkout-index`, and focused
+tests were run there to reveal missing local dependencies before commit.
+
+Final evidence carried into the checkpoint:
+- 88 tests OK: login / MarketData host / candle refresh;
+- 42 tests OK: Production candle / Mock boundary / package / reconnect / projection;
+- 47 tests OK: ownership / aggregation / lifecycle;
+- 134 tests OK: current Mock Indicator adapter + continuation contract;
+- 22 tests OK: Mock stop / Quick Chart integration;
+- 9 tests OK: Mock execution chart read model;
+- Python32 py_compile OK for staged production modules;
+- staged diff check OK.
+
+Total focused evidence: 342 passing tests across isolated processes.
+
+6. CODE CHECKPOINT BOUNDARY
+
+29 paths were committed. Important boundary detail:
+`gui_stock_instance_chart_window.py` was partially staged. Only the execution
+read-model support hunks (BUY round/process display and MOCK_FILL detail text)
+entered the checkpoint. Other chart WIP remains local and dirty.
+
+Commit:
+1c2258b0cd6428fc772a152a4041e14bbaec4725
+
+Push:
+successful to origin/feat/restore-auto-trade-setting-ui; local/remote equality
+verified immediately after push.
+
+7. PROTECTED LOCAL WIP
+
+After the code checkpoint, the automatic-trading repository intentionally remains
+heavily dirty. Close-out evidence immediately after push recorded 345 porcelain
+status entries with status-list SHA256:
+408fbf91d683a2d876a87ecd0de2494736497e4575838452034aea9396f14cb8
+
+This is an evidence fingerprint, not a claim that every entry belongs to one
+feature. Protected state includes modified/untracked chart, Signal Validation,
+Runtime, stock/user data, group/rule-apply, broker/realtime, and other ongoing WIP.
+Do not clean, reset, restore, stash, or broad-stage it.
+
+8. DURABLE LOCAL TASK ENVIRONMENT HANDOFF
+
+Verified worker root:
+C:\Users\JIN KWANG CHUL\Documents\chatgpt_durable_worker
+
+Current worker layers include durable_worker.py, security_policy.py, safe_api.py,
+and mcp_server.py.
+
+Security contract observed at close:
+- the worker project root is allowed by default;
+- additional trusted workspaces require
+  CHATGPT_DURABLE_WORKER_ALLOWED_ROOTS;
+- Codex mutate mode additionally requires
+  CHATGPT_DURABLE_WORKER_ALLOW_MUTATION opt-in;
+- safe Python test entry accepts unittest/pytest only;
+- generic start_task remains unsafe/internal and must not be exposed as MCP-safe.
+
+Current limitation:
+kiwoom_auto was rejected by the safe worker when it was not present in the
+allowed-roots environment. No security-policy relaxation was made during this
+feature close. Long tasks may use direct Desktop Commander only with the fallback
+reason recorded, or the trusted workspace root can be configured separately under
+an explicitly approved environment task.
+
+9. KNOWN NON-BLOCKING ENVIRONMENT NOTE
+
+Large combined PyQt test processes can terminate at the Windows/Qt lifetime
+boundary even when the same modules pass in fresh isolated Python processes.
+Closing evidence therefore uses isolated processes for the affected GUI modules.
+This note is not a license to ignore a reproducible isolated failure.
+
+10. OUT-OF-SCOPE / NOT CLAIMED
+
+- no live broker order was executed for this close;
+- live SOR reconciliation is not newly claimed verified;
+- unrelated chart/filter/live-price WIP is not frozen by this checkpoint;
+- unrelated existing docs-repository dirty WIP is not normalized;
+- no PR was created.
+
+11. NEXT SESSION START POINT
+
+The Production Candle Standby / MarketData boundary normalization unit is closed.
+No next Big Feature has been explicitly selected by the user at this closing.
+Therefore the next session must verify the final repository/document state and
+confirm the next task/role instead of inventing one.
+
+Recommended recovery read order:
+1. 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+2. 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_PRODUCTION_CANDLE_STANDBY_MARKETDATA_BOUNDARY_CLOSURE.txt
+3. this Work Resume
+4. 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-22_PRODUCTION_CANDLE_STANDBY_MARKETDATA_BOUNDARY_CLOSURE.txt
+5. 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
+
+Next task: Must Confirm.
+Next role: Must Confirm.

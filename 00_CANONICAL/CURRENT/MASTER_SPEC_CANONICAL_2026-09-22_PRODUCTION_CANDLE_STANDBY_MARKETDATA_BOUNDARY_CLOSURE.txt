@@ -1,0 +1,247 @@
+﻿MASTER SPEC CANONICAL SUPPLEMENT
+2026-09-22 Production Candle Standby / MarketData Boundary Closure
+
+Status: FREEZE / CLOSURE SUPPLEMENT
+Code branch: feat/restore-auto-trade-setting-ui
+Code checkpoint: 1c2258b0cd6428fc772a152a4041e14bbaec4725
+Code remote verification: local HEAD == origin/feat/restore-auto-trade-setting-ui at close-out
+
+1. AUTHORITY AND SCOPE
+
+This document is the latest supplemental owner for the Production candle standby,
+Routine-declared candle requirement, login bootstrap, Mock/Production candle
+boundary, and the narrow Mock status/read-model corrections committed in the
+2026-09-22 checkpoint.
+
+It supersedes the 2026-09-21 Production MarketData/KRX/NXT/SOR checkpoint only
+where that document described the wider candle/standby/Mock MarketData wiring as
+protected local WIP or incomplete. It does NOT claim that live SOR reconciliation
+has been proven in a real broker session. The existing
+LIVE_SOR_RECONCILIATION_UNVERIFIED fail-closed contract remains unchanged.
+
+The 2026-09-21 Signal Validation MarketData correction supplement remains an
+independent owner for its validation-domain contracts where not contradicted by
+this Production closure.
+
+2. RETROACTIVE PREVIOUS-WINDOW CLOSEOUT
+
+The immediately preceding conversation completed substantial Candle/MarketData
+normalization but ended without the required Conversation Closing procedure.
+This 2026-09-22 close-out explicitly applies that missing close retroactively.
+
+The previous-window completed scope now frozen here includes:
+
+- Routine-owned declaration of candle needs through a generic market-bar
+  projection request rather than Main-owned indicator interpretation.
+- Projection values COMPLETED_TIMEFRAME and FORMING_BASE_BAR.
+- Warmup requirement validation and a 10 percent minute-candle margin.
+- Maximum Production minute-candle requirement of 200,000; excess demand fails
+  closed rather than silently truncating the contract.
+- Read/display projection may omit warmup when it is not asking Main to allocate
+  cache capacity.
+- Indicator Follow computes warmup from active evaluator paths and effective
+  persisted rules; inactive/unreachable filters do not force maximum possible
+  cache allocation.
+- Production MarketData separates execution, Mock observation, and Production
+  standby candle requirements.
+- Main/MarketData owns broker acquisition, retention, refresh, and source
+  authority. Routine code does not own the Production cache.
+- The current/forming bar can be supplied from the realtime shadow for a
+  FORMING_BASE_BAR projection and is not committed into canonical historical
+  candles merely because it is used for live evaluation.
+- `market_bar_projection_callable` is optional at the package boundary. A future
+  external-information Routine is not required to declare candle needs.
+- Login-time monitoring discovers candle-capable registered Routine Instances,
+  reads persisted effective rules, synchronizes standby requirements, and starts
+  a Production candle bootstrap.
+- Registration, successful edit-save, and successful approved-rule Production
+  apply all reach the semantic monitoring resync path. Pending/UI-only state is
+  not a substitute for persisted effective rules.
+- Approved-rule apply refreshes assignment views and monitoring only after the
+  successful Production commit/read-back path.
+- Mock validation does not retain bound mutable callbacks into Production
+  MarketDataHost and uses a Mock-owned read projection instead.
+
+3. PRODUCTION CANDLE OWNERSHIP CONTRACT
+
+3.1 Routine responsibility
+
+A Routine may declare only what its evaluator needs:
+- projection mode;
+- positive warmup bars when cache capacity is requested;
+- its own interpretation of active filters, delays, and lookbacks.
+
+Main must not interpret RSI, MACD, Bollinger, moving-average, OCR, price-box, or
+other strategy semantics to decide cache size.
+
+3.2 Main / MarketData responsibility
+
+Main/MarketData owns:
+- broker request scheduling;
+- historical minute-candle retention;
+- realtime shadow ownership;
+- projection into Routine-visible bars;
+- execution/observation/standby target union;
+- bootstrap and incremental refresh;
+- reconnect/session coordination;
+- capacity and fail-closed limits.
+
+3.3 Capacity
+
+Required minute candles are derived from the Routine-declared warmup and applied
+bar interval, plus the 10 percent margin. The common maximum is 200,000 minute
+candles. A Routine that does not declare candle capability is not made a candle
+refresh target merely because the stock participates in execution.
+
+4. LOGIN, BOOTSTRAP, AND REFRESH CONTRACT
+
+- Login monitoring synchronization occurs before Production recovery proceeds.
+- Registered candle-capable stocks join Production standby even when they are not
+  currently execution-ready.
+- Login bootstrap uses `drain_all=True`.
+- The normal per-cycle request budget is 15 targets, but drain-all bootstrap does
+  not discard targets above 15. It processes the entire target set serially and
+  inserts a conservative batch pause after each 15 requested targets.
+- The ordinary minute cycle remains bounded/round-robin for normal refresh.
+- While a login/bootstrap candle refresh is already in flight, the operation
+  signal pipeline defers and resumes from the completion callback. Cache
+  preparation is therefore not bypassed by the operation timer.
+- Session transition clears transient refresh coordination, bootstrap-completed
+  tracking, queues, and realtime session state. It does not erase the declared
+  standby requirement map merely because the broker session changed. The new
+  login semantic sync recalculates current requirements.
+
+5. TRANSIENT STANDBY-REQUIREMENT FAILURE CONTRACT
+
+The final audit found and reproduced a real gap: replacing the standby map from
+only successfully calculated requirements could silently delete a previously
+valid requirement for a still-registered stock when that stock suffered a
+transient Routine/rules/declaration error.
+
+The frozen correction is:
+
+- `sync_candle_standby_requirements` accepts an explicit preserve set.
+- Only a still-current stock whose standby calculation failed is eligible to
+  retain its previous valid requirement.
+- A local per-item validation failure inside MarketData may likewise retain the
+  previous requirement for that same stock.
+- A successfully calculated stock uses the new requirement.
+- A stale, unregistered, unsupported, or non-Candle Routine stock is not kept
+  merely because an old requirement existed.
+- Preserved codes are exposed in diagnostic output.
+- If every new calculation fails but a previous current requirement is
+  preserved, login bootstrap still runs for the preserved standby target.
+
+This is bounded continuity, not stale-state immortality.
+
+6. MOCK / PRODUCTION ISOLATION
+
+- Mock validation cannot use Production MarketDataHost mutable callbacks as its
+  candle writer/update boundary.
+- Mock-owned candle projection reads without requiring the Production host.
+- Mock observation requirements remain separate from Production execution and
+  Production standby requirements.
+- Mock start/run/stop must not mutate Production MarketData state.
+- Production historical source ownership and Mock read projection remain distinct.
+
+7. MOCK SIGNAL AND VIRTUAL-EXECUTION PARITY INCLUDED IN THE CHECKPOINT
+
+The committed Mock adapter/continuation boundary preserves Routine signal facts
+separately from whether virtual execution is currently possible.
+
+- Missing/stale orderbook may preserve a valid Routine signal while blocking
+  virtual execution.
+- Mock execution permission is independent from Production execution-enabled
+  state and follows the Mock-specific contract.
+- Cycle revision/identity conflicts remain fail closed.
+- Main does not reinterpret Routine signal priority or strategy semantics.
+- Quick Chart reads Mock execution facts through a read model and does not
+  acquire Production operation mutation authority.
+
+8. MOCK OPERATOR STATUS CONTRACT
+
+The `운영종료` display remains a real terminal tag. This closure narrows when it
+is applied in Mock UI:
+
+- actual ordinary ENDED lifecycle -> `운영종료`;
+- RUNNING lifecycle whose time projection is FINAL_END -> `감시/대기`;
+- ENDED with termination_provenance `ATS_FINAL_NO_TERMINATION` -> `감시/대기`;
+- review/error/close states keep their existing independent projections.
+
+The correction does not retire the `운영종료` tag and does not change Production
+terminal-state policy.
+
+9. MOCK EXECUTION CHART READ MODEL
+
+The checkpoint contains the Mock execution-chart read model used by Quick Chart.
+The common chart UI receives only the minimal Mock execution presentation support
+needed by that read model:
+
+- execution-process BUY round display;
+- ACTIVE process display text;
+- MOCK_FILL time basis and Mock order/fill identity;
+- BUY round text in actual-fill detail.
+
+Other local chart navigation/live-price/filter-visualization changes remain
+protected unstaged WIP and are not made part of this freeze.
+
+10. MAIN / ROUTINE BOUNDARY AUDIT RESULT
+
+Final audit found no strategy-semantic leakage into the common MarketData
+boundary for the closed scope.
+
+Confirmed:
+- Main consumes generic projection/warmup requirements.
+- Routine owns active-filter interpretation.
+- Candle acquisition/retention is not owned by Routine.
+- non-Candle Routine capability remains valid.
+- Mock and Production mutation ownership remain separate.
+
+11. CODE CHECKPOINT AND VERIFICATION
+
+Committed and pushed code checkpoint:
+1c2258b0cd6428fc772a152a4041e14bbaec4725
+
+29 staged paths were isolated from a large dirty worktree. The common chart file
+was not staged wholesale; only the two execution-read-model function hunks were
+placed in the checkpoint. `git diff --cached --check` passed before commit.
+
+Independent HEAD+index exports were used so unstaged local WIP could not mask a
+dependency. Focused isolated-process evidence for the checkpoint includes:
+
+- login / MarketData host / automatic candle refresh: 88 tests OK;
+- Production candle provider / Mock MarketData boundary / Routine package /
+  reconnect / candle projection contract: 42 tests OK;
+- Main-Routine ownership / timeframe aggregation / lifecycle: 47 tests OK;
+- Mock Indicator adapter and continuation current contract: 134 tests OK;
+- Mock stop + Quick Chart integration: 22 tests OK;
+- Mock execution-chart read model: 9 tests OK;
+- staged production Python modules: py_compile OK.
+
+These are 342 focused passing tests across isolated Python32 processes, not one
+claimed monolithic suite. Combined Qt module execution can terminate at the
+Windows/Qt process-lifetime boundary; isolated module runs are the authoritative
+focused evidence recorded here.
+
+No live broker order or live broker mutation was performed as part of this close.
+
+12. PROTECTED WIP / EXCLUSIONS
+
+The repository remains intentionally dirty after the checkpoint. This closure
+does not absorb or normalize unrelated local work, including wider chart
+navigation/live-price/filter visualization, Signal Validation UI/history/cache,
+runtime/user data, stock folders, local group/rule-apply work, and other
+pre-existing modifications or untracked files.
+
+No reset, restore, stash, clean, broad stage, or `git add .`/`git add -A` was used.
+
+13. COMPLETION JUDGMENT
+
+The Production Candle Standby / MarketData boundary normalization unit is closed
+at the 2026-09-22 checkpoint.
+
+The broader Production KRX/NXT/SOR program is not declared globally complete by
+this supplement. In particular, any previously unverified real-session SOR
+reconciliation evidence remains unverified until separately proven.
+
+No next Big Feature is selected by this document.
