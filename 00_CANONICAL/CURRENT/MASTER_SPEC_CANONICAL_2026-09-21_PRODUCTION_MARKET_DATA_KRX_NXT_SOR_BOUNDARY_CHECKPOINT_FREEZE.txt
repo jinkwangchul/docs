@@ -1,0 +1,146 @@
+MASTER SPEC CANONICAL SUPPLEMENT
+Production MarketData / KRX / NXT / SOR Boundary Checkpoint Freeze
+Date: 2026-09-21
+
+Code repository: kiwoom_auto
+Branch: feat/restore-auto-trade-setting-ui
+Checkpoint code commit:
+5f1b49c97331f1da36aaedea6235bac9f058cf7a
+Remote push:
+origin/feat/restore-auto-trade-setting-ui confirmed at the same commit.
+
+======================================================================
+1. AUTHORITY AND SCOPE
+======================================================================
+
+This supplement freezes only the safely separable, remotely committed order
+route, SOR fail-closed, Chejan normalization, and reconciliation boundary.
+
+It records, but does not falsely promote to remote-complete status, the wider
+local Production MarketData / KRX / NXT / SOR normalization whose mixed-file
+dependencies remain protected local WIP.
+
+Older independent Signal Validation, operation, Routine, Mock, liquidation,
+and broker architecture owners remain authoritative outside this scope.
+
+======================================================================
+2. CONFIRMED REMOTE CHECKPOINT CONTRACT
+======================================================================
+
+- Broker order route identity is separate from market-data identity.
+- Fresh NEW broker requests use the explicit KRX/SOR route admitted by the
+  upstream eligibility/policy boundary.
+- CANCEL and MODIFY preserve the source order route; they do not silently
+  reselect a route from current eligibility.
+- KRX order types remain 1 through 6.
+- SOR order types are normalized to 11, 12, 13, and 15 where the adapter
+  contract permits them.
+- A claimed Production live SOR execution remains fail closed when durable
+  reconciliation is unavailable, with reason
+  LIVE_SOR_RECONCILIATION_UNVERIFIED.
+- No code in this checkpoint force-enables live SOR dispatch.
+- Chejan/event normalization preserves available route metadata, including
+  broker FIDs 2134, 2135, and 2136, without inventing parent/child semantics.
+- Event-journal and execution-queue evidence record the admitted route and the
+  fail-closed outcome at the committed boundary.
+
+======================================================================
+3. MARKETDATA AND SESSION DISTINCTIONS
+======================================================================
+
+The wider local task established these intended distinctions:
+- exchange session time is not program operation time;
+- market-data identity is not broker order-route identity;
+- NXT eligibility can influence a fresh NEW route, but must not rewrite the
+  source route for CANCEL/MODIFY;
+- Mock/Validation read-only market-data paths must not mutate Production state.
+
+The required changes in kiwoom_api.py and connected host/chart/Validation
+files overlap older protected WIP and were not safely separable. Therefore
+these wider MarketData statements are recorded as local task evidence and next
+audit requirements, not as a claim that commit 5f1b49c is a standalone remote
+MarketData implementation.
+
+======================================================================
+4. SELECTIVE COMMIT BOUNDARY
+======================================================================
+
+Commit 5f1b49c contains exactly 14 selectively audited paths:
+- 10 production paths for order boundary, adapter, safety, route identity,
+  Chejan/event evidence, queue evidence, and the minimal settings route hunks;
+- 4 focused test paths.
+
+The following task-related areas remain local protected dependencies:
+- kiwoom_api.py and its read-only minute-candle tests;
+- gui_market_data_host.py and market-data host tests;
+- gui_stock_instance_chart_window.py and live-price tests;
+- kiwoom_realtime_shadow.py and realtime tests;
+- gui_indicator_follow_signal_validation_flow.py;
+- indicator_follow_signal_validation_historical_cache.py;
+- indicator_follow_validation_regular_market.py and its test;
+- integrated MarketData/SOR aggregate test;
+- local dependent corrections in group-pack, rule-apply, and execution-preview
+  tests that did not form a standalone HEAD-based checkpoint.
+
+These files were not reset, restored, stashed, cleaned, or broad-staged.
+
+======================================================================
+5. VERIFICATION EVIDENCE
+======================================================================
+
+User-provided current-worktree evidence before closeout:
+- contract modules: 85/85 PASS
+  (group pack 10, rule apply 68, final dispatch 7);
+- MarketData/SOR modules: 190/190 PASS across 9 modules;
+- broader audit inventory: 632 modules and raw 10,175 tests;
+- broader non-pass results were classified as pre-existing HEAD baseline or
+  protected dependency evidence, not silently converted into checkpoint PASS;
+- protected runtime/config/routine hash audit reported 0 changes across the
+  named 43-path boundary.
+
+Final independent exported-index verification for commit 5f1b49c:
+- changed production Python files compiled successfully;
+- final_dispatch_fresh_preflight, chejan_event_normalizer,
+  event_journal_broker_fill_close_connection, and
+  kiwoom_send_order_executor: 71/71 PASS;
+- git diff --cached --check: PASS before commit.
+
+Two dependent test corrections and one execution-preview fixture set were
+removed from the commit after isolated HEAD+index verification exposed local
+protected dependencies. Their worktree edits remain preserved.
+
+No live broker order was sent. No live SOR reconciliation success is claimed.
+
+======================================================================
+6. PROTECTED LOCAL WIP
+======================================================================
+
+After code commit and push:
+- default git status entries: 205
+- expanded untracked-file status entries: 353
+- NUL-safe status SHA-256:
+  bf6c6a4dd013b30e7aeeea01cb178d6b2da60715453dfd475cfbf27929257e24
+
+This is the protected current local state, not a cleanup backlog. Do not reset,
+restore, stash, clean, broad-stage, delete, or normalize it.
+
+======================================================================
+7. COMPLETION JUDGMENT
+======================================================================
+
+Frozen and remotely confirmed:
+- selective order route provenance;
+- KRX/SOR adapter mapping at the committed boundary;
+- live SOR reconciliation fail-closed behavior;
+- Chejan/event route metadata normalization;
+- 71-test isolated checkpoint verification.
+
+Not declared complete:
+- standalone remote Production MarketData identity normalization;
+- end-to-end NXT realtime/chart/history/cache wiring;
+- live SOR reconciliation success and recovery semantics;
+- Main/Routine boundary integrity after the wider local change set;
+- explanation of the observed local test-edit reversion.
+
+The next session begins with a code-modification-free feature-loss audit and
+Main/Routine Boundary Audit. A concern is not a confirmed Production defect.

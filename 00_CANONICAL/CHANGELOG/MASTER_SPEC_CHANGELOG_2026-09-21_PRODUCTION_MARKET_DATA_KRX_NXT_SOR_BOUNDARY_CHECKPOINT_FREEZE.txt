@@ -1,0 +1,43 @@
+MASTER SPEC CHANGELOG
+Production MarketData / KRX / NXT / SOR Boundary Checkpoint Freeze
+Date: 2026-09-21
+
+Code checkpoint:
+5f1b49c97331f1da36aaedea6235bac9f058cf7a
+
+CHANGED / FROZEN
+- Added explicit order-route provenance across the selectively committed
+  order boundary, adapter, safety gate, executor, event journal, and queue.
+- Preserved source route for CANCEL/MODIFY.
+- Recorded KRX order types 1-6 and SOR types 11/12/13/15 at the adapter boundary.
+- Kept claimed live SOR execution fail closed when reconciliation is unverified.
+- Normalized available Chejan route metadata without inventing semantics.
+- Selectively committed 14 paths, 536 insertions, and 10 deletions.
+- Pushed CODE branch feat/restore-auto-trade-setting-ui to the same SHA.
+
+VERIFIED
+- Exported the exact HEAD+index candidate tree.
+- Changed production modules compiled.
+- 71/71 focused checkpoint tests passed.
+- Staged diff check passed.
+- No live broker call was performed.
+
+DELIBERATELY NOT COMMITTED
+- Mixed kiwoom_api / realtime / host / chart / Signal Validation history and
+  cache changes that overlap protected WIP.
+- New integrated MarketData/SOR aggregate tests whose remote dependencies were
+  not independently separable.
+- Local group-pack, rule-apply, and execution-preview test corrections that
+  failed standalone HEAD+index verification despite passing with local WIP.
+
+OPEN
+- Code-modification-free feature-loss and Main/Routine Boundary Audit.
+- Standalone remote MarketData identity checkpoint.
+- Durable live SOR reconciliation proof.
+- Root cause of the observed local test-edit reversion.
+
+PROTECTION
+- CODE remains intentionally dirty at 205 default status entries / 353 expanded
+  entries with NUL-safe SHA-256
+  bf6c6a4dd013b30e7aeeea01cb178d6b2da60715453dfd475cfbf27929257e24.
+- No reset, restore, stash, clean, broad add, or WIP deletion was used.

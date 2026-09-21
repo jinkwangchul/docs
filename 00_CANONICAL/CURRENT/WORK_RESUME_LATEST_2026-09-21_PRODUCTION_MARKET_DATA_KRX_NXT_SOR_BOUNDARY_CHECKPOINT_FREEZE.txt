@@ -1,0 +1,159 @@
+WORK RESUME LATEST
+Production MarketData / KRX / NXT / SOR Boundary Checkpoint Freeze
+Date: 2026-09-21
+
+==================================================
+Current Big Feature Goal
+==================================================
+
+Normalize the issue discovered through Signal Validation across Production
+MarketData, exchange-session identity, KRX/NXT/SOR route provenance, broker
+events, and reconciliation without granting Validation or Mock any Production
+mutation authority.
+
+Current progress:
+- the safely separable order/SOR/Chejan boundary is committed and pushed;
+- the wider MarketData/host/chart/history/cache portion remains protected local
+  WIP because required hunks overlap older work in the same files.
+
+Completion criteria:
+- market-data identity and broker order-route identity remain distinct;
+- NEW route selection and CANCEL/MODIFY source-route preservation are proven;
+- Production and Mock/Validation mutation boundaries remain intact;
+- realtime/Chejan/reconciliation identity survives end to end;
+- live SOR remains fail closed until durable reconciliation is verified;
+- remote checkpoint and protected local dependencies are independently audited;
+- Main/Routine boundaries show no feature loss.
+
+Current blocker:
+- mixed-file protected WIP prevents an honest standalone remote MarketData
+  checkpoint without a separate hunk-by-hunk audit.
+
+==================================================
+Repository Checkpoints
+==================================================
+
+CODE:
+- branch: feat/restore-auto-trade-setting-ui
+- commit/pushed upstream: 5f1b49c97331f1da36aaedea6235bac9f058cf7a
+- ahead/behind after push: 0/0
+
+DOCS:
+- branch: agent/project-prompt-standard
+- pre-closeout base: 68be616b4b9878a2bc9f5a24f474810273e96922
+- the final documentation commit is the branch HEAD containing this file;
+  its exact SHA is recorded in the generated closing result and startup prompt
+  because a commit cannot contain its own SHA.
+
+Latest Canonical:
+MASTER_SPEC_CANONICAL_2026-09-21_PRODUCTION_MARKET_DATA_KRX_NXT_SOR_BOUNDARY_CHECKPOINT_FREEZE.txt
+
+==================================================
+Committed / Confirmed
+==================================================
+
+- Fresh NEW route provenance reaches the Kiwoom adapter boundary.
+- CANCEL/MODIFY retain the source order route.
+- KRX types 1-6 and SOR types 11/12/13/15 are represented by the committed
+  adapter/safety/executor contract.
+- Claimed live SOR execution fails closed with
+  LIVE_SOR_RECONCILIATION_UNVERIFIED when durable reconciliation is absent.
+- Chejan FIDs 2134/2135/2136 are normalized as available metadata without
+  invented parent/child meaning.
+- Event-journal and execution-queue evidence preserve the route result.
+- No real broker side effect occurred during closeout.
+
+==================================================
+Verification
+==================================================
+
+Current-worktree evidence supplied for this feature:
+- 85/85 PASS in 3 contract modules;
+- 190/190 PASS in 9 MarketData/SOR modules;
+- broader inventory: 632 modules, raw 10,175 tests;
+- protected 43-path runtime/config/routine hash delta: 0.
+
+Checkpoint-only verification performed during closing:
+- exported HEAD+selected-index tree;
+- changed production modules compile: PASS;
+- 4 focused modules: 71/71 PASS;
+- staged diff check: PASS.
+
+Do not report the broader audit as an all-PASS suite. Its remaining non-pass
+evidence includes pre-existing HEAD baselines and protected dependencies.
+
+The group-pack and rule-apply test edits were observed to revert once, then
+were reapplied and passed 85/85 in the current worktree. An operator-UI probe
+also reported no protected hash change. The cause is unconfirmed; this is not
+classified as a Production regression.
+
+==================================================
+Protected Local WIP
+==================================================
+
+CODE after commit/push:
+- default status entries: 205
+- expanded untracked-file entries: 353
+- NUL-safe status SHA-256:
+  bf6c6a4dd013b30e7aeeea01cb178d6b2da60715453dfd475cfbf27929257e24
+
+Important local dependencies include:
+- kiwoom_api.py;
+- gui_market_data_host.py;
+- gui_stock_instance_chart_window.py;
+- kiwoom_realtime_shadow.py;
+- Signal Validation flow/history/cache paths;
+- integrated MarketData/SOR and related focused tests;
+- local group-pack/rule-apply/execution-preview test corrections.
+
+DOCS before this exact closeout commit:
+- default status entries: 134
+- expanded untracked-file entries: 137
+- NUL-safe status SHA-256:
+  151eda9148921aa74aa3d7a5ed4947f72ed8cc4c5166026747810c67a1d4280c
+
+Protection rules:
+- no reset / restore / stash / clean;
+- no git add . or git add -A;
+- no broad staging or deletion;
+- audit exact hunks before any future commit.
+
+==================================================
+Live SOR Safety Boundary
+==================================================
+
+Live SOR is not enabled merely because route selection exists. Until durable
+execution/fill reconciliation is independently proven, claimed live SOR must
+remain fail closed with LIVE_SOR_RECONCILIATION_UNVERIFIED.
+
+==================================================
+Next Start Point
+==================================================
+
+First task only:
+1. Perform a code-modification-free feature-loss audit of the wider local
+   MarketData/KRX/NXT/SOR change set.
+2. Perform a Main/Routine Boundary Audit.
+3. Compare remote commit 5f1b49c with protected local dependencies and identify
+   whether any additional hunk is independently committable.
+4. Treat Production/SOR concerns as hypotheses until reproduced with evidence.
+
+No implementation, staging, cleanup, or live broker operation is authorized by
+this Work Resume alone.
+
+==================================================
+Recovery / Read First
+==================================================
+
+1. 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+2. 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-21_PRODUCTION_MARKET_DATA_KRX_NXT_SOR_BOUNDARY_CHECKPOINT_FREEZE.txt
+3. this Work Resume
+4. 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-21_PRODUCTION_MARKET_DATA_KRX_NXT_SOR_BOUNDARY_CHECKPOINT_FREEZE.txt
+5. the 2026-09-21 Signal Validation Timeframe/Viewport checkpoint for its
+   still-independent timeframe and local cache dependency boundary.
+
+Environment:
+- CODE: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+- DOCS: C:\Users\JIN KWANG CHUL\Documents\docs
+- Python: C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+- Python 3.11.9, 32-bit; QT_QPA_PLATFORM=offscreen for GUI test probes.
