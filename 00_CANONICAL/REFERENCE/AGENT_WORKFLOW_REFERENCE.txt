@@ -458,6 +458,39 @@ Desktop Commander High-Value Utilization Policy:
 - Evaluate DC efficiency by `useful local evidence per round trip`, not by raw
   call-count minimization.
 
+Durable Local Task Execution Policy:
+- Long-running local jobs that may outlive a normal tool round trip, require
+  repeated polling, or must survive ChatGPT/DC transport loss should use the
+  verified Durable Worker when available instead of keeping a DC process session
+  open for the entire job.
+- Verified worker root:
+  `C:\Users\JIN KWANG CHUL\Documents\chatgpt_durable_worker`.
+- The immediate web-app path remains `ChatGPT Web -> Desktop Commander -> Durable
+  Worker CLI`. The MCP stdio facade is a compatible optional layer; Secure MCP
+  Tunnel or full ChatGPT MCP write integration is not required for the current
+  workflow and must not block safe local use.
+- Use `start_codex_job` for substantial Codex jobs and `start_python32_test` for
+  detached Python32 test jobs. The generic `start_task` entry point is
+  `UNSAFE/INTERNAL` and must not be exposed as an MCP-safe tool.
+- Prefer an explicit stable `TASK_ID` for substantial jobs and record that ID in
+  the execution note before relying on the detached task. The start call should
+  return promptly; do not keep a ChatGPT turn alive merely to stream progress.
+- After launch, use `get_task_status` and `get_task_result`. Use `recover_task`
+  after transport loss or uncertain completion, and `cancel_task` only when an
+  actual stop is required.
+- `transport timeout`, `socket closed`, browser reconnect, or lost DC response is
+  not evidence that the local job failed. On reconnect, inspect the same
+  `TASK_ID` first. Do not relaunch the mutation/test until the previous task is
+  confirmed absent, terminal, cancelled, or explicitly superseded.
+- Avoid repeated `read_process_output` polling for jobs already managed by the
+  Durable Worker. Persisted state/result/log artifacts are the recovery source.
+- Durable Worker completion is execution evidence, not final correctness proof.
+  Desktop Commander plus the Orchestrator still owns actual diff inspection and
+  applicable Python32/GUI/Runtime/Log/Git verification.
+- If the Durable Worker is unavailable or unsuitable for the current local job,
+  declare `DURABLE_WORKER_FALLBACK_REASON` and use the direct DC process path
+  safely. Do not pretend a durable task was created when it was not.
+
 Evidence And Verification Efficiency Policy:
 - Core rule: Single Evidence Pass, Scoped Verification, No Full Re-audit.
 - At task start, create one Task Boundary Snapshot covering task files, relevant functions or call paths, required tests, known pre-existing failures, and protected unrelated WIP.
@@ -564,10 +597,11 @@ Codex CLI Invocation Contract:
 ChatGPT Web Orchestrator
 -> Desktop Commander
 -> connected Windows device
--> PowerShell/local process execution
+-> Durable Worker task for long-running Codex work
+   OR direct PowerShell/local process for a short bounded Codex call
 -> local codex.exe
 -> Codex CLI task
--> local file/diff result
+-> persisted task result / local file-diff result
 -> Desktop Commander evidence return
 -> ChatGPT Web independent criticism and verification
 ```
@@ -582,10 +616,12 @@ ChatGPT Web Orchestrator
   recorded executable path changed.
 - Verify the local Codex login state and, when relevant, the configured model and
   reasoning effort before relying on them as current facts.
-- Invoke the local CLI from the intended repository/work directory, normally by
-  Desktop Commander running PowerShell and `codex.exe exec`. Use a noninteractive
-  input path such as piped stdin or a prompt file when appropriate so the call
-  does not remain waiting for additional terminal input.
+- Invoke the local CLI from the intended repository/work directory. For
+  substantial or long-running Codex work, Desktop Commander should start the
+  Durable Worker `start_codex_job` path and record its `TASK_ID`; for a genuinely
+  short bounded Codex call, direct PowerShell + `codex.exe exec` remains allowed.
+  Use noninteractive prompt input and do not leave the task waiting for terminal
+  input.
 - After Codex returns, the Orchestrator must use Desktop Commander to inspect the
   actual changed files/diff and perform the applicable local Python, GUI,
   Runtime, state, log, and Git verification. Codex's own completion message is
@@ -1513,6 +1549,37 @@ Judge efficiency by useful local evidence per round trip, not raw call count.
 ```
 
 Every final Next Session Startup Prompt must also reproduce this independent
+Durable Local Task Execution block:
+
+```text
+==================================================
+Durable Local Task Execution
+==================================================
+Verified worker root:
+C:\Users\JIN KWANG CHUL\Documents\chatgpt_durable_worker
+
+Use the Durable Worker for long-running Codex/test jobs that may outlive a normal
+DC round trip or must survive browser/DC transport loss.
+- ChatGPT Web -> Desktop Commander -> Durable Worker CLI is the immediate path.
+- Use start_codex_job for substantial Codex work.
+- Use start_python32_test for detached Python32 test work.
+- Record an explicit TASK_ID for substantial jobs.
+- After launch use get_task_status/get_task_result; after uncertain transport loss
+  use recover_task before considering any rerun.
+- Browser timeout, socket closed, or lost DC response does NOT prove job failure.
+  Never duplicate the mutation/test until the same TASK_ID is checked first.
+- Avoid read_process_output polling for a task already owned by Durable Worker.
+- generic start_task is UNSAFE/INTERNAL and is not an MCP-safe tool.
+- Durable Worker completion is not final correctness proof; final diff and real
+  environment verification still belong to ChatGPT Web + Desktop Commander.
+- If Durable Worker cannot be used, declare DURABLE_WORKER_FALLBACK_REASON before
+  using a long direct DC process.
+The local MCP stdio facade is optional. Secure MCP Tunnel/full ChatGPT MCP write
+integration is an external layer and must not block the current local workflow.
+==================================================
+```
+
+Every final Next Session Startup Prompt must also reproduce this independent
 Evidence And Verification Efficiency block:
 
 ```text
@@ -1640,14 +1707,18 @@ Normal automated path:
 ChatGPT Web Orchestrator
 -> Desktop Commander
 -> connected Windows PC
--> PowerShell/local process
+-> Durable Worker task for substantial/long-running Codex work
+   OR direct PowerShell/local process for a short bounded Codex call
 -> local codex.exe exec
--> Codex CLI result / file changes
+-> persisted task result / file changes
 -> Desktop Commander diff and local evidence
 -> ChatGPT Web independent criticism and verification
 
 Rules:
 - Desktop Commander is the bridge used to launch local Codex CLI.
+- For substantial/long-running Codex work, prefer Desktop Commander starting the
+  Durable Worker `start_codex_job` path and keep its TASK_ID. Direct `codex.exe`
+  process execution is reserved for short bounded calls.
 - Do not describe this as a direct web-app Codex call.
 - Resolve the current codex.exe path when necessary because the VS Code
   extension directory can change after updates.
@@ -1864,8 +1935,8 @@ role instructions required by Step 5. Every final Startup Prompt must include
 the verified Development Environment block, the Mandatory Hybrid Orchestration
 block, the Codex Mutation Enforcement Gate block, the Remote-First Source Routing
 block, the Desktop Commander Latency
-Control block, the Desktop Commander High-Value Utilization block, the Evidence
-And Verification
+Control block, the Desktop Commander High-Value Utilization block, the Durable
+Local Task Execution block, the Evidence And Verification
 Efficiency block, the Execution Efficiency
 Rules block, the Checkpoint Commit And Push Gate block, the Codex Scope Discipline
 block, and the independent Codex CLI
