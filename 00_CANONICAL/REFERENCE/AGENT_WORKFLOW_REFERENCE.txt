@@ -383,6 +383,30 @@ Remaining Mutation Boundary: <small bounded remainder or approved fallback scope
   inspecting Runtime/Log/GUI state, gathering evidence, or applying a genuinely
   small bounded correction after an explicit ownership transfer.
 
+Remote-First Source Routing Policy:
+- Route evidence by source authority instead of defaulting every read to Desktop
+  Commander.
+- `REMOTE / COMMITTED BASELINE`: use the connected GitHub tool first for already
+  pushed source, remote branch/HEAD state, commit history, committed diffs,
+  historical versions, PR/issue history, and pushed project documentation when
+  those materials answer the question. Do not spend DC round trips re-reading
+  the same committed evidence from the local checkout merely out of habit.
+- `LOCAL CODE REASONING`: for MEDIUM/HEAVY work, use Codex as the default owner
+  of repeated source search, call-graph tracing, cross-file reasoning, and other
+  substantial local code exploration after the minimum local reality check.
+- `LOCAL REALITY`: use Desktop Commander for facts that GitHub cannot know and
+  Codex cannot safely prove alone: dirty/untracked WIP, local-only diffs, Runtime,
+  logs, caches, actual process state, Python32/PyQt/GUI/Kiwoom execution, local
+  permissions, and final real-environment verification.
+- When the same fact is available from more than one route, prefer the cheapest
+  authoritative route: GitHub for committed remote truth, Codex for local code
+  reasoning, Desktop Commander for local mutable/runtime truth.
+- A large dirty worktree is not a reason to route all source inspection through
+  DC. Use DC only for the local delta that actually matters and keep committed
+  baseline/history reads on GitHub when available.
+- If GitHub access is unavailable or cannot see the required ref/content, record
+  that limitation and fall back to the minimum necessary local Git/DC read.
+
 Desktop Commander Latency Policy:
 - Desktop Commander is a local execution and verification boundary, not the
   default iterative inner loop for code reasoning on MEDIUM or HEAVY work.
@@ -464,6 +488,27 @@ ChatGPT + Desktop Commander
   verification when that is clearly faster and safer. Re-escalate structural,
   cross-file, design-level, or repeated failures to Codex instead of expanding a
   long sequence of manual DC edits.
+
+Checkpoint Commit And Push Gate:
+- Preserve the project policy: `Commit = recovery point`, `Push = synchronization`,
+  and PRs are for large features or explicit exceptions. Do not return to tiny
+  commit cycles after every edit or test.
+- However, once an approved feature/normalization unit has reached final local
+  verification and its task boundary is stable, create a focused checkpoint
+  commit and push it before starting the next substantial structural mutation,
+  unless the user explicitly defers the checkpoint or the current WIP boundary
+  cannot be safely isolated.
+- A checkpoint must stage only the files belonging to the verified task boundary.
+  Never use `git add .` or `git add -A` in a dirty repository.
+- Before commit, verify the exact staged file list and run staged diff checks.
+  Before push, confirm branch/upstream and that the commit contains no protected
+  unrelated WIP.
+- After push, verify local HEAD equals the intended remote branch HEAD.
+- If checkpointing is deferred, record a concrete `CHECKPOINT_DEFERRED_REASON`
+  and keep the uncommitted task boundary explicit before further structural work.
+- This gate is about durable recovery/synchronization at meaningful completion
+  points, not about forcing commits for exploratory or incomplete intermediate
+  states.
 
 Codex Scope Discipline:
 - Codex implementation tasks should receive the smallest complete code boundary
@@ -1367,6 +1412,31 @@ substantial mutation. If not, return to implementation.
 ```
 
 Every final Next Session Startup Prompt must also reproduce this independent
+Remote-First Source Routing block:
+
+```text
+==================================================
+Remote-First Source Routing
+==================================================
+Route evidence by source authority.
+- REMOTE / COMMITTED BASELINE -> GitHub direct first:
+  pushed source, remote branch/HEAD, commit history, committed diffs,
+  historical versions, PR/issue history, pushed project docs.
+- LOCAL CODE REASONING -> Codex first for MEDIUM/HEAVY:
+  repeated source search, call graph, cross-file reasoning, substantial code
+  exploration and implementation after minimum local reality check.
+- LOCAL REALITY -> Desktop Commander:
+  dirty/untracked WIP, local-only diff, Runtime, logs, caches, processes,
+  Python32/PyQt/GUI/Kiwoom execution, permissions, final local verification.
+Do not spend DC round trips re-reading committed remote evidence merely because
+it also exists in the local checkout.
+A large dirty worktree does not justify routing all source inspection through DC.
+If GitHub cannot access the required ref/content, record the limitation and use
+only the minimum necessary local Git/DC fallback.
+==================================================
+```
+
+Every final Next Session Startup Prompt must also reproduce this independent
 Desktop Commander Latency Control block:
 
 ```text
@@ -1449,6 +1519,32 @@ Execution Efficiency Rules
 - Use DC for small bounded post-verification corrections when clearly faster;
   re-escalate structural, cross-file, design-level, or repeated failures to
   Codex instead of expanding long manual DC edit sequences.
+==================================================
+```
+
+Every final Next Session Startup Prompt must also reproduce this independent
+Checkpoint Commit And Push Gate block:
+
+```text
+==================================================
+Checkpoint Commit And Push Gate
+==================================================
+Commit = recovery point. Push = synchronization. Do not create tiny commits for
+every edit or test.
+When an approved feature/normalization unit has final local verification and a
+stable task boundary, create a focused checkpoint commit and push it before the
+next substantial structural mutation unless the user explicitly defers it or the
+verified boundary cannot be safely isolated.
+Rules:
+- Stage only verified task-boundary files. Never use git add . or git add -A in a
+  dirty repository.
+- Verify exact staged names and staged diff checks before commit.
+- Verify branch/upstream and protected WIP exclusion before push.
+- After push, verify local HEAD equals intended remote branch HEAD.
+- If deferred, record CHECKPOINT_DEFERRED_REASON and keep the uncommitted task
+  boundary explicit before further structural work.
+This gate creates durable recovery/synchronization points; it does not force
+commits for incomplete exploratory states.
 ==================================================
 ```
 
@@ -1717,10 +1813,12 @@ It must also begin with the mandatory `Current AI Role` block, declare the
 applicable role-specific principle, and include the corresponding explicit
 role instructions required by Step 5. Every final Startup Prompt must include
 the verified Development Environment block, the Mandatory Hybrid Orchestration
-block, the Codex Mutation Enforcement Gate block, the Desktop Commander Latency
+block, the Codex Mutation Enforcement Gate block, the Remote-First Source Routing
+block, the Desktop Commander Latency
 Control block, the Evidence And Verification
 Efficiency block, the Execution Efficiency
-Rules block, the Codex Scope Discipline block, and the independent Codex CLI
+Rules block, the Checkpoint Commit And Push Gate block, the Codex Scope Discipline
+block, and the independent Codex CLI
 Invocation Path block. When the role is
 Integrated Development Orchestrator, it must additionally reproduce the
 Mandatory Development Workflow block. These Startup Prompt requirements are
