@@ -82,6 +82,16 @@ The following task-related areas remain local protected dependencies:
 - local dependent corrections in group-pack, rule-apply, and execution-preview
   tests that did not form a standalone HEAD-based checkpoint.
 
+Fixture-correction provenance for the 85/85 contract result is explicit:
+- tests/test_group_pack_packing.py expects a newly created RoutineInstance to
+  remain enabled=True; this edit remains protected local WIP;
+- tests/test_rule_apply_commit_service.py supplies
+  signed_percent_offset=True for the Bollinger fixture; this edit remains
+  protected local WIP;
+- tests/test_final_dispatch_fresh_preflight.py supplies
+  stock_nxt_availability=False for the KRX-only fixture; this correction is
+  included in code checkpoint 5f1b49c.
+
 These files were not reset, restored, stashed, cleaned, or broad-staged.
 
 ======================================================================

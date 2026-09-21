@@ -19,6 +19,13 @@ VERIFIED
 - Exported the exact HEAD+index candidate tree.
 - Changed production modules compiled.
 - 71/71 focused checkpoint tests passed.
+- The 85/85 contract evidence includes these explicit fixture corrections:
+  group-pack RoutineInstance enabled=True; rule-apply Bollinger
+  signed_percent_offset=True; final-dispatch KRX-only
+  stock_nxt_availability=False.
+- The final-dispatch correction is in code commit 5f1b49c; the group-pack and
+  rule-apply edits remain protected local WIP because they were not standalone
+  HEAD+index safe.
 - Staged diff check passed.
 - No live broker call was performed.
 

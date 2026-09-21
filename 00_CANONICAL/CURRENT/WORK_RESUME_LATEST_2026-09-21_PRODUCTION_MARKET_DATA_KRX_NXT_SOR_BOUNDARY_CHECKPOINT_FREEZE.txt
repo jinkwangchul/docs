@@ -69,6 +69,11 @@ Verification
 
 Current-worktree evidence supplied for this feature:
 - 85/85 PASS in 3 contract modules;
+- the three fixture corrections were:
+  tests/test_group_pack_packing.py -> RoutineInstance enabled=True,
+  tests/test_rule_apply_commit_service.py -> Bollinger
+  signed_percent_offset=True, and tests/test_final_dispatch_fresh_preflight.py
+  -> KRX-only stock_nxt_availability=False;
 - 190/190 PASS in 9 MarketData/SOR modules;
 - broader inventory: 632 modules, raw 10,175 tests;
 - protected 43-path runtime/config/routine hash delta: 0.
@@ -83,9 +88,12 @@ Do not report the broader audit as an all-PASS suite. Its remaining non-pass
 evidence includes pre-existing HEAD baselines and protected dependencies.
 
 The group-pack and rule-apply test edits were observed to revert once, then
-were reapplied and passed 85/85 in the current worktree. An operator-UI probe
-also reported no protected hash change. The cause is unconfirmed; this is not
-classified as a Production regression.
+were reapplied and passed 85/85 in the current worktree. They remain protected
+local WIP because they did not pass the standalone HEAD+index checkpoint. The
+final-dispatch KRX-only fixture correction is included in code commit 5f1b49c.
+An operator-UI probe also reported no protected hash change. The cause of the
+observed reversion is unconfirmed; this is not classified as a Production
+regression.
 
 ==================================================
 Protected Local WIP
