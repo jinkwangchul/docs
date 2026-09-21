@@ -957,6 +957,13 @@ Reference rules:
     must be applied, or the user asks.
 
 External Tool Environment restoration:
+- Restore Durable Worker availability, verified root, local MCP stdio facade
+  state, and default Durable routing when those values are present in the closing
+  handoff.
+- If Durable Worker is recorded as `VERIFIED_AVAILABLE`, do not spend the new
+  session rediscovering whether it exists. Use it immediately for qualifying
+  long-running Codex/test work unless current evidence shows the environment has
+  changed.
 - When the Latest Work Resume or Next Session Startup Prompt records external
   tool environment state, restore at least Computer Use availability, KOA
   StudioSA installed or confirmed version, installed official Kiwoom materials,
@@ -1369,6 +1376,10 @@ Development Environment
 - Codex CLI Executable: <verified path / Must Verify>
 - Codex Authentication: <verified state / Must Verify>
 - Codex Model / Reasoning: <verified current setting / Must Verify>
+- Durable Worker: <VERIFIED_AVAILABLE / Not Available / Must Verify>
+- Durable Worker Root: <verified path / Must Verify>
+- Durable MCP Stdio Facade: <Available / Not Available / Must Verify>
+- Durable Default Route: <DC -> Durable Worker -> Codex/Test when verified available>
 - Superpowers: <Available / Not Available / Must Verify>
 - ChatGPT Work: Do Not Use unless the user explicitly re-enables it
 
@@ -1383,6 +1394,10 @@ Tool Routing:
 - HEAVY -> default `CODEX_PRIMARY` when Codex is available for code analysis and
   implementation. ChatGPT + Desktop Commander owns local environment evidence,
   Python/GUI/Runtime/Log execution, safety checks, and final verification.
+- When Durable Worker is `VERIFIED_AVAILABLE`, substantial or long-running
+  MEDIUM/HEAVY Codex execution and detached Python32 test execution use the
+  Durable route by default. Direct long-lived DC process execution requires a
+  concrete `DURABLE_WORKER_FALLBACK_REASON`.
 - Before any write, select exactly one Mutation Owner for each overlapping write
   surface. Do not let ChatGPT/Desktop Commander and Codex modify the same
   mutation boundary concurrently.
@@ -1423,6 +1438,10 @@ implementation in DC first and attach Codex only as a late critic unless Codex
 is unavailable or only a small bounded correction remains.
 HEAVY -> CODEX_PRIMARY by default when Codex is available for code analysis and
 implementation; ChatGPT+DC owns local execution evidence and final verification.
+When Durable Worker is VERIFIED_AVAILABLE, substantial or long-running
+MEDIUM/HEAVY Codex jobs and detached Python32 test jobs use Durable by default.
+Do not open a long-lived direct DC process for those jobs unless
+DURABLE_WORKER_FALLBACK_REASON is recorded.
 Before implementation record:
 Execution Weight / Orchestration Mode / Codex Role / Mutation Owner /
 Verification Owner.
@@ -1555,9 +1574,14 @@ Durable Local Task Execution block:
 ==================================================
 Durable Local Task Execution
 ==================================================
+Durable Runtime Status: <VERIFIED_AVAILABLE / Not Available / Must Verify>
 Verified worker root:
 C:\Users\JIN KWANG CHUL\Documents\chatgpt_durable_worker
+Verified local MCP stdio facade: <Available / Not Available / Must Verify>
 
+If Durable Runtime Status is VERIFIED_AVAILABLE, treat it as an already verified
+execution environment. Do not fall back to the previous direct long-lived DC
+process pattern merely because that pattern was used in the prior session.
 Use the Durable Worker for long-running Codex/test jobs that may outlive a normal
 DC round trip or must survive browser/DC transport loss.
 - ChatGPT Web -> Desktop Commander -> Durable Worker CLI is the immediate path.
@@ -1745,6 +1769,18 @@ final verified closing state:
 ==================================================
 External Tool Environment
 ==================================================
+
+- Durable Worker:
+  <VERIFIED_AVAILABLE / Not Available / Must Verify>
+
+- Durable Worker Root:
+  <verified path / Must Verify>
+
+- Durable MCP Stdio Facade:
+  <Available / Not Available / Must Verify>
+
+- Durable Default Route:
+  <DC -> Durable Worker -> Codex/Test when verified available>
 
 - Computer Use:
   Available / Not Available / Must Verify
