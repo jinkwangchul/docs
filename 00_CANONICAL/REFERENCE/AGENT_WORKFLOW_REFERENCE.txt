@@ -1592,6 +1592,28 @@ DC round trip or must survive browser/DC transport loss.
   use recover_task before considering any rerun.
 - Browser timeout, socket closed, or lost DC response does NOT prove job failure.
   Never duplicate the mutation/test until the same TASK_ID is checked first.
+- Same-Chat Transport Recovery Gate:
+  when the current ChatGPT conversation loses its response/transport while a
+  Durable job may still be running, the next user continuation instruction
+  (continue, resume, ??? ??, ??, or equivalent) is a recovery trigger,
+  not authorization to start a duplicate job. Before creating any new TASK_ID,
+  query the Durable recovery ledger for the current repository/workdir using
+  durable_runtime.py recovery --workdir <repo> or the MCP
+  get_recovery_snapshot equivalent when available.
+  * RUNNING/CREATED -> do not rerun; keep the same TASK_ID and recover/status it.
+  * SUCCEEDED -> recover get_task_result, inspect the actual diff/result, then
+    continue from verification/criticism/next-stage work.
+  * FAILED/CANCELLED/INTERRUPTED -> recover the persisted result/logs and resume
+    from the appropriate failure/cancellation analysis; do not silently rerun.
+  * A new TASK_ID is allowed only after recovery evidence proves there is no
+    relevant surviving/terminal task for the interrupted operation, or the user
+    explicitly starts a different scope.
+- Durable Monitor is expected to auto-start for tracked Codex/Python32 jobs and
+  remain singleton. Its status/notification is operator evidence, but ChatGPT
+  must still perform the recovery query before deciding whether to rerun.
+- Durable Monitor resource figures are evidence with freshness semantics:
+  Codex values come from local Codex rate-limit events; Desktop Commander is a
+  last-known MCP snapshot and may be stale. Never invent or extrapolate quota.
 - Avoid read_process_output polling for a task already owned by Durable Worker.
 - generic start_task is UNSAFE/INTERNAL and is not an MCP-safe tool.
 - Durable Worker completion is not final correctness proof; final diff and real
