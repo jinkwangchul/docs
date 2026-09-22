@@ -1575,6 +1575,7 @@ Durable Local Task Execution block:
 Durable Local Task Execution
 ==================================================
 Durable Runtime Status: <VERIFIED_AVAILABLE / Not Available / Must Verify>
+Current WORKSTREAM_ID: <stable id for this conversation/workstream / Must Verify>
 Verified worker root:
 C:\Users\JIN KWANG CHUL\Documents\chatgpt_durable_worker
 Verified local MCP stdio facade: <Available / Not Available / Must Verify>
@@ -1588,6 +1589,21 @@ DC round trip or must survive browser/DC transport loss.
 - Use start_codex_job for substantial Codex work.
 - Use start_python32_test for detached Python32 test work.
 - Record an explicit TASK_ID for substantial jobs.
+- Multi-Conversation Workstream Isolation:
+  every ChatGPT conversation or independently operated implementation/audit stream
+  that can launch Durable work must carry one stable WORKSTREAM_ID. Pass it as
+  --workstream-id <id> or through CHATGPT_DURABLE_WORKSTREAM_ID on every tracked
+  Codex/Python32 Durable launch. Two chats may share the same repository/workdir
+  but must not share a WORKSTREAM_ID unless they intentionally represent one
+  serialized workstream.
+- Recovery and rerun decisions must be filtered by WORKSTREAM_ID first. Do not use
+  a global Latest Task as the recovery authority when multiple conversations are
+  active. The Monitor's yellow event task, Recovery Summary and Recovery Copy
+  must refer to the same TASK_ID and WORKSTREAM_ID; an explicitly selected row
+  may temporarily become the recovery target.
+- Legacy tasks without WORKSTREAM_ID are isolated under a legacy workdir-derived
+  stream only for backward compatibility; new tracked tasks must use an explicit
+  WORKSTREAM_ID.
 - After launch use get_task_status/get_task_result; after uncertain transport loss
   use recover_task before considering any rerun.
 - Browser timeout, socket closed, or lost DC response does NOT prove job failure.
