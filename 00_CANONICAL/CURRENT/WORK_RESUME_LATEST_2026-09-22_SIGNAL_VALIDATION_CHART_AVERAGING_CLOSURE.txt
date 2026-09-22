@@ -1,0 +1,153 @@
+2026-09-22 Signal Validation Chart / History / Averaging Work Resume
+
+1. RECOVERY BASELINE
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Branch: feat/restore-auto-trade-setting-ui
+Checkpoint: caa271f85f0a37d26895d2d890b025939ec4bf70
+Remote: origin/feat/restore-auto-trade-setting-ui
+Close verification: local HEAD == remote HEAD
+
+Documentation repository:
+C:\Users\JIN KWANG CHUL\Documents\docs
+Branch: agent/project-prompt-standard
+Docs checkpoint is recorded by the final close report after this document set is
+committed and pushed.
+
+Procedural authority:
+00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+
+Current functional authority:
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_SIGNAL_VALIDATION_CHART_AVERAGING_CLOSURE.txt
+
+2. WHY THIS RESUME EXISTS
+
+Several recent conversations belonged to one Signal Validation workstream but were
+split by context limits or mixed with Durable Worker discussion. This resume
+consolidates the actual committed product state and explicitly separates
+infrastructure work.
+
+The earlier 2026-09-22 Production Candle Standby / MarketData closure is already
+complete and remains independent.
+
+3. COMPLETED PRODUCT STATE
+
+Signal Validation V2 now has the committed batch/replay/history/chart checkpoint
+needed for the recent operator workflow:
+- replay batch fast path with parity/fallback;
+- persistent history and exact-view signal-entry reuse;
+- regular-market-only Validation projection;
+- minute plus D1/W1/MO1/Y1 Validation identity;
+- viewport/reset/pan/latest-edge interaction normalization;
+- weighted virtual execution and completed-cycle presentation;
+- chart-local averaging controls;
+- filter-only apply-back boundary.
+
+4. AVERAGING CONTRACT
+
+Displayed modes:
+회차기준 / 예산기준 / 능동매수.
+
+예산기준:
+- ratio > 1.0;
+- previous approved calculated budget is the next basis;
+- whole-share quantity uses floor(budget/current price);
+- unspent difference does not reduce the next approved basis.
+
+Example at 10,000 and x1.3:
+10,000 -> 13,000 -> 16,900 -> 21,970,
+with whole-share buys 1 -> 1 -> 1 -> 2.
+
+회차기준:
+uses the fixed first-round budget and confirmed-round formula, not budget
+compounding.
+
+능동매수:
+preserves all direction/comparator choices in settings. Runtime may no-order when
+a user-selected combination cannot be satisfied mathematically.
+
+5. APPLY-BACK BOUNDARY
+
+Validation averaging/execution settings are chart-local.
+Routine registration/change receives only the approved signal/filter projection.
+Do not reintroduce validation_execution into the source-dialog apply payload.
+
+6. TOOLTIP CONTRACT
+
+BUY execution tooltip:
+- first line = round / current-round shares / current-round amount;
+- second line = total shares / cumulative buy amount.
+
+Example:
+2차 / 3주 / 839,812원
+총 4주 / 1,120,562원
+
+7. VERIFICATION EVIDENCE
+
+Independent Git-index export:
+- 381 focused tests PASS across isolated Python32 processes;
+- staged production py_compile PASS;
+- staged diff check PASS.
+
+The independent export initially exposed missing regular-market/timeframe/
+historical-provenance dependencies. Those were added to the checkpoint before
+commit.
+
+Known unrelated pre-existing failure:
+test_situation_response_round_trip_and_legacy_apply_normalize_pair.
+Do not assume this was fixed by the Signal Validation checkpoint.
+
+8. PROTECTED WIP
+
+After code push the repository still had 170 porcelain entries.
+Status SHA256:
+a936b309d4e889434938fc140f4e1d6b3119a5cab15a3f9c56976da6382e5153
+
+Important protected WIP:
+- large kiwoom_api.py period/NXT/Realtime/SOR changes;
+- tests tied to that broader broker boundary;
+- Main/chart/live-price work not included in this checkpoint;
+- runtime, stock, group, assignment, and user-data artifacts;
+- other existing reports and dirty files.
+
+Never run reset/restore/stash/clean or broad add against this state.
+
+9. DURABLE WORKER HANDOFF
+
+Root:
+C:\Users\JIN KWANG CHUL\Documents\chatgpt_durable_worker
+
+Recovery inspection at close:
+active_count=0.
+Recent chart/average-price Python32 jobs are terminal.
+The implementation/Codex usage audit is terminal SUCCEEDED.
+
+Durable Worker is infrastructure only. Do not merge its design or UI semantics
+into the trading program.
+
+For this closure, staged-export execution through Durable Worker was denied by its
+allowed-root security boundary because the temporary export path was outside the
+trusted workspace. Direct Desktop Commander Python32 testing was used as the
+recorded fallback.
+
+10. OPEN / EXCLUDED
+
+- Live broker period-candle transport remains in protected local kiwoom_api WIP
+  and is not frozen by this checkpoint.
+- The unrelated Situation Response round-trip failure remains open.
+- Live SOR reconciliation is not newly claimed.
+- No PR was created.
+
+11. NEXT SESSION
+
+No next Big Feature was selected during closing.
+Next task: Must Confirm.
+Next role: Must Confirm.
+
+Recovery read order:
+1. 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+2. 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_SIGNAL_VALIDATION_CHART_AVERAGING_CLOSURE.txt
+3. this Work Resume
+4. 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-22_SIGNAL_VALIDATION_CHART_AVERAGING_CLOSURE.txt
+5. 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md

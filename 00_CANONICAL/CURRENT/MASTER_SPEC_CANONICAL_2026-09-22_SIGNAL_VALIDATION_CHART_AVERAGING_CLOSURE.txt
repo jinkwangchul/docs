@@ -1,0 +1,253 @@
+2026-09-22 Signal Validation Chart / History / Averaging Closure
+
+Status: FREEZE / CLOSURE SUPPLEMENT
+Code branch: feat/restore-auto-trade-setting-ui
+Code checkpoint: caa271f85f0a37d26895d2d890b025939ec4bf70
+Code remote verification: local HEAD == origin/feat/restore-auto-trade-setting-ui
+
+1. AUTHORITY AND SCOPE
+
+This document is the current supplemental owner for the completed Signal Validation
+V2 chart/history/performance work and the validation-only averaging/execution
+contract checkpointed on 2026-09-22.
+
+It consolidates recent conversation windows that were split by context exhaustion
+or mixed with Durable Worker infrastructure discussion. It does not absorb Durable
+Worker implementation into the trading product contract.
+
+Earlier Signal Validation owners remain authoritative outside the scope explicitly
+superseded here. The 2026-09-22 Production Candle Standby / MarketData closure
+remains an independent owner for Production MarketData ownership and bootstrap.
+
+2. RETROACTIVE CONVERSATION CLOSEOUT
+
+Recent work was spread across multiple conversations. One Signal Validation chart
+optimization window ended before the required Conversation Closing procedure.
+Another conversation mixed chart implementation discussion with Durable Worker
+monitor/recovery work. This closure records the product work by actual repository
+state rather than by chat-window order.
+
+The recovered product work includes:
+- replay/batch performance normalization;
+- chart viewport/reset/pan/latest-edge interaction work;
+- persistent Validation history/cache work;
+- period identity and regular-market-only Validation projection;
+- validation-only weighted virtual execution and completed-cycle presentation;
+- averaging UI, budget/round/active-buy policy normalization;
+- tooltip and terminology corrections.
+
+Durable Worker remains a separate local execution environment and is not a
+Production trading subsystem.
+
+3. SIGNAL VALIDATION PERFORMANCE AND HISTORY
+
+- Validation replay has a batch fast path while preserving authoritative Routine
+  semantics and fallback behavior.
+- persistent Validation history/cache is keyed by semantic timeframe and market
+  data identity where available;
+- persisted signal entries can be reused when exact view identity matches;
+- adaptive refresh/probe behavior preserves cache continuity and does not treat
+  stale identity as current;
+- chart/history extension remains Validation-owned and does not mutate Production
+  MarketData state;
+- regular-market-only mode derives a Validation view without rewriting the raw
+  historical pool;
+- large regular-market minute views may request a smaller source interval and
+  reaggregate inside Validation.
+
+4. TIMEFRAME IDENTITY
+
+Validation timeframe identity includes minute intervals plus D1, W1, MO1, and Y1.
+The UI groups minute and period values while preserving legacy minute-value
+compatibility.
+
+The committed checkpoint owns the Validation-side identity, provider dispatch
+contract, cache identity, and replay handling.
+
+Important exclusion:
+the large local kiwoom_api.py period-candle/NXT/Realtime worktree is NOT part of
+this checkpoint because it is intertwined with broader protected MarketData/SOR
+WIP. Therefore this closure does not claim a newly frozen live-broker period-candle
+transport implementation. That local dependency remains protected for later
+boundary-specific closure.
+
+5. VALIDATION-ONLY AVERAGING / VIRTUAL EXECUTION
+
+The compact Validation averaging controls are chart-local execution simulation
+controls. They are not Production order authorization and do not directly mutate
+Routine registration/change execution settings.
+
+Mode names shown to the operator are:
+- 회차기준 / ROUND
+- 예산기준 / BUDGET
+- 능동매수 / ACTIVE_BUY
+
+Legacy labels 회차증가 and 금액증가 remain accepted only as compatibility inputs.
+
+5.1 First buy
+
+The Validation starting budget is expressed as a whole-share quantity. Virtual
+fills use the approved Validation representative fill price and update weighted
+average price, cumulative quantity, cycle cost, and completed-cycle return.
+
+5.2 회차기준
+
+ROUND uses the fixed starting budget as its origin and derives each repeat budget
+from the confirmed previous round number plus/multiplied by the configured value.
+It does not compound the previous calculated budget.
+
+5.3 예산기준
+
+BUDGET ratio must be greater than 1.0.
+
+The next round uses the previous approved calculated budget, not the previous
+actual filled amount. Integer-share sizing is floor(calculated_budget/current
+price). The difference between calculated budget and effective order spend is not
+carried as a separate cash remainder and does not shrink the next budget basis.
+
+Illustrative fixed-price contract at 10,000 with starting quantity 1 and x1.3:
+- round 1 approved basis 10,000 -> 1 share;
+- round 2 calculated budget 13,000 -> 1 share;
+- round 3 calculated budget 16,900 -> 1 share;
+- round 4 calculated budget 21,970 -> 2 shares.
+
+The following round compounds from 21,970, not from the 20,000 actually spent.
+
+5.4 능동매수
+
+ACTIVE_BUY compares the confirmed weighted average position with a reference price
+and computes the minimum whole-share purchase needed for the selected target where
+that target is mathematically actionable.
+
+User setting freedom is preserved:
+- directions: 상향, 하향, 상하
+- comparators: 이상, 이하, 이내, 이탈
+
+The registration/change UI does not silently rewrite an intentionally unusual
+direction/comparator combination. Runtime policy evaluation may produce no order
+when the chosen combination is not actionable.
+
+6. APPLY-BACK BOUNDARY
+
+Signal Validation settings apply back to the Routine registration/change dialog
+only through the approved signal/filter projection.
+
+Validation-local fields do NOT cross this boundary:
+- validation_execution / averaging controls;
+- starting quantity;
+- ROUND/BUDGET/ACTIVE_BUY selection and values;
+- trading-cost simulation;
+- Validation market-scope controls.
+
+This prevents chart experimentation from silently overwriting Production Routine
+execution policy.
+
+7. OPERATOR PRESENTATION
+
+BUY virtual-execution tooltip lines use:
+- current round / current-round quantity / current-round amount;
+- total cumulative quantity / cumulative buy amount.
+
+Example:
+  2차 / 3주 / 839,812원
+  총 4주 / 1,120,562원
+
+The completed-cycle table and aggregate summary continue to use weighted average,
+actual virtual fill quantities, virtual buy cost, sell value, and optional
+Validation trading-cost simulation.
+
+8. CHART INTERACTION CHECKPOINT
+
+The recent chart work preserved:
+- entry-state reset semantics;
+- viewport preservation across relevant settings/averaging revalidation;
+- bounded zoom and local history navigation;
+- latest-edge pan clamping so the newest candle cannot be dragged beyond the
+  legal right boundary;
+- lighter pan/render behavior and batch preparation;
+- range selection and marker/tooltip continuity.
+
+This closure does not claim that every unrelated local chart/live-price change in
+the dirty worktree entered the checkpoint.
+
+9. VERIFICATION
+
+The final Git index was exported to an independent temporary directory so unstaged
+WIP could not satisfy missing imports or hide dependency gaps.
+
+That audit found and corrected missing staged dependencies for:
+- regular-market Validation projection;
+- MO1 timeframe identity;
+- ValidationHistoricalSnapshot market provenance.
+
+Final independent staged-export evidence:
+- 89 tests OK: batch/replay/virtual execution/timeframe/regular-market group;
+- 241 tests OK: cache/buy-policy/rule-mapper group;
+- 42 tests OK: historical provider + persistent-history flow;
+- 1 focused P3 active-buy UI freedom test OK;
+- 8 focused V2/operator apply/averaging/tooltip tests OK;
+- total recorded passing tests: 381;
+- Python32 py_compile OK for staged production modules;
+- git diff --cached --check OK.
+
+A broad combined PyQt process again exhibited the known Windows/Qt termination
+delay. Isolated Python32 processes are the authoritative evidence here.
+
+Known pre-existing unrelated failure:
+test_situation_response_round_trip_and_legacy_apply_normalize_pair currently
+reproduces in the full worktree as well as an earlier staged export. The failing
+Situation Response code/test was not modified by this checkpoint and is not
+silently fixed or reclassified here.
+
+10. CODE CHECKPOINT
+
+Commit:
+caa271f85f0a37d26895d2d890b025939ec4bf70
+
+Push:
+successful to origin/feat/restore-auto-trade-setting-ui.
+Local and remote commit equality was verified after push.
+
+36 task-boundary files entered the checkpoint.
+
+11. PROTECTED LOCAL WIP
+
+The code repository intentionally remains dirty after the checkpoint.
+
+Immediately after push:
+- porcelain status entries: 170
+- status-list SHA256:
+  a936b309d4e889434938fc140f4e1d6b3119a5cab15a3f9c56976da6382e5153
+
+Protected state includes broader kiwoom_api/NXT/Realtime/SOR work, runtime/user
+data, stock folders, Main/chart WIP, reports, test WIP, and untracked artifacts.
+Do not clean, reset, restore, stash, or broad-stage these paths.
+
+12. DURABLE WORKER ENVIRONMENT
+
+Durable Worker root:
+C:\Users\JIN KWANG CHUL\Documents\chatgpt_durable_worker
+
+At close-out recovery inspection:
+- active task count: 0;
+- recent tracked chart/average-price test tasks were terminal;
+- latest implementation/Codex usage audit was SUCCEEDED;
+- product repository work and Durable Worker infrastructure remain separate.
+
+An attempt to execute staged-export verification through Durable Worker was
+correctly rejected because the temporary export directory was outside configured
+allowed workspace roots. The fallback reason was recorded and verification was
+performed read/test-only through direct Desktop Commander Python32 processes.
+
+13. COMPLETION JUDGMENT
+
+The checkpointed Signal Validation chart/history/averaging unit is closed at
+caa271f85f0a37d26895d2d890b025939ec4bf70.
+
+Not claimed complete:
+- live-broker period-candle transport in the protected large kiwoom_api WIP;
+- unrelated Situation Response defect;
+- broader live SOR reconciliation;
+- unrelated Main/chart/runtime/user-data WIP.
+
+No next Big Feature is selected by this document.

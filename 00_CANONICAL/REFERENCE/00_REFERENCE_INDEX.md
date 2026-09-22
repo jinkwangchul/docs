@@ -28,6 +28,7 @@ CURRENT.
 | Signal Validation V2 virtual execution, configured-filter visualization, Evidence interaction, and Candle-snapped Crosshair | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-19_SIGNAL_VALIDATION_V2_FILTER_VISUALIZATION_AND_VIRTUAL_EXECUTION_SUPPLEMENT.txt` | Current supplemental owner for completed-Candle admission, OHLC/4 virtual fills, simplified weighted-average execution, 8-family visualization/cache, fixed lower-pane H, Evidence styling, Marker Pin/release, Crosshair, and cached value lookup; Git checkpoint remains separate |
 | Signal Validation V2 chart/history/persistent-cache freeze | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-20_SIGNAL_VALIDATION_V2_CHART_HISTORY_AND_CACHE_FREEZE.txt` | Latest owner for actual committed chart/history/cache behavior, latest-100 viewport, local chart navigation, replay scan optimization, V2 averaging defaults, marker clipping/legend normalization, and Validation-owned restart-persistent history cache; committed 5,000 vs earlier user-directed 10,000 preload remains unresolved and is not treated as policy approval |
 | Signal Validation timeframe identity, 250/4,000 viewport, and entry-identity checkpoint | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-21_SIGNAL_VALIDATION_TIMEFRAME_VIEWPORT_CHECKPOINT_FREEZE.txt` | Supplemental owner for minute+D1/W1/Y1 Validation identity, Registration/Edit round trip, semantic period handling, explicit entry identity preservation, default visible 250, and max visible 4,000. The fixed 5,000 history amount remains implementation state only; demand-driven older-history extension and overlapping local broker/cache wiring remain open. |
+| Signal Validation chart/history/performance and validation-only averaging closure | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_SIGNAL_VALIDATION_CHART_AVERAGING_CLOSURE.txt` | Latest supplemental owner for checkpoint `caa271f85f0a37d26895d2d890b025939ec4bf70`: batch/replay/history/cache, regular-market Validation projection, minute+D1/W1/MO1/Y1 Validation identity, chart interaction/performance checkpoint, ROUND/BUDGET/ACTIVE_BUY validation-only execution, and filter-only apply-back boundary. Live broker period-candle transport in the protected large `kiwoom_api.py` WIP is explicitly not frozen here. |
 | Production order route, KRX/NXT/SOR fail-closed, Chejan, and reconciliation checkpoint | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-21_PRODUCTION_MARKET_DATA_KRX_NXT_SOR_BOUNDARY_CHECKPOINT_FREEZE.txt` | Latest supplemental owner for the selectively committed order-route provenance, KRX/SOR adapter mapping, source-route-preserving CANCEL/MODIFY, Chejan route metadata, and LIVE_SOR_RECONCILIATION_UNVERIFIED fail-closed boundary. Live SOR reconciliation remains unverified unless separately proven. |
 | Production candle standby, Routine-declared candle requirements, login bootstrap, Mock/Production MarketData isolation, and Mock execution-chart read boundary | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_PRODUCTION_CANDLE_STANDBY_MARKETDATA_BOUNDARY_CLOSURE.txt` | Latest supplemental owner for the closed candle/standby boundary at code checkpoint `1c2258b0cd6428fc772a152a4041e14bbaec4725`; supersedes only the Sep-21 wording that treated this wider candle/standby/Mock MarketData wiring as uncommitted local WIP. |
 | Mock Validation bounded runtime growth | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-18_MOCK_VALIDATION_RUNTIME_GROWTH_NORMALIZATION.txt` | Current owner for bounded process-local Mock runtime/evidence growth without Production persistence authority |
@@ -83,15 +84,15 @@ does not supersede them.
 ## Current Resume And Changelog
 
 - Latest Frozen Authority:
-  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_PRODUCTION_CANDLE_STANDBY_MARKETDATA_BOUNDARY_CLOSURE.txt`
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_SIGNAL_VALIDATION_CHART_AVERAGING_CLOSURE.txt`
 - Latest Local WIP Work Resume:
   `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
 - Latest Local WIP Changelog:
   `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-05_REPEAT_ACTIVE_BUY_SIGNAL_PIPELINE_INTERIM_CHECKPOINT.txt`
 - Latest Frozen Work Resume:
-  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-22_PRODUCTION_CANDLE_STANDBY_MARKETDATA_BOUNDARY_CLOSURE.txt`
+  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-22_SIGNAL_VALIDATION_CHART_AVERAGING_CLOSURE.txt`
 - Latest Frozen Changelog:
-  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-22_PRODUCTION_CANDLE_STANDBY_MARKETDATA_BOUNDARY_CLOSURE.txt`
+  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-22_SIGNAL_VALIDATION_CHART_AVERAGING_CLOSURE.txt`
 
 Older Work Resumes, Readable variants, Freeze snapshots, and Changelogs are
 historical records. They may explain a past decision but must not be used as a

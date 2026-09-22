@@ -1,0 +1,109 @@
+2026-09-22 Signal Validation Chart / History / Averaging Closure Changelog
+
+Type: Big Feature checkpoint / Conversation Closing / multi-window consolidation
+Code checkpoint: caa271f85f0a37d26895d2d890b025939ec4bf70
+
+A. WINDOW CONSOLIDATION
+
+This close-out consolidates recent Signal Validation conversations that were split
+by context exhaustion and one conversation where Durable Worker infrastructure
+work was mixed with product discussion.
+
+The previously completed 2026-09-22 Production Candle Standby / MarketData
+closure is not reopened.
+
+B. CHECKPOINT CONTENT
+
+Committed product changes include:
+- batch Validation fast path and replay integration;
+- persistent Validation history/cache and exact-view signal-entry reuse;
+- regular-market-only Validation reaggregation;
+- timeframe identity including MO1;
+- chart viewport/reset/pan/latest-edge performance normalization;
+- virtual weighted-position execution and completed-cycle presentation;
+- averaging controls and execution tooltip data;
+- ROUND/BUDGET/ACTIVE_BUY normalization;
+- source-dialog apply projection restricted to signal/filter values.
+
+C. AVERAGING CORRECTIONS
+
+Terminology:
+- 회차기준
+- 예산기준
+- 능동매수
+
+BUDGET:
+- requires ratio > 1;
+- compounds previous approved calculation budget;
+- does not compound previous actual fill spend;
+- whole-share rounding affects executed quantity only.
+
+ACTIVE_BUY:
+- keeps user-selected direction/comparator combinations without UI rewriting;
+- calculation remains fail/no-order when a target is not actionable.
+
+D. TOOLTIP CORRECTION
+
+BUY tooltip changed from ambiguous amount/total presentation to:
+current round / current-round quantity / current-round amount
+and
+total cumulative quantity / cumulative amount.
+
+E. APPLY-BOUNDARY CORRECTION
+
+Validation execution/averaging settings are chart-local and do not propagate into
+Routine registration/change execution settings. Only the approved signal/filter
+projection is applied back.
+
+F. INDEPENDENT CHECKPOINT AUDIT
+
+A staged-index export was used to detect unstaged dependency leakage.
+
+The first export exposed missing checkpoint dependencies:
+- indicator_follow_validation_regular_market.py;
+- MO1 timeframe support;
+- ValidationHistoricalSnapshot market provenance.
+
+Those dependencies and tests were added before commit.
+
+Final evidence:
+- 381 focused tests PASS in isolated Python32 processes;
+- staged production py_compile PASS;
+- git diff --cached --check PASS.
+
+Known pre-existing unrelated Situation Response round-trip failure remains outside
+this checkpoint.
+
+G. GIT
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Commit:
+caa271f85f0a37d26895d2d890b025939ec4bf70
+
+Push:
+successful; local HEAD equals origin branch HEAD.
+
+36 task-boundary files committed.
+
+H. PROTECTED WIP
+
+Post-push code status:
+170 porcelain entries
+SHA256:
+a936b309d4e889434938fc140f4e1d6b3119a5cab15a3f9c56976da6382e5153
+
+Large kiwoom_api period/NXT/Realtime/SOR work, runtime/user data, stock folders,
+other Main/chart work, and unrelated tests remain protected local WIP.
+
+I. DOCUMENT AUTHORITY
+
+New Canonical:
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_SIGNAL_VALIDATION_CHART_AVERAGING_CLOSURE.txt
+
+New Work Resume:
+00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-22_SIGNAL_VALIDATION_CHART_AVERAGING_CLOSURE.txt
+
+This supplement supersedes conflicting/incomplete wording only for the committed
+Signal Validation chart/history/averaging scope.
