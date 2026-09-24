@@ -1053,6 +1053,16 @@ or repeated full-project document audit.
 
 Conversation Shutdown is Project Freeze, not casual summarization.
 
+Context Capacity Early Closing Proposal Rule:
+- The AI must continuously consider whether the current conversation is becoming too large to preserve safe project continuity through the next meaningful work boundary.
+- Do not claim an exact context-window usage percentage, remaining-token count, or precise limit unless the active environment actually exposes that measurement.
+- Use practical warning signs such as accumulated long logs, code, Codex/agent reports, repeated design decisions, large attached material, and increasing dependence on compressed prior context.
+- When continued work creates a material risk of reaching the conversation context limit before a safe handoff, proactively tell the user and propose starting the regular Conversation Closing Standard Procedure before the limit is reached.
+- This is a proposal only. Context pressure does not authorize automatic Project Freeze, Git work, documentation work, or creation of a Next Session Startup Prompt.
+- Do not start the regular Closing procedure until the user explicitly approves closing, moving to a new conversation/window, or equivalent.
+- When practical, make the proposal at a safe implementation/test boundary. If waiting for that boundary itself creates a material context-loss risk, propose Closing immediately and report the current unfinished state accurately.
+- Every final Next Session Startup Prompt must carry this same proactive early-closing proposal rule so the next conversation inherits it.
+
 Shutdown triggers:
 - User says the work is ending
 - User says to move to the next conversation or next window
@@ -1243,6 +1253,32 @@ verify in this order:
 Do not invent the next task or role from inference.
 
 The final prompt must include:
+- The following independent Context Capacity Early Closing Proposal block. It must be
+  reproduced explicitly in every final Next Session Startup Prompt so the next
+  conversation proactively proposes regular Closing before context continuity is at risk:
+
+```text
+==================================================
+Context Capacity Early Closing Proposal
+==================================================
+- Continuously consider whether accumulated conversation, logs, code, files,
+  agent/Codex reports, and prior decisions are approaching a level where safe
+  continuity through the next meaningful work boundary may be lost.
+- Do not claim an exact context usage percentage, remaining-token count, or
+  precise limit unless the active environment actually exposes it.
+- Before the conversation context limit is reached, proactively tell the user
+  when there is a material continuity risk and propose starting the regular
+  Conversation Closing Standard Procedure.
+- This is a proposal only. Do not automatically Freeze, perform Git/document
+  closing work, or create a Next Session Startup Prompt because of context pressure.
+- Start regular Closing only after the user explicitly approves closing, moving
+  to a new conversation/window, or equivalent.
+- Prefer proposing at a safe implementation/test boundary. If waiting itself
+  risks losing context, propose immediately and preserve the unfinished state
+  accurately in the approved Closing procedure.
+==================================================
+```
+
 - The following independent Mandatory Development Workflow block. It must be
   reproduced explicitly whenever the next-session role is Integrated Development
   Orchestrator, and it must not be replaced by a reference to this file:
@@ -1359,7 +1395,22 @@ NO
 
 Every final Next Session Startup Prompt must include this verified Development
 Environment block. Fill it from the actual Closing state; use `Must Verify`
-instead of guessing any value:
+instead of guessing any value.
+
+Codex availability must be resolved by executable reachability, not by PATH alone:
+- A failed `Get-Command codex` or bare `codex` lookup does not prove Codex is
+  unavailable.
+- When Desktop Commander is available, resolve the actual local `codex.exe`
+  from the current OpenAI Codex app installation and/or current VS Code OpenAI
+  extension path, then verify the executable with `--version` and verify login
+  state when authentication matters.
+- If a working executable is found and can be launched through Desktop Commander,
+  record `Codex CLI: Available` even when `codex` is not registered in PATH.
+- Record `Codex CLI: Not Available` only when no runnable local Codex executable
+  can be resolved/launched. Authentication, quota, or another execution blocker
+  must be recorded separately and must not be mislabeled as CLI unavailability.
+- Direct ChatGPT Web invocation not being available is a routing constraint, not
+  a Codex availability failure; use the Codex CLI Invocation Path below.
 
 ```text
 ==================================================
@@ -1375,6 +1426,7 @@ Development Environment
 - Codex CLI: <Available / Not Available / Must Verify>
 - Codex CLI Executable: <verified path / Must Verify>
 - Codex Authentication: <verified state / Must Verify>
+- Codex Execution State: <Ready / Quota Blocked / Auth Blocked / Environment Blocked / Must Verify>
 - Codex Model / Reasoning: <verified current setting / Must Verify>
 - Durable Worker: <VERIFIED_AVAILABLE / Not Available / Must Verify>
 - Durable Worker Root: <verified path / Must Verify>
@@ -1419,6 +1471,61 @@ Tool Routing:
   tiny commit cycles, or extra spec/plan files by default. This does not prohibit
   the explicit ChatGPT Web + Desktop Commander + local Codex CLI hybrid policy
   defined above.
+==================================================
+```
+
+Every final Next Session Startup Prompt must also reproduce this independent
+Local Execution Authority And Codex Recovery block. This block exists so a new
+conversation does not mistake a missing PATH registration for missing local
+execution authority or unavailable Codex:
+
+```text
+==================================================
+Local Execution Authority And Codex Recovery
+==================================================
+- When Desktop Commander is connected and verified, ChatGPT Web is authorized
+  to use it as the local execution bridge to the user's connected Windows PC.
+- Through Desktop Commander, ChatGPT Web may inspect authorized local project
+  files/state and run the PowerShell, Git, approved Python runtime, focused
+  tests, process inspection, Runtime/Log/cache checks, and other local
+  verification required by the approved task.
+- Desktop Commander is also the authorized bridge for launching the user's
+  local Codex CLI. A separate direct ChatGPT Web -> Codex tool is not required.
+- If the user explicitly says `Codex로 진행`, `코덱스로 진행`, or otherwise
+  assigns implementation to Codex, treat that as an instruction to launch and
+  manage the local Codex CLI through Desktop Commander when the verified local
+  route is available. Do not merely write a Codex prompt and hand execution
+  back to the user unless the user explicitly asks for a manual prompt or local
+  Codex launch is actually blocked.
+- A failed bare `codex`, `where codex`, or `Get-Command codex` lookup does NOT
+  prove Codex is unavailable. PATH registration is optional.
+- If the short command is missing, resolve a runnable Codex executable using
+  current local evidence. Check, as applicable:
+  1. an already running `codex` process and its executable Path;
+  2. the current OpenAI Codex Windows app installation under
+     `%LOCALAPPDATA%\\OpenAI\\Codex\\bin\\*\\codex.exe`;
+  3. current npm/npx cache installations such as
+     `%LOCALAPPDATA%\\npm-cache\\_npx\\*\\node_modules\\.bin\\codex.cmd`
+     and the corresponding `@openai/codex` package;
+  4. the current OpenAI/ChatGPT VS Code extension installation and its bundled
+     Codex executable when present;
+  5. normal PATH/command discovery as supplemental evidence, not the sole test.
+- Verify a discovered candidate with `--version` before treating it as the
+  active CLI. Record the actually resolved executable path and version in the
+  Development Environment block. Do not permanently trust an old hash/version
+  path because app, extension, or npx-cache locations may change after updates.
+- If multiple runnable candidates exist, prefer the currently verified stable
+  CLI appropriate for the task; record which executable was selected instead
+  of silently assuming one.
+- Authentication, quota exhaustion, sandbox limitations, or another execution
+  blocker are separate states. Do not misreport them as `Codex CLI: Not
+  Available` when the executable itself is reachable.
+- If local Codex launch fails, report the concrete blocker and only then apply
+  the workflow's approved fallback. Do not infer unavailability from one failed
+  lookup method.
+- ChatGPT Web + Desktop Commander remains the independent Verification Owner
+  after Codex implementation and must inspect the actual diff/result and run
+  applicable local verification.
 ==================================================
 ```
 

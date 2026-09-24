@@ -63,9 +63,11 @@ with whole-share buys 1 -> 1 -> 1 -> 2.
 uses the fixed first-round budget and confirmed-round formula, not budget
 compounding.
 
-능동매수:
-preserves all direction/comparator choices in settings. Runtime may no-order when
-a user-selected combination cannot be satisfied mathematically.
+능동매수 (2026-09-23 amendment):
+uses fixed 신호가(SIGNAL_PRICE) against confirmed 평단가(AVG_PRICE) as a
+corrective policy. 상향/하향 allow only 이하(<=); 상하 allows only 이내
+(WITHIN). 이상/이탈 are non-corrective and are not Active-Buy actions. The
+projected average must remain between the previous average and signal price.
 
 5. APPLY-BACK BOUNDARY
 

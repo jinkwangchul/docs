@@ -1,0 +1,172 @@
+Signal Validation Price / Visual / MRU Closure
+Date: 2026-09-24
+Type: Conversation Closing / multi-window consolidation / checkpoint
+Code checkpoint: 1b33dd959704846ff11e60e3b3253ee215ec058d
+
+A. WINDOW CONSOLIDATION
+
+This close-out retroactively includes the immediately previous automatic-trading
+conversation that ended without regular Conversation Closing, plus the current
+conversation that completed the same workstream.
+
+The 2026-09-22 Signal Validation chart/averaging checkpoint remains the prior
+recovery baseline. Protected unrelated WIP is not absorbed.
+
+B. PRICE CONTRACT NORMALIZATION
+
+Completed:
+- strategy comparison axes fixed to CURRENT_PRICE / SIGNAL_PRICE / AVG_PRICE;
+- ORDER_PRICE retired as a new strategy comparison axis;
+- explicit legacy 주문가 / ORDER_PRICE read compatibility maps to SIGNAL_PRICE
+  only in approved price-source fields;
+- actual order/fill price remains execution-domain evidence;
+- Validation filter/evaluated BUY/SELL price uses Candle CLOSE;
+- earlier OHLC/4 Validation virtual-fill convention is superseded.
+
+ACTIVE_BUY normalized to corrective behavior:
+- UP/DOWN -> 이하(<=) only;
+- BOTH -> 이내(WITHIN) only;
+- 이상(>=) and 이탈(OUTSIDE) -> no-buy;
+- projected average cannot cross SIGNAL_PRICE.
+
+C. CHART / OPERATOR PRESENTATION
+
+Completed-cycle table normalized to:
+회차 / 매수구간 / 매수횟수 / 매수총액 / 평단 / 매도시각 / 매도가 / 손익 / 수익률.
+
+Completed-cycle row selection now highlights the matching average-price chart
+line/label, and outside click clears that selection.
+
+Lower-indicator display normalization:
+- MACD and SIGNAL lines share the oscillator pane with OCR;
+- OCR remains histogram;
+- MACD/SIGNAL evaluation semantics remain separate from OCR;
+- MACD-family visualization always projects both MACD and SIGNAL.
+
+Internal lower-pane boundaries are draggable while total canvas size stays fixed.
+Reset restores entry pane heights. Lower criterion lines show source side and
+configured value, with same-value BUY/SELL labels merged when applicable.
+
+D. RECENT-STOCK MRU
+
+Recent-stock history is newest-first and capped at 20 entries.
+
+The upper current stock is omitted only from the lower display, not removed from
+MRU/cache.
+
+Lower-item contract:
+X 종목코드 종목명
+
+- stock text -> current-stock replacement;
+- X -> immediate exact deletion;
+- no confirmation/message/toast.
+
+Width shortage no longer removes MRU entries. Overflow uses ◁ / ▷ complete-item
+navigation. Navigation does not mutate QSettings, MRU order, or cache.
+
+The 21st genuinely new MRU entry silently evicts the oldest entry.
+
+E. DELETE / CACHE INVALIDATION
+
+Manual X deletion and automatic oldest eviction purge:
+- persistent Validation candles;
+- settings-hash signal cache;
+- shared/window historical pools;
+- related Validation session/history-extension/last-run memory.
+
+A persistent stock-level cache-state generation was added so a physical unlink
+failure cannot resurrect stale cache after process restart:
+- INVALIDATED is persisted before unlink;
+- stale payload generation is rejected by all load paths;
+- fresh broker store is verified before state becomes ACTIVE;
+- stale sibling artifacts remain blocked.
+
+F. CHECKPOINT BOUNDARY AUDIT
+
+The dirty code repository contained 157 changed tracked files before closing.
+
+Read-only classification produced:
+- 43 whole-file task paths;
+- 13 mixed paths requiring patch staging;
+- 101 protected tracked paths.
+
+A dedicated partial staging patch was validated with git apply --cached --check.
+Mixed-file staged content was checked to exclude range-replay, trading-cost,
+calendar-day, simultaneous/positionless BUY/SELL, and other protected work.
+
+The intended Git index was exported to an independent temporary directory and
+tested there so unstaged WIP could not satisfy missing dependencies.
+
+The staged audit caught and corrected:
+- one Evidence-label test expectation belonging to protected Evidence WIP;
+- completed-cycle/MACD-pane/pane-resize tests that shared a diff hunk with a
+  protected calendar-day test.
+
+G. VERIFICATION
+
+Fresh staged-snapshot evidence:
+- 457 tests PASS across 13 price/execution/compatibility/cache modules;
+- visualization 13/13 PASS;
+- axis/completed-cycle/pane 20/20 PASS;
+- isolated operator/V2/recent-stock 19/19 PASS;
+- total focused PASS: 509;
+- 55 changed Python files py_compile PASS;
+- commit diff-check PASS;
+- final focused Qt native-abnormal count: 0.
+
+H. GIT
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Commit:
+1b33dd959704846ff11e60e3b3253ee215ec058d
+
+Push:
+successful.
+
+Verification:
+local HEAD == origin/feat/restore-auto-trade-setting-ui.
+
+56 task-boundary paths committed.
+
+No PR was created.
+
+I. PROTECTED WIP
+
+Post-push code status:
+180 porcelain entries
+
+Status SHA256:
+1d3e260b457bf33e3eef6c480e8d10f15498736d9be0d80e6fae6f5a8841a6c9
+
+Protected work includes:
+- range replay;
+- Validation trading-cost UI/presentation;
+- calendar-day boundary rendering;
+- positionless/simultaneous BUY/SELL behavior;
+- expanded Evidence criterion/prose presentation;
+- broader Main/Mock/live MarketData/SOR work;
+- runtime/stock/routine-instance/report/cache/screenshot/user-data artifacts.
+
+Do not reset/restore/stash/clean or broad-stage this state.
+
+J. WORKFLOW MANUAL
+
+The Closing also carries the approved Workflow Reference reinforcement:
+- proactive context-capacity early-closing proposal rule;
+- Codex availability determined by runnable executable, not PATH alone;
+- Desktop Commander as the authorized local execution bridge;
+- user instruction to use Codex means launch/manage local Codex through DC when
+  available rather than merely handing the user a prompt.
+
+K. DOCUMENT AUTHORITY
+
+New Canonical:
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-24_SIGNAL_VALIDATION_PRICE_VISUAL_MRU_CLOSURE.txt
+
+New Work Resume:
+00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-24_SIGNAL_VALIDATION_PRICE_VISUAL_MRU_CLOSURE.txt
+
+This 2026-09-24 closure supersedes only conflicting/incomplete wording inside the
+price-axis, chart-presentation, recent-stock MRU, and deleted-cache reuse scope.

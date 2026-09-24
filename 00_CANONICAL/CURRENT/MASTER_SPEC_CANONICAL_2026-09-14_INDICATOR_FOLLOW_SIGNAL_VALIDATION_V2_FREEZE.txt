@@ -319,9 +319,9 @@ output remains byte-equivalent to the former deep-recreation reference.
 For the default evaluator, one context-independent base indicator series is
 built per eligible Historical prefix and reused for SELL then BUY evaluation.
 Each side receives its own shallow mapping view before context enrichment, so
-AVG_PRICE/ORDER_PRICE additions do not mutate the shared base mapping or leak
-between sides. The underlying MACD, RSI, moving-average, Bollinger, and Price
-Box lists remain read-only in this path.
+AVG_PRICE/SIGNAL_PRICE additions (and legacy ORDER_PRICE compatibility data) do
+not mutate the shared base mapping or leak between sides. The underlying MACD,
+RSI, moving-average, Bollinger, and Price Box lists remain read-only in this path.
 
 Custom evaluators keep their existing API and call order. No whole-series
 future lookup, incremental indicator formula, worker, timer batch, or event-loop

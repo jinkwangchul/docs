@@ -1,0 +1,251 @@
+1. RECOVERY BASELINE
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Branch: feat/restore-auto-trade-setting-ui
+Checkpoint: 1b33dd959704846ff11e60e3b3253ee215ec058d
+Remote: origin/feat/restore-auto-trade-setting-ui
+Close verification: local HEAD == remote HEAD
+
+Documentation repository:
+C:\Users\JIN KWANG CHUL\Documents\docs
+Branch: agent/project-prompt-standard
+Docs checkpoint is recorded by the final close report after this document set is
+committed and pushed.
+
+Procedural authority:
+00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+
+Current functional authority:
+00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-24_SIGNAL_VALIDATION_PRICE_VISUAL_MRU_CLOSURE.txt
+
+2. WHY THIS RESUME EXISTS
+
+The immediately previous automatic-trading conversation ended without the regular
+Conversation Closing procedure. The current conversation completed the same
+Signal Validation workstream and the user explicitly directed one combined close.
+
+This resume therefore consolidates the verified repository state rather than
+treating chat-window boundaries as product boundaries.
+
+The 2026-09-22 Signal Validation chart/averaging checkpoint remains the recovery
+baseline immediately before this work.
+
+3. COMPLETED PRICE CONTRACT
+
+Strategy comparison axes are:
+CURRENT_PRICE / SIGNAL_PRICE / AVG_PRICE.
+
+ORDER_PRICE is retired as a strategy comparison axis. Legacy 주문가/ORDER_PRICE
+is read-compatible only through the narrow price-source compatibility mapping.
+Actual order/fill prices remain execution evidence.
+
+Validation filter comparison and estimated BUY/SELL execution use the evaluated
+Candle CLOSE.
+
+ACTIVE_BUY is corrective-only:
+- UP/DOWN: only 이하(<=) actionable;
+- BOTH: only 이내(WITHIN) actionable;
+- 이상(>=) / 이탈(OUTSIDE): no-buy;
+- projected weighted average must stay between the previous AVG_PRICE and
+  SIGNAL_PRICE and may not cross SIGNAL_PRICE.
+
+4. COMPLETED CHART / OPERATOR STATE
+
+Completed-cycle table columns:
+회차 / 매수구간 / 매수횟수 / 매수총액 / 평단 / 매도시각 / 매도가 / 손익 / 수익률.
+
+Selecting a completed-cycle row highlights the matching chart average-price line
+and label. Clicking elsewhere clears the selection.
+
+Lower-indicator presentation:
+- MACD and SIGNAL lines share the oscillator display pane with OCR;
+- OCR remains histogram;
+- MACD/SIGNAL evaluation families remain semantically separate from OCR;
+- MACD-family visualization always projects both MACD and SIGNAL lines;
+- configured lower reference lines show side + configured value;
+- same-value BUY/SELL labels may be combined;
+- structural zero remains plain 0 unless owned by a BUY/SELL criterion.
+
+Chart pane interaction:
+- total canvas height remains fixed;
+- internal horizontal boundaries are draggable;
+- lower pane minimum heights prevent collapse;
+- price min/max are preserved while pixel height changes;
+- Reset restores entry-time pane heights and chart view.
+
+5. RECENT-STOCK HISTORY CONTRACT
+
+Recent-stock MRU:
+- newest-first;
+- maximum 20 entries;
+- 21st new entry silently evicts the oldest.
+
+The upper current stock remains in the MRU but is omitted only from the lower
+recent-stock display. Changing the current stock lets the previous current stock
+reappear below without reload if its MRU/cache entry still exists.
+
+Lower item:
+X 종목코드 종목명
+
+Behavior:
+- stock text click -> upper current-stock replacement;
+- X -> exact immediate delete;
+- no confirmation/message/toast;
+- width shortage never deletes MRU state;
+- ◁/▷ appears only on overflow and moves by complete stock item;
+- navigation does not write QSettings, reorder MRU, or delete cache.
+
+6. CACHE DELETE / RELOAD CONTRACT
+
+Manual X deletion and 21st-entry eviction purge the stock's Validation-owned:
+- persistent candles;
+- settings-hash signal cache;
+- shared/window historical pools;
+- related session/history-extension/last-run memory.
+
+A persistent cache-state generation prevents stale reuse when physical deletion
+fails:
+- INVALIDATED is persisted before unlink;
+- stale loads fail closed after restart;
+- fresh broker history must be stored and verified before ACTIVE is restored;
+- stale sibling count/timeframe and old signal-hash artifacts remain blocked.
+
+Result:
+a deleted stock is reloaded from broker when registered again rather than being
+revived from a stale locked file.
+
+7. VERIFICATION EVIDENCE
+
+The final Git index was exported into:
+C:\Users\JIN KWANG CHUL\Documents\_closing_verify_kiwoom_20260924
+
+This export represented the actual intended commit rather than the larger dirty
+working tree.
+
+Recorded final evidence:
+- 457 tests PASS across 13 price/execution/compatibility/cache modules;
+- Signal Validation visualization: 13/13 PASS;
+- axis/completed-cycle/pane module: 20/20 PASS;
+- isolated operator/V2/recent-stock focused tests: 19/19 PASS;
+- total focused PASS: 509;
+- changed Python files compiled: 55, errors 0;
+- commit diff-check PASS;
+- final focused Qt abnormal/native termination count: 0.
+
+The staged audit also caught and corrected staging-boundary leakage before commit.
+
+8. CODE CHECKPOINT
+
+Commit:
+1b33dd959704846ff11e60e3b3253ee215ec058d
+
+Push:
+successful to origin/feat/restore-auto-trade-setting-ui.
+
+Verification:
+local HEAD == origin/feat/restore-auto-trade-setting-ui.
+
+Committed task-boundary paths:
+56.
+
+9. PROTECTED WIP
+
+The code repository intentionally remains dirty.
+
+Post-push porcelain entries:
+180
+
+Status SHA256:
+1d3e260b457bf33e3eef6c480e8d10f15498736d9be0d80e6fae6f5a8841a6c9
+
+Important protected work includes:
+- Signal Validation range replay;
+- trading-cost UI/presentation;
+- calendar-day boundary rendering;
+- positionless/simultaneous BUY/SELL handling;
+- expanded Evidence criterion/prose work;
+- broader live MarketData/SOR/Main/Mock work;
+- runtime/stock/routine-instance/report/cache/screenshot/user-data artifacts.
+
+Several tracked Signal Validation files therefore remain modified after the
+checkpoint. This is intentional and must not be interpreted as a failed commit.
+
+Never run reset/restore/stash/clean or broad add against this state.
+
+10. DEVELOPMENT ENVIRONMENT
+
+Desktop Commander:
+Available and verified on connected Windows device KWANGS-LP.
+
+Automatic-trading Python:
+C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+Python 3.11.9 32-bit
+PyQt5 5.15.11 / Qt 5.15.2
+
+Codex CLI:
+Available through Desktop Commander.
+Verified current executable:
+C:\Users\JIN KWANG CHUL\AppData\Local\npm-cache\_npx\c8ab89660c602c20\node_modules\.bin\codex.cmd
+Verified version: codex-cli 0.156.1
+
+A Codex Windows-app embedded CLI was also detected. Its hashed install path is not
+a permanent contract and must be resolved again when needed.
+
+Bare PATH lookup may fail even when Codex is available. Follow the Workflow
+Reference executable-recovery rule instead of declaring Codex unavailable.
+
+Observed Codex execution for this close:
+model gpt-5.6-sol
+reasoning effort medium
+
+Superpowers:
+Available in Codex and used as a quality-gate layer.
+
+ChatGPT Work:
+Do not use unless the user explicitly reverses that restriction.
+
+11. WORKFLOW MANUAL UPDATE
+
+The Workflow Reference was reinforced so every final Startup Prompt carries:
+- proactive Context Capacity Early Closing proposal behavior;
+- executable-based Codex availability resolution rather than PATH-only lookup;
+- explicit ChatGPT Web -> Desktop Commander -> local Codex execution authority;
+- the rule that a user instruction such as 코덱스로 진행 means to launch/manage
+  local Codex through DC when that route is available, rather than merely handing
+  the user a prompt.
+
+12. OPEN / EXCLUDED
+
+Not included in the 1b33dd9 checkpoint:
+- range-replay historical-prefix work;
+- Validation trading-cost UI/presentation;
+- calendar-day chart boundary work;
+- positionless/simultaneous BUY/SELL behavior;
+- expanded Evidence criterion/prose presentation;
+- broader live SOR/MarketData/Main/Mock WIP;
+- runtime/user-data changes.
+
+No full monolithic suite was used as closure evidence. The recorded evidence is
+the scoped staged-snapshot verification above.
+
+No PR was created.
+
+13. NEXT SESSION
+
+No next Big Feature was selected during closing.
+
+Next task:
+Must Confirm.
+
+Next role:
+Must Confirm.
+
+The next session must not infer a feature merely from protected WIP.
+
+Recovery read order:
+1. 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+2. 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-24_SIGNAL_VALIDATION_PRICE_VISUAL_MRU_CLOSURE.txt
+3. this Work Resume
+4. 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-24_SIGNAL_VALIDATION_PRICE_VISUAL_MRU_CLOSURE.txt
+5. 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md

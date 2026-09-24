@@ -86,9 +86,10 @@ Legacy labels 회차증가 and 금액증가 remain accepted only as compatibilit
 
 5.1 First buy
 
-The Validation starting budget is expressed as a whole-share quantity. Virtual
-fills use the approved Validation representative fill price and update weighted
-average price, cumulative quantity, cycle cost, and completed-cycle return.
+The Validation starting budget is expressed as a whole-share quantity. Validation
+estimated BUY/SELL fills use the same completed-Candle CLOSE used by signal/filter
+evaluation and update weighted average price, cumulative quantity, cycle cost, and
+completed-cycle return.
 
 5.2 회차기준
 
@@ -115,17 +116,30 @@ The following round compounds from 21,970, not from the 20,000 actually spent.
 
 5.4 능동매수
 
-ACTIVE_BUY compares the confirmed weighted average position with a reference price
-and computes the minimum whole-share purchase needed for the selected target where
-that target is mathematically actionable.
+2026-09-23 amendment:
 
-User setting freedom is preserved:
-- directions: 상향, 하향, 상하
-- comparators: 이상, 이하, 이내, 이탈
+ACTIVE_BUY is a corrective signal-price/average-price policy. The fixed reference
+is SIGNAL_PRICE, captured at the BUY signal point. AVG_PRICE is the confirmed
+position weighted average and changes only through confirmed fills.
 
-The registration/change UI does not silently rewrite an intentionally unusual
-direction/comparator combination. Runtime policy evaluation may produce no order
-when the chosen combination is not actionable.
+The allowed corrective grammar is:
+- 상향(UP): 평단가 is above 신호가; only 이하(<=) is actionable.
+- 하향(DOWN): 평단가 is below 신호가; only 이하(<=) is actionable.
+- 상하(BOTH): either side may be corrected; only 이내(WITHIN) is actionable.
+- 이상(>=) and 이탈(OUTSIDE) are not Active-Buy actions because a BUY must not
+  manufacture or enlarge the configured gap.
+
+The minimum whole-share quantity is calculated from the actionable acquisition
+price, but the projected weighted average must remain between the pre-buy average
+and SIGNAL_PRICE. A projected average that would cross SIGNAL_PRICE is no-order.
+
+Production strategy price-comparison axes are CURRENT_PRICE, SIGNAL_PRICE, and
+AVG_PRICE. CURRENT_PRICE is live and may trigger an immediate state transition as
+the market moves. SIGNAL_PRICE is fixed for the source signal. AVG_PRICE changes
+only as confirmed fills change the position. Legacy strategy UI label 주문가 is
+read-compatible as SIGNAL_PRICE, but new strategy comparison rules are written as
+SIGNAL_PRICE. Actual order/fill prices remain execution evidence, not a fourth
+strategy comparison axis.
 
 6. APPLY-BACK BOUNDARY
 

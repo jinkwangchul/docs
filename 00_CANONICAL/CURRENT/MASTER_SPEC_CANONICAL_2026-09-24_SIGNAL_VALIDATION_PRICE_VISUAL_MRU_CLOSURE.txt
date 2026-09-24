@@ -1,0 +1,274 @@
+Status: FREEZE / CLOSURE SUPPLEMENT
+Date: 2026-09-24
+Code branch: feat/restore-auto-trade-setting-ui
+Code checkpoint: 1b33dd959704846ff11e60e3b3253ee215ec058d
+Code remote verification: local HEAD == origin/feat/restore-auto-trade-setting-ui
+
+1. AUTHORITY AND SCOPE
+
+This document is the current supplemental owner for the Signal Validation and
+Indicator-follow work completed after the 2026-09-22 chart/averaging closure and
+closed across the immediately previous unclosed conversation plus the current
+conversation.
+
+It owns only:
+- strategy price-axis normalization completed on 2026-09-23;
+- the completed-cycle and lower-indicator chart presentation work closed here;
+- recent-stock MRU/history lifecycle and cache invalidation closed here.
+
+Earlier CURRENT owners remain authoritative outside the scope explicitly
+superseded below. Protected local WIP is not absorbed by this closure.
+
+2. STRATEGY PRICE AXES
+
+Strategy price comparison has exactly three semantic axes:
+- CURRENT_PRICE / 현재가: live moving market price used for immediate comparison;
+- SIGNAL_PRICE / 신호가: fixed reference captured from the source signal;
+- AVG_PRICE / 평단가: confirmed position weighted average changed only by fills.
+
+ORDER_PRICE is not a fourth strategy comparison axis.
+
+Legacy strategy UI values 주문가 and ORDER_PRICE remain read-compatible only in
+the explicit price-source fields covered by compatibility normalization. New
+strategy rules are written as SIGNAL_PRICE.
+
+Actual order price, fill price, hoga selection, and execution evidence remain
+execution-domain values. They do not become strategy comparison operands.
+
+3. VALIDATION CANDLE PRICE CONTRACT
+
+Signal Validation filter evaluation and Validation estimated BUY/SELL execution
+use the Candle CLOSE belonging to the evaluated candle.
+
+This supersedes the earlier OHLC/4 Validation virtual-fill convention.
+
+The chart/replay market-data identity, incomplete-query-snapshot semantics, and
+Production realtime price authority remain governed by their existing owners.
+This closure changes only the Validation comparison/fill price contract.
+
+4. ACTIVE_BUY CORRECTIVE CONTRACT
+
+ACTIVE_BUY is corrective-only.
+
+Let:
+- S = fixed SIGNAL_PRICE for the BUY signal;
+- A = confirmed pre-buy AVG_PRICE;
+- A' = projected post-buy weighted average.
+
+Allowed geometry:
+- if S < A: S <= A' < A;
+- if A < S: A < A' <= S.
+
+A BUY may move the average toward SIGNAL_PRICE but must never cross it.
+
+Actionable grammar:
+- UP / 상향: only <= / 이하;
+- DOWN / 하향: only <= / 이하;
+- BOTH / 상하: only WITHIN / 이내.
+
+Non-actionable:
+- UP or DOWN with >= / 이상;
+- BOTH with OUTSIDE / 이탈.
+
+If whole-share rounding would make A' cross SIGNAL_PRICE, the result is no-order.
+
+5. COMPLETED-CYCLE TABLE AND CHART LINK
+
+The completed-cycle table columns are fixed as:
+회차, 매수구간, 매수횟수, 매수총액, 평단, 매도시각, 매도가, 손익, 수익률.
+
+The table uses Validation virtual-execution quantities/costs and completed-cycle
+data. Row selection selects the corresponding completed cycle and highlights its
+chart average-price dashed line and attached label. Clicking elsewhere clears the
+cycle selection/highlight.
+
+This selection is presentation state only and does not mutate replay, rules, or
+Production execution state.
+
+6. LOWER-INDICATOR DISPLAY PROJECTION
+
+MACD-line evaluation and OCR evaluation remain separate internal families.
+
+Display projection merges MACD/SIGNAL into the oscillator pane used together with
+OCR:
+- OCR remains a histogram;
+- MACD remains a line;
+- SIGNAL remains a line;
+- when a MACD-family condition is visualized, both MACD and SIGNAL lines are
+  projected even if only one channel participates in the condition.
+
+This is display normalization only. It does not merge evaluation semantics.
+
+7. LOWER-PANE GEOMETRY
+
+The overall chart canvas height remains fixed.
+
+Internal horizontal boundaries are operator-draggable:
+- price/candle area <-> first lower pane;
+- adjacent lower panes such as RSI <-> oscillator.
+
+Dragging redistributes pixel height while preserving the price min/max contract.
+Minimum pane heights prevent collapse. Reset restores the entry-time lower-pane
+heights together with the existing entry chart view state.
+
+No separate Y-scale policy is created by this feature.
+
+8. LOWER REFERENCE-LINE LABELS
+
+Configured lower-indicator criterion/reference lines show their source side and
+actual configured value on the fixed axis.
+
+Examples:
+- 매수 30
+- 매도 50
+- 매수 -100
+
+If BUY and SELL own the same numeric reference, one line may display the combined
+label, for example:
+매수 30 / 매도 30
+
+The structural oscillator zero line is displayed as 0 when it has no condition
+owner. If a BUY/SELL condition owns that zero reference, the side label is used.
+
+Labels follow their line when lower-pane geometry changes.
+
+9. RECENT-STOCK MRU CONTRACT
+
+Signal Validation recent-stock history stores at most 20 stocks in newest-first
+MRU order.
+
+The upper current stock may remain in the MRU but is omitted only from the lower
+recent-stock display. Therefore the same stock is not shown simultaneously as the
+current stock and as an X-delete target.
+
+When the current stock changes, the former current stock may reappear in the lower
+history without re-registration because it was not deleted.
+
+Lower item contract:
+X 종목코드 종목명
+
+- clicking 종목코드/종목명 activates that stock as the upper current stock;
+- clicking X immediately deletes that exact stock;
+- X does not perform stock activation.
+
+No confirmation dialog, message box, or toast is used for recent-stock deletion.
+
+10. MRU CAP AND NAVIGATION
+
+If a genuinely new selection would create a 21st MRU entry:
+- the oldest entry is removed;
+- the MRU remains at 20;
+- the removed stock enters the same cache/memory purge lifecycle as manual X
+  deletion;
+- no user message is emitted.
+
+Viewport width is not a deletion condition.
+
+When all displayable recent stocks fit, navigation arrows are hidden.
+When they do not fit, ◁ / ▷ navigate by complete stock item. Navigation:
+- does not change QSettings;
+- does not change MRU order;
+- does not delete cache;
+- does not split a stock item.
+
+The current upper stock counts toward the 20-entry MRU limit even though it is
+hidden from the lower display.
+
+11. DELETION AND CACHE PURGE
+
+Manual X deletion and automatic oldest eviction purge the removed stock's
+Validation-owned state:
+- QSettings recent-stock membership;
+- persistent candle history;
+- settings-hash signal entries stored with that history;
+- shared historical pool;
+- window historical pool;
+- related Validation session/history-extension/last-run memory state.
+
+Deletion is immediate and silent.
+
+12. PERSISTENT FAIL-CLOSED INVALIDATION
+
+Physical file deletion failure must not make a deleted stock reusable from stale
+Validation cache.
+
+The historical-cache owner therefore records a stock-level persistent cache-state
+generation before physical deletion:
+- delete begins by atomically recording INVALIDATED with a new generation;
+- load(), load_covering(), and load_signal_entries() reject stale payloads while
+  state is INVALIDATED or the payload generation does not match;
+- this survives process restart because the invalidation state is persistent;
+- a file left behind by Windows file locking is therefore not reusable.
+
+A fresh broker history store:
+- writes and verifies a payload bound to the current generation;
+- only after successful persistence changes the state to ACTIVE;
+- allows the fresh generation to be reused normally.
+
+Older sibling count/timeframe artifacts and old settings-hash signal entries that
+do not match the active generation remain blocked.
+
+13. VERIFICATION
+
+The final Git index was exported to an independent temporary directory so
+unstaged protected WIP could not satisfy staged dependencies.
+
+Fresh staged-snapshot evidence:
+- 457 tests PASS across 13 price/execution/compatibility/cache modules;
+- 13/13 Signal Validation visualization tests PASS;
+- 20/20 axis/completed-cycle/pane tests PASS;
+- 19/19 isolated operator/V2/recent-stock focused tests PASS;
+- total recorded focused passing tests: 509;
+- 55 changed Python files py_compile PASS;
+- commit diff check PASS.
+
+The staged-snapshot audit found and corrected two staging-boundary issues before
+commit:
+- one Evidence-label expectation that belonged to protected Evidence WIP was
+  excluded from this checkpoint;
+- completed-cycle/MACD-pane/pane-resize tests were restored without the protected
+  calendar-day test that shared their working-tree diff hunk.
+
+No Qt native 0xC0000409 termination occurred in the recorded final focused batch.
+
+14. CODE CHECKPOINT
+
+Commit:
+1b33dd959704846ff11e60e3b3253ee215ec058d
+
+Push:
+successful to origin/feat/restore-auto-trade-setting-ui.
+
+Local and remote branch HEAD equality was verified after push.
+
+56 task-boundary paths entered this checkpoint.
+
+15. PROTECTED LOCAL WIP
+
+The code repository intentionally remains dirty after the checkpoint.
+
+Post-push porcelain entries:
+180
+
+Post-push status-list SHA256:
+1d3e260b457bf33e3eef6c480e8d10f15498736d9be0d80e6fae6f5a8841a6c9
+
+Protected state includes, among other work:
+- Signal Validation range-replay work;
+- Validation trading-cost UI/presentation work;
+- calendar-day boundary rendering;
+- positionless/simultaneous BUY/SELL behavior;
+- expanded Evidence criterion/prose presentation;
+- broader Main/Mock/live-broker/SOR work;
+- runtime, stock, routine-instance, report, screenshot, cache, and user-data
+  artifacts.
+
+Do not clean, reset, restore, stash, or broad-stage this state.
+
+16. COMPLETION JUDGMENT
+
+The price-axis, completed-cycle/lower-pane visualization, recent-stock MRU, and
+persistent delete-invalidation unit is closed at
+1b33dd959704846ff11e60e3b3253ee215ec058d.
+
+No next Big Feature is selected by this document.
