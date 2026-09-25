@@ -1,0 +1,156 @@
+1. RECOVERY BASELINE
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Code checkpoint:
+a9552b840784cc9cccb90386453496248d3c766b
+
+Remote:
+origin/feat/restore-auto-trade-setting-ui
+
+Code close verification:
+local HEAD == remote HEAD
+
+Documentation repository:
+C:\Users\JIN KWANG CHUL\Documents\docs
+
+Documentation branch:
+agent/project-prompt-standard
+
+The final docs commit SHA is reported by the Closing result after this document
+set is committed and pushed.
+2. WHY THIS RESUME EXISTS
+
+The immediately previous automatic-trading conversation completed the Price Box
+direction discussion but did not execute regular Conversation Closing.
+
+The user confirmed that Price Box must use only the most recent configured
+period Candles, default 24, as a rolling window.
+
+This conversation retroactively closes that workstream without absorbing
+unrelated protected WIP.
+
+The previous product checkpoint remains:
+1b33dd959704846ff11e60e3b3253ee215ec058d
+2026-09-24 Signal Validation Price / Visual / MRU Closure.
+
+3. COMPLETED PRICE BOX CONTRACT
+
+Price Box is rolling, not cumulative.
+
+For each eligible index:
+- use exactly the latest configured period Candles;
+- default period is 24;
+- calculate Middle from that same window;
+- calculate positive/negative deviations from that same window Middle;
+- calculate Upper/Lower statistics from those same-window deviation groups;
+- when a new Candle enters, evict the oldest Candle outside the period.
+
+Appending future Candles cannot change previously computed Price Box points.
+4. COMPLETED CONSUMER NORMALIZATION
+
+Canonical calculation owner:
+engines/indicator_engine.py::price_box()
+
+Direct consumers normalized in this checkpoint:
+- Signal Validation visualization cache;
+- Validation Historical Replay;
+- Validation Batch / signal scan.
+
+Validation no longer needs a separate cumulative Price Box formula.
+Replay and Batch expose the applicable prefix of the canonical rolling series.
+
+Detailed Replay, Batch, and signal-scan Price Box evidence use the same operand
+index after delay_bar / bar_offset adjustment.
+
+5. VERIFICATION
+
+Independent staged snapshot:
+C:\Users\JIN KWANG CHUL\Documents\_closing_verify_kiwoom_20260925_price_box_v1
+
+Evidence:
+- 7 changed Python files py_compile PASS;
+- staged git diff --check PASS;
+- Price Box focused tests 12 / 12 PASS;
+- expanded three-module run: 95 total, 93 PASS, 2 FAIL;
+- the same 2 failures reproduce from untouched baseline HEAD;
+- checkpoint-introduced regression: 0.
+
+The baseline failures are OCR delay_anchor expectation mismatches and were not
+changed or absorbed by this checkpoint.
+6. GIT CHECKPOINT
+
+Commit:
+a9552b840784cc9cccb90386453496248d3c766b
+
+Commit message:
+fix: normalize rolling Price Box calculation
+
+Push:
+successful.
+
+Verification:
+local HEAD == origin/feat/restore-auto-trade-setting-ui.
+
+Committed task-boundary paths:
+7.
+
+No PR was created.
+
+7. PROTECTED WIP
+
+The code repository intentionally remains dirty.
+
+Post-push porcelain entries:
+189
+
+Status SHA256:
+5441b5c2f0c9b8836deca0b0c7a461df15be01f79c2f7a9764ee5986ff21ebf4
+
+Do not run reset, restore, stash, clean, or broad add against this state.
+Protected work includes unrelated:
+- BUY Composite / legacy compatibility;
+- registration and settings behavior;
+- Signal Validation UI and Evidence work;
+- broader MarketData / SOR / Main / Mock work;
+- Runtime, stock, routine-instance, cache, screenshot, report, and user-data
+  artifacts.
+
+Mixed unstaged hunks remain in some files that also participated in this
+checkpoint. The commit contains only the approved Price Box boundary.
+
+8. DEVELOPMENT ENVIRONMENT
+
+Desktop Commander:
+connected Windows device KWANGS-LP.
+
+Automatic-trading Python:
+C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+
+Verified project runtime:
+Python 3.11.9 32-bit / PyQt5 5.15.11 / Qt 5.15.2.
+
+ChatGPT Work:
+do not use unless the user explicitly reverses the restriction.
+
+9. NEXT SESSION
+
+No next Big Feature is selected by this Closing.
+
+Next task:
+Must Confirm.
+
+Next role:
+Must Confirm.
+Recovery read order:
+1. 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+2. 00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-25_PRICE_BOX_ROLLING_WINDOW_NORMALIZATION.txt
+3. this Work Resume
+4. 00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-25_PRICE_BOX_ROLLING_WINDOW_NORMALIZATION.txt
+5. 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
+
+Do not infer a new Production task merely from protected WIP.

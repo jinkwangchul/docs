@@ -1,0 +1,95 @@
+PRICE BOX ROLLING WINDOW NORMALIZATION
+Date: 2026-09-25
+Type: Conversation Closing / retroactive previous-window close / code checkpoint
+Code checkpoint: a9552b840784cc9cccb90386453496248d3c766b
+
+A. WINDOW CLOSING SCOPE
+
+The immediately previous automatic-trading conversation ended without the
+regular Conversation Closing procedure.
+
+This close-out covers only the Price Box rolling-window normalization confirmed
+by the user in that workstream. Existing 2026-09-24 Price/Visual/MRU closure
+remains the previous checkpoint and is not reopened.
+
+Unrelated protected Working Tree work is excluded.
+
+B. CONTRACT CORRECTION
+
+Price Box configured period is now an exact rolling window.
+Default period is 24 Candles.
+
+At every eligible index the Middle, positive deviation statistics, and negative
+deviation statistics are calculated from the same most-recent period Candles.
+A new Candle evicts the oldest Candle that falls outside that period.
+The calculation therefore does not accumulate the complete historical prefix.
+
+This supersedes only conflicting Price Box wording that described AvgIf/StdevIf
+statistics as full-prefix cumulative. Existing direction and comparison mapping
+remain unchanged.
+
+C. IMPLEMENTATION NORMALIZATION
+
+The canonical engine price_box() now calculates each index from its exact period
+window.
+
+build_indicator_series normalizes invalid/non-positive configured period to 24.
+
+Signal Validation visualization consumes the canonical Price Box series directly.
+
+Replay and Batch consume historical prefixes of that canonical series instead
+of reconstructing cumulative Price Box offsets.
+
+Detailed Replay, Batch scan, and signal-scan retain the same operand index for
+delay_bar / bar_offset Price Box evidence.
+
+D. COMMIT BOUNDARY
+
+Seven paths were committed:
+- engines/indicator_engine.py
+- indicator_follow_signal_validation_visualization.py
+- routines/지표추종매매/routine_validation_batch.py
+- routines/지표추종매매/routine_validation_replay.py
+- tests/test_indicator_follow_16_control_provenance_correction.py
+- tests/test_indicator_follow_signal_validation_visualization.py
+- tests/test_indicator_follow_validation_replay.py
+Mixed unrelated hunks in the same Working Tree were deliberately excluded.
+No broad add/reset/restore/stash/clean was used.
+
+E. VERIFICATION
+
+Staged snapshot:
+C:\Users\JIN KWANG CHUL\Documents\_closing_verify_kiwoom_20260925_price_box_v1
+
+Results:
+- py_compile changed Python files: 7 / 7 PASS;
+- staged git diff --check: PASS;
+- focused Price Box regression: 12 / 12 PASS;
+- expanded regression: 95 run, 93 PASS, 2 FAIL;
+- both failures reproduce unchanged from baseline HEAD;
+- new checkpoint regression: 0.
+
+The reproduced failures are OCR delay_anchor expectation mismatches and are not
+part of this Price Box task.
+
+F. GIT
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Commit:
+a9552b840784cc9cccb90386453496248d3c766b
+
+Push:
+successful to origin/feat/restore-auto-trade-setting-ui
+local HEAD == remote branch verified after push.
+
+No PR was created.
+
+G. PROTECTED WIP
+
+Post-push code porcelain entries: 189
+Status SHA256:
+5441b5c2f0c9b8836deca0b0c7a461df15be01f79c2f7a9764ee5986ff21ebf4
+
+All unrelated local WIP remains protected and outside this checkpoint.

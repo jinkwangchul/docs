@@ -1,0 +1,128 @@
+MASTER SPEC CANONICAL SUPPLEMENT
+2026-09-25 PRICE BOX ROLLING WINDOW NORMALIZATION
+
+Status: CURRENT SUPPLEMENTAL FREEZE
+Code repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Code checkpoint: a9552b840784cc9cccb90386453496248d3c766b
+Previous checkpoint: 1b33dd959704846ff11e60e3b3253ee215ec058d
+Push: origin/feat/restore-auto-trade-setting-ui verified
+
+1. AUTHORITY AND SCOPE
+
+This supplement owns only the Price Box calculation-time-window contract and
+its direct Validation / Replay / Batch consumption boundary.
+
+It does not change Price Box direction mapping, comparison semantics, BUY/SELL
+expression policy, order execution, Runtime ownership, Broker ownership,
+SendOrder, Chejan, position, budget, or unrelated chart/UI contracts.
+
+Within this narrow scope, this supplement supersedes conflicting wording that
+treated AvgIf/StdevIf deviations as cumulative across the complete caller prefix.
+Historical documents remain preserved as point-in-time evidence.
+2. ROLLING PRICE BOX CONTRACT
+
+Configured period means an exact rolling Candle window.
+Default period is 24.
+
+For evaluation index i, once at least period Candles exist:
+
+window_i = CLOSE[i - period + 1 : i + 1]
+A_i = arithmetic mean(window_i)
+deviation_j = CLOSE_j - A_i for each CLOSE_j inside window_i
+
+Positive deviations are the values > 0 inside that same window.
+Negative deviations are the values < 0 inside that same window.
+
+Upper_i = A_i + mean(positive deviations)
+                + 2 * population_stdev(positive deviations)
+
+Lower_i = A_i + mean(negative deviations)
+                - 2 * population_stdev(negative deviations)
+
+If the corresponding positive or negative group is empty, that band is None.
+If the exact rolling window contains a missing value, that index remains None.
+
+The project population-variance convention remains unchanged.
+No new claim is made about an officially exposed N versus N-1 Kiwoom divisor.
+3. ROLLING / CAUSAL BEHAVIOR
+
+Price Box does not accumulate every historical Candle indefinitely.
+
+When a new Candle enters a full period window:
+- the newest Candle enters the calculation;
+- the oldest Candle outside the period is evicted;
+- the calculation again uses exactly period Candles.
+
+Therefore:
+- period=24 means only the latest 24 eligible Candles participate at each point;
+- appending future Candles cannot alter already-computed earlier Price Box points;
+- historical evaluation is causal without rebuilding deviation statistics from
+  the entire growing prefix.
+
+Before period Candles are available, Lower / Middle / Upper remain None.
+
+At the canonical build_indicator_series boundary, invalid or non-positive
+configured Price Box period falls back to the default 24.
+4. SHARED CONSUMER NORMALIZATION
+
+The Indicator Engine price_box() is the canonical calculation owner.
+
+Signal Validation visualization now consumes the canonical rolling Price Box
+series directly instead of rebuilding a separate per-prefix Price Box formula.
+
+Validation Replay and Batch no longer recreate Price Box by cumulative
+prefix-offset statistics. They expose only the applicable prefix of the already
+canonical rolling Price Box series to each historical evaluation.
+
+The Replay / Batch path preserves existing delay_bar and bar_offset operand
+alignment. The Price Box operand used in detailed Replay, Batch scan, and
+signal-scan is the same canonical series value for the same operand index.
+
+This change creates no second Price Box formula and no new Source of Truth.
+5. VERIFICATION EVIDENCE
+
+The intended Git index was exported independently to:
+C:\Users\JIN KWANG CHUL\Documents\_closing_verify_kiwoom_20260925_price_box_v1
+
+Fresh staged-snapshot evidence:
+- changed Python files py_compile: 7 / 7 PASS;
+- staged git diff --check: PASS;
+- Price Box focused regression: 12 / 12 PASS;
+- expanded three-module regression: 95 run, 93 PASS, 2 FAIL;
+- the same 2 OCR delay_anchor failures reproduce from untouched baseline HEAD;
+- new Price Box regression introduced by this checkpoint: 0.
+
+The two reproduced baseline failures expect FOLLOWING_BASE_BAR_ENTRY while the
+existing baseline implementation returns FOLLOWING_COMPLETED_BASE_BAR_ENTRY.
+They are unrelated to this Price Box checkpoint and were not modified here.
+
+No Broker order action, SendOrder call, Runtime migration, or user-data writer
+is part of this checkpoint.
+6. CODE CHECKPOINT AND PROTECTED WIP
+
+Committed task boundary:
+- engines/indicator_engine.py
+- indicator_follow_signal_validation_visualization.py
+- routines/지표추종매매/routine_validation_batch.py
+- routines/지표추종매매/routine_validation_replay.py
+- tests/test_indicator_follow_16_control_provenance_correction.py
+- tests/test_indicator_follow_signal_validation_visualization.py
+- tests/test_indicator_follow_validation_replay.py
+
+Commit:
+a9552b840784cc9cccb90386453496248d3c766b
+
+Push:
+successful to origin/feat/restore-auto-trade-setting-ui
+
+Post-push protected code Working Tree:
+189 porcelain entries
+Status SHA256:
+5441b5c2f0c9b8836deca0b0c7a461df15be01f79c2f7a9764ee5986ff21ebf4
+
+Unrelated BUY Composite, registration/settings, UI, MarketData, Runtime, stock,
+routine-instance, screenshot, report, cache, and other local WIP remains outside
+this checkpoint and must not be reset, restored, stashed, cleaned, or broad-added.
+
+PRICE_BOX_ROLLING_WINDOW_NORMALIZATION_FREEZE_COMPLETE
