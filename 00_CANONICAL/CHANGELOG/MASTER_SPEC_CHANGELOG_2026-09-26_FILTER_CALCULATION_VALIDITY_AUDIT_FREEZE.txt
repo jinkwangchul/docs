@@ -1,0 +1,46 @@
+MASTER SPEC CHANGELOG
+=====================
+
+Date:
+2026-09-26
+
+Change:
+Close the Indicator Follow filter calculation validity audit.
+
+Scope:
+- Moving Average / arrangement;
+- Bollinger Band;
+- Price Box;
+- Price Comparison;
+- RSI;
+- MACD / Signal;
+- OCR / OSC;
+- common Indicator Input Candle SoT.
+
+Functional checkpoints included:
+- a9552b8 Price Box rolling-window normalization;
+- ba91fed live Price Comparison semantics;
+- 8b60ea0 / 86cc172 RSI period and runtime binding;
+- 8877b12 OCR turning-point threshold semantics;
+- 7b5058b Indicator Input Candle SoT regression freeze.
+
+Unchanged verified areas:
+- MA / arrangement;
+- Bollinger;
+- MACD / Signal internal period/value parity.
+Final verification:
+- independent committed-HEAD filter/candle suite: 421/421 PASS;
+- Indicator Input SoT expanded regression: 139/139 PASS;
+- local complete 3-minute OHLCV parity evidence confirmed;
+- no new Production writer, Broker mutation, Runtime mutation, or SendOrder path.
+
+Retained evidence gaps:
+- Kiwoom EAVG initial seed;
+- RSI completely-flat 0/0 exact Broker convention;
+- Price Box StdevIf N versus N-1 divisor.
+
+No speculative formula change is authorized for those gaps.
+
+Canonical:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-26_FILTER_CALCULATION_VALIDITY_AUDIT_FREEZE.txt

@@ -1,0 +1,183 @@
+FILTER CALCULATION VALIDITY AUDIT FREEZE
+========================================
+
+Authority
+---------
+
+Feature:
+Indicator Follow Filter Calculation Validity and Production/Validation Parity
+
+Date:
+2026-09-26
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Code branch:
+feat/restore-auto-trade-setting-ui
+
+Final code checkpoint:
+7b5058b44b720c09d73062ddbb4b39e4f13d03c1
+
+This freeze closes the current audit of filter value calculation semantics.
+It supplements, and does not replace, the dedicated Price Box, price-comparison,
+RSI, OCR, and Indicator Input Candle SoT freezes.
+
+Final input contract
+--------------------
+
+Indicator Input SoT is the candle series of the selected timeframe.
+All candle-derived indicators in one evaluation consume that same timeframe
+candle set. Per-indicator alternate price sources are forbidden.
+
+For minute timeframes, Production may derive target candles from canonical
+one-minute candles. Validation may acquire read-only target-timeframe rows.
+Complete target-timeframe OHLCV remains the shared semantic authority.
+Filter verdicts
+---------------
+
+1. Moving Average / MA arrangement
+Status: VERIFIED, NO NEW IMPLEMENTATION REQUIRED.
+
+- MA values use the common timeframe CLOSE series.
+- Explicit MA period identities remain distinct.
+- MA comparison and arrangement conditions consume the configured periods.
+- Production, Replay, Batch, and chart visualization share the same candle
+  identity and period semantics.
+
+2. Bollinger Band
+Status: VERIFIED, NO NEW IMPLEMENTATION REQUIRED.
+
+- Middle/upper/lower bands are derived from the same timeframe CLOSE series.
+- Configured period and standard-deviation multiplier are preserved.
+- Selected upper/lower band and signed-percent comparison are evaluated from
+  the canonical band series.
+- Production and Validation share the same Bollinger calculation functions.
+
+3. Price Box
+Status: NORMALIZED AND VERIFIED.
+
+Checkpoint:
+a9552b8 fix: normalize rolling Price Box calculation
+
+- configured period is the exact rolling CLOSE window;
+- default period is 24;
+- a new candle evicts the oldest candle outside the rolling window;
+- Production/Visualization/Replay/Batch consume the canonical rolling series;
+- future candles cannot rewrite past Price Box values.
+4. Price Comparison
+Status: NORMALIZED AND VERIFIED.
+
+Checkpoint:
+ba91fed fix: normalize live price comparison semantics
+
+- CURRENT_PRICE is an evaluation-time live/fresh strategy axis in Production;
+- Validation CURRENT_PRICE is the CLOSE of the candle being evaluated;
+- AVG_PRICE is the confirmed average at the evaluation point;
+- delayed signal indexes must not push CURRENT_PRICE/AVG_PRICE back to stale
+  historical values;
+- legacy CLOSE<->AVG_PRICE strategy rules are normalized inside the Routine,
+  not by changing common indicator CLOSE semantics.
+
+5. RSI
+Status: NORMALIZED AND VERIFIED.
+
+Checkpoints:
+8b60ea0 fix: honor configured RSI periods across evaluation
+86cc172 fix: harden RSI runtime series binding
+
+- BUY and SELL use the configured RSI period;
+- SELL condition period no longer falls back silently to global RSI period;
+- Production/Replay/Batch/Visualization use the same condition-period RSI;
+- warmup uses period + 1 close observations;
+- runtime private-series binding is derived from canonical fields and cannot
+  be trusted from persisted private override data;
+- current project RSI uses Wilder initial average plus recursive smoothing.
+
+6. MACD / Signal
+Status: VERIFIED, NO NEW IMPLEMENTATION REQUIRED.
+
+- MACD = fast EMA - slow EMA;
+- Signal = EMA(MACD, signal period);
+- configured fast/slow/signal periods are shared by Production and Validation;
+- MACD and Signal remain distinct selectable evaluation lines.
+7. OCR / OSC
+Status: NORMALIZED AND VERIFIED.
+
+Checkpoint:
+8877b12 fix: anchor OCR thresholds to turning points
+
+- OSC = MACD - Signal;
+- TURN_UP is prev2 > prev < current;
+- TURN_DOWN is prev2 < prev > current;
+- current confirms the transition;
+- prev is the actual turning point;
+- when OCR transition and numeric threshold belong to the same OCR row, the
+  numeric threshold is evaluated at the turning point (bar_offset=1);
+- 0/1/2 bars remain post-confirmation signal delay semantics;
+- legacy rules without explicit threshold bar_offset receive the same runtime
+  turning-point interpretation without mutating persisted rules.
+
+Calculation parity
+------------------
+
+Current implementation was checked across:
+- common indicator engine;
+- Routine evaluator;
+- Rule Mapper;
+- Production candle projection;
+- Validation historical provider;
+- Validation Replay;
+- Validation Batch fast path;
+- Validation indicator cache / chart visualization.
+
+Committed-HEAD independent verification:
+- 421 / 421 PASS.
+- py_compile PASS for task-specific changes.
+- staged/HEAD snapshot verification used clean exported index content rather
+  than relying on unrelated Working Tree WIP.
+Real-data timeframe parity evidence
+-----------------------------------
+
+Local Samsung Electronics data on 2026-09-23 provided 68 overlapping 3-minute
+buckets between:
+- canonical one-minute candles aggregated by the project; and
+- read-only Broker 3-minute Validation candles.
+
+Result:
+- OHLC: 68 / 68 exact matches.
+- Volume: 67 / 68 exact matches.
+- The single volume mismatch was the structurally incomplete left-edge bucket
+  where canonical one-minute history began at 16:38 inside a 16:36 bucket.
+- Every following complete overlapping bucket matched OHLCV exactly.
+
+Evidence gaps retained
+----------------------
+
+The following are not classified as current code defects because acquired
+official evidence does not expose the exact implementation detail:
+
+1. MACD EMA seed exact Kiwoom parity.
+   Kiwoom documentation exposes the EAVG recursion/formula family but does not
+   expose the exact initial seed convention.
+
+2. RSI zero-gain / zero-loss flat-window exact Kiwoom parity.
+   The official descriptions do not state the exact value returned for the
+   degenerate 0/0 flat case.
+
+3. Price Box StdevIf divisor.
+   Exact N versus N-1 divisor remains not officially exposed. The existing
+   population-variance convention remains frozen.
+
+These gaps must not be used as justification for speculative formula changes.
+A future change requires stronger broker/reference evidence.
+
+Final verdict
+-------------
+
+FILTER_CALCULATION_VALIDITY_AUDIT_FREEZE_COMPLETE
+
+The major configured filter families now have a verified common candle input
+contract and Production/Validation calculation parity. No further formula
+change is authorized from this audit without new evidence or an explicit user
+decision.
