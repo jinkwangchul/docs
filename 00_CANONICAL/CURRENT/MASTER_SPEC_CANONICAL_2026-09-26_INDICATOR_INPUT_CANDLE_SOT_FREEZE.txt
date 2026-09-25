@@ -1,0 +1,125 @@
+INDICATOR INPUT CANDLE SoT FREEZE
+=================================
+
+Authority
+---------
+
+Feature:
+Indicator Input Candle Source-of-Truth Normalization
+
+Date:
+2026-09-26
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Code branch:
+feat/restore-auto-trade-setting-ui
+
+Code checkpoint:
+7b5058b test: freeze indicator input candle SoT
+
+This supplement is authoritative only for indicator input candle identity and
+Production/Validation parity. It does not redefine indicator formulas that are
+owned by their existing contracts.
+
+Canonical contract
+------------------
+
+1. Indicator Input SoT is the candle series of the selected chart timeframe.
+2. All indicators evaluated at one point consume that same timeframe candle set.
+3. No RSI/MACD/OSC/MA/Bollinger/Price Box path may silently source a separate
+   price series for the same evaluation.
+4. Minute-timeframe examples:
+   - 1-minute RSI14 uses the selected 1-minute candle closes.
+   - 30-minute RSI14 uses the closes of the selected 30-minute candles.
+   - Production 30-minute candles are projected from canonical one-minute
+     candles using the common timeframe aggregation boundary.
+5. The same rule applies to MACD, Signal, OSC, moving averages, Bollinger,
+   Price Box, and other candle-derived indicators.
+6. OHLCV belongs to the timeframe candle SoT. Indicators consume only the
+   fields required by their formula; the current indicator set is primarily
+   close-based, while VOLUME remains projected from the same candle objects.
+7. A forming candle, when the Routine projection explicitly permits it, is one
+   shared forming timeframe candle snapshot for every indicator in that
+   evaluation. Indicators may not hold independent forming-candle states.
+8. Historical Validation evaluates the same candles that its chart/replay
+   displays. The indicator cache must not reconstruct a different price source.
+
+Acquisition-path boundary
+-------------------------
+
+Production and Validation are not required to use the same broker request
+mechanism. They are required to represent the same target-timeframe candle
+semantics.
+
+- Production minute-timeframe path:
+  canonical one-minute candles -> aggregate_minute_candles(timeframe)
+  -> Routine candle projection -> common indicator engine.
+
+- Validation minute-timeframe path:
+  read-only Broker target-timeframe rows -> detached Validation candles
+  -> Replay/Batch/Visualization -> common indicator formulas.
+A difference in acquisition path does not authorize a difference in complete
+target-timeframe OHLCV. If complete buckets diverge, treat that as a parity
+defect to investigate rather than defining separate indicator semantics.
+
+Local parity evidence
+---------------------
+
+Local Samsung Electronics data available during this freeze provided an
+overlap between canonical one-minute candles and read-only Broker 3-minute
+Validation candles for 2026-09-23.
+
+Observed overlap:
+- 68 common 3-minute bucket timestamps.
+- OHLC: 68 / 68 exact matches.
+- Volume: 67 / 68 exact matches.
+- The single volume mismatch was the first overlapping bucket only:
+  canonical one-minute history began at 16:38 while that bucket began at 16:36,
+  so the local raw source was structurally incomplete at the left edge.
+- All following complete overlapping buckets matched OHLCV exactly.
+
+This is local evidence, not a claim that Broker aggregation can never differ.
+The structural rule remains that incomplete edge buckets are not evidence of a
+complete-candle mismatch.
+
+Regression evidence
+-------------------
+
+New contract test:
+tests/test_indicator_input_candle_sot.py
+
+Verified behaviors:
+- 1-minute -> 30-minute aggregation produces the visible 30-minute OHLCV input.
+- Equivalent visible 30-minute candles produce identical common indicator
+  series.
+- Production build_indicator_series shares one CLOSE series object across
+  MACD, RSI, Bollinger, Price Box, and moving-average calculations.
+- Validation build_validation_indicator_cache shares one CLOSE series object
+  across RSI, MACD/Signal, OCR/OSC, MA, Bollinger, and Price Box calculations.
+- CLOSE and VOLUME are sourced from the same timeframe candle objects.
+
+Verification:
+- focused SoT test: 3 / 3 PASS.
+- expanded candle/Validation regression: 139 / 139 PASS.
+- independent staged snapshot SoT test: 3 / 3 PASS.
+- py_compile: PASS.
+- new Production calculation changes: 0.
+- Broker mutation/SendOrder calls: 0.
+
+Non-minute timeframe note
+-------------------------
+
+Daily, weekly, monthly, and yearly Validation periods use their explicit
+period-candle source. This freeze does not require reconstructing non-minute
+periods from one-minute history. The same semantic rule still applies:
+the displayed/evaluated period candles are the Indicator Input SoT.
+
+Final verdict
+-------------
+
+INDICATOR_INPUT_CANDLE_SOT_FREEZE_COMPLETE
+
+The selected timeframe candle series is the sole candle-derived input authority
+for all indicators in one evaluation.

@@ -1,0 +1,45 @@
+MASTER SPEC CHANGELOG
+=====================
+
+Date:
+2026-09-26
+
+Change:
+Freeze Indicator Input Candle SoT.
+
+Reason:
+The operator confirmed that indicators use the OHLCV candles of the selected
+chart timeframe directly. A 30-minute indicator therefore consumes 30-minute
+candles, not an independent one-minute or indicator-specific price series.
+
+Frozen contract:
+- one timeframe candle set per evaluation;
+- no per-indicator candle source;
+- Production minute timeframes may aggregate canonical one-minute candles;
+- Validation may use read-only Broker target-timeframe rows;
+- complete target-timeframe OHLCV must remain semantically equivalent;
+- forming-candle state, when allowed, is shared across all indicators;
+- Validation indicators use the same candles shown by Replay/Chart.
+
+Code evidence:
+- 7b5058b test: freeze indicator input candle SoT
+- tests/test_indicator_input_candle_sot.py
+Verification:
+- focused SoT: 3/3 PASS;
+- expanded candle/Validation regression: 139/139 PASS;
+- independent staged snapshot: 3/3 PASS;
+- py_compile PASS.
+
+Local real-data evidence:
+- Samsung Electronics, 2026-09-23 overlapping 3-minute bars;
+- OHLC 68/68 exact;
+- volume 67/68 exact;
+- sole volume mismatch was the incomplete left-edge bucket caused by canonical
+  one-minute history starting at 16:38 inside a 16:36 bucket.
+
+No Production formula code was changed by this freeze.
+No Runtime, Queue, Broker, or SendOrder writer was added.
+
+Canonical:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-26_INDICATOR_INPUT_CANDLE_SOT_FREEZE.txt
