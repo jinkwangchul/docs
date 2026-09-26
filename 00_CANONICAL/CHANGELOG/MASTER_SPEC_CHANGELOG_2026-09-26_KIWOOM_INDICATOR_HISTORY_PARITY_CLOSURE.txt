@@ -1,0 +1,58 @@
+MASTER SPEC CHANGELOG
+=====================
+
+Date:
+2026-09-26
+
+Change:
+Close the Indicator Follow history-context / Kiwoom parity normalization.
+
+Code checkpoint:
+ccb08050951b7cff7aa7eefc3128eac241ce1a02
+fix: align indicator history with Kiwoom parity
+
+Primary changes:
+- separate minimum warmup from retained indicator history;
+- introduce project history target of 600 target-timeframe bars;
+- make Production retention honor history target;
+- make Validation hidden history context honor the same target;
+- preserve timeframe identity through persistent Validation cache refresh;
+- cap Replay indicator context while preserving global evidence indexes.
+Price Box correction:
+- the configured period still defines the rolling center line;
+- upper/lower statistics are derived from signed rolling-center deviations in
+  the causal trailing history window;
+- the old exact-latest-24-only outer-statistics interpretation is superseded;
+- population-variance convention remains unchanged.
+
+RSI / MACD:
+- formula families are unchanged;
+- causal history wrappers evaluate each point from at most the retained history
+  target;
+- available prefix history is used before the cap is reached.
+
+Superseded Price Box scope text:
+- 2026-09-25 Price Box Rolling Window Normalization;
+- Price Box section of the 2026-09-26 Filter Calculation Validity Audit.
+Fresh verification:
+- task-boundary py_compile PASS;
+- Kiwoom/history parity: 14/14 PASS;
+- focused changed paths: 9/9 PASS;
+- expanded parity/replay/batch/visualization/projection: 121/121 PASS;
+- pre-commit staged diff check PASS;
+- code local/remote SHA equality confirmed after push.
+
+Known baseline:
+Two OCR delay-anchor tests fail identically on untouched pre-change HEAD and
+final staged snapshot. They were not changed or absorbed into this scope.
+
+Protected WIP:
+Untracked test_indicator_follow_history_target_parity.py is a superseded draft
+with an obsolete import and remains untouched.
+
+No Broker mutation, Runtime writer, Queue writer, SendOrder action, KOA Studio
+execution, or PR was performed.
+
+Canonical:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-26_KIWOOM_INDICATOR_HISTORY_PARITY_CLOSURE.txt

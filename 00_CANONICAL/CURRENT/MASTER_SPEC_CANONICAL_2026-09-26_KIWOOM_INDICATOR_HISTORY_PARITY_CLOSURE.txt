@@ -1,0 +1,233 @@
+KIWOOM INDICATOR HISTORY PARITY CLOSURE
+=======================================
+
+Authority
+---------
+
+Feature:
+Indicator Follow History Context / Kiwoom Parity Normalization
+
+Date:
+2026-09-26
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Code branch:
+feat/restore-auto-trade-setting-ui
+
+Final code checkpoint:
+ccb08050951b7cff7aa7eefc3128eac241ce1a02
+fix: align indicator history with Kiwoom parity
+
+This Canonical closes the unclosed indicator-history normalization workstream.
+It is authoritative for indicator history context, warmup/history separation,
+and the corrected Price Box history scope.
+Precedence and correction
+-------------------------
+
+This document SUPPLEMENTS the 2026-09-26 Indicator Input Candle SoT Freeze and
+the filter calculation audit, but it CORRECTS the Price Box history-scope text
+in these earlier records:
+
+- MASTER_SPEC_CANONICAL_2026-09-25_PRICE_BOX_ROLLING_WINDOW_NORMALIZATION.txt
+- MASTER_SPEC_CANONICAL_2026-09-26_FILTER_CALCULATION_VALIDITY_AUDIT_FREEZE.txt
+
+The earlier statement that Price Box upper/lower statistics use only the exact
+latest configured-period candles is no longer current.
+
+The configured Price Box period still owns the rolling center line. However,
+the upper/lower statistics use the valid signed deviation history available
+inside the causal trailing indicator-history window described below.
+
+Older documents remain historical evidence and are not edited in place.
+Final history contract
+----------------------
+
+1. The selected timeframe candle series remains the Indicator Input SoT.
+2. Minimum formula warmup and retained indicator history are separate concepts.
+3. `warmup_bars` is the minimum history required for an indicator to become
+   evaluable.
+4. `history_target_bars` is the desired retained/evaluation context and does
+   not become a minimum-availability gate.
+5. The Indicator Follow project history target is:
+   DEFAULT_INDICATOR_HISTORY_TARGET_BARS = 600.
+6. Effective history context is max(600, required warmup).
+7. When fewer than 600 target-timeframe candles are available but minimum
+   warmup is satisfied, evaluation may proceed with all available history.
+8. When more than 600 target-timeframe candles are available, the active
+   indicator context is capped to the newest 600 bars where this contract
+   applies.
+9. The value 600 is the project's normalized history target. It is not a claim
+   that Kiwoom HTS internally uses a universally fixed 600-bar limit.
+Production retention contract
+-----------------------------
+
+The Routine projection request now declares both:
+- minimum `warmup_bars`; and
+- `history_target_bars`.
+
+Production MarketData standby/retention sizing uses the history target when it
+is present, rather than sizing retention only from minimum warmup.
+
+The raw one-minute requirement may therefore exceed 600 rows for larger target
+timeframes because enough source minutes must be retained to project the target
+timeframe history.
+
+Projection output remains bounded by the target-timeframe history target.
+History target overflow and warmup insufficiency remain distinct states.
+
+No new Broker writer, Runtime writer, Queue mutation, or SendOrder path is
+created by this contract.
+Validation history contract
+---------------------------
+
+Signal Validation uses:
+required_validation_history_context_bars(rules)
+= max(DEFAULT_INDICATOR_HISTORY_TARGET_BARS,
+      required_validation_warmup_bars(rules)).
+
+The Validation flow uses this context for:
+- initial historical fetch;
+- history extension;
+- working-pool projection;
+- replay preparation;
+- cached replay slices;
+- persistent-history restore and refresh identity.
+
+A persistent cache fixture was corrected so its historical snapshot preserves
+the actual Validation request timeframe key. Cache lookup uses the same key.
+This matches the real historical provider contract rather than the old fixture's
+mixed timeframe identity.
+
+The visible chart candle count remains distinct from hidden indicator context.
+Corrected Price Box calculation
+-------------------------------
+
+Canonical owner:
+engines/indicator_engine.py::price_box()
+
+Default configured period:
+24 bars.
+
+For each evaluable bar:
+- Middle is the rolling configured-period CLOSE average.
+- A causal local history window is selected, capped at 600 bars by default.
+- Inside that local history, a rolling configured-period center is calculated.
+- Each valid deviation is CLOSE minus that bar's own rolling center.
+- Positive and negative deviations are separated.
+- Upper = current Middle + AvgIf(positive deviations)
+  + 2 * StdevIf(positive deviations).
+- Lower = current Middle + AvgIf(negative deviations)
+  - 2 * StdevIf(negative deviations).
+- The existing population-variance convention is retained.
+- Future candles cannot rewrite already calculated historical points.
+
+Therefore Price Box is causal, but its outer statistics are not restricted to
+only the current 24 CLOSE values.
+RSI and MACD history behavior
+-----------------------------
+
+RSI:
+- Formula remains the project's Wilder-style RSI implementation.
+- rsi_causal_history() evaluates each point from at most the causal trailing
+  history target.
+- Before the history cap is reached, all available prefix history is used.
+
+MACD / Signal / OSC:
+- Formula family remains fast EMA minus slow EMA, Signal EMA, and OSC difference.
+- macd_series_causal_history() evaluates each point from at most the causal
+  trailing history target.
+- Before the history cap is reached, all available prefix history is used.
+
+The purpose of these wrappers is history-context parity, not a new RSI/MACD
+formula definition.
+Cross-path parity
+-----------------
+
+The normalized history contract is wired through:
+- common indicator engine;
+- Routine Production evaluation;
+- Production MarketData projection/retention;
+- Signal Validation historical flow;
+- Validation Replay;
+- Validation Batch behavior through shared indicator series;
+- Validation visualization / indicator cache.
+
+Replay history capping preserves global evidence indexes when a local trailing
+window is used.
+
+Production and Validation may acquire candles through different read paths, but
+they must evaluate the same target-timeframe candle semantics and the same
+history-context contract.
+Verification evidence
+---------------------
+
+Independent clean-index snapshots were used so unrelated Working Tree WIP did
+not contaminate close verification.
+
+Fresh evidence:
+- py_compile for the staged task-boundary Python files: PASS.
+- Kiwoom/history parity module: 14 / 14 PASS.
+- focused changed-path set: 9 / 9 PASS.
+- expanded Replay/Batch/Visualization/Production projection set:
+  121 / 121 PASS.
+- git diff --cached --check before commit: PASS.
+- final code commit pushed successfully.
+- local code HEAD == origin/feat/restore-auto-trade-setting-ui.
+- ahead/behind after push: 0 / 0.
+
+The full Signal Validation V2 module was not used as a single-process closing
+gate because an earlier full run encountered a Qt access-violation crash.
+Changed V2 behaviors were instead re-run as focused isolated tests.
+Known baseline and protected findings
+-------------------------------------
+
+Two OCR provenance tests fail identically on the untouched pre-change HEAD and
+on the final staged snapshot:
+- test_ocr_convert_zero_one_two_are_signal_order_delays
+- test_sell_ocr_direction_convert_logic_and_macd_logic_are_canonical
+
+Both expect FOLLOWING_BASE_BAR_ENTRY while the current implementation returns
+FOLLOWING_COMPLETED_BASE_BAR_ENTRY.
+
+These are pre-existing baseline failures, not regressions introduced by
+ccb0805, and were not changed by this task.
+
+An untracked draft:
+tests/test_indicator_follow_history_target_parity.py
+is superseded by the committed
+tests/test_indicator_follow_kiwoom_history_parity.py
+and still contains an obsolete import. It is preserved as protected WIP and is
+not part of this freeze.
+Evidence limits
+---------------
+
+This closure does not claim exact undocumented Kiwoom internals.
+
+Still not officially proven:
+- exact Kiwoom MACD EMA initial seed convention;
+- exact Kiwoom RSI completely-flat 0/0 convention;
+- exact Kiwoom Price Box StdevIf divisor;
+- that Kiwoom universally uses a fixed 600-bar history window.
+
+The 600-bar value is the project's selected causal history target based on the
+current parity work. Stronger official or measured evidence is required before
+changing formula semantics again.
+
+KOA StudioSA was not executed or modified during this closure.
+No real order approval, SendOrder, or Broker-side mutation was performed.
+Final verdict
+-------------
+
+KIWOOM_INDICATOR_HISTORY_PARITY_CLOSURE_COMPLETE
+
+The project now separates minimum warmup from retained indicator history,
+uses a 600-bar causal history target across the relevant Production/Validation
+paths, and corrects Price Box from the obsolete exact-24-only outer-statistics
+interpretation to the causal loaded-history deviation contract.
+
+Code recovery point:
+ccb08050951b7cff7aa7eefc3128eac241ce1a02
+
+No PR was created.

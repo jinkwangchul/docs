@@ -1,0 +1,223 @@
+1. RECOVERY BASELINE
+
+Code repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Code checkpoint:
+ccb08050951b7cff7aa7eefc3128eac241ce1a02
+
+Code commit:
+fix: align indicator history with Kiwoom parity
+
+Remote:
+origin/feat/restore-auto-trade-setting-ui
+
+Code close verification:
+local HEAD == remote HEAD
+ahead / behind = 0 / 0
+
+Documentation repository:
+C:\Users\JIN KWANG CHUL\Documents\docs
+
+Documentation branch:
+agent/project-prompt-standard
+The final docs commit SHA is reported by the Closing result after this document
+set is committed and pushed.
+
+2. WHY THIS RESUME EXISTS
+
+The immediately previous automatic-trading conversation continued the indicator
+calculation / Kiwoom parity work but did not complete regular Conversation
+Closing.
+
+This closure retroactively freezes that workstream without absorbing unrelated
+local WIP.
+
+It also corrects the previous Price Box documentation that described the outer
+statistics as using only the exact latest configured-period candles.
+
+3. CURRENT AUTHORITATIVE CONTRACT
+
+Indicator Input SoT:
+selected target-timeframe candles.
+
+Minimum formula availability:
+warmup_bars.
+
+Retained/evaluation history target:
+history_target_bars = max(600, required warmup).
+The 600-bar value is a project normalization target, not a claim that Kiwoom
+universally uses a hard-coded 600-bar internal window.
+
+Price Box:
+- center line = rolling configured-period close average;
+- default period = 24;
+- upper/lower use positive/negative close-minus-rolling-center deviations from
+  the causal trailing history window;
+- population variance remains the current StdevIf convention;
+- calculation remains prefix-causal.
+
+RSI/MACD:
+- formulas unchanged;
+- values are evaluated from at most the causal retained-history target per point
+  where the history wrapper applies.
+
+4. IMPLEMENTATION BOUNDARY
+
+Committed paths:
+13 files.
+
+New contract helper:
+indicator_follow_validation_history_contract.py
+
+New primary regression:
+tests/test_indicator_follow_kiwoom_history_parity.py
+
+Production, Validation Flow, Replay, visualization, and shared indicator engine
+were normalized inside the committed boundary.
+The unstaged routines/지표추종매매/routine_validation_batch.py changes were
+inspected and intentionally excluded as protected unrelated WIP.
+
+The untracked tests/test_indicator_follow_history_target_parity.py is an older
+draft superseded by the committed parity test. It still references an obsolete
+import. It was not edited, deleted, or staged.
+
+5. VERIFICATION
+
+Independent clean-index snapshot verification:
+- py_compile: PASS.
+- tests.test_indicator_follow_kiwoom_history_parity: 14 / 14 PASS.
+- focused changed-path tests: 9 / 9 PASS.
+- expanded parity/replay/batch/visualization/projection set:
+  121 / 121 PASS.
+- staged diff check before commit: PASS.
+
+Known baseline comparison:
+tests.test_indicator_follow_16_control_provenance_correction
+- untouched pre-change HEAD: 30 run, 28 PASS, 2 FAIL.
+- final staged snapshot: 30 run, 28 PASS, 2 FAIL.
+- exact same two OCR delay_anchor expectation failures in both.
+The two baseline failures:
+- test_ocr_convert_zero_one_two_are_signal_order_delays
+- test_sell_ocr_direction_convert_logic_and_macd_logic_are_canonical
+
+Expected by tests:
+FOLLOWING_BASE_BAR_ENTRY
+
+Current implementation:
+FOLLOWING_COMPLETED_BASE_BAR_ENTRY
+
+They were not changed in this closure.
+
+The full Signal Validation V2 module had previously encountered a Qt
+access-violation when run as one large process. Closing evidence therefore used
+the directly affected V2 tests in isolated/focused execution instead of treating
+that unstable all-in-one harness as the gate.
+
+6. GIT CHECKPOINT
+
+Commit:
+ccb08050951b7cff7aa7eefc3128eac241ce1a02
+
+Push:
+successful.
+
+Final code branch:
+feat/restore-auto-trade-setting-ui
+
+Final remote:
+origin/feat/restore-auto-trade-setting-ui
+Verification:
+local code HEAD == remote branch HEAD.
+
+No PR was created.
+
+7. PROTECTED WIP
+
+The code repository intentionally remains dirty.
+
+Post-push porcelain entries:
+194
+
+Status SHA256:
+29de7f0eb21ea7f75b5a75e8c5698571bf361c11eaf27910292811434216a781
+
+Index after code commit:
+0 staged paths.
+
+Do not run reset, restore, stash, clean, broad add, or deletion against this
+state.
+
+Protected WIP includes unrelated GUI, Runtime, stock, routine-instance,
+MarketData, Mock, report, test, screenshot, and user-data artifacts.
+8. DOCUMENT PRECEDENCE
+
+Newest owner for this workstream:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-26_KIWOOM_INDICATOR_HISTORY_PARITY_CLOSURE.txt
+
+Changelog:
+00_CANONICAL/CHANGELOG/
+MASTER_SPEC_CHANGELOG_2026-09-26_KIWOOM_INDICATOR_HISTORY_PARITY_CLOSURE.txt
+
+This closure corrects only the Price Box history-scope statements in:
+- MASTER_SPEC_CANONICAL_2026-09-25_PRICE_BOX_ROLLING_WINDOW_NORMALIZATION.txt
+- MASTER_SPEC_CANONICAL_2026-09-26_FILTER_CALCULATION_VALIDITY_AUDIT_FREEZE.txt
+
+Those older files remain historical records and must not be edited retroactively.
+
+9. DEVELOPMENT ENVIRONMENT
+
+Desktop Commander:
+connected Windows device KWANGS-LP.
+
+Automatic-trading Python:
+C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+Verified runtime family:
+Python 3.11.9 32-bit / PyQt5 5.15.11.
+
+KOA StudioSA:
+installed path previously confirmed as C:\OpenAPI\KOAStudioSA.exe.
+During this closure it was not launched, modified, installed, or deleted.
+
+Computer Use:
+not used in this closing conversation.
+
+ChatGPT Work:
+do not use unless the user explicitly reverses the restriction.
+
+No real order approval, SendOrder, or Broker-side mutation was performed.
+
+10. REMAINING EVIDENCE LIMITS
+
+Do not claim as verified:
+- exact Kiwoom MACD EMA initial seed convention;
+- exact Kiwoom RSI flat 0/0 convention;
+- exact Kiwoom Price Box StdevIf N versus N-1 divisor;
+- a universal fixed 600-bar internal Kiwoom history limit.
+
+Any future formula change requires stronger evidence or explicit user approval.
+11. NEXT SESSION
+
+No next Big Feature is selected by this Closing.
+
+Next task:
+Must Confirm.
+
+Next role:
+Must Confirm.
+
+Recovery read order:
+1. 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+2. 00_CANONICAL/CURRENT/
+   MASTER_SPEC_CANONICAL_2026-09-26_KIWOOM_INDICATOR_HISTORY_PARITY_CLOSURE.txt
+3. this Work Resume
+4. 00_CANONICAL/CHANGELOG/
+   MASTER_SPEC_CHANGELOG_2026-09-26_KIWOOM_INDICATOR_HISTORY_PARITY_CLOSURE.txt
+5. 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
+
+Do not infer a new Production task from protected WIP or from the remaining
+evidence gaps.
