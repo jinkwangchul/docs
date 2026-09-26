@@ -1,0 +1,219 @@
+1. RECOVERY BASELINE
+
+Automatic-trading repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Final code checkpoint:
+5c651ac4e58c22b1ac60c62e5677609306682fc8
+
+Final code commit:
+fix: align indicator history targets with Hero4 timeframes
+
+Remote verification:
+local HEAD == origin/feat/restore-auto-trade-setting-ui
+remote HEAD == 5c651ac4e58c22b1ac60c62e5677609306682fc8
+
+Documentation repository:
+C:\Users\JIN KWANG CHUL\Documents\docs
+
+Documentation branch:
+agent/project-prompt-standard
+
+The final documentation SHA is reported by the Closing result after this document
+set is committed and pushed.
+2. WHY THIS RESUME EXISTS
+
+The previous automatic-trading conversation continued work after the earlier
+ccb0805 documentation freeze and did not complete regular Conversation Closing.
+
+This recovery record includes the two later confirmed code checkpoints:
+- 61ce488721de5aae6452df8de8b5117456318e53
+  Hero4 EAVG and flat-RSI semantic normalization.
+- 5c651ac4e58c22b1ac60c62e5677609306682fc8
+  timeframe-specific retained-history targets.
+
+After 5c651ac was pushed, the conversation continued read-only investigation
+toward a direct Hero4 numerical comparison. That investigation was not finished.
+
+3. CURRENT AUTHORITATIVE CONTRACT
+
+Use:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-26_HERO4_INDICATOR_PARITY_TIMEFRAME_HISTORY_FINALIZATION.txt
+
+Key current history targets:
+MINUTE 900 / DAY 600 / WEEK 300 / MONTH 120 / YEAR 120.
+
+Minimum warmup remains a separate availability gate.
+Current confirmed indicator semantics added after ccb0805:
+- numeric EAVG uses the Hero4-compatible warmed-prefix behavior;
+- completely flat RSI 0/0 returns 0.0;
+- MACD history remains prefix-causal;
+- Price Box remains causal and uses signed deviation history;
+- Price Box StdevIf divisor remains population variance unless stronger evidence
+  or explicit user approval changes it.
+
+4. FRESH CLOSE VERIFICATION
+
+A clean Git ZIP archive of code commit 5c651ac was extracted outside the working
+repository so unrelated dirty WIP could not affect the result.
+
+Python:
+C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+Python 3.11.9 / 32-bit.
+
+Result:
+- task-boundary py_compile PASS.
+- tests.test_indicator_follow_kiwoom_history_parity
+  + tests.test_production_candle_provider: 46 / 46 PASS.
+- temporary verification copy cleanup PASS.
+- local code HEAD == remote code branch HEAD.
+
+5. UNFINISHED DIRECT HERO4 INVESTIGATION
+
+Confirmed installed evidence:
+- Hero4 is installed and nkrunlite is running.
+- C:\KiwoomHero4\bin\IMAX\ChartInfo\indica\box지표.ind
+  declares FORMULAR = fmBox.
+- C:\KiwoomHero4\system\chartdata\funcwizard.dat contains installed
+  indicator-function definitions including AvgIf / StdevIf / EAVG-related help.
+- KOA StudioSA is installed at C:\OpenAPI\KOAStudioSA.exe.
+- observed KOA StudioSA version: 2.34.
+
+The previous conversation attempted to access [0600] Kiwoom total chart controls
+and KOA Studio controls through the local Windows environment.
+
+Not completed:
+- a deterministic visible Hero4 005930 Samsung Electronics three-minute
+  indicator value was not captured as a final numerical comparison;
+- therefore no further formula correction was authorized from that unfinished
+  direct-comparison phase.
+
+Last data-provenance check before the conversation stopped:
+stocks\005930_삼성전자\candles.json
+- observed row count: 202
+- first timestamp: 20260923163800
+- last timestamp: 20260923195900
+
+This file must not be assumed to be valid regular-market three-minute parity
+evidence. Its provenance/session composition must be checked before it is used.
+
+6. NEXT CONCRETE TASK
+
+Continue the existing direct Hero4 numerical parity investigation.
+Do not select a new Big Feature.
+First target:
+- Samsung Electronics 005930
+- 3-minute timeframe
+- choose one deterministic candle/time that exists in both the current project
+  evidence and Hero4
+- obtain the exact visible Hero4 Price Box values for that point if possible
+- align the exact same candle history/session basis in the project calculation
+- compare result and explain any difference from evidence
+
+Only after the direct comparison establishes a real mismatch may a formula or
+history contract correction be designed.
+
+Required Gate before any implementation:
+IMPLEMENTATION_ALLOWED / USER_DECISION_REQUIRED / DOCUMENT_CONFLICT_STOP.
+
+Until then the task is investigation-only.
+
+7. PROTECTED WIP
+
+The code repository is intentionally dirty.
+Closing-start porcelain count: 194 entries.
+
+Protected untracked draft:
+tests/test_indicator_follow_history_target_parity.py
+
+Also preserve all unrelated GUI, Runtime, stock data, routine-instance, Mock,
+report, screenshot, test, and user-data artifacts.
+
+Do not reset, restore, stash, clean, delete, or broad-stage this state.
+Documentation repository also contains pre-existing protected dirty/untracked
+material unrelated to this closing. Stage only the explicit closing documents
+and the Reference Index pointer update.
+
+Existing untracked document:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-26_KIWOOM_INDICATOR_HISTORY_PARITY_SUPERSEDE.txt
+remains untouched and is not the current recovery authority.
+
+8. DEVELOPMENT ENVIRONMENT
+
+Primary Orchestrator:
+ChatGPT GPT-5.6 Sol / Integrated Development Orchestrator.
+
+Desktop Commander:
+Available.
+
+Connected device:
+KWANGS-LP.
+
+Automatic-trading Python:
+C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+Python 3.11.9 / 32-bit / PyQt5 project runtime.
+
+Codex CLI:
+Available.
+
+Verified Codex executable:
+C:\Users\JIN KWANG CHUL\AppData\Local\OpenAI\Codex\bin\80f78947ad880e6e\codex.exe
+Verified Codex version:
+codex-cli 0.155.0-alpha.16.3.
+
+Codex authentication / quota / current model:
+Must Verify before the next Codex execution.
+Do not infer availability failure from quota state or PATH.
+
+Computer Use:
+Not available as a native tool in the current ChatGPT session.
+Desktop Commander remains the local Windows execution/verification bridge.
+
+KOA StudioSA:
+running and responding at Closing; version 2.34 observed.
+
+Hero4:
+nkrunlite running and responding at Closing.
+
+ChatGPT Work:
+Do Not Use unless the user explicitly re-enables it.
+
+No SendOrder, real order, cancellation, account mutation, Queue writer, or
+Broker-side trading side effect was performed by this closing.
+
+9. NEXT SESSION ROLE
+
+Role:
+Integrated Development Orchestrator.
+
+Applicable Principle:
+제1원칙 상시 + 제2원칙 조사·분석·설계·계획 규율.
+Mandatory flow:
+제1원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판.
+
+The immediate continuation is still investigation, not implementation.
+The same conversation may proceed to implementation only after the evidence,
+minimum scope, plan, and Gate support IMPLEMENTATION_ALLOWED.
+
+Recovery read order:
+1. 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+2. 00_CANONICAL/CURRENT/
+   MASTER_SPEC_CANONICAL_2026-09-26_HERO4_INDICATOR_PARITY_TIMEFRAME_HISTORY_FINALIZATION.txt
+3. this Work Resume
+4. 00_CANONICAL/CHANGELOG/
+   MASTER_SPEC_CHANGELOG_2026-09-26_HERO4_INDICATOR_PARITY_TIMEFRAME_HISTORY_FINALIZATION.txt
+5. 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
+
+Do not reinvestigate the already committed 61ce488 / 5c651ac work unless new
+direct evidence creates a concrete conflict.
+
+10. CONTINUITY RULE
+
+If context size later creates a material risk to safe continuity, proactively
+propose the regular Conversation Closing Standard Procedure before the limit is
+reached. Do not auto-close without explicit user approval.

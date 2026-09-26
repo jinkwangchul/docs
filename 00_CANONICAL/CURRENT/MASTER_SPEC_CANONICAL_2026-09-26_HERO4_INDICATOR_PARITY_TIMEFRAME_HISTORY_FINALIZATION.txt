@@ -1,0 +1,172 @@
+MASTER SPEC CANONICAL
+2026-09-26 HERO4 INDICATOR PARITY / TIMEFRAME HISTORY FINALIZATION
+
+Status: CURRENT FREEZE
+Code repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Final code checkpoint: 5c651ac4e58c22b1ac60c62e5677609306682fc8
+Push: origin/feat/restore-auto-trade-setting-ui verified
+
+1. AUTHORITY AND SCOPE
+
+This Canonical closes the confirmed indicator-formula and retained-history work
+that continued after the earlier ccb0805 history-parity closing document.
+
+Included committed checkpoints:
+- ccb08050951b7cff7aa7eefc3128eac241ce1a02
+  fix: align indicator history with Kiwoom parity
+- 61ce488721de5aae6452df8de8b5117456318e53
+  fix: match Hero4 EAVG and flat RSI semantics
+- 5c651ac4e58c22b1ac60c62e5677609306682fc8
+  fix: align indicator history targets with Hero4 timeframes
+
+This document supersedes only conflicting fixed-600 history-target wording and
+the earlier unresolved EAVG / flat-RSI wording. Other independent contracts remain
+unchanged.
+2. HERO4 EAVG / MACD CONTRACT
+
+For ordinary numeric vectors, the current shared EMA behavior is:
+- recursive EMA state starts from the first numeric value;
+- multiplier = 2 / (period + 1);
+- when fewer than period values exist, the exposed EAVG-compatible vector is zero;
+- once period values exist, the first period output slots are backfilled with the
+  EMA value at the period-th observation;
+- subsequent values continue recursively.
+
+The sparse/None path retains its prior behavior because Hero4 missing-value
+semantics were not proven by this task.
+
+MACD / Signal / OSC remain:
+- MACD = fast EAVG - slow EAVG;
+- Signal = EAVG(MACD, signal period);
+- OSC = MACD - Signal.
+
+The causal-history wrapper preserves prefix causality so the warmed Hero4-style
+prefix cannot leak future observations into earlier historical evaluations.
+
+3. RSI FLAT-WINDOW CONTRACT
+
+The shared Wilder-style RSI family remains in force.
+For the completely flat case where average gain == 0 and average loss == 0,
+the current verified return is 0.0.
+When average loss == 0 and average gain > 0, RSI remains 100.0.
+
+No other RSI formula-family change is authorized by this Canonical.
+4. TIMEFRAME-SPECIFIC RETAINED HISTORY TARGETS
+
+Minimum warmup and desired retained history remain separate concepts.
+
+Current project retained-history targets are:
+- MINUTE: 900 target-timeframe bars
+- DAY / D1: 600 bars
+- WEEK / W1: 300 bars
+- MONTH / MO1: 120 bars
+- YEAR / Y1: 120 bars
+
+These are project normalization targets selected from the Hero4 parity work.
+They are not a claim that Kiwoom internally enforces these exact universal hard
+limits.
+
+Minimum formula availability remains controlled by warmup_bars.
+A shorter available history does not become unavailable merely because the
+desired history target has not yet been reached, provided the minimum warmup is
+satisfied.
+
+5. PRODUCTION RETENTION / PROJECTION
+
+Production MarketData keeps the existing 10 percent minute-source margin and the
+global 200,000 canonical minute-candle ceiling.
+
+A desired history target may be capped by the 200,000-minute ceiling.
+That cap does not weaken the minimum warmup gate and does not itself create an
+availability failure.
+Production projection declares history_target_bars separately from warmup_bars
+and trims the supplied target-timeframe history to the declared target when more
+history is available.
+
+For a 240-minute timeframe, the desired 900-bar minute-source requirement exceeds
+the global source-minute ceiling after margin, so retention is capped rather than
+silently redefining the minimum warmup contract.
+
+No Broker writer, Runtime writer, Queue writer, order action, or SendOrder path
+is introduced by this normalization.
+
+6. VALIDATION / INDICATOR CALCULATION HISTORY
+
+Signal Validation resolves hidden calculation history from the selected
+validation timeframe and then applies max(timeframe history target, configured
+minimum warmup).
+
+The visible chart span remains independent of hidden calculation history.
+
+Price Box still uses:
+- configured period for the rolling center line;
+- causal signed deviation history for upper/lower statistics;
+- the current population-variance convention.
+
+Where rules/timeframe context is available, Price Box, RSI causal history,
+MACD causal history, Replay, Batch, and visualization use the timeframe-specific
+history target rather than assuming one universal 600-bar context.
+7. CLEAN COMMITTED-SNAPSHOT VERIFICATION
+
+The final recovery commit was verified from a separate ZIP archive of the Git
+object, not from the dirty working tree.
+
+Verified runtime:
+C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+Python 3.11.9, 32-bit.
+
+Fresh closing verification:
+- py_compile of the final task-boundary Python modules: PASS
+- tests.test_indicator_follow_kiwoom_history_parity
+  + tests.test_production_candle_provider: 46 / 46 PASS
+- clean snapshot temporary extraction cleanup: PASS
+- local code HEAD == remote branch HEAD:
+  5c651ac4e58c22b1ac60c62e5677609306682fc8
+
+8. REMAINING DIRECT-PARITY EVIDENCE GAP
+
+After 5c651ac was pushed, the previous conversation continued read-only
+investigation against installed Hero4 / KOA resources.
+
+Confirmed installed evidence includes:
+- C:\KiwoomHero4\bin\IMAX\ChartInfo\indica\box지표.ind
+  with FORMULAR = fmBox
+- C:\KiwoomHero4\system\chartdata\funcwizard.dat
+  containing the installed indicator-function definitions
+- C:\OpenAPI\KOAStudioSA.exe, observed version 2.34
+
+The exact deterministic Samsung Electronics 005930 three-minute HTS indicator
+reading needed for a final direct numerical parity comparison was not completed.
+Therefore this Canonical does not claim that the remaining direct HTS numerical
+comparison is finished, and it does not authorize a speculative formula change.
+
+The Price Box StdevIf population-N versus sample-N-1 divisor remains without a
+direct exposed Hero4 internal declaration. The current project keeps population
+variance until stronger evidence or explicit user approval changes that contract.
+
+9. PROTECTED LOCAL STATE
+
+The automatic-trading repository remains intentionally dirty with unrelated
+local WIP, Runtime, stock data, GUI work, tests, screenshots, and user data.
+
+Protected untracked draft:
+tests/test_indicator_follow_history_target_parity.py
+
+An existing untracked documentation draft:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-26_KIWOOM_INDICATOR_HISTORY_PARITY_SUPERSEDE.txt
+is preserved untouched and is not the authoritative recovery owner.
+
+No reset, restore, stash, clean, broad add, arbitrary deletion, or unrelated
+refactor is authorized by this closing.
+
+10. FINAL VERDICT
+
+HERO4_INDICATOR_PARITY_TIMEFRAME_HISTORY_FINALIZATION_COMPLETE
+
+Final code recovery point:
+5c651ac4e58c22b1ac60c62e5677609306682fc8
+
+The next work item is the unfinished direct HTS numerical parity investigation,
+not a new formula implementation by assumption.

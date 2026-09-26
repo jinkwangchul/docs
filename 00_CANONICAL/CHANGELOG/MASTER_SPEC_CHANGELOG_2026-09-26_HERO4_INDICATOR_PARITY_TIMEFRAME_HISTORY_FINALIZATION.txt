@@ -1,0 +1,54 @@
+MASTER SPEC CHANGELOG
+=====================
+
+Date:
+2026-09-26
+
+Change:
+Close the post-ccb0805 Hero4 indicator formula and timeframe-history work.
+
+Final code checkpoint:
+5c651ac4e58c22b1ac60c62e5677609306682fc8
+fix: align indicator history targets with Hero4 timeframes
+
+Included intermediate checkpoint:
+61ce488721de5aae6452df8de8b5117456318e53
+fix: match Hero4 EAVG and flat RSI semantics
+
+Confirmed formula changes:
+- Hero4-compatible numeric EAVG warm-prefix behavior is implemented.
+- Completely flat RSI 0/0 returns 0.0.
+- MACD causal-history handling preserves prefix causality under the EAVG behavior.
+Confirmed retained-history changes:
+- MINUTE = 900 target-timeframe bars.
+- DAY = 600 bars.
+- WEEK = 300 bars.
+- MONTH = 120 bars.
+- YEAR = 120 bars.
+- minimum warmup remains separate from desired retained history.
+- global raw one-minute ceiling remains 200,000.
+- desired history may cap at that ceiling without weakening the warmup gate.
+
+Cross-path normalization:
+- Production projection / retention uses timeframe-aware history targets.
+- Validation hidden history uses the selected timeframe target.
+- Price Box / RSI / MACD causal-history paths receive timeframe-aware context
+  where rules/timeframe identity is available.
+
+Fresh closing verification from a clean Git ZIP snapshot:
+- py_compile PASS.
+- Kiwoom history parity + Production candle provider: 46 / 46 PASS.
+- local code HEAD == remote branch HEAD at 5c651ac4e58c22b1ac60c62e5677609306682fc8.
+
+Remaining evidence:
+- exact deterministic 005930 three-minute HTS numerical comparison remains open.
+- Price Box StdevIf N versus N-1 remains directly unexposed.
+Protected state:
+- unrelated code/runtime/stock/test/GUI WIP remains untouched.
+- untracked tests/test_indicator_follow_history_target_parity.py remains untouched.
+- untracked MASTER_SPEC_CANONICAL_2026-09-26_KIWOOM_INDICATOR_HISTORY_PARITY_SUPERSEDE.txt
+  remains untouched and is not promoted as current authority.
+
+Canonical:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-26_HERO4_INDICATOR_PARITY_TIMEFRAME_HISTORY_FINALIZATION.txt
