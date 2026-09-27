@@ -82,13 +82,14 @@ Staged-tree verification:
 4. CURRENT DIRTY-STATE EVIDENCE
 
 Current porcelain entry count:
-153
+149
 
 This count is not a file-count authority because Git collapses untracked
 directories and Windows stat state can differ from actual content state.
 
-Actual content-oriented inventory after Bollinger/Price Box cleanup:
-- tracked paths with content diff: 96;
+Actual content-oriented inventory after Bollinger/Price Box and
+Filter Display/Preferences cleanup:
+- tracked paths with content diff: 95;
 - staged paths: 0.
 
 Protected data/state areas remain dirty, including Stock, Runtime,
@@ -203,55 +204,51 @@ Verdict:
 USER_DECISION_REQUIRED for the user-facing Modal -> Toast policy.
 The WIP remains protected and unstaged.
 
-8. SIGNAL VALIDATION FILTER DISPLAY / PREFERENCES AUDIT
+8. RESOLVED — FILTER DISPLAY / PREFERENCES LOCAL WIP
 
-Current protected WIP includes:
-- gui_indicator_follow_signal_validation_flow.py preference-store wiring;
-- gui_indicator_follow_signal_validation_window.py Filter Display controls,
-  preference restore/persist wiring, and other large UI/chart/execution changes;
-- indicator_follow_signal_validation_preferences.py;
-- project_validation_filter_descriptors() in visualization;
-- dedicated preference/filter-display/transition tests.
+The user approved the recommendation to preserve the existing configured-filter
+visualization contract and remove the conflicting local Filter Display /
+Preferences WIP.
 
-Filter Display contract audit:
-- the pure descriptor projection helper only narrows an already supplied
-  descriptor universe by BUY/SELL side and ALL/EFFECTIVE scope;
-- however Window-side ALL SELL projection uses
-  _validation_rules_with_all_sell_visualization() to turn unchecked SELL UI
-  filters on in a visualization-only copy and materialize preview candidates;
-- tests explicitly require ALL SELL scope to include unchecked OCR, RSI,
-  Price Comparison, Price Box, Bollinger, MACD and MA Arrangement families;
-- the same feature also permits hiding filters and removing lower panes.
+Removed from local WIP:
+- Flow-level Signal Validation preference-store construction/injection;
+- global Signal Validation V2 QSettings preference module;
+- preference restore/persist methods and preference integration tests;
+- Filter Display ON/OFF, BUY/SELL/ALL, ALL/EFFECTIVE controls;
+- visualization-only ALL SELL expansion that materialized unchecked SELL
+  preview filters;
+- Filter Display projection helpers and dedicated tests.
 
-Current 2026-09-19 Signal Validation visualization authority states:
-- persistent visualization universe = BUY configured filters U SELL configured
-  filters;
-- disabled / unconfigured filters are not shown;
-- without focused Marker, configured supported series remain normally visible.
+Current visualization behavior again follows the 2026-09-19 contract:
+- visualization universe = configured BUY filters U configured SELL filters;
+- disabled/unconfigured filters are not displayed;
+- the configured supported series remain the normal no-marker display state.
 
-Therefore the current ALL-unchecked Filter Display behavior directly conflicts
-with the Current configured-universe contract.
+Direct configured-universe probe:
+- enabled SELL RSI + disabled SELL Bollinger -> RSI descriptor only;
+- result: CONFIGURED_UNIVERSE_ONLY=PASS.
 
-Verdict:
-DOCUMENT_CONFLICT_STOP for the current Filter Display implementation.
+Safety boundary:
+- no Production Settings Apply or Broker/Runtime mutation was introduced;
+- the removed preference path had been V2-local, and its removal does not alter
+  Production rules.
 
-Preferences audit:
-- QSettings store is V2-local and validated;
-- restored preference sections are validation_execution,
-  validation_market_scope and filter_display;
-- integration tests confirm those sections are excluded from Production
-  Settings Apply payload and do not mutate basic/buy/sell strategy state;
-- however no Current Canonical owner was found for persistent global V2
-  execution/market/filter-display preferences;
-- the store schema requires filter_display and therefore currently persists a
-  state belonging to the blocked Filter Display contract.
+Verification after cleanup:
+- py_compile for affected Flow/Window/Visualization/V2 files: PASS;
+- visualization tests: 16/16 PASS;
+- indicator input Candle SoT: 3/3 PASS;
+- six directly related UI/Flow tests: 6/6 PASS;
+- parity focused suite: 117/117 PASS;
+- real 005930 M1 -> Production M3 E2E:
+  Replay 113 / Batch 113, mismatch 0,
+  FILTER_SIGNAL_BACKTEST_AUTHORIZED;
+- forbidden Filter Display/Preferences symbols/references: 0;
+- target diff --check: PASS.
 
-Verdict:
-USER_DECISION_REQUIRED for persistent Signal Validation preferences.
-Do not commit the preference store alone or together with the blocked Filter
-Display implementation.
+No code commit was required because the committed baseline already contains the
+approved configured-universe behavior; this work removed conflicting local WIP
+while preserving unrelated Signal Validation UI work.
 
-The previous Bollinger and Price Box calculation conflicts have been removed.
 A remaining transition-visualization WIP has correct TURN pivot calculation
 semantics, but the exact presentation choice (pivot marker and zero-cross
 vertical dotted line) was not found as an explicit Current Canonical display
@@ -267,10 +264,9 @@ Do not select a new feature automatically.
 Before further mutation, resolve one approved work unit:
 A. NXT display-only vs INTEGRATED/<code>_AL Quick Chart market-source contract;
 B. Mock Modal vs Toast user-response contract;
-C. Filter Display configured-universe contract and persistent V2 Preferences;
-D. approve or contract the remaining transition-line presentation behavior;
-E. separately audit/freeze the remaining Signal Validation UI work unit after the
-   above display-policy decisions.
+C. approve or contract the remaining transition-line presentation behavior;
+D. separately audit/freeze the remaining Signal Validation UI work unit after the
+   remaining display-policy decision.
 
 Protected Stock/Runtime/RoutineInstance/operation-policy data remains
 Do-Not-Touch unless separately investigated and authorized.
