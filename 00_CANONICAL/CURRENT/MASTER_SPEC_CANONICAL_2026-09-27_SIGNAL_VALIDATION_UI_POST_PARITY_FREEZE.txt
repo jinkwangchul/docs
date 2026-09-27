@@ -1,0 +1,172 @@
+MASTER SPEC CANONICAL
+2026-09-27 SIGNAL VALIDATION UI POST-PARITY FREEZE
+
+Status: LOCAL FREEZE / SUPPLEMENT
+Code repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Local code checkpoint: eeaa1f5d5c15458925fdf00c196823c4dd3958c0
+Remote checkpoint: 69a1aa7c30d2787153e70b0d05d17017dc1be063
+Push: NOT PERFORMED; local branch is ahead 1.
+
+1. AUTHORITY AND SCOPE
+
+This document freezes the post-parity Signal Validation UI work completed after
+ae451cb refactor: remove obsolete validation regular-market projection.
+
+It supplements, and does not replace, the 2026-09-27 Production filter-signal
+parity freeze or the 2026-09-24 Signal Validation price/visual/MRU closure.
+
+Frozen range:
+ae451cb..eeaa1f5
+37 commits
+13 changed paths
+3 Production/UI modules and 10 directly related regression-test modules.
+
+No Broker order, account mutation, SendOrder, Queue/Position/Fill Writer,
+cancellation, modification, or live execution authority is added by this freeze.
+2. CALCULATION / DISPLAY BOUNDARY
+
+Production-session M1 aggregation and the four-gate filter-signal authorization
+remain owned by the 2026-09-27 Production parity freeze.
+
+Display projection remains presentation-only.
+Regular-market display scope may hide candles from presentation but may not
+change the underlying calculation candle set or signal decision.
+
+Range replay maps display-selected timestamps back to calculation indexes.
+It does not infer calculation indexes by suffix offset.
+
+Production-session contract identity, M1 source identity, signal-cache identity,
+source coverage fail-closed behavior, and detailed Replay authority remain
+unchanged.
+
+3. RANGE REPLAY AND SETTINGS REEVALUATION
+
+Range replay replaces markers only inside the selected validation interval while
+preserving the historical prefix needed by fixed-history filters.
+
+When settings identity changes while a validation range exists, the range is
+re-requested and replayed against the new settings state.
+
+Averaging-setting changes likewise trigger the existing selected range replay.
+
+Average-price visualization is reprojected for the selected range without
+rewriting unrelated signal evidence or calculation candles.
+4. OPERATOR PRESENTATION
+
+Completed-cycle summary presentation uses:
+- 손익: aggregate return percent plus profit amount;
+- 투입 전체: sum of completed-cycle invested amounts;
+- 평균: average invested amount across completed cycles.
+
+BUY execution tooltips preserve buy round/quantity/aggregate information.
+SELL execution tooltips preserve sell quantity/aggregate and realized
+cycle-profit presentation where available.
+
+Execution/PnL remains simplified Validation evidence and is not promoted to
+Production-equivalent execution.
+
+Internal SELL expression/reason tokens are not exposed as raw operator text.
+Supported warning/error presentation uses localized operator-facing wording.
+
+Evidence/legend presentation remains descriptive and must not change rule
+evaluation semantics.
+
+5. TRANSITION AND COMPLETED-CYCLE PRESENTATION
+
+TURN transition indexes use the pivot candle.
+Zero-cross transitions use the crossing candle.
+
+These transitions are rendered as vertical dotted guide lines.
+
+Completed-cycle row selection highlights the matching cycle presentation state.
+Rebuilding the completed-cycle result set clears stale table selection and chart
+cycle highlight before repopulation.
+
+This selection lifecycle is UI state only and does not mutate replay, rules,
+position state, or Production execution state.
+6. PRODUCTION PARITY RETENTION
+
+The previously frozen real-data evidence remains authoritative:
+005930 Samsung Electronics
+canonical M1 source -> Production M3 aggregation
+Replay 113 / Batch 113
+missing 0 / extra 0 / mismatched 0
+FILTER_SIGNAL_BACKTEST_AUTHORIZED.
+
+The current freeze does not re-authorize execution/PnL.
+Execution trust remains SIMPLIFIED_CLOSE_FILL.
+Execution parity remains NOT_PRODUCTION_EQUIVALENT.
+production_pnl_realistic remains false.
+pnl_backtest_authorized remains false.
+
+7. CLEAN-SNAPSHOT VERIFICATION
+
+An isolated local clone was checked out at eeaa1f5 so protected Working Tree WIP
+could not satisfy dependencies.
+
+Recorded clean-snapshot evidence:
+- changed V2 behavior tests: 22 / 22 PASS;
+- changed Operator UI tests: 3 / 3 PASS;
+- transition-line tests: 2 / 2 PASS;
+- visualization/evidence/axis/history/sell-price/input-candle modules:
+  85 / 85 PASS;
+- total scoped PASS: 112 / 112;
+- task Production/UI py_compile: PASS;
+- ae451cb..eeaa1f5 diff --check: PASS.
+8. PRE-EXISTING BASELINE FAILURES
+
+The broader settings-validation module is not used as pass evidence for this
+freeze because five failures are already present at the ae451cb baseline and
+reproduce unchanged at eeaa1f5.
+
+Baseline-identical failures:
+- four Bollinger direction/sign persistence or fail-closed tests;
+- one Mock operation snapshot test.
+
+The four Bollinger failures reproduce the same direction/sign mismatch at both
+checkpoints.
+
+The Mock error reproduces the same missing
+MockValidationHost._restart_recovery_blocked_session_ids attribute at both
+checkpoints.
+
+These are separate pre-existing defects and are not regressions introduced by
+the frozen 37-commit Signal Validation UI range.
+
+9. WORKING TREE PROTECTION
+
+After eeaa1f5, no directly related tracked Signal Validation Window,
+Presentation, Visualization, V2, Operator UI, Transition, or input-candle file
+remains dirty.
+
+runtime/signal_validation_v2_history_cache remains untracked runtime data and is
+not part of this code freeze.
+
+Other dirty MarketData, Mock, Runtime, Stock, RoutineInstance, operation-policy,
+report, and test WIP remains protected.
+Do not reset, restore, stash, clean, delete, or broad-stage that state.
+
+10. CODE CHECKPOINT AND REMOTE STATE
+
+Local code checkpoint:
+eeaa1f5d5c15458925fdf00c196823c4dd3958c0
+
+Latest remote checkpoint:
+69a1aa7c30d2787153e70b0d05d17017dc1be063
+
+The local branch is ahead by one commit:
+eeaa1f5 fix: clear validation cycle selection on rebuild
+
+Push was deliberately not performed in this work unit.
+
+11. COMPLETION JUDGMENT
+
+The post-parity Signal Validation UI work represented by ae451cb..eeaa1f5 is
+locally frozen and audited.
+
+No new Big Feature is selected by this document.
+Remote synchronization requires a separate explicit push step.
+
+FINAL VERDICT:
+SIGNAL_VALIDATION_UI_POST_PARITY_LOCAL_FREEZE_COMPLETE

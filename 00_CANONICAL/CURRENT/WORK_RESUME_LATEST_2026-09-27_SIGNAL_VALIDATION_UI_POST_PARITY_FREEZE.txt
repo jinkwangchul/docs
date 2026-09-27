@@ -1,0 +1,131 @@
+WORK RESUME
+2026-09-27 SIGNAL VALIDATION UI POST-PARITY FREEZE
+
+Status: VERIFIED LOCAL RECOVERY CHECKPOINT
+
+1. CODE BASELINE
+
+Repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Local HEAD:
+eeaa1f5d5c15458925fdf00c196823c4dd3958c0
+
+Remote HEAD:
+69a1aa7c30d2787153e70b0d05d17017dc1be063
+
+State:
+local branch ahead 1; push not performed.
+
+Functional authority for this work unit:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-27_SIGNAL_VALIDATION_UI_POST_PARITY_FREEZE.txt
+2. COMPLETED WORK UNIT
+
+Frozen range:
+ae451cb..eeaa1f5
+
+37 commits / 13 paths.
+
+Primary Production/UI files:
+- gui_indicator_follow_signal_validation_window.py;
+- indicator_follow_signal_validation_presentation.py;
+- indicator_follow_signal_validation_visualization.py.
+
+The work unit closes the remaining post-parity Signal Validation UI track:
+- display/calculation timestamp projection;
+- range-replay marker replacement and historical-prefix retention;
+- settings-change range rereplay;
+- completed-cycle financial summary;
+- BUY/SELL execution tooltip presentation;
+- average-price re-projection;
+- transition vertical dotted lines;
+- localized evidence/warning presentation;
+- stale completed-cycle selection clearing on rebuild.
+3. PRESERVED SAFETY CONTRACT
+
+No Broker order or account mutation authority was added.
+
+Real-data filter-signal parity remains the existing frozen evidence:
+005930 M1 -> Production M3
+Replay 113 / Batch 113
+mismatch 0
+FILTER_SIGNAL_BACKTEST_AUTHORIZED.
+
+Execution/PnL remains:
+SIMPLIFIED_CLOSE_FILL
+NOT_PRODUCTION_EQUIVALENT
+production_pnl_realistic=false
+pnl_backtest_authorized=false.
+
+4. VERIFICATION
+
+Clean detached local clone checkpoint:
+eeaa1f5.
+
+Scoped clean-snapshot results:
+- V2 changed tests 22/22 PASS;
+- Operator UI changed tests 3/3 PASS;
+- Transition tests 2/2 PASS;
+- related visualization/evidence/axis/history/sell-price/input modules
+  85/85 PASS;
+- total 112/112 PASS;
+- py_compile PASS;
+- diff --check PASS.
+5. KNOWN BASELINE DEFECTS
+
+Five broader settings-validation failures are not regressions from this work.
+
+They reproduce identically at ae451cb and eeaa1f5:
+- four Bollinger direction/sign normalization/persistence tests;
+- one Mock operation snapshot error caused by missing
+  _restart_recovery_blocked_session_ids.
+
+Do not fold these defects into the Signal Validation UI freeze without a
+separate approved work unit.
+
+6. PROTECTED WORKING TREE
+
+Direct tracked Signal Validation UI WIP after eeaa1f5: none.
+
+Untracked runtime/signal_validation_v2_history_cache is runtime evidence/cache,
+not freeze code.
+
+Other dirty MarketData/NXT, Mock, Runtime, Stock, RoutineInstance,
+operation-policy, reports, and unrelated tests remain protected.
+
+Never reset, restore, stash, clean, delete, or broad-stage them.
+7. DOCUMENTATION REPOSITORY
+
+Repository:
+C:\Users\JIN KWANG CHUL\Documents\docs
+
+Branch:
+agent/project-prompt-standard
+
+Baseline before this document set:
+c78769c174bc21ef54cc228432e56dfc1ce55dae
+
+Only this new Canonical and this new Work Resume belong to the current document
+work unit. Existing dirty documentation WIP must remain untouched.
+
+8. NEXT SAFE STEP
+
+The Signal Validation UI unit is locally frozen.
+
+Code push has not been performed.
+Do not infer remote synchronization.
+
+No next Big Feature is automatically selected.
+
+Possible next work must be explicitly approved and kept separate from:
+- NXT display-only vs INTEGRATED/<code>_AL MarketData contract;
+- Mock Modal vs Toast user-response policy;
+- pre-existing Bollinger settings-validation defects;
+- pre-existing MockValidationHost restart-recovery defect.
+
+FINAL RECOVERY VERDICT:
+SIGNAL_VALIDATION_UI_POST_PARITY_LOCAL_FREEZE_RECORDED
