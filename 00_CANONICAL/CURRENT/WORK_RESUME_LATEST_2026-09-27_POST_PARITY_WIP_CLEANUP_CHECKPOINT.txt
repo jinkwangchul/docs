@@ -82,14 +82,13 @@ Staged-tree verification:
 4. CURRENT DIRTY-STATE EVIDENCE
 
 Current porcelain entry count:
-156
+153
 
 This count is not a file-count authority because Git collapses untracked
 directories and Windows stat state can differ from actual content state.
 
-Actual content-oriented inventory at this checkpoint:
-- tracked paths with content diff: 99;
-- untracked files reported by git ls-files --others --exclude-standard: 226;
+Actual content-oriented inventory after Bollinger/Price Box cleanup:
+- tracked paths with content diff: 96;
 - staged paths: 0.
 
 Protected data/state areas remain dirty, including Stock, Runtime,
@@ -99,30 +98,36 @@ restored, stashed, or broad-staged.
 Do not use git reset/restore/stash/clean or broad add against the remaining
 working tree.
 
-5. DOCUMENT_CONFLICT_STOP — BOLLINGER INPUT
+5. RESOLVED — BOLLINGER / PRICE BOX CALCULATION CONFLICTS
 
-Protected local WIP:
-engines/indicator_engine.py
+The user approved the recommendation to retain the current Canonical calculation
+contracts and remove the conflicting local calculation WIP.
 
-Current 2026-09-26 Filter Calculation Validity Audit owns Bollinger input as the
-selected timeframe CLOSE series.
+Bollinger:
+- current 2026-09-26 authority remains timeframe CLOSE input;
+- local (HIGH + LOW + CLOSE) / 3 typical-price wiring was removed from both
+  Production indicator calculation and Validation visualization;
+- all remaining typical_prices references were eliminated.
 
-The local WIP changes Bollinger input to:
-(HIGH + LOW + CLOSE) / 3
+Price Box:
+- current 2026-09-25 authority remains the exact rolling-window canonical
+  price_box() calculation;
+- local visualization-only loaded-window cumulative AvgIf/StdevIf offset helper
+  was removed;
+- Validation visualization again consumes canonical rolling price_box() directly.
 
-Real 005930 evidence already established that the formula choice materially
-changes filter-signal output:
-- Canonical CLOSE candidate: 113 signals;
-- local typical-price candidate: 138 signals.
+Verification after cleanup:
+- Bollinger / input / Price Box focused modules: 45 / 45 PASS;
+- parity focused suite: 117 / 117 PASS;
+- real 005930 M1 -> Production M3 four-gate E2E:
+  Replay 113 / Batch 113, mismatch 0,
+  FILTER_SIGNAL_BACKTEST_AUTHORIZED;
+- current code contains no typical_prices or
+  _hero4_loaded_window_price_box_series references.
 
-Both can satisfy internal Replay/Batch parity, so parity success cannot choose
-the formula.
-
-Verdict:
-DOCUMENT_CONFLICT_STOP
-
-Do not commit this formula change without an explicit user decision and matching
-Canonical contract change.
+No code commit was required for these two corrections because the approved
+calculation contracts were already present in the committed baseline; the work
+removed conflicting local WIP while preserving unrelated Signal Validation WIP.
 
 6. DOCUMENT_CONFLICT_STOP — MARKETDATA / NXT / INTEGRATED QUICK CHART
 
@@ -171,9 +176,9 @@ MarketData investigation evidence:
   integrated MarketData/SOR normalization 25/25;
 - subtotal: 157 / 157 PASS.
 
-Two indicator modules were intentionally excluded from this MarketData verdict
-because their failures require the separately protected Bollinger/Price Box
-formula/visualization WIP.
+The earlier indicator-side failures observed during MarketData isolation were
+resolved separately by removing the conflicting Bollinger/Price Box local WIP;
+they are not MarketData defects and do not alter the MarketData contract stop.
 
 No MarketData code or fixture correction from this investigation was staged or
 committed.
@@ -212,8 +217,14 @@ The preference store is not independently useful: its Flow wiring depends on
 Window-side restore/persist controls and other V2 UI state.
 
 Do not commit the preference module alone.
-Treat this as one larger Signal Validation UI work unit, while keeping the
-Bollinger formula conflict excluded.
+Treat this as one larger Signal Validation UI work unit.
+
+The previous Bollinger and Price Box calculation conflicts have been removed.
+A remaining transition-visualization WIP has correct TURN pivot calculation
+semantics, but the exact presentation choice (pivot marker and zero-cross
+vertical dotted line) was not found as an explicit Current Canonical display
+contract. Keep that presentation WIP protected until approved or separately
+contracted.
 
 9. NEXT SAFE CONTINUATION
 
@@ -222,11 +233,11 @@ The automatic mechanical-cleanup phase has reached contract boundaries.
 Do not select a new feature automatically.
 
 Before further mutation, resolve one approved work unit:
-A. Bollinger CLOSE vs typical-price contract decision;
-B. NXT display-only vs INTEGRATED/<code>_AL Quick Chart market-source contract;
-C. Mock Modal vs Toast user-response contract;
-D. separately audit/freeze the remaining Signal Validation UI work unit while
-   excluding the blocked Bollinger formula.
+A. NXT display-only vs INTEGRATED/<code>_AL Quick Chart market-source contract;
+B. Mock Modal vs Toast user-response contract;
+C. approve or contract the remaining transition-line presentation behavior;
+D. separately audit/freeze the remaining Signal Validation UI work unit now that
+   Bollinger and Price Box calculation conflicts are removed.
 
 Protected Stock/Runtime/RoutineInstance/operation-policy data remains
 Do-Not-Touch unless separately investigated and authorized.
