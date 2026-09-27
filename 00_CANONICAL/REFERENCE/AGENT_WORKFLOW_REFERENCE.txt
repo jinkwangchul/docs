@@ -214,6 +214,9 @@ Automatic Trading Project:
   `https://github.com/jinkwangchul/kiwoom_auto`
 - Default Remote:
   `origin`
+- Current Remote Default Branch observation:
+  `origin/master`
+  This is environment state, not an immutable contract. Re-verify it when branch or push decisions depend on it.
 
 Documentation Repository:
 
@@ -458,39 +461,6 @@ Desktop Commander High-Value Utilization Policy:
 - Evaluate DC efficiency by `useful local evidence per round trip`, not by raw
   call-count minimization.
 
-Durable Local Task Execution Policy:
-- Long-running local jobs that may outlive a normal tool round trip, require
-  repeated polling, or must survive ChatGPT/DC transport loss should use the
-  verified Durable Worker when available instead of keeping a DC process session
-  open for the entire job.
-- Verified worker root:
-  `C:\Users\JIN KWANG CHUL\Documents\chatgpt_durable_worker`.
-- The immediate web-app path remains `ChatGPT Web -> Desktop Commander -> Durable
-  Worker CLI`. The MCP stdio facade is a compatible optional layer; Secure MCP
-  Tunnel or full ChatGPT MCP write integration is not required for the current
-  workflow and must not block safe local use.
-- Use `start_codex_job` for substantial Codex jobs and `start_python32_test` for
-  detached Python32 test jobs. The generic `start_task` entry point is
-  `UNSAFE/INTERNAL` and must not be exposed as an MCP-safe tool.
-- Prefer an explicit stable `TASK_ID` for substantial jobs and record that ID in
-  the execution note before relying on the detached task. The start call should
-  return promptly; do not keep a ChatGPT turn alive merely to stream progress.
-- After launch, use `get_task_status` and `get_task_result`. Use `recover_task`
-  after transport loss or uncertain completion, and `cancel_task` only when an
-  actual stop is required.
-- `transport timeout`, `socket closed`, browser reconnect, or lost DC response is
-  not evidence that the local job failed. On reconnect, inspect the same
-  `TASK_ID` first. Do not relaunch the mutation/test until the previous task is
-  confirmed absent, terminal, cancelled, or explicitly superseded.
-- Avoid repeated `read_process_output` polling for jobs already managed by the
-  Durable Worker. Persisted state/result/log artifacts are the recovery source.
-- Durable Worker completion is execution evidence, not final correctness proof.
-  Desktop Commander plus the Orchestrator still owns actual diff inspection and
-  applicable Python32/GUI/Runtime/Log/Git verification.
-- If the Durable Worker is unavailable or unsuitable for the current local job,
-  declare `DURABLE_WORKER_FALLBACK_REASON` and use the direct DC process path
-  safely. Do not pretend a durable task was created when it was not.
-
 Evidence And Verification Efficiency Policy:
 - Core rule: Single Evidence Pass, Scoped Verification, No Full Re-audit.
 - At task start, create one Task Boundary Snapshot covering task files, relevant functions or call paths, required tests, known pre-existing failures, and protected unrelated WIP.
@@ -597,11 +567,10 @@ Codex CLI Invocation Contract:
 ChatGPT Web Orchestrator
 -> Desktop Commander
 -> connected Windows device
--> Durable Worker task for long-running Codex work
-   OR direct PowerShell/local process for a short bounded Codex call
+-> PowerShell/local process
 -> local codex.exe
 -> Codex CLI task
--> persisted task result / local file-diff result
+-> local file-diff/result
 -> Desktop Commander evidence return
 -> ChatGPT Web independent criticism and verification
 ```
@@ -616,11 +585,10 @@ ChatGPT Web Orchestrator
   recorded executable path changed.
 - Verify the local Codex login state and, when relevant, the configured model and
   reasoning effort before relying on them as current facts.
-- Invoke the local CLI from the intended repository/work directory. For
-  substantial or long-running Codex work, Desktop Commander should start the
-  Durable Worker `start_codex_job` path and record its `TASK_ID`; for a genuinely
-  short bounded Codex call, direct PowerShell + `codex.exe exec` remains allowed.
-  Use noninteractive prompt input and do not leave the task waiting for terminal
+- Invoke the local CLI from the intended repository/work directory through
+  Desktop Commander using a local PowerShell/process path. Use noninteractive
+  prompt input, bounded waits, and actual process/result evidence. Do not invent
+  a detached worker layer or leave the task waiting indefinitely for terminal
   input.
 - After Codex returns, the Orchestrator must use Desktop Commander to inspect the
   actual changed files/diff and perform the applicable local Python, GUI,
@@ -645,6 +613,77 @@ ChatGPT Web Orchestrator
   parallel/subagent development, tiny commit cycles, or extra spec/plan files.
 - Project Canonical, this Workflow Reference, and the latest explicit user
   instruction override Superpowers defaults.
+
+Development Resource Contract:
+- Core rule: tool availability is not permission. Installation, login, account,
+  executable reachability, plugin enablement, or API capability never authorizes
+  scope expansion, source mutation, Git mutation, Broker side effects, or real
+  orders by itself.
+- Tool versions, process state, auth/quota, active profile, token state, current
+  branch/upstream, and executable hash/version paths are transient environment
+  facts. Verify the resources actually needed for the current task instead of
+  treating an older recorded state as current.
+- Desktop Commander is the default local execution bridge and final local
+  verification path. Use it for local files, dirty WIP, PowerShell/processes,
+  Runtime/logs, Python32/PyQt, Git evidence, launching Codex CLI, and fresh
+  verification. Transport loss is not proof of task success or failure; recover
+  actual local state before deciding what happened.
+- Codex CLI is the primary implementation specialist for substantial MEDIUM and
+  HEAVY work after the approved plan/Gate. Resolve the current local codex.exe
+  when needed; do not assume a stable hashed install path or PATH registration.
+  Codex receives a self-contained task boundary, protected WIP, Canonical
+  references, verification requirements, and safety restrictions. Its success
+  message is not final evidence.
+- Codex Windows App is an exceptional resource, not the normal implementation
+  path. Use it only when the operator explicitly requests the Windows App for the
+  current situation. Do not use SendKeys, focus injection, or other brittle GUI
+  typing as the normal way to issue Codex instructions.
+- Superpowers is a selective methodology/quality layer only. Its brainstorming,
+  systematic debugging, planning, TDD, review, and fresh-verification skills may
+  be used when they add value. It does not replace this project's workflow.
+  Multi-agent/subagent skills may be used only when actual Codex multi-agent
+  capability is verified; do not enable or reconfigure it without user approval.
+- Ponytail is an overengineering/complexity auditor, not an implementation or
+  design authority. Project default mode is OFF. Use review after implementation
+  when useful and audit for explicitly approved cleanup investigations. Lite is
+  limited-use; full is for approved audit work; ultra requires explicit operator
+  approval. Ponytail findings are candidates only and never authorize automatic
+  deletion, refactoring, dependency removal, interface removal, or contract
+  change. Order/Fill/Cancel/Liquidation, Safety Gate, Price Contract,
+  Canonical/SoT, Session/Market State, live-vs-validation boundaries,
+  Candle Cache/Warm-up, Routine discovery, and external API boundaries are
+  protected until actual Call Graph, Canonical, regression impact, and user
+  approval support a change.
+- Kiwoom CLI is the REST-based broker evidence and controlled order path. Before
+  API use, verify current profile, real/mock target, credential/token, and call
+  readiness with auth status and doctor when needed. Historical auth state is
+  never current proof. For order commands, absence of --confirm is Preview /
+  no-send and presence of --confirm performs the real send; never use --confirm
+  without explicit approval for the current real-order operation. Distinguish a
+  CLI wrapper limitation from a Kiwoom REST API limitation.
+- Kiwoom OpenAPI+ is the Production Broker/Realtime integration boundary.
+  Login/TR/realtime/order/fill/balance access must go through the approved
+  adapter/execution boundary. General GUI/Domain/Filter code must not bypass that
+  boundary. Real account balance, fills, order state, fees, taxes, and realized
+  trading results should use broker-returned evidence as the final authority when
+  available.
+- KOA StudioSA is an OpenAPI contract-inspection resource for official TR,
+  input/output field, FID, Real Type, function, and event evidence. It is not an
+  implementation authority. Do not claim a GUI observation that was not actually
+  observed.
+- Hero4/HTS is an operator-visible external comparison resource for chart,
+  indicator, order, fill, open-order, and account-state checks. HTS presentation
+  does not automatically become the internal calculation Canonical; internal
+  calculations follow the approved Raw Data -> Canonical Candle -> Canonical
+  Indicator Engine -> Signal Engine contract.
+- Keep the Python runtimes separate. The Kiwoom ActiveX/PyQt5 legacy program uses
+  the required 32-bit Python runtime; modern tooling may use a separate 64-bit
+  runtime. Verify architecture/interpreter before execution and never treat them
+  as one interchangeable environment.
+- Git/GitHub are recovery, synchronization, history, and remote-baseline
+  resources. Commit = recovery point, Push = synchronization, PR = large feature
+  unit unless an approved exception applies. Never clean/reset/restore/revert or
+  force-push unrelated WIP merely to make the worktree tidy.
 
 Computer Use / KOA Studio Session Handoff Policy:
 - One Phase should be performed from start to finish inside one Codex task by default.
@@ -677,10 +716,13 @@ Computer Use / KOA Studio Session Handoff Policy:
 - Official function, event, TR definition, FID, Real Type, and development-guide
   inspection is allowed when performed read-only.
 - Keep permanent operating rules separate from current environment state.
-  Current facts such as Computer Use availability, KOA StudioSA installed
-  version, installed official materials, latest official Kiwoom audit document,
+  Transient facts such as Computer Use availability, KOA StudioSA current version,
+  authentication/quota state, running processes, latest official audit result,
   and remaining PARTIAL or unverified contracts belong in Latest Work Resume or
-  the Next Session Startup Prompt, not as permanent Canonical facts.
+  current recovery evidence, not as permanent Canonical facts.
+- Stable prepared tool paths and role boundaries may be listed in
+  `00_CANONICAL/REFERENCE/AUTO_TRADING_STARTUP_PROMPT.txt`, but their actual
+  availability/state must be re-verified when relevant.
 
 ## 3. Work Purpose
 
@@ -792,12 +834,12 @@ Default priority:
 2. Cause confirmation
 3. Minimal implementation
 4. Verification
-5. Local version management
-6. Documentation only when requested or at Project Freeze
+5. Work-unit recovery/synchronization checkpoint when appropriate
+6. Contract/document maintenance when the verified work or explicit user decision requires it
 
-Forbidden during implementation unless explicitly requested:
+Forbidden during implementation unless explicitly required by the current work:
 - Long repeated structure audits
-- Middle-of-work Canonical, Changelog, or Work Resume creation
+- Unnecessary middle-of-work Canonical, Changelog, or Work Resume creation
 - Expanding the task into future design
 - Treating tests, files, helper functions, or state names as completed user features
 - Ending at an internal pipeline stage when the requested user flow remains disconnected
@@ -847,9 +889,12 @@ Without explicit user approval, do not perform:
 - Structure changes
 - Contract changes
 - Test changes
-- Documentation changes
-- Git work
 - Extra feature additions
+
+Documentation and Git work are additionally allowed only by the standing
+Work-Unit Persistence / Checkpoint Policy in Section 10 and only inside the
+verified task boundary or confirmed contract change. That policy does not
+authorize unrelated cleanup, broad documentation edits, or unrelated Git work.
 
 If an improvement is discovered, report it as:
 
@@ -902,1129 +947,142 @@ Real side effects must go through the existing canonical writer, service, or com
 
 ## 9. Session Startup Policy
 
-At the start of a new session, use the Latest Work Resume to recover the work
-position. Startup is not a broad document review, but the Mandatory Pre-Work
-Contract Audit Gate is required before implementation.
+Automatic Trading Project startup template:
+`00_CANONICAL/REFERENCE/AUTO_TRADING_STARTUP_PROMPT.txt`
 
-Startup triggers:
-- New conversation
-- Continuing previous work
-- Resuming after a Git baseline change
-- User asks to verify current baseline before work
+This file is the single reusable, task-neutral startup prompt for the project.
+Do not embed a fixed current task, test count, next feature, Branch, Commit, or
+pre-written handoff result in it.
 
-Session Startup Source Resolution Policy:
+Startup Prompt application trigger:
+- A new conversation by itself is NOT a trigger.
+- Apply the Startup Prompt when the user explicitly requests startup-prompt
+  application for the automatic-trading project in that conversation.
 
-Before reading project documents or source code, identify the active work environment.
-
-- ChatGPT with GitHub connector: use the GitHub docs repository and GitHub code repository as the remote backup and restoration baseline.
-- Local Codex / VSCode: use the local docs repository and local code repository as the working baseline.
-
-Use the source that matches the active environment. Do not mix GitHub connector state and local repository state unless the user explicitly asks for a comparison.
-Apply the Execution Environment Policy before reporting repository state. Local Git command results may be reported only when local Git command execution is available.
-
-Startup execution flow:
-
-1. Identify the active environment and verify the repository identity.
-2. Read the Latest Work Resume for the previous completion state and current
-   work position.
-3. Confirm the fixed next-task scope from the latest user instruction and the
-   Work Resume. A Work Resume candidate is recovery context, not implementation
-   authority by itself.
-4. Confirm the current Git baseline using evidence available in the active
-   environment.
-5. Run the Mandatory Pre-Work Contract Audit Gate against the task's related
-   CURRENT, REFERENCE, minimal Historical evidence, and actual code.
-6. Compare PRE / Freeze / Current implementation and report the documents,
-   contract, implementation state, difference, conflict or gap, and impact on
-   Source of Truth, Writer, and schema.
-7. Report exactly one of `IMPLEMENTATION_ALLOWED`,
+Direct previous-conversation recovery rule:
+1. Directly investigate the immediately preceding conversation belonging to the
+   same `kiwoom_auto` project.
+2. Do not require the previous conversation to have produced a Closing report,
+   handoff package, or pre-selected next task.
+3. Recover from the actual previous conversation:
+   - last user-authorized task
+   - completed work
+   - in-progress / unfinished work
+   - user decisions and approvals
+   - protected WIP / Do-Not-Touch boundaries
+   - last implementation and verification point
+   - unresolved blocker or evidence gap
+   - the concrete next work that continues the same task
+4. The new conversation itself determines and reports the continuation target.
+   A pre-written Resume next-item, old plan, PR, merge, or default branch does not
+   choose the task.
+5. Treat prior-conversation content as continuity evidence, not proof of current
+   local state. Verify it against actual local code, Git, WIP, Runtime, logs,
+   process state, and task-relevant CURRENT Canonical/Reference through Desktop
+   Commander when local access is available.
+6. If the immediately preceding same-project conversation is unavailable,
+   incomplete, or ambiguous, use Latest Work Resume only as fallback recovery
+   evidence.
+7. If the continuation target remains ambiguous after direct conversation and
+   local-state investigation, report the ambiguity and obtain user direction
+   instead of inventing or selecting a new Big Feature.
+8. Before mutation, run the normal Mandatory Pre-Work Contract Audit Gate and
+   issue exactly one of `IMPLEMENTATION_ALLOWED`,
    `USER_DECISION_REQUIRED`, or `DOCUMENT_CONFLICT_STOP`.
-8. Start implementation only after `IMPLEMENTATION_ALLOWED`.
-9. If the Latest Work Resume states that no next implementation item is
-   authorized, do not infer or select a Production gap. Wait for the user's
-   next implementation instruction.
-10. If no explicit next task exists and selecting one is not prohibited, report
-    the earliest verified user-visible Production gap as a candidate. Do not
-    implement that candidate until its Targeted Contract Audit produces
-    `IMPLEMENTATION_ALLOWED`.
 
-Reference rules:
-
-11. Read only the corresponding Current Canonical and Reference sections needed
-    for the Targeted Contract Audit and implementation.
-12. Use Reference Index only to locate required documents.
-13. Re-read this file only when operating rules changed, a new operating rule
-    must be applied, or the user asks.
-
-External Tool Environment restoration:
-- Restore Durable Worker availability, verified root, local MCP stdio facade
-  state, and default Durable routing when those values are present in the closing
-  handoff.
-- If Durable Worker is recorded as `VERIFIED_AVAILABLE`, do not spend the new
-  session rediscovering whether it exists. Use it immediately for qualifying
-  long-running Codex/test work unless current evidence shows the environment has
-  changed.
-- When the Latest Work Resume or Next Session Startup Prompt records external
-  tool environment state, restore at least Computer Use availability, KOA
-  StudioSA installed or confirmed version, installed official Kiwoom materials,
-  the latest official Kiwoom Evidence or audit document, and remaining PARTIAL
-  or unverified external contracts.
-- If this information is already recorded in the previous closing documents, do
-  not require the user to explain it again.
-- Do not make new-session recovery depend on reading the previous conversation.
-  The Work Resume and Next Session Startup Prompt must carry the environment
-  contract needed for the next task.
-
-Forbidden:
-- Broad structure audit without need
-- Re-reading AGENT, Reference Index, full Canonical, historical documents, or broad project structure by default
-- Adding startup checks inferred from general development or Git practices
-- Treating old Work Resume next steps as current user instruction
-- Starting implementation before the fixed problem and allowed scope are known
-
-### PR History Exclusion Policy
-
-Session Startup and restoration after Project Freeze must not use Pull Request
-or merge history as the working baseline.
-
-The following are not Startup Sources:
-- Pull Request lists
-- closed or merged Pull Requests
-- merge history
-- the latest state of the GitHub default branch such as `master` or `main`
-- recent merge commits
-- past feature branches
-- past review records
-
-These may be inspected only when the user explicitly requests them. Even then,
-they are reference material and cannot replace the approved restoration
-baseline.
-
-Startup Source priority is:
-1. Latest user instruction
-2. `AGENT_WORKFLOW_REFERENCE.txt`
-3. Latest Official Canonical
-4. Latest Work Resume
-5. user-specified branch
-6. user-specified commit
-7. actual Git state available in the current execution environment
-
-Pull Request or merge history cannot replace, reorder, or reinterpret these
-sources.
-
-Branch Resolution Rule:
-- When the user specifies a branch and commit, that pair is the restoration
-  baseline.
-- Verify only whether the specified branch exists and whether the specified
-  commit exists in the available repository evidence.
-- If the remote branch cannot be found, do not infer or replace it from a Pull
-  Request, merge history, a recent merge commit, a past feature branch, or the
-  default branch.
-- If the specified branch or commit cannot be confirmed, report exactly what
-  could not be confirmed and stop until the user provides direction.
-
-Work Resume Rule:
-- If the Latest Work Resume states that no next implementation item is
-  authorized, do not infer a Production Gap.
-- Do not inspect Pull Requests or merge history to invent or select the next
-  feature.
-- Wait for the user's explicit implementation instruction.
-
-GitHub Interpretation Rule:
-- GitHub is used for backup, recovery, and baseline verification.
-- A recent Pull Request, merge, commit, or default-branch state is not an
-  implementation-start authority.
-
-Forbidden:
-- Inferring that `master` or `main` is the current baseline because it contains
-  work merged after a Pull Request.
-- Replacing a user-specified branch with the default branch.
-- Interpreting current implementation state from a Pull Request number.
-- Finding and starting work from a Pull Request when the Latest Work Resume
-  does not authorize a next task.
-
-Reference Index is only an index. It is not an operating policy document.
-Follow only the operating procedures defined by this project. The Mandatory
-Pre-Work Contract Audit is a required targeted gate even when the Latest Work
-Resume names a next implementation point; it must not be expanded into a broad
-or repeated full-project document audit.
-
-## 10. Conversation Shutdown / Project Freeze Policy
-
-Conversation Shutdown is Project Freeze, not casual summarization.
-
-Context Capacity Early Closing Proposal Rule:
-- The AI must continuously consider whether the current conversation is becoming too large to preserve safe project continuity through the next meaningful work boundary.
-- Do not claim an exact context-window usage percentage, remaining-token count, or precise limit unless the active environment actually exposes that measurement.
-- Use practical warning signs such as accumulated long logs, code, Codex/agent reports, repeated design decisions, large attached material, and increasing dependence on compressed prior context.
-- When continued work creates a material risk of reaching the conversation context limit before a safe handoff, proactively tell the user and propose starting the regular Conversation Closing Standard Procedure before the limit is reached.
-- This is a proposal only. Context pressure does not authorize automatic Project Freeze, Git work, documentation work, or creation of a Next Session Startup Prompt.
-- Do not start the regular Closing procedure until the user explicitly approves closing, moving to a new conversation/window, or equivalent.
-- When practical, make the proposal at a safe implementation/test boundary. If waiting for that boundary itself creates a material context-loss risk, propose Closing immediately and report the current unfinished state accurately.
-- Every final Next Session Startup Prompt must carry this same proactive early-closing proposal rule so the next conversation inherits it.
-
-Shutdown triggers:
-- User says the work is ending
-- User says to move to the next conversation or next window
-- User says "마감", "작업 종료", "오늘은 여기까지", "Freeze", or equivalent
-- User asks to create a next-session baseline
-
-Project Freeze is allowed even though Implementation First normally places documentation after implementation. Freeze work is operational baseline creation, not feature documentation.
-
-Freeze includes, when requested or needed:
-- Project state check
-- Git status check
-- Commit of completed project work
-- Push to GitHub as backup and next-session recovery baseline
-- New Latest Official Canonical for confirmed project contracts only
-- New Latest Work Resume for recovery state
-- New Latest Changelog for Canonical changes
-- Reference Index update when latest document pointers change
-- Final verification that local and remote baselines match
-- Environment handoff when the development environment, tools, Codex plugins,
-  Computer Use availability, external official-material access method, KOA
-  Studio version or installation state, or official Evidence inspection method
-  changed during the conversation
-
-Big Feature Freeze must record:
-- Current Big Feature Goal
-- Current Big Feature progress
-- Completion criteria
-- Current blocker or next start point
-- Why the next Big Feature must not be selected yet, if the current one is not complete
-
-Freeze is complete only when the next AI can continue the same work from GitHub and the recorded documents without reading the previous conversation.
-
-Freeze must not record ideas, unapproved plans, or discussed UI proposals as Canonical.
-
-Latest Work Resume environment handoff:
-- Conversation Closing must record the current environment state needed by the
-  next task when external tool contracts changed or matter to recovery.
-- Record reproducible environment contracts, not temporary UI positions or which
-  window happened to be foreground at shutdown.
-
-## 11. Conversation Closing Standard Procedure
-
-Run this procedure only when the user explicitly says they are moving to the next conversation, opening a new window, closing the window, finishing, wrapping up, or equivalent.
-
-Step 1. Implementation Work Ends
-
-Confirm that the implementation work itself has ended.
-
-This means:
-- Code implementation is complete.
-- Required tests and verification are complete.
-- The completed work scope and excluded scope are known.
-
-Do not create a Next Session Startup Prompt at this step.
-
-Step 2. Integrated Closing Execution
-
-The current AI responsible for Conversation Closing performs the close-out work directly. The former Codex-specific closing prompt is retired and its duties are absorbed into this procedure.
-
-The Closing AI performs, as applicable:
-- Git status inspection
-- Commit
-- Push
-- Canonical update
-- Changelog update
-- Work Resume update
-- Development Environment handoff refresh
-- Other close-out work explicitly required by this Workflow Reference
-
-Codex CLI may be used as an optional specialist during Closing only when it adds material value. It is never required for Closing, and Codex quota exhaustion or unavailability must not block Project Freeze when the current AI can complete and verify the work through Desktop Commander and available Git evidence.
-
-Do not create a Next Session Startup Prompt during this step.
-
-Step 3. Integrated Closing Report
-
-The same Closing AI reports the close-out result from actual evidence.
-
-The report must include:
-- Commit SHA
-- Push result
-- Updated documents
-- Git status
-- Any protected dirty/untracked files that intentionally remain
-- Development Environment state needed by the next session
-
-Do not create a Next Session Startup Prompt in the completion report unless Steps 2 through 4 have already completed.
-
-Step 4. Independent Result Verification
-
-The Closing AI must independently re-check the close-out result before declaring Conversation Closing complete.
-
-Required checks:
-- Commit SHA
-- Branch
-- Push success or exact push failure reason
-- Git status
-- Canonical creation or update status
-- Work Resume creation or update status
-- Changelog creation or update status
-- Protected dirty/untracked files remain protected
-
-Conversation Closing is complete only after these checks pass or an unresolved blocker is explicitly reported.
-
-The Closing AI must not rely on an implementation agent, Codex report, previous
-message, or assumed tool state as proof. Re-read the final Git/document/tool
-evidence directly before moving to Step 5.
-
-Step 5. Create The Next Session Startup Prompt
-
-Create the Next Session Startup Prompt only after Steps 2 through 4 are complete.
-
-Never create it before close-out commit, push, Canonical, Work Resume, Changelog, and Git status verification are complete.
-
-The prompt must be based on the final:
-- Commit
-- Branch
-- Canonical
-- Work Resume
-- Changelog
-- Git status
-
-The Next Session Startup Prompt must be written exactly once.
-
-Forbidden:
-- Temporary Next Session Startup Prompt
-- Preliminary Next Session Startup Prompt
-- Draft Next Session Startup Prompt
-- Intermediate Next Session Startup Prompt
-- Multiple competing startup prompts
-
-Every final Next Session Startup Prompt must begin with this independent role
-declaration block:
-
-```text
-==================================================
-Current AI Role
-==================================================
-
-Role:
-<Integrated Development Orchestrator / Execution Agent / Design-Audit-Manager / Must Confirm>
-
-Applicable Principle:
-<제1원칙 상시 + 제2원칙 조사·분석·설계·계획 규율 / 제1원칙 / 제2원칙 / Must Confirm>
-
-==================================================
-```
-
-Role declaration rules:
-- Determine the next-session role only from the latest user instruction, the
-  confirmed nature of the next task, and the verified handoff. Do not guess the
-  role.
-- If the role is not confirmed at Closing, write `Role: Must Confirm` and
-  `Applicable Principle: Must Confirm`, and require the next session to confirm
-  the role before work starts.
-- For `Role: Execution Agent`, declare `Applicable Principle: 제1원칙` and state
-  explicitly that changes, deletions, refactors, cleanup, and new implementation
-  outside the authorized target are forbidden.
-- For `Role: Design-Audit-Manager`, declare `Applicable Principle: 제2원칙` and
-  state explicitly that the AI must investigate and analyze first, must not
-  guess or treat unconfirmed facts as confirmed, must confirm cause and impact
-  scope, must establish the minimum implementation scope and plan, must issue
-  the Gate verdict, and may write an Execution Agent implementation instruction
-  only after `IMPLEMENTATION_ALLOWED`. It must not confuse itself with the
-  Execution Agent role.
-- For `Role: Integrated Development Orchestrator`, declare the combined
-  applicable principle exactly as shown above. The AI owns the end-to-end flow
-  `제1원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판`, uses the existing
-  Gate before implementation, selects Desktop Commander or Codex according to
-  the Development Tool Routing Policy, and performs independent criticism and
-  fresh verification before completion.
-- This role declaration does not replace the independent First Principle block
-  or any other existing mandatory Startup Prompt content below.
-
-Any AI that writes a Startup Prompt is governed by the Second Principle for
-Closing/handoff verification, including an Integrated Development Orchestrator.
-Before writing the Startup Prompt, its author must
-verify in this order:
-1. final Closing result
-2. actual Branch and Commit
-3. actual protected WIP
-4. Latest Canonical and Work Resume
-5. current completion state
-6. whether the next task is actually confirmed
-7. the next AI role
-8. the principle applicable to that role
-9. only then write the Startup Prompt
-
-Do not invent the next task or role from inference.
-
-The final prompt must include:
-- The following independent Context Capacity Early Closing Proposal block. It must be
-  reproduced explicitly in every final Next Session Startup Prompt so the next
-  conversation proactively proposes regular Closing before context continuity is at risk:
-
-```text
-==================================================
-Context Capacity Early Closing Proposal
-==================================================
-- Continuously consider whether accumulated conversation, logs, code, files,
-  agent/Codex reports, and prior decisions are approaching a level where safe
-  continuity through the next meaningful work boundary may be lost.
-- Do not claim an exact context usage percentage, remaining-token count, or
-  precise limit unless the active environment actually exposes it.
-- Before the conversation context limit is reached, proactively tell the user
-  when there is a material continuity risk and propose starting the regular
-  Conversation Closing Standard Procedure.
-- This is a proposal only. Do not automatically Freeze, perform Git/document
-  closing work, or create a Next Session Startup Prompt because of context pressure.
-- Start regular Closing only after the user explicitly approves closing, moving
-  to a new conversation/window, or equivalent.
-- Prefer proposing at a safe implementation/test boundary. If waiting itself
-  risks losing context, propose immediately and preserve the unfinished state
-  accurately in the approved Closing procedure.
-==================================================
-```
-
-- The following independent Mandatory Development Workflow block. It must be
-  reproduced explicitly whenever the next-session role is Integrated Development
-  Orchestrator, and it must not be replaced by a reference to this file:
-
-```text
-==================================================
-Mandatory Development Workflow
-==================================================
-
-제1원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판
-
-- 제1원칙은 모든 단계에서 계속 적용한다.
-- 조사·분석에서는 추측하지 않고 실제 근거를 확인한다.
-- 설계·계획에서 새 계약/정책/범위 결정이 필요하면 사용자 확인을 받는다.
-- 계획 후 기존 Gate verdict를 통과해야 구현으로 진입한다.
-- 구현 도구는 Development Tool Routing Policy에 따라 선택한다.
-- 구현 완료 보고를 그대로 신뢰하지 않고 비판 단계에서 독립 재검토한다.
-- 비판 결과는 BLOCKER / IMPORTANT / MINOR / EVIDENCE_GAP으로 구분한다.
-- 비판 후 fresh verification 근거가 있어야 완료로 판정한다.
-==================================================
-```
-
-- The following independent `제1원칙 — 작업 범위 절대 보호` block, reproduced
-  explicitly in every final Next Session Startup Prompt. It must not be omitted,
-  shortened, summarized, buried inside another rule, or replaced by an indirect
-  reference to this file:
-
-```text
-==================================================
-제1원칙 — 작업 범위 절대 보호
-==================================================
-
-구현·수정하려는 명시적 대상 이외에는
-그 어느 것도 임의로 변경, 삭제, 추가 구현하지 않는다.
-
-작업 중 다른 결함, 개선점, 중복 코드, 오래된 코드,
-테스트 문제, 문서 문제, 구조 문제를 발견하더라도
-현재 사용자가 명시적으로 승인한 작업 범위가 아니면:
-
-- 수정하지 않는다.
-- 삭제하지 않는다.
-- 추가 구현하지 않는다.
-- 리팩터링하지 않는다.
-- 정리하지 않는다.
-- 테스트 기대값을 임의 변경하지 않는다.
-- 문서 계약을 임의 변경하지 않는다.
-
-필요하면 발견사항으로만 보고한다.
-
-판단 기준:
-
-"이 변경이 사용자가 명시한 현재 구현/수정 대상의
-정상 완료에 직접 필수인가?"
-
-YES
-→ 승인된 범위 안에서 최소 변경
-
-NO
-→ 변경 금지
-
-판단 불가 또는 새로운 계약/정책/범위 결정 필요
-→ 작업 중단 후 사용자에게 보고
-
-사용자의 추가 명시 승인 없이
-작업 범위를 확대하지 않는다.
-==================================================
-```
-
-- The final prompt must also include an independent `Full Task Instruction
-  Prompt Handoff Rule` that explicitly instructs the next-session AI as
-  follows:
-  - Whenever it writes a complete/full project work instruction prompt intended
-    for Codex or another implementation agent, that generated instruction prompt
-    must begin with the project's First Principle.
-  - The generated full task instruction prompt must explicitly reproduce the
-    following block at its top:
-
-```text
-==================================================
-제1원칙 — 작업 범위 절대 보호
-==================================================
-
-구현·수정하려는 명시적 대상 이외에는 그 어느 것도
-임의로 변경, 삭제, 추가 구현하지 않는다.
-
-이 원칙은 모든 분석·구현·테스트·문서·Git 작업보다 우선한다.
-==================================================
-```
-
-  - The next-session AI must not omit that block on the basis that the First
-    Principle already exists in the Next Session Startup Prompt, this
-    `AGENT_WORKFLOW_REFERENCE`, current chat context, or another governing
-    document.
-  - A generic Forbidden, Scope, Warning, Change Scope Rule, or equivalent
-    section does not substitute for the explicit First Principle block.
-  - This requirement applies whenever the AI generates a complete project work
-    instruction intended to be handed to Codex or another implementation agent.
-
-- Environment resolution
-- External Tool Environment, when needed for recovery or when external tool
-  contracts changed during the conversation
-- Source of Truth selection
-- Conditional repository verification against Project Identity before work starts:
-  run `git remote -v`, `git branch --show-current`, `git rev-parse HEAD`,
-  `git status -sb`, and `git diff --stat` only when local Git command execution
-  is available; otherwise report GitHub-visible information and mark local-only
-  verification fields as not confirmed.
-- Repository Information block from the Conversation Closing Template
-- Latest repository branch and commit
-- Dirty or untracked state to preserve
-- Recently completed work
-- Current implementation location
-- The first concrete next implementation task, if one is defined by the Source of Truth
-
-Every final Next Session Startup Prompt must include this verified Development
-Environment block. Fill it from the actual Closing state; use `Must Verify`
-instead of guessing any value.
-
-Codex availability must be resolved by executable reachability, not by PATH alone:
-- A failed `Get-Command codex` or bare `codex` lookup does not prove Codex is
-  unavailable.
-- When Desktop Commander is available, resolve the actual local `codex.exe`
-  from the current OpenAI Codex app installation and/or current VS Code OpenAI
-  extension path, then verify the executable with `--version` and verify login
-  state when authentication matters.
-- If a working executable is found and can be launched through Desktop Commander,
-  record `Codex CLI: Available` even when `codex` is not registered in PATH.
-- Record `Codex CLI: Not Available` only when no runnable local Codex executable
-  can be resolved/launched. Authentication, quota, or another execution blocker
-  must be recorded separately and must not be mislabeled as CLI unavailability.
-- Direct ChatGPT Web invocation not being available is a routing constraint, not
-  a Codex availability failure; use the Codex CLI Invocation Path below.
-
-```text
-==================================================
-Development Environment
-==================================================
-
-- Primary Orchestrator: <current verified ChatGPT model / role>
-- Desktop Commander: <Available / Not Available / Must Verify>
-- Connected Device: <verified device name / Must Verify>
-- Automatic Trading Repository: <Project Identity local path>
-- Documentation Repository: <Project Identity local path>
-- Python Runtime: <verified executable path, version, bitness / Must Verify>
-- Codex CLI: <Available / Not Available / Must Verify>
-- Codex CLI Executable: <verified path / Must Verify>
-- Codex Authentication: <verified state / Must Verify>
-- Codex Execution State: <Ready / Quota Blocked / Auth Blocked / Environment Blocked / Must Verify>
-- Codex Model / Reasoning: <verified current setting / Must Verify>
-- Durable Worker: <VERIFIED_AVAILABLE / Not Available / Must Verify>
-- Durable Worker Root: <verified path / Must Verify>
-- Durable MCP Stdio Facade: <Available / Not Available / Must Verify>
-- Durable Default Route: <DC -> Durable Worker -> Codex/Test when verified available>
-- Superpowers: <Available / Not Available / Must Verify>
-- ChatGPT Work: Do Not Use unless the user explicitly re-enables it
-
-Tool Routing:
-- Core rule: Parallel Reasoning, Serialized Mutation.
-- Classify implementation weight as LIGHT / MEDIUM / HEAVY before implementation.
-- LIGHT -> default `DC_ONLY`; Codex optional; small direct edits may use DC.
-- MEDIUM -> default `HYBRID_PARALLEL`; ChatGPT + Desktop Commander establishes
-  actual local evidence and verification conditions, while Codex CLI normally
-  takes primary code analysis and implementation after plan/Gate. Codex may also
-  perform criticism. If Codex is skipped, state `CODEX_SKIPPED_REASON`.
-- HEAVY -> default `CODEX_PRIMARY` when Codex is available for code analysis and
-  implementation. ChatGPT + Desktop Commander owns local environment evidence,
-  Python/GUI/Runtime/Log execution, safety checks, and final verification.
-- When Durable Worker is `VERIFIED_AVAILABLE`, substantial or long-running
-  MEDIUM/HEAVY Codex execution and detached Python32 test execution use the
-  Durable route by default. Direct long-lived DC process execution requires a
-  concrete `DURABLE_WORKER_FALLBACK_REASON`.
-- Before any write, select exactly one Mutation Owner for each overlapping write
-  surface. Do not let ChatGPT/Desktop Commander and Codex modify the same
-  mutation boundary concurrently.
-- While Codex runs, continue safe non-conflicting read-only investigation,
-  Runtime/Log review, GUI-path tracing, test-scope analysis, or verification
-  preparation instead of idling.
-- Required planning declaration:
-  Execution Weight / Orchestration Mode / Codex Role / Mutation Owner /
-  Verification Owner, plus CODEX_SKIPPED_REASON when MEDIUM/HEAVY skips Codex.
-- Verification Owner remains ChatGPT Web + Desktop Commander.
-- Desktop Commander speed rule: batch independent read-only inspections and
-  verification commands into as few round trips as practical.
-- Codex output is not final evidence; independently verify the actual diff and
-  applicable tests, Runtime, logs, state, or GUI result.
-- If Codex quota is exhausted or Codex is unavailable, continue through
-  ChatGPT Web + Desktop Commander when safe.
-- Superpowers is used only as a selective quality gate. Do not introduce
-  Superpowers-managed worktrees, Superpowers parallel/subagent development,
-  tiny commit cycles, or extra spec/plan files by default. This does not prohibit
-  the explicit ChatGPT Web + Desktop Commander + local Codex CLI hybrid policy
-  defined above.
-==================================================
-```
-
-Every final Next Session Startup Prompt must also reproduce this independent
-Local Execution Authority And Codex Recovery block. This block exists so a new
-conversation does not mistake a missing PATH registration for missing local
-execution authority or unavailable Codex:
-
-```text
-==================================================
-Local Execution Authority And Codex Recovery
-==================================================
-- When Desktop Commander is connected and verified, ChatGPT Web is authorized
-  to use it as the local execution bridge to the user's connected Windows PC.
-- Through Desktop Commander, ChatGPT Web may inspect authorized local project
-  files/state and run the PowerShell, Git, approved Python runtime, focused
-  tests, process inspection, Runtime/Log/cache checks, and other local
-  verification required by the approved task.
-- Desktop Commander is also the authorized bridge for launching the user's
-  local Codex CLI. A separate direct ChatGPT Web -> Codex tool is not required.
-- If the user explicitly says `Codex로 진행`, `코덱스로 진행`, or otherwise
-  assigns implementation to Codex, treat that as an instruction to launch and
-  manage the local Codex CLI through Desktop Commander when the verified local
-  route is available. Do not merely write a Codex prompt and hand execution
-  back to the user unless the user explicitly asks for a manual prompt or local
-  Codex launch is actually blocked.
-- A failed bare `codex`, `where codex`, or `Get-Command codex` lookup does NOT
-  prove Codex is unavailable. PATH registration is optional.
-- If the short command is missing, resolve a runnable Codex executable using
-  current local evidence. Check, as applicable:
-  1. an already running `codex` process and its executable Path;
-  2. the current OpenAI Codex Windows app installation under
-     `%LOCALAPPDATA%\\OpenAI\\Codex\\bin\\*\\codex.exe`;
-  3. current npm/npx cache installations such as
-     `%LOCALAPPDATA%\\npm-cache\\_npx\\*\\node_modules\\.bin\\codex.cmd`
-     and the corresponding `@openai/codex` package;
-  4. the current OpenAI/ChatGPT VS Code extension installation and its bundled
-     Codex executable when present;
-  5. normal PATH/command discovery as supplemental evidence, not the sole test.
-- Verify a discovered candidate with `--version` before treating it as the
-  active CLI. Record the actually resolved executable path and version in the
-  Development Environment block. Do not permanently trust an old hash/version
-  path because app, extension, or npx-cache locations may change after updates.
-- If multiple runnable candidates exist, prefer the currently verified stable
-  CLI appropriate for the task; record which executable was selected instead
-  of silently assuming one.
-- Authentication, quota exhaustion, sandbox limitations, or another execution
-  blocker are separate states. Do not misreport them as `Codex CLI: Not
-  Available` when the executable itself is reachable.
-- If local Codex launch fails, report the concrete blocker and only then apply
-  the workflow's approved fallback. Do not infer unavailability from one failed
-  lookup method.
-- ChatGPT Web + Desktop Commander remains the independent Verification Owner
-  after Codex implementation and must inspect the actual diff/result and run
-  applicable local verification.
-==================================================
-```
-
-Every final Next Session Startup Prompt must also reproduce this independent
-Mandatory Hybrid Orchestration block:
-
-```text
-==================================================
-Mandatory Hybrid Orchestration
-==================================================
-Core rule: Parallel Reasoning, Serialized Mutation.
-LIGHT -> DC_ONLY by default; Codex optional; small direct edits may use DC.
-MEDIUM -> HYBRID_PARALLEL by default; ChatGPT+DC establishes actual local
-state/evidence, then Codex is the default primary owner of code analysis and
-substantial implementation after plan/Gate. Do not finish a substantial MEDIUM
-implementation in DC first and attach Codex only as a late critic unless Codex
-is unavailable or only a small bounded correction remains.
-HEAVY -> CODEX_PRIMARY by default when Codex is available for code analysis and
-implementation; ChatGPT+DC owns local execution evidence and final verification.
-When Durable Worker is VERIFIED_AVAILABLE, substantial or long-running
-MEDIUM/HEAVY Codex jobs and detached Python32 test jobs use Durable by default.
-Do not open a long-lived direct DC process for those jobs unless
-DURABLE_WORKER_FALLBACK_REASON is recorded.
-Before implementation record:
-Execution Weight / Orchestration Mode / Codex Role / Mutation Owner /
-Verification Owner.
-If MEDIUM or HEAVY skips Codex, record CODEX_SKIPPED_REASON.
-Only one Mutation Owner may write an overlapping mutation boundary at a time.
-While Codex runs, continue safe non-conflicting read-only investigation and
-verification preparation through Desktop Commander rather than idling.
-Verification Owner remains CHATGPT_WEB + DESKTOP_COMMANDER.
-Desktop Commander speed rule: batch independent read-only inspection and
-verification commands into as few round trips as practical.
-Codex quota or availability failure falls back to ChatGPT Web + Desktop
-Commander without blocking safe progress.
-==================================================
-```
-
-Every final Next Session Startup Prompt must also reproduce this independent
-Codex Mutation Enforcement Gate block:
-
-```text
-==================================================
-Codex Mutation Enforcement Gate
-==================================================
-This is a hard gate for MEDIUM / HEAVY work.
-If Codex is available and Mutation Owner = CODEX:
-- ChatGPT + Desktop Commander remain read-only on TASK FILES and the overlapping
-  mutation boundary.
-- If Codex returns analysis/design without completing the authorized substantial
-  implementation, resume the SAME Codex task immediately and make it finish the
-  implementation. Do not substitute a large DC implementation.
-Mutation Owner may transfer to CHATGPT_DC only when:
-- Codex is unavailable or quota-blocked;
-- the user explicitly selects DC implementation;
-- only a genuinely small bounded correction remains; or
-- a verified local-environment limitation prevents Codex completion.
-Before transfer declare:
-CODEX_FALLBACK_REASON: <concrete reason>
-Mutation Owner: CHATGPT_DC
-Remaining Mutation Boundary: <bounded remainder or approved fallback scope>
-`DC is convenient`, `the code is already open`, and `Codex returned a design`
-are not valid fallback reasons for substantial MEDIUM/HEAVY mutation.
-Before verification, confirm the declared Mutation Owner actually performed the
-substantial mutation. If not, return to implementation.
-==================================================
-```
-
-Every final Next Session Startup Prompt must also reproduce this independent
-Remote-First Source Routing block:
-
-```text
-==================================================
-Remote-First Source Routing
-==================================================
-Route evidence by source authority.
-- REMOTE / COMMITTED BASELINE -> GitHub direct first:
-  pushed source, remote branch/HEAD, commit history, committed diffs,
-  historical versions, PR/issue history, pushed project docs.
-- LOCAL CODE REASONING -> Codex first for MEDIUM/HEAVY:
-  repeated source search, call graph, cross-file reasoning, substantial code
-  exploration and implementation after minimum local reality check.
-- LOCAL REALITY -> Desktop Commander:
-  dirty/untracked WIP, local-only diff, Runtime, logs, caches, processes,
-  Python32/PyQt/GUI/Kiwoom execution, permissions, final local verification.
-Do not spend DC round trips re-reading committed remote evidence merely because
-it also exists in the local checkout.
-A large dirty worktree does not justify routing all source inspection through DC.
-If GitHub cannot access the required ref/content, record the limitation and use
-only the minimum necessary local Git/DC fallback.
-==================================================
-```
-
-Every final Next Session Startup Prompt must also reproduce this independent
-Desktop Commander Latency Control block:
-
-```text
-==================================================
-Desktop Commander Latency Control
-==================================================
-- Desktop Commander is the local execution/verification boundary, not the
-  MEDIUM/HEAVY code-reasoning inner loop.
-- Normal MEDIUM/HEAVY structure when practical:
-  1. DC initial local-reality evidence phase;
-  2. DC launch/handoff to local Codex CLI;
-  3. DC post-implementation real-environment verification phase.
-  These are phases, not a three-call cap. Use additional high-value DC calls when
-  the local evidence genuinely requires them.
-- After minimum local evidence is established, let Codex keep code exploration,
-  call-graph tracing, repeated source search, and substantial implementation in
-  one continuous task instead of alternating repeatedly with DC.
-- Batch known initial evidence and known final verification work. Do not split
-  predetermined Git/diff/test/Runtime/Log checks into many sequential DC calls.
-- Do not repeatedly poll Codex or a verification process. Prefer bounded wait or
-  completion/result-file handoff and retrieve once; inspect intermediate output
-  only for timeout, hang, interactive prompt, safety concern, or user request.
-- Extra DC calls are allowed when genuinely new local evidence is required.
-- This reduces round trips only; it does not weaken scope protection, serialized
-  mutation ownership, or required real-environment verification.
-==================================================
-```
-
-Every final Next Session Startup Prompt must also reproduce this independent
-Desktop Commander High-Value Utilization block:
-
-```text
-==================================================
-Desktop Commander High-Value Utilization
-==================================================
-DC_USAGE_TARGET = MINIMIZE_WASTE, NOT MINIMIZE_USAGE.
-Do not optimize for a lower DC call count by itself.
-Reduce low-value DC work first:
-- repeated source search / broad rg loops
-- rereading committed remote source
-- unnecessary process polling
-- repeated reads of already-confirmed evidence
-Use DC actively for high-value local evidence:
-- dirty/untracked WIP and local-only diffs
-- Python32 / PyQt / GUI / Kiwoom execution
-- Runtime / Log / cache / real-data inspection
-- local process and permission state
-- Codex CLI launch and result recovery
-- focused regression and final real-environment verification
-Batch when safe, but never skip useful local verification just to save calls.
-Judge efficiency by useful local evidence per round trip, not raw call count.
-==================================================
-```
-
-Every final Next Session Startup Prompt must also reproduce this independent
-Durable Local Task Execution block:
-
-```text
-==================================================
-Durable Local Task Execution
-==================================================
-Durable Runtime Status: <VERIFIED_AVAILABLE / Not Available / Must Verify>
-Current WORKSTREAM_ID: <stable id for this conversation/workstream / Must Verify>
-Verified worker root:
-C:\Users\JIN KWANG CHUL\Documents\chatgpt_durable_worker
-Verified local MCP stdio facade: <Available / Not Available / Must Verify>
-
-If Durable Runtime Status is VERIFIED_AVAILABLE, treat it as an already verified
-execution environment. Do not fall back to the previous direct long-lived DC
-process pattern merely because that pattern was used in the prior session.
-Use the Durable Worker for long-running Codex/test jobs that may outlive a normal
-DC round trip or must survive browser/DC transport loss.
-- ChatGPT Web -> Desktop Commander -> Durable Worker CLI is the immediate path.
-- Use start_codex_job for substantial Codex work.
-- Use start_python32_test for detached Python32 test work.
-- Record an explicit TASK_ID for substantial jobs.
-- Multi-Conversation Workstream Isolation:
-  every ChatGPT conversation or independently operated implementation/audit stream
-  that can launch Durable work must carry one stable WORKSTREAM_ID. Pass it as
-  --workstream-id <id> or through CHATGPT_DURABLE_WORKSTREAM_ID on every tracked
-  Codex/Python32 Durable launch. Two chats may share the same repository/workdir
-  but must not share a WORKSTREAM_ID unless they intentionally represent one
-  serialized workstream.
-- Recovery and rerun decisions must be filtered by WORKSTREAM_ID first. Do not use
-  a global Latest Task as the recovery authority when multiple conversations are
-  active. The Monitor's yellow event task, Recovery Summary and Recovery Copy
-  must refer to the same TASK_ID and WORKSTREAM_ID; an explicitly selected row
-  may temporarily become the recovery target.
-- Legacy tasks without WORKSTREAM_ID are isolated under a legacy workdir-derived
-  stream only for backward compatibility; new tracked tasks must use an explicit
-  WORKSTREAM_ID.
-- After launch use get_task_status/get_task_result; after uncertain transport loss
-  use recover_task before considering any rerun.
-- Browser timeout, socket closed, or lost DC response does NOT prove job failure.
-  Never duplicate the mutation/test until the same TASK_ID is checked first.
-- Same-Chat Transport Recovery Gate:
-  when the current ChatGPT conversation loses its response/transport while a
-  Durable job may still be running, the next user continuation instruction
-  (continue, resume, or equivalent continuation wording) is a recovery trigger,
-  not authorization to start a duplicate job. Before creating any new TASK_ID,
-  query the Durable recovery ledger for the current repository/workdir using
-  durable_runtime.py recovery --workdir <repo> or the MCP
-  get_recovery_snapshot equivalent when available.
-  * RUNNING/CREATED -> do not rerun; keep the same TASK_ID and recover/status it.
-  * SUCCEEDED -> recover get_task_result, inspect the actual diff/result, then
-    continue from verification/criticism/next-stage work.
-  * FAILED/CANCELLED/INTERRUPTED -> recover the persisted result/logs and resume
-    from the appropriate failure/cancellation analysis; do not silently rerun.
-  * A new TASK_ID is allowed only after recovery evidence proves there is no
-    relevant surviving/terminal task for the interrupted operation, or the user
-    explicitly starts a different scope.
-- Durable Monitor is expected to auto-start for tracked Codex/Python32 jobs and
-  remain singleton. Its status/notification is operator evidence, but ChatGPT
-  must still perform the recovery query before deciding whether to rerun.
-- Durable Monitor resource figures are evidence with freshness semantics:
-  Codex values come from local Codex rate-limit events; Desktop Commander is a
-  last-known MCP snapshot and may be stale. Never invent or extrapolate quota.
-- Avoid read_process_output polling for a task already owned by Durable Worker.
-- generic start_task is UNSAFE/INTERNAL and is not an MCP-safe tool.
-- Durable Worker completion is not final correctness proof; final diff and real
-  environment verification still belong to ChatGPT Web + Desktop Commander.
-- If Durable Worker cannot be used, declare DURABLE_WORKER_FALLBACK_REASON before
-  using a long direct DC process.
-The local MCP stdio facade is optional. Secure MCP Tunnel/full ChatGPT MCP write
-integration is an external layer and must not block the current local workflow.
-==================================================
-```
-
-Every final Next Session Startup Prompt must also reproduce this independent
-Evidence And Verification Efficiency block:
-
-```text
-==================================================
-Evidence And Verification Efficiency
-==================================================
-Core rule: Single Evidence Pass, Scoped Verification, No Full Re-audit.
-At task start create one Task Boundary Snapshot containing:
-- TASK FILES
-- TASK FUNCTIONS / CALL PATHS
-- TASK TESTS
-- PRE-EXISTING FAILURES
-- PROTECTED WIP
-Reuse freshly confirmed evidence across stages instead of repeating the same Git,
-Runtime, Log, GUI, call-graph, or repository investigation.
-Carry forward confirmed facts, unresolved questions, actual changed files/functions,
-tests already executed, failures, and remaining unverified items.
-During implementation run only direct RED/GREEN checks needed to guide the change.
-After implementation run the required focused regression set once as a batch.
-Do not rerun the same broad regression group unless a later mutation makes its
-prior result stale.
-Final criticism receives the Task Boundary Snapshot, actual task diff, confirmed
-evidence, final verification results, and unresolved questions. It must not restart
-a repository-wide call-graph/diff/test audit by default.
-Unrelated dirty WIP is protected context, not automatic audit scope.
-If a concrete dependency crosses the boundary, report SCOPE_EXPANSION_REQUIRED
-before widening investigation.
-No arbitrary test-count cap: preserve every genuinely required safety/regression
-check while eliminating duplicated verification work.
-==================================================
-```
-
-Every final Next Session Startup Prompt must also reproduce this independent
-Execution Efficiency Rules block:
-
-```text
-==================================================
-Execution Efficiency Rules
-==================================================
-- If Codex has already analyzed the relevant files/call path deeply enough,
-  continue the same Codex task into implementation when safe instead of ending
-  at analysis and making ChatGPT+DC redo the same substantial work.
-- Do not make Codex repeat Runtime/Log/GUI/Git/local-state investigation already
-  confirmed by ChatGPT+Desktop Commander. Pass confirmed facts and unresolved
-  questions separately.
-- If Codex hits the same Python/Python32/PyQt/GUI/Kiwoom/permission/local-runtime
-  class failure twice, stop environment workaround attempts. Return the code
-  result and unverified items; Desktop Commander performs the real local check.
-- Preferred MEDIUM/HEAVY flow:
-  ChatGPT+DC minimum real evidence -> Codex analysis+implementation in one task
-  -> actual diff inspection -> DC Python32/GUI/Runtime/Log/state verification
-  -> ChatGPT independent criticism.
-- Use DC for small bounded post-verification corrections when clearly faster;
-  re-escalate structural, cross-file, design-level, or repeated failures to
-  Codex instead of expanding long manual DC edit sequences.
-==================================================
-```
-
-Every final Next Session Startup Prompt must also reproduce this independent
-Checkpoint Commit And Push Gate block:
-
-```text
-==================================================
-Checkpoint Commit And Push Gate
-==================================================
-Commit = recovery point. Push = synchronization. Do not create tiny commits for
-every edit or test.
-When an approved feature/normalization unit has final local verification and a
-stable task boundary, create a focused checkpoint commit and push it before the
-next substantial structural mutation unless the user explicitly defers it or the
-verified boundary cannot be safely isolated.
-Rules:
-- Stage only verified task-boundary files. Never use git add . or git add -A in a
+Repository verification:
+- Repository Identity is static and comes from Section 2.
+- Branch, HEAD, status, upstream, and local WIP are dynamic.
+- When local Git is available, verify the actual remote, branch, HEAD, status,
+  task-relevant diff, and modified/deleted/untracked WIP.
+- If an available remote does not match Project Identity, stop and report the
+  mismatch. Do not guess, auto-switch, or substitute another repository.
+
+Recovery boundaries:
+- PR lists, merge history, recent merges, and default-branch state are not task
+  authority unless the user explicitly asks to inspect them.
+- Historical / Archive material is evidence only.
+- Reference Index is navigation only.
+- Do not perform a broad repository/document re-audit by default.
+- Reuse freshly verified evidence until a later mutation makes it stale.
+- Verify only the tools needed for the recovered task; old auth/quota/process
+  state is never assumed current.
+
+The detailed permanent rules for role boundaries, evidence routing, mutation
+ownership, Codex routing, Git checkpoints, WIP protection, Kiwoom safety,
+criticism, and work-unit persistence remain in this Workflow Reference.
+
+## 10. Work-Unit Persistence / Checkpoint Policy
+
+The project lifecycle follows the WORK UNIT, not the conversation lifetime.
+
+Conversation Closing, Project Freeze, and the regular window-closing standard
+procedure are retired. Ending a chat, moving to a new chat, or reaching a context
+boundary does not by itself authorize or require Git mutation, documentation
+work, a Work Resume, a Changelog, Canonical creation, or a handoff package.
+
+Persistence actions are performed at the point where the work itself requires
+them:
+
+1. Verified feature / fix / approved change completion
+   - After fresh verification confirms a stable user-usable boundary, create a
+     focused recovery/synchronization checkpoint when appropriate.
+   - Commit only the verified task boundary.
+   - Push when synchronization / durable remote recovery is appropriate.
+   - Do not create tiny commits for every edit or test.
+
+2. Before a substantial risky next mutation
+   - If the current verified boundary should be preserved before the next
+     structural change, create a focused checkpoint first.
+   - If the boundary cannot be safely isolated because of protected unrelated
+     WIP, do not force a commit; keep the boundary explicit and report the
+     reason.
+
+3. Confirmed contract / operating-rule change
+   - Update Canonical, Workflow Reference, Startup Prompt, Changelog, Reference
+     Index, or other operating documentation only when the completed work or
+     explicit user decision actually changes that document's contract role.
+   - Documentation is maintained when the contract changes, not because a
+     conversation is ending.
+   - Never write unapproved ideas or incomplete proposals into Canonical as
+     confirmed policy.
+
+4. Recovery need during incomplete work
+   - A checkpoint may be created when there is a concrete recovery need and the
+     current boundary is safe to isolate.
+   - Do not force incomplete functionality into a false completed/documented
+     state solely to preserve a chat boundary.
+
+Checkpoint safety:
+- Stage only verified task files; never use `git add .` or `git add -A` in a
   dirty repository.
-- Verify exact staged names and staged diff checks before commit.
-- Verify branch/upstream and protected WIP exclusion before push.
-- After push, verify local HEAD equals intended remote branch HEAD.
-- If deferred, record CHECKPOINT_DEFERRED_REASON and keep the uncommitted task
-  boundary explicit before further structural work.
-This gate creates durable recovery/synchronization points; it does not force
-commits for incomplete exploratory states.
-==================================================
-```
+- Verify staged names and staged diff before commit.
+- Verify branch/upstream before push and the intended remote state after push.
+- Protect unrelated modified/deleted/untracked WIP.
+- Commit = recovery point. Push = synchronization. PR = large feature unit
+  unless an approved exception applies.
 
-Every final Next Session Startup Prompt must also reproduce this independent
-Codex Scope Discipline block:
+## 11. Conversation Lifetime Policy
 
-```text
-==================================================
-Codex Scope Discipline
-==================================================
-- Codex implementation receives the smallest complete boundary needed for the
-  approved problem: target files, relevant call paths, confirmed evidence,
-  required tests, and protected WIP boundaries.
-- A post-implementation Codex Critic is a focused audit, not repository-wide
-  rediscovery. Give it the actual changed files/diff, named functions or call
-  paths, relevant tests, and explicit questions.
-- Unrelated dirty files, historical WIP, broad Git diffs, unrelated subsystems,
-  and large test surfaces are outside critic scope unless a concrete dependency
-  is demonstrated.
-- If evidence crosses the supplied boundary, report `SCOPE_EXPANSION_REQUIRED`
-  and the dependency, then stop; do not widen scope silently.
-- MEDIUM: prefer one strong Codex analysis+implementation task plus ChatGPT+DC
-  verification. Add a separate Codex Critic only when regression risk, safety
-  boundaries, or unresolved evidence justify it.
-- HEAVY/safety-boundary work: a separate focused Codex Critic is normally useful
-  after local verification, but the same narrow-scope rule still applies.
-==================================================
-```
+A conversation is an execution surface, not a project transaction boundary.
 
-Every final Next Session Startup Prompt must also include this independent
-Codex CLI Invocation Path block. It must be reproduced explicitly and must not
-be replaced by a generic statement such as `Codex available` or `use Codex when
-needed`:
-
-```text
-==================================================
-Codex CLI Invocation Path
-==================================================
-
-Codex CLI is not called directly from ChatGPT Web.
-
-Normal automated path:
-
-ChatGPT Web Orchestrator
--> Desktop Commander
--> connected Windows PC
--> Durable Worker task for substantial/long-running Codex work
-   OR direct PowerShell/local process for a short bounded Codex call
--> local codex.exe exec
--> persisted task result / file changes
--> Desktop Commander diff and local evidence
--> ChatGPT Web independent criticism and verification
-
-Rules:
-- Desktop Commander is the bridge used to launch local Codex CLI.
-- For substantial/long-running Codex work, prefer Desktop Commander starting the
-  Durable Worker `start_codex_job` path and keep its TASK_ID. Direct `codex.exe`
-  process execution is reserved for short bounded calls.
-- Do not describe this as a direct web-app Codex call.
-- Resolve the current codex.exe path when necessary because the VS Code
-  extension directory can change after updates.
-- Verify Codex login/model/reasoning when those values matter to the task.
-- Run Codex in the intended repository/work directory.
-- Codex completion text is not final evidence; inspect the actual diff and run
-  the required local verification through Desktop Commander.
-- If Desktop Commander is unavailable, do not pretend the local Codex CLI was
-  called directly from the web app.
-- If Codex quota is exhausted or Codex is unavailable, continue with
-  ChatGPT Web + Desktop Commander when safe.
-==================================================
-```
-
-The Next Session Startup Prompt must hand off not only Repository Information
-and Work Resume state, but also the currently confirmed External Tool
-Environment and Computer Use / KOA Studio operating rules when they are needed
-for the next task.
-
-When needed, include this block after Repository Information and fill it from the
-final verified closing state:
-
-```text
-==================================================
-External Tool Environment
-==================================================
-
-- Durable Worker:
-  <VERIFIED_AVAILABLE / Not Available / Must Verify>
-
-- Durable Worker Root:
-  <verified path / Must Verify>
-
-- Durable MCP Stdio Facade:
-  <Available / Not Available / Must Verify>
-
-- Durable Default Route:
-  <DC -> Durable Worker -> Codex/Test when verified available>
-
-- Computer Use:
-  Available / Not Available / Must Verify
-
-- KOA StudioSA:
-  <current confirmed version or state>
-
-- Installed Official Kiwoom Evidence:
-  <available official materials>
-
-- Latest Kiwoom Official Contract Audit:
-  <document path>
-
-- Remaining PARTIAL / Unverified Contracts:
-  <record if any>
-
-==================================================
-Computer Use / KOA Studio Operating Rule
-==================================================
-
-- This Phase is performed inside one Codex task.
-- If additional official-contract confirmation is needed, do not create a
-  separate Codex conversation by default.
-- If Computer Use is available in the current task, inspect KOA StudioSA
-  directly.
-- After inspection, return to the same task context.
-- The user does not need to relay window-switching state.
-- Do not reinvestigate existing VERIFIED Evidence.
-- Do not execute Broker side effects without separate approval.
-```
-
-Do not reinterpret this block manually each time. At Closing, fill it with the
-actual environment state that the next session needs.
-
-Conversation Closing Template:
-
-The Next Session Startup Prompt must include the following Repository Information
-block. Do not omit, abbreviate, move, or manually rewrite this block. Fill Local
-Repository, GitHub Repository, and Remote from Project Identity. Fill Branch and
-Commit from the verified Conversation Closing result.
-
-```text
-==================================================
-Repository Information
-==================================================
-
-자동매매 프로젝트
-
-Local Repository
-
-<Project Identity에서 자동 참조>
-
-GitHub Repository
-
-<Project Identity에서 자동 참조>
-
-Remote
-
-<Project Identity에서 자동 참조>
-
-현재 Branch
-
-<Conversation Closing 완료 후 실제 Branch>
-
-현재 Commit
-
-<Conversation Closing 완료 후 실제 Commit>
-
---------------------------------------------------
-
-문서 저장소
-
-Local Repository
-
-<Project Identity에서 자동 참조>
-
-GitHub Repository
-
-<Project Identity에서 자동 참조>
-
-Remote
-
-<Project Identity에서 자동 참조>
-
-현재 Branch
-
-<Conversation Closing 완료 후 실제 Branch>
-
-현재 Commit
-
-<Conversation Closing 완료 후 실제 Commit>
-```
-
-Repository Information rules:
-- The Repository Information block is mandatory in every Next Session Startup Prompt.
-- The block must include both the Automatic Trading Project and the Documentation Repository.
-- Local Repository, GitHub Repository, and Remote values must be copied from Project Identity.
-- Branch and Commit values must be copied from the final verified Conversation Closing result.
-- The prompt author must not manually invent, abbreviate, omit, or relocate repository information.
+- Opening a new conversation does not automatically apply the Startup Prompt.
+  The user explicitly requests Startup Prompt application.
+- Closing a conversation does not trigger a special close-out procedure.
+- If the current conversation becomes too large for safe continuity, tell the
+  user that moving to a new conversation is advisable. Do not run a Closing or
+  Freeze procedure merely because of context pressure.
+- The new conversation, after the user's Startup Prompt request, directly
+  investigates the immediately preceding same-project conversation and
+  reconstructs the continuation target under Section 9.
+- A special handoff report is optional only when the user explicitly asks for
+  one; it is not required for ordinary continuity.
+- Latest Work Resume remains fallback recovery evidence when direct prior-
+  conversation recovery is unavailable or insufficient. It is not mandatory at
+  every chat transition.
+- Changes to startup authority, tool roles, repository identity, safety
+  boundaries, or this persistence policy require explicit user approval and
+  must be reflected in the authoritative operating documents.
 
 ## 12. Local Git And GitHub
 
@@ -2045,7 +1103,10 @@ GitHub is used for:
 GitHub is not a development procedure and not a reason to add collaboration workflow.
 
 Rules:
-- Do not run Git operations unless requested or necessary for an approved Freeze/Git task.
+- Run Git mutation only when explicitly requested or when the standing Work-Unit
+  Persistence / Checkpoint Policy in Section 10 requires a focused verified
+  recovery/synchronization point.
+- A conversation ending is never a Git trigger.
 - Do not use `git add .` or `git add -A`.
 - Stage only specified files.
 - Do not reset, restore, stash, clean, or delete protected dirty/untracked files unless the user explicitly asks.
@@ -2105,26 +1166,13 @@ User reports focus on the implemented function, verified result, and remaining
 real blocker. Use Git internals only when an exact Git operation or diagnosis
 requires them.
 
-Explicit exception: the permanent-rule non-repetition rule applies to ordinary
-Task Prompts, but not to the final Next Session Startup Prompt created by
-Conversation Closing Step 5. Every such final startup prompt must reproduce the
-independent `제1원칙 — 작업 범위 절대 보호` block specified in Step 5 exactly;
-it may not abbreviate the block or replace it with a reference to this document.
-It must also begin with the mandatory `Current AI Role` block, declare the
-applicable role-specific principle, and include the corresponding explicit
-role instructions required by Step 5. Every final Startup Prompt must include
-the verified Development Environment block, the Mandatory Hybrid Orchestration
-block, the Codex Mutation Enforcement Gate block, the Remote-First Source Routing
-block, the Desktop Commander Latency
-Control block, the Desktop Commander High-Value Utilization block, the Durable
-Local Task Execution block, the Evidence And Verification
-Efficiency block, the Execution Efficiency
-Rules block, the Checkpoint Commit And Push Gate block, the Codex Scope Discipline
-block, and the independent Codex CLI
-Invocation Path block. When the role is
-Integrated Development Orchestrator, it must additionally reproduce the
-Mandatory Development Workflow block. These Startup Prompt requirements are
-explicit exceptions to the ordinary Task Prompt non-repetition rule.
+The reusable automatic-trading session bootstrap is
+`00_CANONICAL/REFERENCE/AUTO_TRADING_STARTUP_PROMPT.txt`. It contains the compact
+First Principle, authority, environment, workflow, safety, and recovery rules
+needed at startup. Apply the detailed permanent rules from this Workflow
+Reference; do not copy their full independent blocks into the reusable prompt or
+generate a competing task-specific startup body for ordinary chat transitions.
+A one-off handoff prompt is allowed only when the user explicitly requests one.
 
 Default prompt length should stay small:
 - Analysis: about 10-20 lines when possible
