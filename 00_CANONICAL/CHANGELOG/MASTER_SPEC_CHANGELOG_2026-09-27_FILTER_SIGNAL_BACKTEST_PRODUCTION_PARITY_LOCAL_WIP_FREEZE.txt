@@ -1,0 +1,74 @@
+MASTER SPEC CHANGELOG
+=====================
+
+Date:
+2026-09-27
+
+Change:
+Record the post-5c651ac Signal Validation filter-signal backtest / production
+parity implementation as verified local WIP without creating a false code Freeze.
+
+Committed code baseline:
+5c651ac4e58c22b1ac60c62e5677609306682fc8
+fix: align indicator history targets with Hero4 timeframes
+
+New code commit:
+NONE
+
+Reason:
+The parity Call Graph is mixed with protected pre-existing local WIP.
+A broad or file-level commit would either import unrelated work or break the
+actual integrated Call Graph.
+
+Confirmed local-WIP contract:
+- production one-minute source + production session aggregation for calculation;
+- regular-market-only remains display projection;
+- calculation/cache identity includes production session/source basis;
+- persisted signal cache is not relabeled as current;
+- source undercoverage refetches or fails closed;
+- detailed Replay is authoritative over Batch;
+- four-gate filter-signal authorization;
+- execution/PnL trust remains separately non-production-equivalent.
+Public trust states recorded:
+- FILTER_SIGNAL_BACKTEST_AUTHORIZED
+- FILTER_SIGNAL_BACKTEST_BLOCKED
+- SIMPLIFIED_CLOSE_FILL
+- NOT_PRODUCTION_EQUIVALENT
+- FORMING_BAR_PARITY_NOT_VERIFIED
+
+Evidence limitation:
+Passing production-compatible test input does not prove that a real stock's
+current broker history is production-equivalent.
+
+Fresh Closing verification:
+- parity/session/signal-selection/Batch/Replay focused suite: 100 / 100 PASS.
+- directly related Signal Validation V2 integration methods: 14 / 14 PASS.
+- task-boundary py_compile: PASS.
+- whole Signal Validation V2 module: no valid PASS verdict because the 32-bit
+  Qt process exited with Windows code 3221226505 / signed -1073740791 before a
+  unittest summary.
+
+Closing fixture correction:
+One test declared a large requested_count while supplying only five candles.
+The fixture was corrected to provide the declared source amount; Production
+behavior was not weakened.
+
+Protected state:
+- 217 code-repository porcelain entries at Closing start;
+- no reset/restore/stash/clean/delete/broad add;
+- no new code commit or code push;
+- local committed code HEAD remained equal to remote at 5c651ac.
+Canonical:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE.txt
+
+Work Resume:
+00_CANONICAL/CURRENT/
+WORK_RESUME_LATEST_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE.txt
+
+Reference Index:
+updated to point to the 2026-09-27 local-WIP authority and recovery record.
+
+Result:
+FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE_RECORDED
+CODE_FREEZE_NOT_CREATED

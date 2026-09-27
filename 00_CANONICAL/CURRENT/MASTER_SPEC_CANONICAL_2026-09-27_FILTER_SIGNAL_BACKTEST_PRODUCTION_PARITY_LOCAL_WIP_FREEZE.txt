@@ -1,0 +1,196 @@
+MASTER SPEC CANONICAL
+2026-09-27 FILTER SIGNAL BACKTEST / PRODUCTION PARITY LOCAL WIP FREEZE
+
+Status: CURRENT SUPPLEMENTAL CONTRACT / VERIFIED LOCAL WIP FREEZE
+Code repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Committed code baseline: 5c651ac4e58c22b1ac60c62e5677609306682fc8
+Code push state: local HEAD == origin/feat/restore-auto-trade-setting-ui at 5c651ac
+New code Freeze SHA: NOT CREATED
+Reason: current parity implementation is mixed with protected pre-existing local WIP.
+
+1. AUTHORITY AND SCOPE
+
+This Canonical records the confirmed Signal Validation filter-signal backtest
+trust boundary implemented after the 2026-09-26 Hero4 indicator-history Freeze.
+
+It does not supersede the 2026-09-26 Hero4 formula/history contract.
+It supplements Signal Validation V2 only for:
+- production-session calculation provenance;
+- filter-signal backtest authorization;
+- Replay/Batch signal parity;
+- calculation/display separation;
+- execution/PnL trust labeling.
+
+No Broker order, Runtime Writer, Queue Writer, Position Writer, Fill Writer,
+SendOrder, cancel, or account mutation authority is added by this document.
+2. PRODUCTION CALCULATION SOURCE CONTRACT
+
+For minute-timeframe Signal Validation, a production-eligible registered stock
+uses the production session contract and one-minute source history as the
+calculation basis when that contract is available.
+
+The calculation path is identified as:
+PRODUCTION_M1_SESSION_AGGREGATION
+
+Target-timeframe calculation candles are derived from the one-minute source
+through the production session aggregation contract.
+
+The display option such as regular-market-only is a display projection.
+It must not change the calculation candle set or the resulting signal decision.
+
+Calculation/cache identity must distinguish materially different:
+- source identity;
+- timeframe identity;
+- production session contract;
+- retained source range.
+
+A persisted signal cache must not be relabeled as current merely because a
+new production session contract is available.
+
+Insufficient one-minute source coverage is retried within the approved bounded
+source ceiling. If required production projection coverage cannot be proven,
+the filter-signal backtest path fails closed instead of silently authorizing.
+3. FILTER-SIGNAL BACKTEST AUTHORIZATION
+
+FILTER_SIGNAL_BACKTEST_AUTHORIZED is allowed only when all required trust gates
+are satisfied for the same calculation basis.
+
+The current gates are:
+- signal rule/support gate;
+- detailed Replay versus optimized Batch signal parity;
+- market-session parity;
+- candle/projection parity.
+
+Any unresolved or failed gate produces FILTER_SIGNAL_BACKTEST_BLOCKED.
+
+Detailed Replay remains the authoritative signal sequence for presentation and
+backtest consumption. Batch remains an optimization/differential path and must
+not create an extra signal absent from the authoritative detailed evaluation.
+
+BUY/SELL conflict selection and signal indexes must remain semantically
+consistent between Production-oriented decision semantics and Validation.
+
+Authorization on production-compatible test input proves only that the gates
+work for that evidence set. It is not proof that a real stock's current broker
+history is production-equivalent.
+
+4. FORMING-BAR BOUNDARY
+
+Completed-bar source parity and forming-bar parity are distinct.
+When the latest projected bar is forming and direct production equivalence has
+not been verified, the trust state remains:
+FORMING_BAR_PARITY_NOT_VERIFIED
+
+A forming bar must not be promoted to production-equivalent evidence by label
+or cache reuse alone.
+5. EXECUTION AND PNL SEPARATION
+
+Filter-signal authorization does not authorize production-equivalent execution
+or production-realistic PnL.
+
+The current Validation execution model remains labeled:
+SIMPLIFIED_CLOSE_FILL
+
+Execution parity remains:
+NOT_PRODUCTION_EQUIVALENT
+
+The model uses the Validation candle-close fill assumption and simplified
+virtual execution behavior. It does not reproduce actual order routing,
+slippage, queue position, partial fills, broker latency, or Chejan lifecycle.
+
+Therefore production_pnl_realistic remains false unless a separate approved
+execution-parity task proves otherwise.
+
+Signal parity and execution parity must be reported separately.
+
+6. DISPLAY PROJECTION
+
+Calculation candles and display candles are separate projections.
+Signal entries are mapped from calculation timestamps to visible display
+timestamps; suffix-position assumptions are not authoritative.
+
+Changing the regular-market display projection must not alter the underlying
+production-session calculation result.
+
+The chart may hide calculation candles while preserving hidden history needed
+for Replay and indicator continuity.
+7. VERIFIED LOCAL-WIP EVIDENCE
+
+Closing verification used:
+C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+Python 3.11.9 / 32-bit.
+
+Fresh focused verification on the current working tree:
+- backtest parity + production session + signal selection + Batch + Replay:
+  100 / 100 PASS.
+- directly related Signal Validation V2 methods:
+  14 / 14 PASS after correcting an internally inconsistent test fixture.
+- task-boundary py_compile:
+  PASS.
+
+The corrected fixture had declared requested_count=fetch_count while physically
+providing only five one-minute candles. That contradicted the new fail-closed
+undercoverage rule. The fixture now supplies the declared source amount; no
+production behavior was relaxed.
+
+A whole-module run of tests.test_indicator_follow_signal_validation_v2 did not
+produce a valid PASS verdict. The 32-bit Qt process exited with Windows code
+3221226505 (signed -1073740791) after partial progress. No assertion summary was
+produced. This is recorded as an unresolved test-harness/environment evidence
+gap, not as a regression PASS.
+8. GIT CLOSURE BOUNDARY
+
+At Closing start, the automatic-trading repository had 217 porcelain entries.
+The repository already contained large protected dirty/untracked GUI, Runtime,
+stock-data, routine-instance, test, report, screenshot, and user-data WIP.
+
+The new parity work is not safely file-separable from that protected state.
+Examples include mixed changes in:
+- gui_indicator_follow_signal_validation_flow.py;
+- gui_indicator_follow_signal_validation_window.py;
+- indicator_follow_signal_validation_projection.py;
+- indicator_follow_signal_validation_execution.py;
+- routines/지표추종매매/routine_validation_batch.py;
+- routines/지표추종매매/routine_validation_replay.py;
+- tests/test_indicator_follow_signal_validation_v2.py.
+
+The new modules also depend on protected/local components including the strategy
+price contract and shared signal-side selection.
+
+For that reason Closing did not use git add ., git add -A, reset, restore,
+stash, clean, broad staging, or a partial commit that would break the actual
+Call Graph.
+
+The committed code recovery baseline therefore remains 5c651ac.
+The verified parity implementation remains protected local WIP.
+9. REAL-DATA EVIDENCE LIMIT
+
+No claim is made that a real stock dataset has completed production-equivalent
+backtest validation.
+
+The FILTER_SIGNAL_BACKTEST_AUTHORIZED evidence obtained during this work used
+production-compatible test input with all defined trust gates passing.
+
+A later real-data parity task must use the same source/session/timeframe
+identity and must report any forming-bar limitation separately.
+
+10. PROTECTED STATE AND NEXT BOUNDARY
+
+Do not reset, restore, stash, clean, delete, or broad-stage the current code
+working tree.
+
+Do not select a new Big Feature merely because this documentation Freeze is
+complete.
+
+The next continuation starts from the protected filter-signal parity WIP and
+must first recover the exact current diff and verification state.
+
+A code Freeze/push may occur only after the parity Call Graph can be staged as a
+coherent unit without importing unrelated protected WIP, or after the user
+explicitly authorizes the wider related WIP scope.
+
+FINAL VERDICT:
+FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE_RECORDED
+CODE_FREEZE_NOT_CREATED
+COMMITTED_CODE_BASELINE_REMAINS_5c651ac

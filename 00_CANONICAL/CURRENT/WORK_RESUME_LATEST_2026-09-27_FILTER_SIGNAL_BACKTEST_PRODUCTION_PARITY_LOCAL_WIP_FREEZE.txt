@@ -1,0 +1,284 @@
+1. RECOVERY BASELINE
+
+Automatic-trading repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Committed code baseline:
+5c651ac4e58c22b1ac60c62e5677609306682fc8
+
+Remote verification at Closing:
+local HEAD == origin/feat/restore-auto-trade-setting-ui
+remote HEAD == 5c651ac4e58c22b1ac60c62e5677609306682fc8
+
+New parity code commit:
+NONE
+
+Reason:
+The parity Call Graph is mixed with protected pre-existing local WIP and cannot
+be safely broad-staged or file-staged without contaminating the recovery state.
+
+Documentation repository:
+C:\Users\JIN KWANG CHUL\Documents\docs
+
+Documentation branch:
+agent/project-prompt-standard
+
+The final documentation SHA is reported by the Closing result after this
+document set is committed and pushed.
+2. WHY THIS RESUME EXISTS
+
+The 2026-09-26 Hero4 closing ended at code commit 5c651ac, but the automatic
+trading conversation then continued substantial Signal Validation work.
+
+The later work implemented and tested a production-session-aware filter-signal
+backtest trust boundary, but regular Conversation Closing had not been performed.
+
+This Resume preserves that later local WIP without pretending it is part of
+5c651ac or a pushed code Freeze.
+
+3. CURRENT BIG FEATURE
+
+Current Big Feature Goal:
+Close the filter-signal backtest parity boundary between Signal Validation and
+the production candle/session/signal contract.
+
+Current progress:
+- implementation exists in the current local working tree;
+- focused parity tests pass;
+- production-session calculation provenance is wired;
+- display/calculation separation is wired;
+- Replay/Batch differential parity is wired;
+- trust metadata and authorization status are wired;
+- execution/PnL remains explicitly non-production-equivalent;
+- code Git closure is NOT complete.
+
+Do not select the next Big Feature until this protected WIP is either coherently
+committed/pushed or explicitly deferred by the user.
+4. CONFIRMED BEHAVIOR
+
+Minute Signal Validation can use one-minute production source history and the
+production session aggregation contract.
+
+The calculation source token is:
+PRODUCTION_M1_SESSION_AGGREGATION
+
+Regular-market-only display is a presentation projection and does not redefine
+the signal calculation candle set.
+
+A persisted signal cache cannot be treated as current merely because a
+production session contract is attached later.
+
+Production source undercoverage is retried within the bounded source limit and
+otherwise fails closed.
+
+FILTER_SIGNAL_BACKTEST_AUTHORIZED requires all current trust gates to pass:
+- supported signal-rule scope;
+- authoritative detailed Replay == optimized Batch;
+- market-session parity;
+- candle/projection parity.
+
+Detailed Replay remains authoritative. Batch is not allowed to invent a signal
+on a candle where the detailed evaluation has none.
+5. EXECUTION / PNL TRUST
+
+The current execution model remains:
+SIMPLIFIED_CLOSE_FILL
+
+Execution parity remains:
+NOT_PRODUCTION_EQUIVALENT
+
+production_pnl_realistic remains false.
+
+Do not report filter-signal parity as actual order/fill/PnL production parity.
+
+No real-stock broker dataset was proven production-equivalent by this closing.
+The successful authorization evidence used production-compatible test input.
+
+Forming-bar parity remains separately unverified when applicable:
+FORMING_BAR_PARITY_NOT_VERIFIED
+
+6. DIRECTLY RELEVANT LOCAL FILES
+
+New local modules:
+- indicator_follow_backtest_parity.py
+- indicator_follow_validation_production_session.py
+- tests/test_indicator_follow_backtest_parity.py
+- tests/test_indicator_follow_validation_production_session.py
+- tests/test_indicator_follow_signal_selection_parity.py
+
+Related local components include:
+- indicator_follow_strategy_price_contract.py
+- routines/지표추종매매/routine_signal_selection.py
+Mixed tracked WIP directly touched by this feature includes:
+- gui_indicator_follow_signal_validation_flow.py
+- gui_indicator_follow_signal_validation_window.py
+- indicator_follow_signal_validation_projection.py
+- indicator_follow_signal_validation_execution.py
+- indicator_follow_signal_validation_presentation.py
+- routines/지표추종매매/routine_validation_batch.py
+- routines/지표추종매매/routine_validation_replay.py
+- tests/test_indicator_follow_signal_validation_v2.py
+
+These files also contain earlier unrelated/protected work.
+Do not stage the entire files without a fresh hunk-level audit.
+
+7. FRESH CLOSING VERIFICATION
+
+Python:
+C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+Python 3.11.9 / 32-bit.
+
+Focused suite:
+tests.test_indicator_follow_backtest_parity
+tests.test_indicator_follow_validation_production_session
+tests.test_indicator_follow_signal_selection_parity
+tests.test_indicator_follow_validation_batch
+tests.test_indicator_follow_validation_replay
+
+Result:
+100 / 100 PASS.
+Selected Signal Validation V2 integration tests:
+14 / 14 PASS.
+
+The selected set covered:
+- unregistered-source fail closed;
+- production M1 detailed Replay/Batch/four-gate agreement;
+- M1 calculation fetch independence from display scope;
+- persisted cache/session-contract identity;
+- production source projection/display separation;
+- production contract retention in fetched pools;
+- undercoverage refetch;
+- at-cap undercoverage fail closed;
+- timestamp-based display mapping;
+- window display/calculation separation;
+- display-timestamp range Replay;
+- detached backtest trust metadata;
+- full signal scan completion before install;
+- signal parity mismatch fail closed.
+
+Task-boundary py_compile:
+PASS.
+
+Whole tests.test_indicator_follow_signal_validation_v2:
+NOT VERIFIED AS PASS.
+The process exited with Windows code 3221226505
+(signed -1073740791) after partial progress, without a unittest summary.
+
+Do not convert that whole-module result into PASS.
+8. TEST FIXTURE CORRECTION DURING CLOSING
+
+One selected V2 test initially failed:
+test_production_session_does_not_relabel_persisted_signal_cache_as_current
+
+Cause:
+the fixture declared requested_count=fetch_count but physically supplied only
+five one-minute candles.
+
+That fixture contradicted the new production undercoverage fail-closed rule and
+caused the current implementation to refetch rather than install the fake cache.
+
+Correction:
+the test fixture now supplies the declared fetch_count using valid minute
+timestamps across production-session source ranges.
+
+Production behavior was not relaxed.
+
+After the fixture correction, the selected 14 tests passed 14 / 14.
+
+9. PROTECTED WORKING TREE
+
+Closing-start git status count:
+217 porcelain entries.
+
+This includes pre-existing protected:
+GUI WIP, Runtime files, stock data, routine instances, reports, screenshots,
+tests, generated evidence, and user data.
+
+Do not reset, restore, stash, clean, delete, or broad-stage this repository.
+The 2026-09-26 Resume already documented a protected dirty repository.
+This closing preserves that rule.
+
+Because the new parity feature shares files and dependencies with that protected
+state, no new code commit was created.
+
+10. NEXT SAFE STEP
+
+Recovery order:
+1. 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+2. 00_CANONICAL/CURRENT/
+   MASTER_SPEC_CANONICAL_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE.txt
+3. this Work Resume
+4. 00_CANONICAL/CHANGELOG/
+   MASTER_SPEC_CHANGELOG_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE.txt
+5. 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
+
+Then verify:
+- current code branch and HEAD;
+- local/remote 5c651ac baseline;
+- current git status count/diff;
+- the local parity files still exist;
+- focused tests still reproduce before mutation.
+
+Immediate continuation:
+complete a fresh hunk-level boundary audit for the parity Call Graph.
+Do not broad-stage mixed files.
+Do not select a new Big Feature.
+If a coherent staged parity snapshot can be formed without importing unrelated
+protected WIP, extract that index snapshot and run the focused verification
+against the staged state before commit/push.
+
+If a coherent parity snapshot cannot be formed, report the exact dependency
+boundary and obtain user direction before expanding the commit scope.
+
+11. DEVELOPMENT ENVIRONMENT
+
+Primary role:
+Integrated Development Orchestrator.
+
+Mandatory work order:
+제1원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판.
+
+Desktop Commander:
+Available during Closing.
+
+Connected device:
+KWANGS-LP.
+
+Automatic-trading runtime:
+Python 3.11.9 / 32-bit / PyQt5 project runtime.
+
+Codex:
+Not required for this Closing.
+Availability/quota must be re-verified before any later use.
+
+ChatGPT Work:
+Do Not Use unless the user explicitly re-enables it.
+
+No SendOrder, real order, modification, cancellation, account mutation, Queue
+writer, Position writer, Fill writer, or Broker-side trading side effect was
+performed by this Closing.
+12. CLOSING STATE
+
+Code branch:
+feat/restore-auto-trade-setting-ui
+
+Committed code recovery SHA:
+5c651ac4e58c22b1ac60c62e5677609306682fc8
+
+Code push:
+No new code push required; local and remote committed baseline were already equal.
+
+Current parity implementation:
+VERIFIED LOCAL WIP / NOT CODE-FROZEN.
+
+Current documentation authority:
+2026-09-27 filter-signal backtest / production parity local WIP Freeze.
+
+CONTINUITY RULE
+
+If the next conversation becomes too large to preserve safe continuity, propose
+the regular Conversation Closing Standard Procedure before the next unsafe
+boundary. Do not auto-close without explicit user approval.
