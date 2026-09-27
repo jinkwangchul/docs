@@ -128,6 +128,29 @@ Codex CLI
 - Primary implementation specialist for substantial MEDIUM/HEAVY work.
 - Normal path: ChatGPT -> DC -> local codex.exe.
 - Resolve the current executable path when needed; do not assume PATH or a stable hashed path.
+- Windows Computer Use is VERIFIED_AVAILABLE in the current local Codex CLI environment.
+- Verified E2E path:
+  ChatGPT Web -> DC -> Codex CLI -> computer-use skill -> node_repl -> @oai/sky -> Windows app.
+- 2026-09-27 read-only E2E: sky.list_apps() succeeded and returned
+  id=C:\OpenAPI\KOAStudioSA.exe, displayName=KOAStudioSA.
+- Computer Use is a general Windows GUI information-gathering and observation resource, not a KOA-only tool.
+- Use it for reading, inspecting, comparing, and understanding Windows-app state when that
+  materially improves the approved task: project GUI state checks, window/dialog/button/toast/menu/
+  chart/settings observation, KOA Studio contract inspection, HTS comparison, and similar
+  read-and-understand workflows.
+- Computer Use is NOT an execution path for trading actions or operational mutation.
+- In trading/broker areas, direct BUY/SELL, order submission, modification, cancellation,
+  liquidation, account mutation, password/authentication entry, or any equivalent Broker side
+  effect through Computer Use is prohibited.
+- UI interaction is limited to what is necessary to gather information or verify visible state.
+  Prefer read-only observation. Any click/navigation/scroll used for inspection must not cross
+  into trading or other side-effectful operational actions.
+- Re-verify availability after Codex/plugin/runtime updates.
+- Current Codex CLI 0.158.0-alpha.2.1 ignores
+  computer_use.windows.always_allowed_app_ids; never treat that setting as standing
+  approval or unrestricted GUI authority.
+- Computer Use actions remain subject to its current confirmation/safety rules and this
+  project's Broker/financial safety boundaries.
 - Give Codex a self-contained task: First Principle, repository, current task/state,
   approved design, scope, Do-Not-Touch, Canonical, verification and safety restrictions.
 - Codex completion text is not final evidence; inspect actual diff and verify independently.
@@ -180,6 +203,11 @@ Kiwoom OpenAPI+
 KOA StudioSA
 - OpenAPI contract-inspection resource.
 - Use for official TR, field, FID, Real Type, function and event evidence.
+- Preferred verified GUI route when needed:
+  ChatGPT Web -> DC -> Codex CLI -> Computer Use -> KOAStudioSA.
+- Default use is read-only inspection. Do not perform login, account input, TR execution,
+  realtime registration, SendOrder, modification, cancellation, or other Broker side effects
+  without explicit approval for the current operation.
 - Not an implementation authority.
 - Do not claim GUI observation that was not actually observed.
 
@@ -310,7 +338,7 @@ rules above when the user requests Startup Prompt application.
 FINAL RESOURCE DEFINITIONS
 ==================================================
 DC = Local Execution Bridge
-Codex CLI = primary implementation resource
+Codex CLI = primary implementation resource + verified Windows GUI information-gathering path via Computer Use
 Codex Windows App = operator-request-only exceptional resource
 Superpowers = development-methodology quality aid
 Ponytail = overengineering auditor

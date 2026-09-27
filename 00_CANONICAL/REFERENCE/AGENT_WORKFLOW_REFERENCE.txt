@@ -631,7 +631,26 @@ Development Resource Contract:
 - Codex CLI is the primary implementation specialist for substantial MEDIUM and
   HEAVY work after the approved plan/Gate. Resolve the current local codex.exe
   when needed; do not assume a stable hashed install path or PATH registration.
-  Codex receives a self-contained task boundary, protected WIP, Canonical
+- Windows Computer Use is VERIFIED_AVAILABLE through the current local Codex CLI.
+  Verified 2026-09-27 read-only E2E path:
+  `ChatGPT Web -> Desktop Commander -> Codex CLI -> computer-use skill
+  -> node_repl -> @oai/sky -> Windows app`.
+  `sky.list_apps()` succeeded and identified
+  `C:\OpenAPI\KOAStudioSA.exe` with displayName `KOAStudioSA`.
+- Treat this as a verified capability, not permanent availability. Re-verify
+  after Codex/plugin/runtime updates or when the current task depends on it.
+- Current Codex CLI `0.158.0-alpha.2.1` reports
+  `computer_use.windows.always_allowed_app_ids` as an ignored setting. That
+  setting therefore does not grant standing approval, bypass confirmation, or
+  authorize unrestricted control of KOA Studio or any other Windows app.
+- Computer Use remains subject to its current confirmation/safety rules, user
+  authorization, task scope, and this project's Broker/financial safety rules.
+  For this project, Computer Use is intentionally restricted to information
+  gathering, observation, comparison, and visible-state verification. It must not
+  be used for BUY/SELL, order submission, modification, cancellation, liquidation,
+  account mutation, authentication/security input, terminal applications, or any
+  other Broker/order side effect.
+- Codex receives a self-contained task boundary, protected WIP, Canonical
   references, verification requirements, and safety restrictions. Its success
   message is not final evidence.
 - Codex Windows App is an exceptional resource, not the normal implementation
@@ -685,13 +704,38 @@ Development Resource Contract:
   unit unless an approved exception applies. Never clean/reset/restore/revert or
   force-push unrelated WIP merely to make the worktree tidy.
 
-Computer Use / KOA Studio Session Handoff Policy:
-- One Phase should be performed from start to finish inside one Codex task by default.
-- When additional Kiwoom OpenAPI+ official technical contract confirmation is
-  needed, do not create a separate KOA Studio-only Codex conversation by default.
-- If Computer Use is available in the current Codex task, use Computer Use in
-  the same task to inspect KOA StudioSA, then return to the same task context
-  and compare the result against Production code and existing official Evidence.
+Windows Computer Use Operating Policy:
+- Current local capability status: VERIFIED_AVAILABLE through Codex CLI as of
+  2026-09-27 by a read-only `sky.list_apps()` E2E test.
+- Computer Use is a general Windows GUI information-gathering, observation,
+  comparison, and state-understanding resource. It is not restricted to KOA Studio.
+- Normal GUI path:
+  `ChatGPT Web -> Desktop Commander -> Codex CLI -> Computer Use -> target Windows app`.
+- Appropriate uses include, when relevant to the approved task:
+  * automatic-trading project GUI state inspection and visible-behavior verification
+  * window, dialog, button, Toast, menu, chart, visible state, and settings observation
+  * KOA Studio official OpenAPI contract inspection
+  * Hero4/HTS visible behavior comparison
+  * other read-and-understand Windows-app workflows needed for investigation or verification
+- Computer Use is NOT an execution path for trading actions, Broker mutation, or
+  operational state changes.
+- In trading/Broker areas, the following are prohibited through Computer Use:
+  * BUY or SELL execution
+  * SendOrder or equivalent order submission
+  * order modification or cancellation
+  * liquidation / forced liquidation actions
+  * account mutation
+  * account-password or authentication/security input
+  * any other action that can create a Broker-side trading effect
+- UI interaction is limited to what is necessary to gather information or verify
+  visible state. Prefer read-only observation. Inspection clicks, navigation, or
+  scrolling must not cross into side-effectful trading or operational actions.
+- Keep one coherent GUI-dependent Phase inside one Codex task when practical so
+  the code context, UI observation, and verification evidence remain connected.
+- KOA Studio is one specialized use case. When additional Kiwoom OpenAPI+
+  official technical contract confirmation is needed, use Computer Use in the
+  same Codex task when available, then compare the result against Production
+  code and existing official Evidence.
 - Do not require the user to relay whether the active window is Codex or KOA
   Studio, whether the window switched to KOA Studio, whether it switched back to
   Codex, or the window-switching process itself.
@@ -701,8 +745,9 @@ Computer Use / KOA Studio Session Handoff Policy:
   as VERIFIED in Docs official Evidence or audit reports.
 - Use KOA Studio only when a new implementation needs an external contract that
   is absent from existing Evidence or remains PARTIAL or unverified.
-- Do not assume Computer Use is always available. At new-session startup, judge
-  its availability from the current environment when possible.
+- Do not assume Computer Use is permanently available merely because the
+  2026-09-27 E2E passed. Re-verify after Codex/plugin/runtime updates or when a
+  task materially depends on GUI automation.
 - If Computer Use is unavailable, do not invent GUI inspection results. Use
   installed official Kiwoom materials, such as `C:\OpenAPI\koa_devguide.xml`,
   only in read-only mode. If a contract can be confirmed only through GUI access,
@@ -1239,15 +1284,17 @@ GUI verification workflow:
   alternative safe evidence such as window geometry, widget rectangles,
   screenshots, accessibility text, runtime state, or process/window identity
   before asking the user to perform a simple GUI action.
-- Codex should perform ordinary safe GUI actions such as button clicks, Toast
-  checks, and settings-window navigation when the requested action is in scope,
-  the target control is identified, and the operation cannot trigger an
-  unauthorized Broker/order side effect.
-- User direct action is limited to boundaries that only the user should cross:
-  login, certificate or password entry, security input, account authentication,
-  real order approval, or a GUI action whose automation target cannot be made
-  safe. Do not automate those boundaries without explicit approval for the
-  current task.
+- Codex may use limited GUI interaction only to gather information or verify
+  visible state, such as inspection clicks, Toast checks, or settings-window
+  navigation. Such interaction must remain observational in purpose and must not
+  trigger trading, Broker mutation, account mutation, operational state changes,
+  authentication/security input, or other side effects.
+- The following remain user-only boundaries and are never automated through
+  Computer Use in this project: login, certificate/password entry, security
+  input, account authentication, real-order approval, BUY/SELL, order submission,
+  modification, cancellation, liquidation, and any other Broker/account mutation.
+  Computer Use remains an information-gathering and visible-state verification
+  tool even when those screens are being inspected.
 
 If evidence is missing, report "not confirmed".
 
