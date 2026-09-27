@@ -1,0 +1,186 @@
+1. RECOVERY BASELINE
+
+Automatic-trading repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Final committed code baseline:
+337d4fadff1e1d0ada3ea0609fff3d22f536eb25
+
+Final commit:
+feat: freeze production filter-signal backtest parity
+
+Remote verification:
+local HEAD == origin/feat/restore-auto-trade-setting-ui
+remote HEAD == 337d4fadff1e1d0ada3ea0609fff3d22f536eb25
+
+Documentation repository:
+C:\Users\JIN KWANG CHUL\Documents\docs
+
+Documentation branch:
+agent/project-prompt-standard
+
+The final documentation SHA is reported after this document set is committed
+and pushed.
+2. WHAT WAS CLOSED
+
+The prior 2026-09-27 Work Resume recorded the parity implementation as
+VERIFIED LOCAL WIP / NOT CODE-FROZEN.
+
+That state is now superseded for the same parity scope.
+
+A coherent staged snapshot was built without broad-staging unrelated WIP.
+The snapshot was independently verified and committed as 337d4fa.
+
+The completed Big Feature scope is:
+Signal Validation filter-signal backtest parity against the Production
+candle/session/signal contract.
+
+Do not reinterpret this as production order/fill/PnL parity.
+3. REAL 005930 EVIDENCE
+
+Read-only Kiwoom CLI ka10080 evidence was acquired for 005930.
+
+Source:
+- M1 rows: 6,300;
+- range: 2026-09-08 12:24 through 2026-09-23 19:59.
+
+Production contract:
+- PRODUCTION_SESSION_READY;
+- regular 09:00 to 15:20;
+- selected ATS: none.
+
+Actual registered Routine:
+- 지표추종매매A;
+- M3;
+- visible target 250;
+- hidden context 900.
+
+Projected M3:
+- available completed rows: 1,456;
+- active calculation rows: 1,150;
+- active range: 2026-09-10 15:00 through 2026-09-23 15:18.
+Final four-gate result:
+- signal rule/support: PASS;
+- Replay: 113 signals;
+- Batch: 113 signals;
+- missing/extra/mismatched: 0/0/0;
+- SIGNAL_PARITY_PASS;
+- MARKET_SESSION_PARITY_PASS;
+- COMPLETED_BAR_PRODUCTION_PARITY_PASS;
+- FILTER_SIGNAL_BACKTEST_AUTHORIZED.
+
+Execution/PnL remains:
+SIMPLIFIED_CLOSE_FILL / NOT_PRODUCTION_EQUIVALENT.
+
+4. STAGED SNAPSHOT VERIFICATION
+
+Index tree:
+1df28cbffd3e8ff223f004e6c741a034458969d3
+
+Verification from the extracted staged tree:
+- 117 / 117 focused tests PASS;
+- task-boundary py_compile PASS;
+- real 005930 four-gate E2E PASS.
+
+The staged snapshot excluded unrelated current Working Tree modifications.
+5. IMPORTANT FORMULA BOUNDARY
+
+A local uncommitted engines/indicator_engine.py change switches Bollinger input
+from CLOSE to (HIGH + LOW + CLOSE) / 3.
+
+The latest 2026-09-26 Filter Calculation Validity Audit still owns Bollinger as
+the selected timeframe CLOSE series.
+
+The typical-price WIP is therefore NOT part of 337d4fa.
+
+Evidence:
+- committed/CLOSE staged candidate: 113 real 005930 signals;
+- local typical-price WIP candidate: 138 real 005930 signals.
+
+Both candidates can satisfy internal Replay/Batch parity.
+Therefore parity-gate success cannot choose the indicator formula contract.
+
+Do not stage or commit the typical-price change without explicit user decision
+and a corresponding Canonical contract change.
+6. REMAINING PROTECTED WORKING TREE
+
+After the parity Code Freeze:
+git status porcelain count: 187.
+Staged count: 0.
+
+The remaining flow.py Working Tree diff beyond 337d4fa is limited to:
+- Signal Validation preference-store wiring;
+- QObject-deletion-safe signal emit handling.
+
+Other protected WIP includes:
+- Indicator/UI/chart work;
+- indicator_follow_signal_validation_preferences.py;
+- engines/indicator_engine.py typical-price change;
+- Runtime and user-data files;
+- Stock and Routine Instance state;
+- Mock work;
+- reports and unrelated tests.
+
+Do not broad-stage or clean this state.
+7. CLEANUP ALREADY COMPLETED
+
+With explicit user approval, 14 untracked temporary/evidence files were deleted
+before the Code Freeze.
+
+The code repository status count moved:
+217 -> 203 after temporary-file cleanup.
+
+After committing the coherent parity snapshot:
+203 -> 187.
+
+No tracked Stock, Runtime, Routine Instance, user setting, or unrelated test was
+deleted or restored by that cleanup.
+
+8. NEXT SAFE CLEANUP STEP
+
+Continue cleanup, not a new Big Feature.
+
+Recommended order:
+1. classify the remaining 187 entries after the new 337d4fa baseline;
+2. keep the Bollinger typical-price conflict stopped pending user decision;
+3. keep 17 deleted Stock directories and two deleted Routine Instances
+   protected until their lifecycle provenance is established;
+4. separate older UI/preferences/Mock/Runtime WIP into coherent feature groups;
+5. create further checkpoints only when each group has an isolated verified
+   Call Graph.
+
+No automatic restore/delete/stash/clean action is authorized.
+9. DEVELOPMENT ENVIRONMENT
+
+Desktop Commander:
+available during this Freeze.
+
+Automatic-trading runtime:
+C:\Users\JIN KWANG CHUL\AppData\Local\Programs\Python\Python311-32\python.exe
+Python 3.11.9 / 32-bit / PyQt5.
+
+Kiwoom CLI:
+C:\Users\JIN KWANG CHUL\.local\bin\kiwoomcli.exe
+
+The real-profile token was valid during the read-only ka10080 query.
+No order/account mutation command was used.
+
+Codex:
+not required for this cleanup/Freeze.
+Re-verify availability/quota before later use.
+
+10. RECOVERY ORDER
+
+1. 00_CANONICAL/REFERENCE/AGENT_WORKFLOW_REFERENCE.txt
+2. 00_CANONICAL/CURRENT/
+   MASTER_SPEC_CANONICAL_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_CODE_FREEZE.txt
+3. this Work Resume
+4. 00_CANONICAL/CHANGELOG/
+   MASTER_SPEC_CHANGELOG_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_CODE_FREEZE.txt
+5. 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
+
+Then verify branch, HEAD, remote SHA, staged state, and remaining WIP before
+continuing cleanup.

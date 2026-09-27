@@ -1,0 +1,70 @@
+MASTER SPEC CHANGELOG
+=====================
+
+Date:
+2026-09-27
+
+Change:
+Promote the filter-signal backtest / Production parity work from verified local
+WIP to an isolated Code Freeze.
+
+Final code checkpoint:
+337d4fadff1e1d0ada3ea0609fff3d22f536eb25
+feat: freeze production filter-signal backtest parity
+
+Supersedes for the same scope:
+MASTER_SPEC_CANONICAL_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE.txt
+
+The earlier local-WIP document remains historical recovery evidence.
+Frozen behavior:
+- Production M1 source + Production session aggregation;
+- calculation/display separation;
+- source/session-aware cache identity;
+- bounded undercoverage retry/fail-closed;
+- shared BUY/SELL conflict selector;
+- Replay/Batch signal parity gate;
+- signal-price strategy-axis normalization;
+- four-gate FILTER_SIGNAL_BACKTEST authorization;
+- explicit execution/PnL non-equivalence.
+
+Real 005930 evidence:
+- Kiwoom CLI ka10080 read-only M1 rows: 6,300;
+- Production M3 available completed rows: 1,456;
+- active calculation rows: 1,150;
+- Replay signals: 113;
+- Batch signals: 113;
+- missing/extra/mismatched: 0/0/0;
+- FILTER_SIGNAL_BACKTEST_AUTHORIZED.
+Verification:
+- staged tree:
+  1df28cbffd3e8ff223f004e6c741a034458969d3;
+- focused staged-snapshot suite: 117 / 117 PASS;
+- task-boundary py_compile: PASS;
+- real 005930 M1 -> Production M3 four-gate E2E: PASS;
+- local code HEAD == remote code HEAD at 337d4fa.
+
+Excluded protected WIP:
+- Bollinger typical-price change in engines/indicator_engine.py;
+- large Signal Validation UI/window/presentation/visualization WIP;
+- preferences feature;
+- unrelated settings/repository/Runtime/Stock/Mock/test/report WIP.
+
+The typical-price change was excluded because current Canonical still requires
+Bollinger from the timeframe CLOSE series and the local change altered the same
+005930 signal count from 113 to 138.
+Cleanup:
+- 14 confirmed untracked temporary/evidence files removed with user approval;
+- repository porcelain count 217 -> 203;
+- parity Code Freeze reduced remaining count 203 -> 187;
+- no broad add/reset/restore/stash/clean.
+
+Canonical:
+00_CANONICAL/CURRENT/
+MASTER_SPEC_CANONICAL_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_CODE_FREEZE.txt
+
+Work Resume:
+00_CANONICAL/CURRENT/
+WORK_RESUME_LATEST_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_CODE_FREEZE.txt
+
+Result:
+FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_CODE_FREEZE_COMPLETE

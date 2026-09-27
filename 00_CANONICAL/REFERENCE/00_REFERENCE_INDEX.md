@@ -30,7 +30,7 @@ CURRENT.
 | Signal Validation timeframe identity, 250/4,000 viewport, and entry-identity checkpoint | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-21_SIGNAL_VALIDATION_TIMEFRAME_VIEWPORT_CHECKPOINT_FREEZE.txt` | Supplemental owner for minute+D1/W1/Y1 Validation identity, Registration/Edit round trip, semantic period handling, explicit entry identity preservation, default visible 250, and max visible 4,000. The fixed 5,000 history amount remains implementation state only; demand-driven older-history extension and overlapping local broker/cache wiring remain open. |
 | Signal Validation chart/history/performance and validation-only averaging closure | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_SIGNAL_VALIDATION_CHART_AVERAGING_CLOSURE.txt` | Latest supplemental owner for checkpoint `caa271f85f0a37d26895d2d890b025939ec4bf70`: batch/replay/history/cache, regular-market Validation projection, minute+D1/W1/MO1/Y1 Validation identity, chart interaction/performance checkpoint, ROUND/BUDGET/ACTIVE_BUY validation-only execution, and filter-only apply-back boundary. Live broker period-candle transport in the protected large `kiwoom_api.py` WIP is explicitly not frozen here. |
 | Signal Validation price-axis, completed-cycle/lower-pane presentation, recent-stock MRU, and deleted-cache invalidation closure | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-24_SIGNAL_VALIDATION_PRICE_VISUAL_MRU_CLOSURE.txt` | Latest supplemental owner for checkpoint `1b33dd959704846ff11e60e3b3253ee215ec058d`: CURRENT/SIGNAL/AVG strategy axes, CLOSE-aligned Validation price, corrective ACTIVE_BUY, completed-cycle table/highlight, MACD+SIGNAL oscillator projection, draggable lower panes and reference labels, 20-entry MRU with current-stock display omission, silent X/oldest eviction, and restart-persistent stale-cache invalidation. Protected range-replay/trading-cost/calendar-day/Evidence/live-SOR WIP is explicitly excluded. |
-| Signal Validation filter-signal backtest / production parity local-WIP authority | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE.txt` | Current supplemental contract for production-session calculation provenance, Replay/Batch signal parity, four-gate filter-signal authorization, calculation/display separation, and explicit execution/PnL non-equivalence. This is a verified Local WIP authority, not a new code Freeze; committed code baseline remains `5c651ac4e58c22b1ac60c62e5677609306682fc8`. |
+| Signal Validation filter-signal backtest / Production parity Code Freeze | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_CODE_FREEZE.txt` | Current owner for code checkpoint `337d4fadff1e1d0ada3ea0609fff3d22f536eb25`: Production M1/session aggregation, Replay/Batch parity, four-gate `FILTER_SIGNAL_BACKTEST_AUTHORIZED`, 005930 real-data evidence, and explicit execution/PnL non-equivalence. The earlier Sep-27 Local-WIP Freeze is superseded for this scope. |
 | Indicator calculation history, Hero4 EAVG/flat-RSI semantics, Price Box history context, and timeframe-specific retained-history targets | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-26_HERO4_INDICATOR_PARITY_TIMEFRAME_HISTORY_FINALIZATION.txt` | Current owner for code checkpoint `5c651ac4e58c22b1ac60c62e5677609306682fc8`; supersedes conflicting fixed-600 history-target wording and the earlier unresolved EAVG/flat-RSI wording while leaving the unfinished direct 005930 three-minute HTS numerical comparison as an evidence gap. |
 | Production order route, KRX/NXT/SOR fail-closed, Chejan, and reconciliation checkpoint | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-21_PRODUCTION_MARKET_DATA_KRX_NXT_SOR_BOUNDARY_CHECKPOINT_FREEZE.txt` | Latest supplemental owner for the selectively committed order-route provenance, KRX/SOR adapter mapping, source-route-preserving CANCEL/MODIFY, Chejan route metadata, and LIVE_SOR_RECONCILIATION_UNVERIFIED fail-closed boundary. Live SOR reconciliation remains unverified unless separately proven. |
 | Production candle standby, Routine-declared candle requirements, login bootstrap, Mock/Production MarketData isolation, and Mock execution-chart read boundary | `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-22_PRODUCTION_CANDLE_STANDBY_MARKETDATA_BOUNDARY_CLOSURE.txt` | Latest supplemental owner for the closed candle/standby boundary at code checkpoint `1c2258b0cd6428fc772a152a4041e14bbaec4725`; supersedes only the Sep-21 wording that treated this wider candle/standby/Mock MarketData wiring as uncommitted local WIP. |
@@ -87,17 +87,13 @@ does not supersede them.
 ## Current Resume And Changelog
 
 - Latest Frozen Authority:
-  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-26_HERO4_INDICATOR_PARITY_TIMEFRAME_HISTORY_FINALIZATION.txt`
-- Latest Local WIP Canonical:
-  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE.txt`
-- Latest Local WIP Work Resume:
-  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE.txt`
-- Latest Local WIP Changelog:
-  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE.txt`
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_CODE_FREEZE.txt`
 - Latest Frozen Work Resume:
-  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-26_HERO4_INDICATOR_DIRECT_PARITY_CONTINUATION.txt`
+  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_CODE_FREEZE.txt`
 - Latest Frozen Changelog:
-  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-26_HERO4_INDICATOR_PARITY_TIMEFRAME_HISTORY_FINALIZATION.txt`
+  `00_CANONICAL/CHANGELOG/MASTER_SPEC_CHANGELOG_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_CODE_FREEZE.txt`
+- Superseded Sep-27 Local-WIP checkpoint:
+  `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE.txt`
 
 Older Work Resumes, Readable variants, Freeze snapshots, and Changelogs are
 historical records. They may explain a past decision but must not be used as a

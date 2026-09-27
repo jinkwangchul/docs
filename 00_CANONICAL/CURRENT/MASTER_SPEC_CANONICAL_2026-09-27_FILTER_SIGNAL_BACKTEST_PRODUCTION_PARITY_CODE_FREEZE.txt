@@ -1,0 +1,229 @@
+MASTER SPEC CANONICAL
+2026-09-27 FILTER SIGNAL BACKTEST / PRODUCTION PARITY CODE FREEZE
+
+Status: CURRENT FREEZE
+Code repository: C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+Code branch: feat/restore-auto-trade-setting-ui
+Final code checkpoint: 337d4fadff1e1d0ada3ea0609fff3d22f536eb25
+Push: origin/feat/restore-auto-trade-setting-ui verified
+
+1. AUTHORITY AND SCOPE
+
+This Freeze supersedes the earlier 2026-09-27
+FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_LOCAL_WIP_FREEZE only for the same
+filter-signal backtest / Production parity scope.
+
+The earlier document remains historical recovery evidence.
+The 2026-09-26 Hero4 formula/history and filter-calculation contracts remain
+authoritative for their independent scopes.
+
+This Freeze owns:
+- Production-session calculation provenance for Signal Validation;
+- Replay/Batch signal parity;
+- four-gate filter-signal backtest authorization;
+- calculation/display separation;
+- BUY/SELL conflict-selection parity;
+- signal-price strategy-axis normalization used by the frozen parity path.
+
+No Broker order, account mutation, Queue/Position/Fill Writer, cancellation,
+modification, or SendOrder authority is added.
+2. PRODUCTION CALCULATION CONTRACT
+
+Minute-timeframe Signal Validation uses canonical M1 source history and the
+resolved Production session contract when Production-session evidence is ready.
+
+Calculation source:
+PRODUCTION_M1_SESSION_AGGREGATION
+
+Target-timeframe calculation candles are projected through the common
+Production session aggregation boundary.
+
+Display filtering such as regular-market-only remains presentation projection.
+It must not redefine the underlying calculation candle set or signal decision.
+
+Cache/calculation identity distinguishes the source, timeframe, session
+contract, retained source range, and request identity.
+
+Insufficient M1 source coverage retries within the existing bounded source
+ceiling and otherwise fails closed.
+
+A persisted signal cache is not relabeled current merely by attaching a newer
+Production session contract.
+3. FILTER-SIGNAL AUTHORIZATION
+
+FILTER_SIGNAL_BACKTEST_AUTHORIZED requires all four gates to pass on the same
+calculation basis:
+
+1. signal rule/support;
+2. authoritative detailed Replay versus optimized Batch signal parity;
+3. market-session parity;
+4. candle/projection parity.
+
+Any unresolved or failed gate produces FILTER_SIGNAL_BACKTEST_BLOCKED.
+
+Detailed Replay remains authoritative.
+Batch remains an optimization/differential path and may not invent signals that
+the authoritative detailed evaluation does not emit.
+
+The shared BUY/SELL selector resolves simultaneous signals consistently across
+the frozen Validation paths.
+
+Execution/PnL authorization is explicitly outside this signal-only verdict.
+4. REAL 005930 PRODUCTION-DATA EVIDENCE
+
+Read-only broker evidence was acquired through Kiwoom CLI:
+- API: ka10080 stock-minute candle query;
+- stock: 005930 Samsung Electronics;
+- interval: 1 minute;
+- profile: existing real profile;
+- side effect: read-only; no order/account mutation command was used.
+
+Acquired canonical M1 source:
+- 6,300 unique rows;
+- oldest: 2026-09-08 12:24;
+- newest: 2026-09-23 19:59.
+
+Resolved Production session contract:
+- status: PRODUCTION_SESSION_READY;
+- regular session: 09:00:00 to 15:20:00;
+- selected ATS: none.
+
+M1 -> Production M3 aggregation:
+- total projected completed M3 rows available: 1,456;
+- frozen Validation calculation slice: 1,150 rows;
+- calculation slice oldest: 2026-09-10 15:00;
+- calculation slice newest: 2026-09-23 15:18;
+- visible target: 250;
+- hidden indicator-history context: 900.
+Actual registered Routine rules were used:
+- Routine Instance: 지표추종매매A;
+- target timeframe: M3;
+- history target: 900 bars;
+- minimum formula warmup: 60 bars;
+- effective hidden context: 900 bars.
+
+Final real-data gate result on the Code Freeze candidate:
+- signal rule support: PASS;
+- detailed Replay emitted signals: 113;
+- optimized Batch emitted signals: 113;
+- missing: 0;
+- extra: 0;
+- mismatched: 0;
+- signal parity: SIGNAL_PARITY_PASS;
+- market session: MARKET_SESSION_PARITY_PASS;
+- completed candle projection:
+  COMPLETED_BAR_PRODUCTION_PARITY_PASS;
+- final authorization:
+  FILTER_SIGNAL_BACKTEST_AUTHORIZED.
+
+The latest calculation row was completed. Forming-bar equivalence is not
+promoted by this evidence.
+5. EXECUTION / PNL BOUNDARY
+
+The frozen execution trust label remains:
+SIMPLIFIED_CLOSE_FILL
+
+Execution parity remains:
+NOT_PRODUCTION_EQUIVALENT
+
+production_pnl_realistic remains false.
+pnl_backtest_authorized remains false.
+
+The current model does not reproduce:
+- multi-hoga execution;
+- multi-time / multi-ratio fills;
+- partial or unfilled orders;
+- cancellation/reset behavior;
+- Broker fill/Chejan lifecycle.
+
+Therefore this Code Freeze proves filter-signal backtest parity, not actual
+production order/fill/PnL parity.
+6. CANONICAL CLOSE-SERIES PROTECTION
+
+The current 2026-09-26 Filter Calculation Validity Audit defines Bollinger
+calculation from the selected timeframe CLOSE series.
+
+A protected local WIP in engines/indicator_engine.py changes Bollinger input to
+(HIGH + LOW + CLOSE) / 3.
+
+That WIP was deliberately excluded from this Code Freeze.
+
+Independent staged-snapshot evidence showed that including that local WIP
+changes the same 005930 real-data signal count from 113 to 138.
+
+The four parity gates can pass under either internally consistent formula, so
+gate success alone cannot authorize a formula change.
+
+Until the current Canonical is explicitly changed by user decision, the
+committed Freeze preserves CLOSE-based Bollinger semantics.
+7. CODE FREEZE COMPOSITION
+
+The focused Code Freeze contains 17 files:
+- 10 Production/Validation code files;
+- 7 directly related regression-test files.
+
+Key frozen components include:
+- gui_indicator_follow_signal_validation_flow.py;
+- indicator_follow_backtest_parity.py;
+- indicator_follow_validation_production_session.py;
+- indicator_follow_strategy_price_contract.py;
+- indicator_follow_signal_validation_execution.py;
+- indicator_follow_signal_validation_projection.py;
+- routine_signal_selection.py;
+- routine_macd_engine.py;
+- routine_validation_batch.py;
+- routine_validation_replay.py.
+
+Large unrelated/mixed UI and preference WIP was excluded rather than broad-staged.
+Explicitly excluded examples:
+- engines/indicator_engine.py local Bollinger typical-price WIP;
+- gui_indicator_follow_signal_validation_window.py;
+- indicator_follow_signal_validation_presentation.py;
+- indicator_follow_signal_validation_visualization.py;
+- indicator_follow_signal_validation_preferences.py;
+- gui_indicator_follow_buy_controls.py;
+- gui_indicator_follow_sell_controls.py;
+- gui_indicator_follow_routine_settings_dialog.py;
+- routine_instance_repository.py.
+
+The remaining Working Tree version of
+gui_indicator_follow_signal_validation_flow.py contains only excluded
+preference-store wiring and QObject-deletion-safe emit handling beyond the
+committed parity version.
+
+8. VERIFICATION
+
+Clean staged-tree snapshot:
+tree 1df28cbffd3e8ff223f004e6c741a034458969d3
+
+Fresh staged-snapshot verification:
+- focused parity/production-session/selection/price-contract/
+  execution/Batch/Replay suite: 117 / 117 PASS;
+- task-boundary py_compile: PASS;
+- real 005930 M1 -> Production M3 -> four-gate E2E: PASS;
+- final signal count: Replay 113 / Batch 113;
+- FILTER_SIGNAL_BACKTEST_AUTHORIZED confirmed.
+9. CLEANUP AND PROTECTED WIP
+
+Before this Freeze, 14 confirmed untracked temporary/evidence files were removed
+with explicit user approval:
+- six _phase7 BMP files;
+- six runtime Phase7/value-icon image artifacts;
+- tmp_review_instrument.py;
+- tmp_review_signal_probe.py.
+
+None was referenced by tracked project code.
+
+After the Code Freeze commit:
+- code HEAD == remote HEAD at 337d4fa;
+- staged files: 0;
+- remaining repository porcelain count: 187.
+
+Remaining WIP includes older GUI, indicator-formula, Runtime, Stock,
+RoutineInstance, Mock, report, and test work.
+
+Do not reset, restore, stash, clean, delete, or broad-stage that protected state
+without separate evidence and user approval.
+
+FINAL VERDICT:
+FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_CODE_FREEZE_COMPLETE
