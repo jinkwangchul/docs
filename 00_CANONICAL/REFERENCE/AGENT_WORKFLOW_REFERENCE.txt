@@ -1114,9 +1114,20 @@ A conversation is an execution surface, not a project transaction boundary.
 - Opening a new conversation does not automatically apply the Startup Prompt.
   The user explicitly requests Startup Prompt application.
 - Closing a conversation does not trigger a special close-out procedure.
-- If the current conversation becomes too large for safe continuity, tell the
-  user that moving to a new conversation is advisable. Do not run a Closing or
-  Freeze procedure merely because of context pressure.
+- Proactively recommend moving to a new conversation before continuity is
+  materially at risk; do not wait until context loss is imminent.
+- Prefer making that recommendation at a safe work boundary such as after an
+  investigation result, approved design, completed implementation unit, or fresh
+  verification point. If continuity risk is growing faster than the next safe
+  boundary can be reached, recommend the transition immediately and report the
+  exact unfinished state.
+- Judge context pressure from practical evidence such as accumulated long logs or
+  code, repeated multi-step decisions, large tool outputs, increasing dependence
+  on compressed prior context, or difficulty preserving exact task boundaries.
+  Do not claim an exact context percentage, remaining-token count, or precise
+  limit unless the active environment actually exposes that measurement.
+- A context-based new-conversation recommendation does not trigger Closing,
+  Freeze, Commit, Push, Canonical, Changelog, Work Resume, or handoff work.
 - The new conversation, after the user's Startup Prompt request, directly
   investigates the immediately preceding same-project conversation and
   reconstructs the continuation target under Section 9.

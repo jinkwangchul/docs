@@ -330,9 +330,19 @@ Project persistence follows the WORK UNIT, not the conversation lifetime:
 - Do not rewrite this reusable Startup Prompt unless the startup/resource operating contract
   itself has been explicitly changed.
 
-If context continuity becomes unsafe, tell the user that moving to a new conversation is advisable.
-Do not run a special closing procedure. The new conversation recovers the work directly by the
-rules above when the user requests Startup Prompt application.
+Context-limit transition rule:
+- Proactively recommend moving to a new conversation BEFORE continuity is materially at risk.
+- Prefer a safe work boundary such as after an investigation result, approved design, completed
+  implementation unit, or fresh verification point; do not wait until context loss is imminent.
+- Use practical signs such as accumulated long logs/code, repeated multi-step decisions, large
+  tool outputs, growing dependence on compressed prior context, or difficulty preserving exact
+  task boundaries. Do not invent an exact context-usage percentage or remaining-token count unless
+  the active environment actually exposes it.
+- This recommendation does NOT trigger Closing, Freeze, Commit, Push, Canonical, Work Resume,
+  Changelog, or handoff work by itself.
+- After the user moves to a new conversation and explicitly requests Startup Prompt application,
+  the new conversation directly investigates the immediately preceding same-project conversation
+  and reconstructs the continuation target under the rules above.
 
 ==================================================
 FINAL RESOURCE DEFINITIONS
