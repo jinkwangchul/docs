@@ -86,6 +86,8 @@ does not supersede them.
 
 ## Current Resume And Changelog
 
+- Latest Work-Unit Recovery Checkpoint:
+  `00_CANONICAL/CURRENT/WORK_RESUME_LATEST_2026-09-27_POST_PARITY_WIP_CLEANUP_CHECKPOINT.txt`
 - Latest Frozen Authority:
   `00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-09-27_FILTER_SIGNAL_BACKTEST_PRODUCTION_PARITY_CODE_FREEZE.txt`
 - Latest Frozen Work Resume:

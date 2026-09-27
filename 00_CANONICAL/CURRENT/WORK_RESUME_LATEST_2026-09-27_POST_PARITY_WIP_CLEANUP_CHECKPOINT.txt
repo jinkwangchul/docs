@@ -1,0 +1,239 @@
+WORK RESUME
+2026-09-27 POST-PARITY WIP CLEANUP CHECKPOINT
+
+Status: VERIFIED WORK-UNIT RECOVERY CHECKPOINT
+This is not a new Canonical contract and does not supersede an existing
+functional Canonical owner.
+
+1. CURRENT CODE BASELINE
+
+Repository:
+C:\Users\JIN KWANG CHUL\Documents\kiwoom_auto
+
+Branch:
+feat/restore-auto-trade-setting-ui
+
+Current local HEAD:
+ae451cbf31fb6105397b8d3f6e420d0d97366159
+
+Current remote:
+origin/feat/restore-auto-trade-setting-ui
+
+Verification:
+local HEAD == remote HEAD.
+
+Latest commit:
+ae451cb refactor: remove obsolete validation regular-market projection
+
+Staged files:
+0
+
+2. VERIFIED CLEANUP COMPLETED AFTER THE 9/27 PARITY FREEZE
+
+The parity Code Freeze remains:
+337d4fadff1e1d0ada3ea0609fff3d22f536eb25
+feat: freeze production filter-signal backtest parity
+
+Subsequent verified cleanup/checkpoint commits through the current HEAD:
+
+c63529f fix: normalize indicator price comparison axes
+7d84cd5 fix: keep new routine instances enabled
+935bfca fix: honor optional routine projection locators
+81b1686 fix: drop validation completion after flow teardown
+1f5802a test: align rule apply fixtures with price contract
+2c36a39 fix: wire early-close return to auto actions
+ac4c8da fix: restore validation sell filter logic operator
+5dc1308 docs: fix footer time-policy owner
+0a7bcd9 test: align footer vocabulary count
+6e4a0c5 test: flush chart refresh events
+bf6c40b test: refresh execution preview fixtures
+5ca0474 test: cover routine assignment monitoring refresh
+c48aada test: cover turn confirmation and price axes
+98ff941 test: freeze completed-bar delay provenance
+f4ec46c test: harden mock isolation guard coverage
+b738318 fix: preserve legacy composite state without widgets
+ae451cb refactor: remove obsolete validation regular-market projection
+
+Earlier explicit temporary-artifact cleanup removed 14 confirmed untracked
+Phase7/image/tmp evidence files only.
+
+3. OBSOLETE REGULAR-MARKET VALIDATION HELPER REMOVED
+
+Removed:
+- indicator_follow_validation_regular_market.py
+- tests/test_indicator_follow_validation_regular_market.py
+
+Reason:
+- zero production/import callers remained;
+- the helper belonged to the superseded Validation-only regular-market
+  reaggregation path;
+- Production-session calculation now owns the minute calculation path;
+- keeping the dead helper would preserve a stale 15:30 interpretation while
+  current regular-session authority ends at 15:20.
+
+Independent HEAD-based candidate:
+- import references after deletion: 0;
+- focused parity suite: 117 / 117 PASS.
+
+Staged-tree verification:
+- tree cddcfade592dfb05588f4921a5beacf30608b54e;
+- focused parity suite: 117 / 117 PASS.
+
+4. CURRENT DIRTY-STATE EVIDENCE
+
+Current porcelain entry count:
+156
+
+This count is not a file-count authority because Git collapses untracked
+directories and Windows stat state can differ from actual content state.
+
+Actual content-oriented inventory at this checkpoint:
+- tracked paths with content diff: 99;
+- untracked files reported by git ls-files --others --exclude-standard: 226;
+- staged paths: 0.
+
+Protected data/state areas remain dirty, including Stock, Runtime,
+RoutineInstance, assignment/group, and Mock data. They were not cleaned,
+restored, stashed, or broad-staged.
+
+Do not use git reset/restore/stash/clean or broad add against the remaining
+working tree.
+
+5. DOCUMENT_CONFLICT_STOP — BOLLINGER INPUT
+
+Protected local WIP:
+engines/indicator_engine.py
+
+Current 2026-09-26 Filter Calculation Validity Audit owns Bollinger input as the
+selected timeframe CLOSE series.
+
+The local WIP changes Bollinger input to:
+(HIGH + LOW + CLOSE) / 3
+
+Real 005930 evidence already established that the formula choice materially
+changes filter-signal output:
+- Canonical CLOSE candidate: 113 signals;
+- local typical-price candidate: 138 signals.
+
+Both can satisfy internal Replay/Batch parity, so parity success cannot choose
+the formula.
+
+Verdict:
+DOCUMENT_CONFLICT_STOP
+
+Do not commit this formula change without an explicit user decision and matching
+Canonical contract change.
+
+6. DOCUMENT_CONFLICT_STOP — MARKETDATA / NXT / INTEGRATED QUICK CHART
+
+Relevant current owners:
+- 2026-09-11 NXT Display Realtime Supplemental Contract;
+- 2026-09-19 Verified NXT Eligibility ATS Gate Supplement;
+- 2026-09-21 Signal Validation Market-Data Contract Correction Supplement;
+- 2026-09-21 Production Market Data KRX/NXT/SOR checkpoint.
+
+The 9/11 contract defines a separate display-only NXT path using <code>_NX and
+ECN주식체결, and explicitly does not authorize integrated KRX/NXT source
+priority or <code>_AL as that supplemental's display contract.
+
+The 9/19 supplement explicitly leaves the 9/11 display-only contract unchanged.
+
+The 9/21 Signal Validation Market-Data correction does authorize:
+- D1/W1/MO1/Y1 read-only period sources;
+- historical market_data_identity / market_source provenance;
+- active-registration identity validation;
+- source-switch rollback on downstream candle commit failure.
+
+Current protected WIP also contains a Quick Chart policy that selects
+INTEGRATED / <code>_AL whenever NXT eligibility is true and intentionally does
+not use the separate NXT display state.
+
+No later Current Canonical was found that explicitly supersedes the 9/11/9/19
+display-source policy with that Quick Chart rule.
+
+Verdict:
+DOCUMENT_CONFLICT_STOP for the combined MarketData WIP.
+
+MarketData investigation evidence:
+- current-WIP candidate was rebuilt from HEAD with the MarketData files only;
+- three apparent failures were stale/non-hermetic test fixtures, not confirmed
+  Production defects;
+- after isolating the realtime commit test from the real 005930 source marker
+  and patching the current source-aware minute-candle commit boundary,
+  reconciliation + minute-candle modules: 26 / 26 PASS;
+- coherent MarketData modules then passed:
+  realtime registration 31/31,
+  realtime shadow 10/10,
+  realtime primary reconciliation 18/18,
+  MarketData host separation 50/50,
+  Stock Quick Chart live-price 15/15,
+  read-only minute candles 8/8,
+  integrated MarketData/SOR normalization 25/25;
+- subtotal: 157 / 157 PASS.
+
+Two indicator modules were intentionally excluded from this MarketData verdict
+because their failures require the separately protected Bollinger/Price Box
+formula/visualization WIP.
+
+No MarketData code or fixture correction from this investigation was staged or
+committed.
+
+7. USER_DECISION_REQUIRED — MOCK USER RESPONSE POLICY
+
+Current protected WIP contains:
+- mock_validation_user_response.py;
+- tests/test_mock_user_response.py;
+- gui_windows.py user-facing routing that converts several Mock modal
+  QMessageBox failures and raw internal reason/status output into non-modal
+  Toast/user-language messages.
+
+The same gui_windows.py file also contains a separate policy change removing the
+server-auth gate from Mock initial-budget editing. These two concerns must not
+be committed together by default.
+
+No Current Canonical owner was found that explicitly changes the Mock failure
+surface from the existing modal behavior to the new Toast policy.
+
+Verdict:
+USER_DECISION_REQUIRED for the user-facing Modal -> Toast policy.
+The WIP remains protected and unstaged.
+
+8. MIXED SIGNAL VALIDATION UI / PREFERENCES WIP
+
+Current protected WIP includes:
+- gui_indicator_follow_signal_validation_flow.py preference-store wiring;
+- gui_indicator_follow_signal_validation_window.py large UI/chart/execution
+  changes;
+- indicator_follow_signal_validation_preferences.py;
+- dedicated preference/filter-display/transition tests;
+- presentation/visualization changes.
+
+The preference store is not independently useful: its Flow wiring depends on
+Window-side restore/persist controls and other V2 UI state.
+
+Do not commit the preference module alone.
+Treat this as one larger Signal Validation UI work unit, while keeping the
+Bollinger formula conflict excluded.
+
+9. NEXT SAFE CONTINUATION
+
+The automatic mechanical-cleanup phase has reached contract boundaries.
+
+Do not select a new feature automatically.
+
+Before further mutation, resolve one approved work unit:
+A. Bollinger CLOSE vs typical-price contract decision;
+B. NXT display-only vs INTEGRATED/<code>_AL Quick Chart market-source contract;
+C. Mock Modal vs Toast user-response contract;
+D. separately audit/freeze the remaining Signal Validation UI work unit while
+   excluding the blocked Bollinger formula.
+
+Protected Stock/Runtime/RoutineInstance/operation-policy data remains
+Do-Not-Touch unless separately investigated and authorized.
+
+Recovery should verify current HEAD/remote/staged state before continuing.
+
+FINAL RECOVERY VERDICT:
+POST_PARITY_WIP_CLEANUP_CHECKPOINT_RECORDED
+CURRENT_CODE_HEAD=ae451cbf31fb6105397b8d3f6e420d0d97366159
+STAGED=0
