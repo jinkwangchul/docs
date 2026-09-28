@@ -156,13 +156,30 @@ The selector is read-only. It creates:
 
 The evidence is authorized for the existing Production CURRENT_PRICE boundary.
 
-The existing Final CURRENT_PRICE resolver uses the evidence current_price for:
+Authorized Production consumers use the same evidence current_price for:
 - CURRENT_PRICE final pre-hash revalidation;
 - existing risk revalidation that already depends on that finalized price;
-- existing CURRENT_PRICE execution semantics reached through the same boundary.
+- Routine/actionable CURRENT_PRICE projection used by Main facts, Signal Probe,
+  Indicator Follow BUY/SELL, ATS operations, close/liquidation, and the
+  operation timer;
+- the AutoTradeSettingWindow order-execution boundary;
+- existing CURRENT_PRICE execution semantics reached through those shared
+  Production boundaries.
 
-Missing or invalid evidence remains fail closed through the existing
-current_price_pre_hash_unavailable path.
+When a Production consumer exposes production_current_price_evidence(), that
+evidence is authoritative. Missing or invalid evidence must fail closed and
+must not fall back to a legacy KRX realtime value.
+
+Final pre-hash failure continues through the existing
+current_price_pre_hash_unavailable path. Routine/actionable consumers continue
+to expose unavailable CURRENT_PRICE as None and retain their existing
+CURRENT_PRICE_VALUE_MISSING or equivalent fail-closed behavior.
+
+The Configuration-price contract used for starting-budget/budget editing is
+separate. It intentionally retains its existing current-session
+Snapshot-or-Realtime Configuration evidence contract introduced by the
+behavioral-parity checkpoint. This supplement does not silently replace that
+Configuration contract with the Production actionable CURRENT_PRICE selector.
 
 This supplement does not authorize NXT evidence for:
 - SIGNAL_PRICE;
@@ -234,20 +251,30 @@ authoritative.
 Code repository: kiwoom_auto
 Branch: feat/restore-auto-trade-setting-ui
 
-Local implementation checkpoints:
+Implementation checkpoints:
 - 298132e feat: add current price authority selector
 - 49823c2 feat: route fresh current price through authority
 - 2d38b8e feat: bind current price provenance into request hash
+- ae5f43a feat: route routine current price through authority
+- 8e343f1 feat: align settings current price authority
+
+The first three checkpoints were pushed before the later consumer-alignment
+work. The final consumer-alignment range remains subject to the same selective
+verification/push discipline.
 
 These checkpoints contain no _AL / INTEGRATED market-data policy, no NXT
 canonical/forming candle authority, and no order-route change.
 
-Final clean-snapshot focused and adjacent verification:
-- 303/303 PASS
-- changed Python py_compile: PASS
-- git diff --check over 5d9bece..2d38b8e: PASS
-- exact _AL / INTEGRATED / candle-source-marker guard: 0
-- realtime-primary/forming/canonical-candle connection guard: 0
+Verification evidence:
+- first authority/hash range clean-snapshot focused and adjacent: 303/303 PASS;
+- Routine/actionable CURRENT_PRICE focused and adjacent valid regressions:
+  87/87 PASS, with one unrelated all-stocks fixture failure reproduced on the
+  clean pre-change baseline;
+- settings-order authority focused: 22/22 PASS;
+- changed Python py_compile: PASS;
+- git diff --check: PASS;
+- exact _AL / INTEGRATED / candle-source-marker guard: 0;
+- realtime-primary/forming/canonical-candle/order-route guard: 0.
 
 Known unrelated baseline failures in broader AutoTrade start/Main-host suites
 were reproduced unchanged on the clean pre-change baseline and are not promoted
