@@ -1,0 +1,116 @@
+2026-09-28 MOCK USER RESPONSE AND PRE-AUTH BUDGET SUPPLEMENT
+
+Status: CURRENT SUPPLEMENTAL CONTRACT
+Code repository: kiwoom_auto
+Branch: feat/restore-auto-trade-setting-ui
+Implementation checkpoint: ee26507 feat: normalize mock validation user feedback
+
+======================================================================
+1. AUTHORITY AND SCOPE
+======================================================================
+
+This supplement normalizes two Mock-only UI boundaries:
+- user-visible response text for Mock actions and Mock setup failures;
+- pre-operation Mock starting-budget editing versus Production server-auth UI state.
+
+It supplements, and does not replace, the 2026-09-13 Operation / Mock and
+Indicator-Follow Validation Freeze. The existing rule that protected Mock close
+mutations freshly check Mock/Broker connectivity remains authoritative.
+
+No Production authentication state is copied into Mock authority by this
+supplement. No Production Operation, order, position, fill, PnL, route, SendOrder,
+Chejan, or candle authority is transferred to Mock.
+
+======================================================================
+2. USER RESPONSE CONTRACT
+======================================================================
+Internal Mock reason tokens are not the user interface. Known operational
+reasons project to concise Korean operator messages through
+mock_validation_user_response.py.
+
+Expected MockValidationError admission blocks:
+- use a non-modal toast;
+- preserve the internal reason for diagnostics;
+- log at informational level without a traceback;
+- do not display the raw MOCK_* reason token to the operator.
+
+Unexpected exceptions:
+- keep traceback logging;
+- show a generic non-modal user message;
+- do not leak internal exception text as the primary operator message.
+
+A result carrying summary_toast_message owns the single user-visible toast for
+that action. The generic result mapper must not emit a duplicate second toast.
+
+Status-bar projection is presentation-only:
+- successful/default result -> 완료;
+- blocked/wait/no-op -> 처리 불가;
+- error/failed -> 오류.
+
+Registration/setup failures and unsupported Mock infrastructure use the same
+non-modal presentation direction instead of new blocking QMessageBox warnings.
+
+======================================================================
+3. MOCK STARTING-BUDGET AUTHORITY
+======================================================================
+Mock starting-budget editing is Mock configuration authority and is not gated
+by Production account server-authentication UI state.
+
+Therefore _mock_start_budget_edit_authorized() does not require
+main_budget_display_auth_state == SERVER_AUTH_COMPLETE.
+
+This does not weaken Mock mutation gates that are owned elsewhere. In
+particular, protected close/liquidation edits continue to use their existing
+Mock/Broker connectivity admission before mutation.
+
+Mock starting-budget price resolution remains separate from Production
+actionable CURRENT_PRICE authority. It first uses Mock trade evidence when
+available and otherwise uses the existing Main configuration-price/current-
+session fallback contract. Absence of usable price still fails closed where the
+budget dialog requires a price.
+
+The edit remains Mock-only:
+- no Production config write;
+- no Production account-auth state mutation;
+- no broker order dispatch;
+- no Production runtime ownership change.
+
+======================================================================
+4. IMPLEMENTATION AND VERIFICATION
+======================================================================
+
+Checkpoint ee26507 changes exactly:
+- gui_windows.py Mock presentation and pre-auth budget boundary;
+- mock_validation_user_response.py;
+- tests/test_mock_user_response.py;
+- selected direct tests in tests/test_mock_validation_host_ui.py.
+
+The large unrelated dirty remainder of tests/test_mock_validation_host_ui.py
+was intentionally left unstaged and uncommitted.
+Verification:
+- clean 629e210 rebuild, direct/adjacent: 88/88 PASS;
+- actual protected dirty tree, same direct/adjacent set: 88/88 PASS;
+- py_compile for changed Python modules/tests: PASS;
+- git diff --check: PASS;
+- Production SendOrder/order queue/positions/fills/market-route/order-route
+  staged-diff guard: 0 hits.
+
+The 88-test set includes:
+- Mock user-response mapping: 10;
+- direct budget/summary UI tests: 7;
+- Mock/Production coexistence: 7;
+- Production budget defaults: 64.
+
+======================================================================
+5. EXPLICIT NON-AUTHORITY
+======================================================================
+
+This supplement does not authorize:
+- Production authentication bypass for Production features;
+- Mock close/liquidation mutation while its own connectivity gate is blocked;
+- real order creation or broker dispatch from Mock;
+- Production CURRENT_PRICE replacement by Mock price;
+- Production budget/config persistence from Mock edits;
+- suppression of unexpected exception traceback diagnostics.
+
+Any future change to those boundaries requires a separate Canonical contract.
