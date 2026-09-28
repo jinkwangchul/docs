@@ -51,11 +51,28 @@ NXT
 - source real type: ECN주식체결
 - market_source: NXT
 
+The market-data identity contract recognizes exactly:
+- bare canonical <code> as KRX;
+- <code>_NX as NXT.
+
+The identity parser must reject <code>_AL rather than map it back to a canonical
+owner. `_AL` is not a valid market-data stock code and its market source is
+UNKNOWN. NXT eligibility by itself must never synthesize another quote identity;
+the compatibility eligibility helper resolves to the canonical code and does not
+create `_AL`.
+
 Explicitly unsupported:
 - <code>_AL
 - market_source=INTEGRATED
 - treating order route identity as market-data identity
-- rewriting canonical stock ownership identity from a quote identity
+- rewriting canonical stock ownership identity from an unsupported quote identity
+
+Validation Historical remains a separate canonical-KRX history contract.
+Historical responses are admitted only when their effective identity is the
+canonical stock code and their source is KRX. Historical response provenance
+claiming `_AL`, `_NX`, INTEGRATED, or NXT is not authorized by this supplement.
+Previously persisted `_AL` Validation history is not reusable under the current
+identity contract.
 
 ======================================================================
 3. CURRENT_PRICE AUTHORITY WINDOWS
@@ -257,13 +274,19 @@ Implementation checkpoints:
 - 2d38b8e feat: bind current price provenance into request hash
 - ae5f43a feat: route routine current price through authority
 - 8e343f1 feat: align settings current price authority
+- 629e210 fix: remove dormant integrated market identity
 
-The first three checkpoints were pushed before the later consumer-alignment
-work. The final consumer-alignment range remains subject to the same selective
-verification/push discipline.
+The authority/hash and consumer-alignment checkpoints through 8e343f1 are
+remote-synchronized. Checkpoint 629e210 is the local recovery checkpoint for the
+identity-contract correction and remains subject to the normal explicit push
+approval.
 
-These checkpoints contain no _AL / INTEGRATED market-data policy, no NXT
-canonical/forming candle authority, and no order-route change.
+Checkpoint 629e210 removes dormant `_AL` acceptance from the committed
+stock-code/market-data contract while retaining explicit `_NX` support. It also
+fixes Validation Historical to canonical KRX identity and rejects unsupported
+historical response/cache provenance. It does not modify the protected dirty
+kiwoom_api/Quick Chart integrated WIP; that obsolete WIP remains a separate
+cleanup package.
 
 Verification evidence:
 - first authority/hash range clean-snapshot focused and adjacent: 303/303 PASS;
@@ -271,10 +294,17 @@ Verification evidence:
   87/87 PASS, with one unrelated all-stocks fixture failure reproduced on the
   clean pre-change baseline;
 - settings-order authority focused: 22/22 PASS;
+- dormant `_AL` contract removal clean focused/adjacent: 231/231 PASS;
+- dormant `_AL` contract removal actual dirty-tree focused/adjacent: 219/219 PASS;
+- large Signal Validation V2: 37 tests PASS before the existing Windows Qt
+  process termination; clean pre-change baseline terminates at the same next test
+  with the same exit code, so it is not promoted as a regression;
 - changed Python py_compile: PASS;
 - git diff --check: PASS;
-- exact _AL / INTEGRATED / candle-source-marker guard: 0;
-- realtime-primary/forming/canonical-candle/order-route guard: 0.
+- committed-production exact `_AL` reference: 0;
+- INTEGRATED_MARKET_DATA_SUFFIX: 0;
+- explicit `_NX` parser/source contract retained;
+- realtime-primary/forming/canonical-candle/order-route diff guard: 0.
 
 Known unrelated baseline failures in broader AutoTrade start/Main-host suites
 were reproduced unchanged on the clean pre-change baseline and are not promoted
