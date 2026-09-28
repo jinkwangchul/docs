@@ -1,0 +1,137 @@
+2026-09-28 MOCK ATS IMMEDIATE CLEANUP AND REGRESSION CLOSURE
+
+Status: CURRENT SUPPLEMENTAL CONTRACT
+Code repository: kiwoom_auto
+Branch: feat/restore-auto-trade-setting-ui
+
+Implementation checkpoints:
+- 9eb89da test: cover mock signal semantics parity
+- 326e02b test: strengthen quick chart performance coverage
+- f77ba3d fix: let ATS immediate liquidation bypass regular cleanup
+- 950e078 test: close mock lifecycle and UI regressions
+
+======================================================================
+1. SCOPE
+======================================================================
+
+This supplement closes the remaining Mock regression-harvest axis after the
+2026-09-28 Mock user-response normalization.
+
+It owns:
+- Mock/Production signal-semantics parity regression coverage;
+- Quick Chart render-performance regression strengthening;
+- active ATS IMMEDIATE liquidation versus regular-end pending-cleanup priority;
+- the harvested Mock lifecycle/context-menu/UI regression set.
+
+It does not authorize any Production order-route, broker-dispatch, candle,
+position, PnL, or CURRENT_PRICE source change.
+======================================================================
+2. ACTIVE ATS IMMEDIATE LIQUIDATION PRIORITY
+======================================================================
+
+For one Mock Instance whose frozen/effective operation mode is CONTINUOUS:
+
+- when close_source is IMMEDIATE;
+- when the currently evaluated time is inside an active selected ATS session;
+- and when the regular-market pending-order cleanup boundary has already passed;
+
+the regular-market pending-cleanup boundary must not suppress the active ATS
+IMMEDIATE liquidation lifecycle.
+
+The Host must therefore pass pending_order_cleanup_boundary=False to the
+Instance lifecycle while that active ATS IMMEDIATE condition is true.
+
+This is symmetric with the already-established final-close boundary exception
+for active CONTINUOUS ATS IMMEDIATE liquidation.
+
+The exception applies only while the ATS session is actually active. It does
+not remove the common regular-end pending-order cleanup for ordinary close,
+liquidation, carryover, expired ATS sessions, or unrelated Operations.
+======================================================================
+3. CURRENT_PRICE IMMEDIATE LIQUIDATION
+======================================================================
+
+CURRENT_PRICE liquidation remains a limit-price liquidation contract, not a
+market-order guarantee.
+
+During active ATS IMMEDIATE CURRENT_PRICE liquidation:
+- fresh Mock trade evidence supplies the current-price limit;
+- a Mock SELL LIMIT order may be created;
+- normal virtual orderbook fill rules decide fills and residual quantity.
+
+The cleanup fix does not convert CURRENT_PRICE to MARKET and does not guarantee
+that every CURRENT_PRICE liquidation ends with zero holding in arbitrary market
+evidence.
+
+The focused regression uses executable evidence where bid and current price
+permit the SELL LIMIT to fill, proving that the previous failure was the
+regular-cleanup boundary suppressing order creation rather than a price-match
+rule.
+
+======================================================================
+4. REGRESSION HARVEST
+======================================================================
+
+The previously protected Mock UI/lifecycle test WIP was audited rather than
+committed wholesale without verification.
+
+Three stale fixtures were corrected:
+- scheduled AUTO-close evidence now includes a positive holding;
+- mixed multi-selection uses a session matrix where one target is final-ended
+  while another target is genuinely startable;
+- ATS menu-routing evidence uses an actually active configured ATS session.
+One stale state expectation was corrected:
+- a close-free CONTINUOUS Instance with zero holding after its final effective
+  session completes normally as ENDED with CONTINUOUS_NO_CLOSE provenance.
+
+The remaining product defect discovered by those tests was the ATS IMMEDIATE
+cleanup-priority bug fixed by f77ba3d.
+
+After that correction, all newly harvested Mock UI/lifecycle tests pass in
+isolated processes.
+
+The untracked mock_validation/ directory is Runtime/session evidence only. It
+is not source code and is not part of these implementation checkpoints.
+
+======================================================================
+5. VERIFICATION
+======================================================================
+
+Signal-semantics parity:
+- tests/test_mock_signal_semantics_parity.py: 3/3 PASS.
+
+Quick Chart performance:
+- tests/test_quick_chart_performance.py: 7/7 PASS.
+
+ATS cleanup fix clean-clone verification:
+- focused new regression: 1/1 PASS;
+- Mock operation lifecycle: 59/59 PASS;
+- Mock market data: 8/8 PASS;
+- Mock/Production coexistence: 7/7 PASS;
+- total: 75/75 PASS.
+Actual protected working-tree verification:
+- same focused/adjacent fix set: 75/75 PASS;
+- new Mock UI tests isolated: 30/30 PASS;
+- all tests affected by the remaining Mock UI diff, isolated: 42/42 PASS;
+- changed Python py_compile: PASS;
+- git diff --check: PASS;
+- Production SendOrder/order-queue/positions/fills/market-route/order-route
+  diff guard: 0 hits.
+
+Windows/PyQt broad-suite process termination remains a separate environment/
+test-runner behavior; isolation was used so one Qt process termination could not
+hide individual test results.
+
+======================================================================
+6. EXPLICIT NON-AUTHORITY
+======================================================================
+
+This supplement does not:
+- change Production ATS liquidation;
+- change Production CURRENT_PRICE authority;
+- bypass Mock market-evidence freshness rules;
+- bypass ATS session admission;
+- suppress pending cleanup outside active ATS IMMEDIATE continuation;
+- convert CURRENT_PRICE liquidation into MARKET;
+- persist mock_validation/ Runtime artifacts as source;
+- authorize real broker orders from Mock.
