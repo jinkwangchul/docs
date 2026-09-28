@@ -1,0 +1,273 @@
+MASTER SPEC CANONICAL SUPPLEMENT
+NXT Production CURRENT_PRICE Authority
+Date: 2026-09-28
+Status: CURRENT SUPPLEMENTAL
+
+======================================================================
+1. PURPOSE AND SUPERSESSION BOUNDARY
+======================================================================
+
+This supplement authorizes one narrowly bounded extension of the existing
+KRX/NXT market-data contract:
+
+- verified NXT realtime evidence may become Production CURRENT_PRICE evidence
+  during explicitly authorized NXT-only windows;
+- KRX and NXT identities remain separate;
+- no integrated market-data identity is introduced.
+
+This supplement supersedes only the earlier clauses that denied NXT evidence
+all Production CURRENT_PRICE / pre-hash authority.
+
+The following earlier protections remain unchanged:
+- NXT does not become canonical candle authority;
+- NXT does not become forming-candle authority;
+- NXT does not become Historical/Validation candle authority;
+- NXT does not change order-route authority;
+- _AL / INTEGRATED identity remains unsupported;
+- no simultaneous KRX/NXT source-priority policy is introduced.
+
+The 2026-09-19 verified NXT eligibility contract remains authoritative for
+eligibility evidence. Its statement that eligibility alone is not realtime
+price authority is preserved: NXT eligibility is only one required gate. This
+supplement adds a separate time/source/session/evidence authority selector.
+
+======================================================================
+2. SOURCE IDENTITIES
+======================================================================
+
+Canonical stock ownership identity remains the broker-action canonical code.
+
+Production CURRENT_PRICE evidence may use exactly these realtime identities:
+
+KRX
+- canonical stock code: <code>
+- broker realtime identity: <code>
+- source real type: 주식체결
+- market_source: KRX
+
+NXT
+- canonical stock code: <code>
+- broker realtime identity: <code>_NX
+- source real type: ECN주식체결
+- market_source: NXT
+
+Explicitly unsupported:
+- <code>_AL
+- market_source=INTEGRATED
+- treating order route identity as market-data identity
+- rewriting canonical stock ownership identity from a quote identity
+
+======================================================================
+3. CURRENT_PRICE AUTHORITY WINDOWS
+======================================================================
+
+For a verified NXT-eligible stock:
+
+08:00 <= t < 08:50
+- authorized CURRENT_PRICE source: NXT
+
+08:50 <= t < 09:00
+- no Production CURRENT_PRICE authority
+- fail closed
+
+09:00 <= t < 15:30
+- authorized CURRENT_PRICE source: KRX
+
+15:30 <= t < 15:40
+- no Production CURRENT_PRICE authority
+- fail closed
+
+15:40 <= t < 20:00
+- authorized CURRENT_PRICE source: NXT
+
+Outside these windows:
+- no authority from this selector.
+
+For a stock whose verified NXT eligibility is false, unknown, missing, invalid,
+or unavailable:
+- NXT windows do not authorize CURRENT_PRICE;
+- fail closed;
+- no KRX or persisted fallback is admitted merely because a price exists.
+
+There is no overlap policy in this contract. At every authorized instant the
+selector admits at most one source.
+
+======================================================================
+4. SOURCE-TRANSITION AND FRESHNESS CONTRACT
+======================================================================
+
+A price observed before the start of the currently authorized source window
+cannot be carried into that window as Production CURRENT_PRICE evidence.
+
+Examples:
+- at 09:00, a KRX Tick observed before 09:00 is insufficient;
+- at 15:40, an NXT Tick observed before 15:40 is insufficient.
+
+The authorized evidence must satisfy all of the following:
+- Broker is connected;
+- connection_epoch matches the current Broker session;
+- login_session_id matches the current Broker session;
+- canonical stock identity matches;
+- broker quote identity matches the authorized source;
+- source real type matches the authorized source;
+- market date equals the current Seoul market date;
+- market_datetime is not in the future;
+- market_datetime falls inside the currently authorized authority window;
+- price is positive and finite;
+- receive sequence is positive;
+- received_at exists.
+
+A reconnect or new login session invalidates prior-session evidence.
+
+This contract does not introduce an arbitrary fixed seconds-based TTL.
+A no-trade interval is not by itself proof that the latest valid exchange Tick
+is stale. Session, source, window, ordering, identity, and market-time evidence
+are the governing freshness boundary for this phase.
+
+======================================================================
+5. PRODUCTION CURRENT_PRICE EVIDENCE
+======================================================================
+
+The selector projects one immutable ProductionCurrentPriceEvidence containing:
+
+- canonical_stock_code
+- broker_code_identity
+- market_source
+- source_real_type
+- current_price
+- market_datetime
+- received_at
+- receive_sequence
+- connection_epoch
+- login_session_id
+- authority_window
+
+The selector is read-only. It creates:
+- no Runtime writer;
+- no candle writer;
+- no event-journal writer;
+- no Position/PnL writer;
+- no Broker request;
+- no SendOrder call.
+
+======================================================================
+6. AUTHORIZED CONSUMER BOUNDARY
+======================================================================
+
+The evidence is authorized for the existing Production CURRENT_PRICE boundary.
+
+The existing Final CURRENT_PRICE resolver uses the evidence current_price for:
+- CURRENT_PRICE final pre-hash revalidation;
+- existing risk revalidation that already depends on that finalized price;
+- existing CURRENT_PRICE execution semantics reached through the same boundary.
+
+Missing or invalid evidence remains fail closed through the existing
+current_price_pre_hash_unavailable path.
+
+This supplement does not authorize NXT evidence for:
+- SIGNAL_PRICE;
+- RSI/MACD/MA/Bollinger/Price Box candle inputs;
+- completed candle creation;
+- forming candle creation;
+- BAR_COMMITTED;
+- canonical candles.json;
+- Historical TR replacement;
+- Signal Validation Historical source;
+- realtime-primary canonical candle commit;
+- Position/PnL source replacement.
+
+======================================================================
+7. REQUEST-HASH PROVENANCE
+======================================================================
+
+When the Production CURRENT_PRICE boundary has an authorized evidence object,
+the final order captures the same evidence snapshot before request identity is
+created.
+
+The request hash binds the normalized CURRENT_PRICE provenance together with
+the final order price.
+
+The hash-bound provenance contains:
+- canonical_stock_code
+- broker_code_identity
+- market_source
+- source_real_type
+- current_price
+- market_datetime
+- received_at
+- receive_sequence
+- connection_epoch
+- login_session_id
+- authority_window
+
+The provenance current_price must equal the final order price. A mismatch,
+incomplete provenance, invalid source identity, or invalid session/sequence
+fails closed before request-hash authorization.
+
+The same provenance is preserved in the execution_request and Queue record so
+the final price can later be attributed to the exact KRX/NXT evidence used for
+identity creation.
+
+Legacy/test contexts that do not provide the evidence callback retain the
+existing numeric CURRENT_PRICE resolver contract. Production binds the
+evidence callback and therefore uses one evidence read for both price and
+provenance, avoiding a two-read Tick race.
+
+======================================================================
+8. ORDER ROUTE IS INDEPENDENT
+======================================================================
+
+Market-data source does not select order route.
+
+Examples allowed by the architecture:
+- market_source=KRX with order route SOR;
+- market_source=NXT with order route SOR.
+
+This supplement does not activate live SOR success, NXT direct ordering, or any
+new SendOrder route. Existing SOR reconciliation and safety contracts remain
+authoritative.
+
+======================================================================
+9. IMPLEMENTATION CHECKPOINT
+======================================================================
+
+Code repository: kiwoom_auto
+Branch: feat/restore-auto-trade-setting-ui
+
+Local implementation checkpoints:
+- 298132e feat: add current price authority selector
+- 49823c2 feat: route fresh current price through authority
+- 2d38b8e feat: bind current price provenance into request hash
+
+These checkpoints contain no _AL / INTEGRATED market-data policy, no NXT
+canonical/forming candle authority, and no order-route change.
+
+Final clean-snapshot focused and adjacent verification:
+- 303/303 PASS
+- changed Python py_compile: PASS
+- git diff --check over 5d9bece..2d38b8e: PASS
+- exact _AL / INTEGRATED / candle-source-marker guard: 0
+- realtime-primary/forming/canonical-candle connection guard: 0
+
+Known unrelated baseline failures in broader AutoTrade start/Main-host suites
+were reproduced unchanged on the clean pre-change baseline and are not promoted
+to PASS by this supplement.
+
+======================================================================
+10. EXPLICITLY DEFERRED
+======================================================================
+
+Not authorized or completed by this supplement:
+- _AL integrated quote identity;
+- INTEGRATED market_source;
+- NXT-derived forming candles;
+- NXT-derived canonical candles;
+- mixed-source candle construction;
+- replacement of KRX Historical history with NXT/integrated history;
+- KRX/NXT overlap priority;
+- NXT orderbook execution logic;
+- live SOR reconciliation success;
+- NXT direct Production order dispatch.
+
+Any future expansion into those areas requires a separate Canonical contract,
+design review, focused implementation, and independent verification.
