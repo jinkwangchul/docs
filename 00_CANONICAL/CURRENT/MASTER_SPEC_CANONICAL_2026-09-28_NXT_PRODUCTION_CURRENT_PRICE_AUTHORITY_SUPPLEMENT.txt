@@ -284,9 +284,22 @@ approval.
 Checkpoint 629e210 removes dormant `_AL` acceptance from the committed
 stock-code/market-data contract while retaining explicit `_NX` support. It also
 fixes Validation Historical to canonical KRX identity and rejects unsupported
-historical response/cache provenance. It does not modify the protected dirty
-kiwoom_api/Quick Chart integrated WIP; that obsolete WIP remains a separate
-cleanup package.
+historical response/cache provenance.
+
+The previously protected obsolete integrated WIP cleanup is now complete for:
+- kiwoom_api.py;
+- kiwoom_realtime_shadow.py;
+- gui_stock_instance_chart_window.py;
+- tests/test_stock_instance_chart_live_price.py;
+- tests/test_integrated_market_data_sor_normalization.py.
+
+The four tracked files were restored exactly to committed state through a
+reverse patch after backup, and the obsolete untracked integrated test was
+removed after backup. Two untracked candle-source markers that explicitly
+declared `*_AL / INTEGRATED`, together with their paired untracked candles.json
+files, were also backed up and removed so unsupported integrated history cannot
+be mistaken for canonical KRX history after the marker mechanism was removed.
+No unrelated dirty WIP was reset, stashed, cleaned, or overwritten.
 
 Verification evidence:
 - first authority/hash range clean-snapshot focused and adjacent: 303/303 PASS;
@@ -296,6 +309,9 @@ Verification evidence:
 - settings-order authority focused: 22/22 PASS;
 - dormant `_AL` contract removal clean focused/adjacent: 231/231 PASS;
 - dormant `_AL` contract removal actual dirty-tree focused/adjacent: 219/219 PASS;
+- obsolete integrated dirty-WIP removal post-cleanup regression: 223/223 PASS;
+- candles.market-source.json remaining under stocks: 0;
+- obsolete untracked integrated normalization test: absent;
 - large Signal Validation V2: 37 tests PASS before the existing Windows Qt
   process termination; clean pre-change baseline terminates at the same next test
   with the same exit code, so it is not promoted as a regression;
