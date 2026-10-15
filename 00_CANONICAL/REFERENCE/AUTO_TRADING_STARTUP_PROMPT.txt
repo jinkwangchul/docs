@@ -82,6 +82,42 @@ Parallel reasoning is allowed.
 Overlapping mutation is serialized: one Mutation Owner per mutation boundary.
 
 ==================================================
+MANDATORY POST-MUTATION COMMIT / PUSH / RECOVERY - USER DECISION 2026-10-15
+==================================================
+After EVERY user-approved modification work unit (source, tests, documents,
+configuration, or other project artifact), establish a remotely recoverable
+checkpoint: create a task-scoped Git COMMIT, then PUSH to the verified remote.
+The unit's small size or the conversation boundary never excuses checkpointing.
+This explicit user rule supersedes older optional/periodic checkpoint timing.
+
+BEFORE changes: verify the exact repository, branch, upstream, HEAD, remote,
+already-staged changes, and protected staged/unstaged/untracked WIP.
+Never stage unrelated changes: NO git add ., git add -A, destructive
+reset/clean/checkout, mass restore, secret inclusion, or force push.
+If a target file already contains unrelated WIP, stage ONLY the newly
+authorized patch, or use an isolated branch/worktree to preserve all WIP.
+
+AFTER changes: inspect the actual scoped diff; run applicable tests and
+verification; check the exact staged file list/diff before commit.
+A VERIFIED change uses a focused checkpoint commit on its authorized branch.
+A PARTIAL/FAILED/MUST-VERIFY change must not be called stable or merged into
+a protected release branch; preserve a labeled WIP recovery checkpoint on
+an isolated recovery branch when it is safe and within the approved scope.
+Never turn a failed implementation into a falsely PASS-marked checkpoint.
+
+PUSH and VERIFY: verify the destination branch/upstream, perform a normal
+non-force push, and confirm the intended remote branch contains the new SHA.
+Report repository, branch, commit SHA, push result, verified remote HEAD,
+test/GUI verification state, and exact recovery ref in the closeout.
+Commit alone is NOT the required remote recovery point.
+
+If credentials, network, branch divergence, WIP isolation, verification, or
+repository safety prevents a trustworthy checkpoint, STOP and report
+CHECKPOINT_BLOCKED with exact cause and next permitted step.
+Do not silently defer commit/push or claim successful completion.
+Keep unrelated work and existing functionality protected throughout.
+
+==================================================
 REPOSITORY / GIT / GITHUB
 ==================================================
 At session start, when local Git is available, verify as applicable:
