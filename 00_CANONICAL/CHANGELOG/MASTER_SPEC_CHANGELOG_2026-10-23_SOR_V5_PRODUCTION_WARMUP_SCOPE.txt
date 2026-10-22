@@ -1,0 +1,44 @@
+MASTER SPEC CHANGELOG
+2026-10-23 SOR V5 / Production Indicator Warmup History Clarification
+
+Type: User-confirmed supplemental technical contract and focused code correction.
+Scope: Indicator-follow Production history requirement, common SOR V5 boundary.
+Source owner: 2026-10-21 SOR shared realtime candle composition prompt.
+
+A. REASON
+- User rejected unsupported MA600 assumptions and 5,000 V5 chart bars
+  being transferred to live indicator calculation requirements.
+- Live Indicator Follow previously declared 900 bars of history even
+  when the active filter warmup required far fewer.
+- The common SOR calculation path checks the declared history target
+  and can block when that target is not present.
+
+B. CHANGE
+- Production Indicator Follow requested retained history:
+  max(300, active filter warmup) timeframe candles.
+- Keep active-filter minimum readiness separate from the 300-bar
+  acquisition target. Protect configurations legitimately requiring >300.
+- Keep V5 5,000-bar chart load independent; do not change V5 history.
+- No MA600 active-filter assertion; historical V4 MA600 test fixture
+  is not a current strategy contract.
+- No real order or runtime-data mutation.
+
+C. FILES
+- New current supplemental Canonical:
+  00_CANONICAL/CURRENT/MASTER_SPEC_CANONICAL_2026-10-23_SOR_V5_PRODUCTION_FILTER_WARMUP_CLARIFICATION.txt
+- Reference index: 00_CANONICAL/REFERENCE/00_REFERENCE_INDEX.md
+- Focused implementation in kiwoom_auto:
+  routines/지표추종매매/routine.py
+- Dedicated regression in kiwoom_auto:
+  tests/test_production_indicator_warmup_300_contract.py
+- One prior 900-target assertion adjusted to new 300-target contract
+  in tests/test_indicator_follow_kiwoom_history_parity.py.
+
+D. VERIFICATION / OPEN
+- New tests: RED 2 of 2 before code change; GREEN 2 of 2 after.
+- Existing indicator history parity: 26 tests PASS.
+- Existing Production candle provider tests: 23 PASS, 1 ERROR in
+  MockValidationHost SimpleNamespace missing _sor_calculation_value_reader.
+  This separate failure is not fixed or concealed.
+- Real SOR session/V5 GUI and live order behavior are not claimed proven.
+- Unrelated dirty worktrees and untracked V4 test fixtures preserved.
