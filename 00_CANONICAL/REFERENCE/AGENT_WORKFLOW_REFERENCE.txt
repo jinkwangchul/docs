@@ -19,11 +19,48 @@ Priority order:
 
 Rules:
 - Latest explicit user instruction always overrides this file.
+- Permanent SOR source rule (2026-10-24): completed M3 and higher timeframe
+  bars require independently received direct SOR _AL bars, including bars
+  completed today. Historical M1 aggregation, reconstruction, fallback,
+  substitution, and validation of those completed bars are forbidden. Missing
+  direct bars block the calculation. Live SOR M1/ticks may form only today's
+  current forming bar. Never reintroduce the removed completed-bar path.
 - The user owns project concepts, rules, policies, states, terms, UI contracts, data contracts, and structure contracts.
 - AI has no authority to create, change, replace, expand, shrink, reinterpret, or delete project contracts without explicit user approval.
 - AI reasoning is only a tool for finding evidence. It is not implementation authority.
 - If implementation and contract conflict, fix the implementation. Do not rewrite the contract to fit AI interpretation.
 - User-unapproved contract change is project contamination.
+
+### Pre-Work Declaration And Acknowledgement - Retired
+
+The former mandatory declaration-and-acknowledgement procedure is retired.
+
+Operating rules:
+- Do not display, request, or require a pre-work declaration or acknowledgement before a substantive work unit.
+- Start directly with the applicable First Principle, investigation, analysis, design, plan, Gate, implementation, verification, criticism, and Fresh Verification flow.
+- Retirement of the declaration/acknowledgement does not grant implementation authority and does not relax scope protection, contract authority, LOCAL WIP protection, single Mutation Owner, Broker safety, or explicit approval requirements.
+- Real broker mutation and actual orders still require explicit approval for the current operation.
+- Historical, archived, Work Resume, prior-conversation, or older prompt text that requires the retired declaration/acknowledgement is superseded by this section.
+
+### Project-Wide Second Principle — 제2원칙: 절대 추측하지 않는다
+
+This is a project-wide, top-level rule equal in priority to the First Principle.
+It applies to every AI role (Integrated Development Orchestrator, Design / Audit /
+Manager, Execution Agent, Codex, and delegated agents) and every work stage,
+including investigation, analysis, design, planning, implementation, criticism,
+verification, documentation, and reporting.
+
+1. 모든 판단과 보고는 확인된 사실과 검증 가능한 증거에 근거한다.
+2. 확인되지 않은 내용을 사실, 원인, 기존 계약 또는 완료로 단정하지 않는다.
+3. 근거가 부족하면 반드시 '미확인'으로 명시하고 확인된 사실과 구분한다.
+4. 추측을 근거로 설계, 수정, 삭제, 추가, 구현 또는 완료 판정을 하지 않는다.
+5. 원인이 입증되지 않으면 조사와 검증을 이어가며 임의로 결론 내리지
+   않는다. 검증이 불가능하거나 사용자 결정이 필요한 경우 기존 승인
+   Gate에 따라 중단하고 미확인 상태를 보고한다.
+
+The role-specific "Second Principle — Design / Audit / Manager AI" below adds
+work-order duties; it does not narrow, replace, or exempt any role from this
+project-wide Second Principle.
 
 ### Role-Specific First / Second Principle
 
@@ -78,7 +115,7 @@ Integrated Development Orchestrator:
 - Its mandatory top-level sequence is:
 
 ```text
-제1원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판
+제1원칙·제2원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판
 ```
 
 - The First Principle is a continuous scope guard across every stage, not only
@@ -278,6 +315,16 @@ Environment B: local Git execution unavailable.
   work to a local-execution agent.
 
 Development Tool Routing Policy:
+- 2026-10-10 user-approved A-route supersedes older default DC-heavy routing
+  wherever they conflict. Codex CLI leads local code exploration, analysis,
+  approved implementation, scoped tests and Git work; Codex Windows App is
+  the operator-executed GUI reproduction/performance evidence route. Desktop
+  Commander is minimized to CLI launch/connection and indispensable local
+  state/environment/final verification not reliably covered by those routes.
+  Avoid duplicate DC source search, Git checks, tests, or blanket verification.
+  ChatGPT retains independent evidence review and final completion judgment.
+  This is provisional pending later user adjustment. Preserve all approval
+  Gates, First/Second Principles, protected WIP, Broker safety and one writer.
 - The current ChatGPT model is the default Orchestrator when the Startup Prompt
   assigns the Integrated Development Orchestrator role.
 - Desktop Commander is the default local reality-check, execution-environment,
@@ -583,6 +630,23 @@ ChatGPT Web Orchestrator
   needed, because the VS Code extension directory may change after an update.
   Do not edit, restore, or reinstall project files merely because a previously
   recorded executable path changed.
+- Mandatory Codex environment preflight (2026-10-08): do not equate `Get-Command codex`
+  or `where.exe codex` failure with an unavailable CLI. Search, in order:
+  (1) PATH, (2) running `codex.exe` process `ExecutablePath`,
+  (3) `$env:LOCALAPPDATA\OpenAI\Codex\bin\*\codex.exe` (newest existing),
+  (4) VS Code extension `openai.chatgpt-*\bin\windows-x86_64\codex.exe`,
+  (5) npm global `codex.cmd` where installed. The hashed install directory is
+  version-dependent, never a fixed canonical executable path.
+- Before declaring `Environment Blocked`, try the discovered full path with
+  `& $codex --version`, capture the exit code, and separately test authentication
+  and intended model access using safe, non-mutating commands. A version success
+  establishes `CLI Ready`, NOT `Auth Ready` or `Model Ready`. If discovery or
+  invocation still fails, record candidates checked, actual error, and
+  `CODEX_SKIPPED_REASON`; never infer absence from PATH alone.
+- Prefer this preflight for every MEDIUM/HEAVY task; retain only the verified
+  process-local executable path for that task, not a permanent hard-coded path.
+  Treat the resulting statuses independently: Ready / Quota Blocked /
+  Auth Blocked / Environment Blocked / Must Verify.
 - Verify the local Codex login state and, when relevant, the configured model and
   reasoning effort before relying on them as current facts.
 - Invoke the local CLI from the intended repository/work directory through
@@ -631,16 +695,18 @@ Development Resource Contract:
 - Codex CLI is the primary implementation specialist for substantial MEDIUM and
   HEAVY work after the approved plan/Gate. Resolve the current local codex.exe
   when needed; do not assume a stable hashed install path or PATH registration.
-- Windows Computer Use is VERIFIED_AVAILABLE through the current local Codex CLI.
-  Verified 2026-09-27 read-only E2E path:
+- Windows Computer Use has historical read-only E2E evidence from 2026-09-27,
+  not a standing assertion that the current Codex CLI session can access Windows GUI.
+  Verify the actual UI bridge and target-window state in each GUI-dependent task.
+  Historical read-only E2E path:
   `ChatGPT Web -> Desktop Commander -> Codex CLI -> computer-use skill
   -> node_repl -> @oai/sky -> Windows app`.
   `sky.list_apps()` succeeded and identified
   `C:\OpenAPI\KOAStudioSA.exe` with displayName `KOAStudioSA`.
 - Treat this as a verified capability, not permanent availability. Re-verify
   after Codex/plugin/runtime updates or when the current task depends on it.
-- Current Codex CLI `0.158.0-alpha.2.1` reports
-  `computer_use.windows.always_allowed_app_ids` as an ignored setting. That
+- In the 2026-09-27 Codex CLI `0.158.0-alpha.2.1` observation,
+  `computer_use.windows.always_allowed_app_ids` was an ignored setting. That
   setting therefore does not grant standing approval, bypass confirmation, or
   authorize unrestricted control of KOA Studio or any other Windows app.
 - Computer Use remains subject to its current confirmation/safety rules, user
@@ -653,10 +719,43 @@ Development Resource Contract:
 - Codex receives a self-contained task boundary, protected WIP, Canonical
   references, verification requirements, and safety restrictions. Its success
   message is not final evidence.
-- Codex Windows App is an exceptional resource, not the normal implementation
-  path. Use it only when the operator explicitly requests the Windows App for the
-  current situation. Do not use SendKeys, focus injection, or other brittle GUI
-  typing as the normal way to issue Codex instructions.
+- Codex Windows App remains non-default for general implementation. For chart
+  performance, latency instrumentation, GUI symptom reproduction, marking,
+  period-selection, and average-price-label investigations, however, it is a
+  standard candidate alongside Codex CLI; no separate per-task Windows App
+  selection approval is needed for already-approved, safe investigation.
+- Codex Windows App handoff is PROMPT-BASED, NOT a tool directly controlled by
+  ChatGPT Web, Desktop Commander, or Codex CLI in this project:
+  (1) ChatGPT investigates available evidence and writes a complete, copyable
+      Codex Windows App task instruction with goal, scope, existing contracts,
+      protected WIP, safety restrictions, required measurements, and report Gate.
+  (2) The operator transfers that instruction to Codex Windows App and runs it.
+  (3) The operator returns the Windows App findings, screenshots/log evidence,
+      and completion report to ChatGPT.
+  (4) ChatGPT checks those results against code/Runtime/Canonical using DC and
+      decides the next step. Do not claim Windows App was launched or verified
+      before the operator returns its actual evidence.
+- When Windows App is the better investigator, WRITE THE PROMPT FIRST; do not
+  waste turns attempting Sky RPC, CLI Computer Use, process probing, SendKeys,
+  focus injection, or other indirect remote-control substitutes. A CLI Sky RPC
+  error is a CLI Computer Use issue, NOT Windows App availability evidence.
+- Select by verified task fitness, not fixed tool precedence: ability to
+  reproduce the exact symptom, actual GUI/trace evidence, reliability,
+  safety, repeatability, coverage, and time/cost. Prefer the stronger tool.
+  Favor Windows App for live GUI observation/reproduction via operator handoff;
+  favor CLI for call-graph analysis, trace code, offline/headless measurement,
+  deterministic tests, and substantial approved implementation.
+- Combine Windows App findings with CLI/DC evidence when useful, but retain
+  one Mutation Owner for any shared write surface and independent DC verification.
+  Keep Windows App report evidence separate from headless/CLI results. Never
+  report headless checks as live GUI verification, or equate a returned Windows
+  App report with an independently executed ChatGPT GUI session.
+- Windows App investigations remain observation/verification-only for trading:
+  no login, credentials, account/broker state changes, real orders, or auto-trading
+  side effects. Investigation approval does not authorize code/setting changes;
+  follow the existing user approval Gate for mutation. Outside this diagnostics
+  exception, retain explicit operator-request-only Windows App use. Do not use
+  SendKeys, focus injection, or brittle GUI typing to issue Codex instructions.
 - Superpowers is a selective methodology/quality layer only. Its brainstorming,
   systematic debugging, planning, TDD, review, and fresh-verification skills may
   be used when they add value. It does not replace this project's workflow.
@@ -705,12 +804,19 @@ Development Resource Contract:
   force-push unrelated WIP merely to make the worktree tidy.
 
 Windows Computer Use Operating Policy:
-- Current local capability status: VERIFIED_AVAILABLE through Codex CLI as of
-  2026-09-27 by a read-only `sky.list_apps()` E2E test.
+- Historical GUI capability evidence: Codex CLI read-only `sky.list_apps()`
+  E2E passed on 2026-09-27. Current availability is MUST VERIFY per session;
+  no standing `VERIFIED_AVAILABLE` claim without fresh successful target access.
 - Computer Use is a general Windows GUI information-gathering, observation,
   comparison, and state-understanding resource. It is not restricted to KOA Studio.
-- Normal GUI path:
-  `ChatGPT Web -> Desktop Commander -> Codex CLI -> Computer Use -> target Windows app`.
+- Distinguish GUI observation routes; they are NOT interchangeable:
+  CLI Computer Use (only when actually connected):
+  `ChatGPT Web -> Desktop Commander -> Codex CLI -> Computer Use -> target Windows app`
+  Codex Windows App (operator handoff, not a ChatGPT-controlled connection):
+  `ChatGPT writes task prompt -> operator submits in Codex Windows App ->
+  Windows App investigates -> operator returns evidence -> ChatGPT verifies`.
+  Never invoke CLI Sky RPC as a prerequisite for handing off a Windows App prompt.
+  Neither route overrides Broker safety boundaries.
 - Appropriate uses include, when relevant to the approved task:
   * automatic-trading project GUI state inspection and visible-behavior verification
   * window, dialog, button, Toast, menu, chart, visible state, and settings observation
@@ -769,6 +875,32 @@ Windows Computer Use Operating Policy:
   `00_CANONICAL/REFERENCE/AUTO_TRADING_STARTUP_PROMPT.txt`, but their actual
   availability/state must be re-verified when relevant.
 
+## 2.x Orchestrator Outcome Ownership (2026-10-11)
+
+- ChatGPT Web owns the end-to-end approved work unit: requirement fidelity,
+  delegate dispatch, completion observation, result retrieval, independent
+  criticism, fresh verification, and honest final verdict.
+- A Codex session start, PID, progress log, generated patch, or passing unit
+  tests are intermediate evidence only, not user-visible completion.
+- Before long-running execution, establish a concrete retrieval path, bounded
+  scope, session/process identity, stop/failure signal, and verification plan.
+  Do not start a competing writer while a prior Mutation Owner is active.
+- While a response can continue, collect the final delegate result rather than
+  ending solely to request repeated user continuation. If tool/runtime limits
+  prevent that, disclose the exact cutoff; do not imply autonomous background
+  monitoring or automatic resumption exists.
+- Verify source configuration ownership, configured filter-set identity/count,
+  full condition semantics, GUI representation and protected behavior when
+  relevant. Never substitute a headless PASS for real GUI acceptance.
+- Repeated failure against the same user-visible contract requires a return to
+  contract/baseline/root-cause investigation before another implementation.
+  Do not create new orchestration infrastructure without separate approval.
+- Execution lifecycle is owned by ChatGPT Web: before dispatch record approved scope, owner, session/PID, result channel and terminal evidence; after dispatch check running/finished/failed state, retrieve the final exit code/report, review scoped diff/tests, and issue the independent verdict.
+- A blocked or input-waiting session is not proof of completion. Inspect its actual state and pending output before deciding whether to resume, wait, or stop. Never start a replacement writer merely because a delegate is slow.
+- At a conversation boundary, preserve the exact session/PID, last observed output, outstanding result and next retrieval action. On restart inspect that existing execution first; do not silently relaunch or claim it has ended.
+- If a turn cannot remain active until terminal evidence, report explicitly that no further ChatGPT polling is guaranteed after the reply. Do not report a task as completed or continuously supervised without actual proof.
+- Preserve all existing approval Gates, WIP, one Mutation Owner and broker safety.
+
 ## 3. Work Purpose
 
 The project goal is working automatic trading software, not document growth, structure growth, or Git activity.
@@ -778,7 +910,7 @@ Every task starts with one fixed problem statement or Big Feature Goal.
 Default work flow:
 
 ```text
-제1원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판
+제1원칙·제2원칙 준수 -> 조사 -> 분석 -> 설계 -> 계획 -> 구현 -> 비판
 ```
 
 1. 제1원칙 준수: lock the user-authorized target and forbidden scope before
