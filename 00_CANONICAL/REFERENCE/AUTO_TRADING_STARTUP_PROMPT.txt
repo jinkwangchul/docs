@@ -84,6 +84,13 @@ Overlapping mutation is serialized: one Mutation Owner per mutation boundary.
 ==================================================
 MANDATORY POST-MUTATION COMMIT / PUSH / RECOVERY - USER DECISION 2026-10-15
 ==================================================
+Permanent DC Git ownership (2026-10-24 user decision): for both kiwoom_auto
+and docs, Desktop Commander (DC) exclusively owns Git staging, committing,
+pushing, and remote SHA verification. Codex CLI may inspect Git read-only and
+perform approved source/documentation edits, but MUST NOT run git add, commit,
+or push. ChatGPT remains the Orchestrator. This is a mandatory Git exception
+to the older DC-minimization route; DC executes the Git steps below.
+
 After EVERY user-approved modification work unit (source, tests, documents,
 configuration, or other project artifact), establish a remotely recoverable
 checkpoint: create a task-scoped Git COMMIT, then PUSH to the verified remote.
@@ -95,7 +102,8 @@ already-staged changes, and protected staged/unstaged/untracked WIP.
 Never stage unrelated changes: NO git add ., git add -A, destructive
 reset/clean/checkout, mass restore, secret inclusion, or force push.
 If a target file already contains unrelated WIP, stage ONLY the newly
-authorized patch, or use an isolated branch/worktree to preserve all WIP.
+authorized patch using an isolated index and, when needed, a recovery branch
+to preserve all WIP. Git worktrees are retired.
 
 AFTER changes: inspect the actual scoped diff; run applicable tests and
 verification; check the exact staged file list/diff before commit.

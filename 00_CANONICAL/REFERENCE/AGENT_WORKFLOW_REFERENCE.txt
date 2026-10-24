@@ -1142,6 +1142,14 @@ A conversation is an execution surface, not a project transaction boundary.
 
 ## 12. Local Git And GitHub
 
+Permanent DC Git ownership (2026-10-24 user decision): for both kiwoom_auto
+and docs, Desktop Commander (DC) exclusively owns Git staging, committing,
+pushing, and remote SHA verification. Codex CLI retains approved source and
+documentation editing and read-only Git inspection, but MUST NOT run git add,
+commit, or push. ChatGPT remains the Orchestrator. This mandatory Git exception
+supersedes older DC-minimization or Codex-led Git-work wording; apply the
+checkpoint and WIP-protection rules below through DC.
+
 Git is used for:
 - Local version management
 - Diff and history inspection
