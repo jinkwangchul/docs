@@ -496,3 +496,10 @@ All mutations remain governed by the Mandatory Development Workflow above.
 - 실프로그램 진단: V5 정규장만 표시 후 마킹 ON 시 2026-10-28 02:57경 간헐적인 marking_failed 기록(동일 실행에서 재시도 후 marking_published). 정규장 표시 화면에 있는 일부 봉은 전체 키움 서버 선택 기준봉의 정규장 투영 중 마지막 보이는 부분이며, 전체 계산 이력/웜업과 동일 길이가 아니다.
 - 정규장 표시 ON의 선택 원천 마킹: 처음부터 소스별 native 서버 완성 기준봉의 정확한 전체 이력에 대해 시간/종목/원천/OHLCV 증빙 유지. 마킹 요청에 담긴 표시봉이 해당 전체 native 계산봉의 정규장 투영에서 정확한 연속 접미 구간일 때만 승인. 재생에는 원본의 검증된 전체 정규장 투영을 넘기고 기존 history_target으로 화면 구간만 잘라 표시한다. 고의 누락·변조·역순·원천 불일치 차단, 과거 M1 -> 상위 기준봉 재구성 금지. 청산/선택구간/실주문 로직 불변.
 - 5분봉 native AL 15:35 특수봉은 기존 원천 검증과 display-only 처리를 통과한 뒤 계산 대상에서 제외하고 정규장 마킹 투영 생성. 코드 수정 전 recovery/v5-regular-marking-pre-20261028=8465388f, 중간 recovery/v5-regular-marking-m3-post-20261028=965e8417, 최종 recovery/v5-regular-marking-post-20261028=bc2f28e9. M3 집중 20 PASS, M3/M5 집중 16 PASS, 실 GUI 재실행 후 결과는 아직 미확인.
+
+[2026-10-28 차트검증 V5 단일 운영·V1~V4 기능 및 백업 폐기]
+- 차트검증의 유일한 운영·개발 기준은 V5이며, 루틴 등록설정창의 검증차트2 버튼·V2 요청 시그널·핸들러·V2 엔진 자동 바인딩을 제거했다. 사용자 버튼은 검증차트 하나로 V5만 호출한다. 루틴 등록·변경·원본 설정 스냅샷·주문 경로는 불변.
+- V1/V3/V4 별도 운영 구현은 폐기 상태, 구버전 백업은 명시된 8개 V2~V4 로컬 restore_points 폴더(23 파일)와 retired_chart_validation_v4_20261023.zip 1개(36 내장 파일)를 삭제해 약 6,639,656 바이트 정리했다. 실제 경로 삭제 확인.
+- V5 코드·테스트 및 삭제 대상 백업 전 상태의 원격 복구기준점 recovery/v5-single-version-cleanup-pre-20261028=85cb85fe; V5 단일 버튼 단계 recovery/v5-single-version-ui-post-20261028=a6ed6331; 로컬 백업 제거 단계 recovery/v5-single-version-cleanup-post-20261028=3685abbb; 최종 사용자 표시·주석 정리 recovery/v5-single-version-final-post-20261028=5a259b0a. Git 원래 작업 브랜치 HEAD/인덱스 유지.
+- 구버전 본체와 tests/test_indicator_follow_signal_validation_v2.py 등 V2 테스트 기반은 현재 24개 다른 테스트 모듈이 참조해 즉시 삭제하면 V5 회귀망에 손실을 일으킨다. 운영 화면에서는 연결이 제거됐지만 V2 코드/테스트 파일은 시험용으로 임시 보존하며, 테스트 헬퍼를 V5 전용으로 독립 이관한 뒤 삭제해야 한다.
+- V5에서 기존 버전의 설정 호환 식별자 indicator_follow_signal_validation_v2, Qt 설정 키 ui/signal_validation_v2/*, runtime/signal_validation_v2_history_cache(약 74MB)는 현재 V5의 활성 사용자 설정·과거 native 캔들 보유 자료라서 삭제 금지. 이름만 바꾸거나 과거 M1을 다른 기준봉으로 재조립하지 않는다. 기존 3분·5분봉 마킹·기간선택·청산 원천 계약 유지. 실행 중 GUI 미재시작으로 버튼 변경 실화면은 미검증.
