@@ -376,3 +376,7 @@ _sor_m1_calculation_view()에 존재하는 다음 처리:
 - V5 상단 기본설정 행의 6개 | 구분자는 모두 맨 왼쪽과 동일한 12x30px·13pt 굵게·좌우 1px 패딩·공통 QHBoxLayout 간격 8px. 청산과 정규장만 표시 사이 빠진 |를 추가하고, 기준봉 및 평단관리/거래비용/청산 구분자의 중복·다른 여백은 없앤다.
 - 기간선택 청산 ON에서 실제 미청산 잔여량 전량 가상매도 사이클이 생기면 선택 끝 봉에 붉은 하향 SELL 삼각형을 표시한다. 원래 BUY/SELL 신호·마커 원본·매도신호 개수·실매매 주문은 불변이며, 체크 OFF·미보유·정상매도 완료·선택 해제·보이는 구간 이탈 시 표시하지 않는다.
 - 기간선택 오른쪽 종료 수직선이 화면에 보이면 청산 ON/OFF와 무관하게 원본 선택 끝 봉의 정확한 MM/DD HH:MM을 하단 시간축에 어두운 배경·청색 글씨 라벨로 표시한다. 코드 수정 전 GitHub 복원점 recovery/v5-liquidation-visuals-pre-20261028=8816bf46, 수정 후 recovery/v5-liquidation-visuals-post-20261028=cf925f84; V5 집중 11/11 PASS. 실행 중 GUI 미재시작·실화면 미확인, 본래 코드 HEAD/index·사용자 데이터 불변.
+[2026-10-28 V5 정규장 표시·기간선택 원천 증빙 정정]
+- 사용자 실창 결함: 삼성전자 005930 M3에서 정규장만 표시 ON 후 기간선택 시 REPLAY_ERROR SOR_M1_BLOCKED:SOR_DIRECT_HISTORY_PROVENANCE_INVALID로 결과표·차트가 비었다. V5 기존 native 선택 기준봉 전체 AL 이력은 적법했으며, 정규장 표시 대상 봉이 AL 완성봉 전체의 마지막 연속 suffix가 아닐 수 있다.
+- 계약: 정규장 표시 ON인 V5 분봉 기간선택 계산은 AL 직접 선택기준봉 원본의 stock/market/timeframe/native query/시각/완성/순서 검증을 그대로 유지하면서 표시 이력을 정확한 _krx_regular_session_candles(검증 원본)과 일치 검증한다. OFF는 기존 suffix 검증 유지. 누락·변조·순서바꿈·장외 혼입은 차단. 과거 M1 재조합 금지. 기존 청산·마킹·기간선택·실매매 주문 불변.
+- 구현: 코드 GitHub 수정 전 recovery/v5-regular-range-provenance-pre-20261028=2441c472, 수정 후 recovery/v5-regular-range-provenance-post-20261028=3a938f3c. 관련 21 집중검증 PASS. 실행 중 GUI는 수정 이전 버전이므로 재실행 후 삼성전자 M3 정규장 표시+기간선택 실화면 및 정상 매수매도/청산 결과를 확인해야 한다.
