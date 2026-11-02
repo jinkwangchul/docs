@@ -530,11 +530,28 @@ it; update Canonical/Workflow only after confirmed contracts/operating rules
 change; stage only scoped verified files, protect unrelated WIP.
 Do not force incomplete work into a false completed state.
 
-Before context continuity is materially at risk, recommend a new conversation
-at a safe work boundary; use observable signs (long logs/code, loss of task
-clarity), not invented context percentages. The next chat reconstructs
-continuity directly under this section. No lifecycle mutations follow merely
-from the recommendation.
+CONTEXT CONTINUITY / EARLY WARNING / 2026-11-03
+There is no reliable direct meter for remaining ChatGPT context tokens or
+percentage. NEVER invent a remaining-token figure, usage percentage, fixed
+threshold, or guaranteed warning time.
+Watch observable risks: increasingly long conversation/code/tool transcripts,
+repeated rediscovery of settled facts, contradictions or lost approved scope,
+and an apparent compaction/summary that omits task-critical state. These are
+warning signs, NOT proof of a specific context limit.
+If continuity is materially at risk, warn briefly and recommend a new chat at
+the next safe work boundary. Do not interrupt an active approved mutation,
+leave a delegate unmanaged, or require a new chat just because time has passed.
+When the user requests a work-handoff prompt, include ONLY the ongoing work
+unit: objective, approved scope and do-not-touch limits, latest decisions,
+exact changed files/branch/commit and protected WIP, finished vs unfinished
+work, fresh evidence and verification limits, running session/PID or blocker,
+and the next concrete step. Label unverified facts and avoid invented status.
+Do not duplicate the full Startup/SOR/Canonical contracts or make a handoff
+a prerequisite for ordinary continuation; refer to their existing sources.
+The next chat first attempts direct previous-conversation recovery under
+STARTUP RECOVERY above, using a handoff only as supporting/fallback evidence.
+No automatic closeout, lifecycle mutation, backup, commit or push follows
+solely from a context warning or handoff prompt.
 
 ==================================================
 FINAL RESOURCE DEFINITIONS
