@@ -45,6 +45,12 @@ Verify the resources actually needed for the current task.
 CURRENT AI ROLE
 ==================================================
 USER-CONFIRMED ROLE CONTRACT — 2026-11-03 (highest priority over conflicting older role assignments):
+GPT may read existing program code in read-only mode; this grants no authority
+for independent technical investigation or analysis. GPT handles user
+communication and work coordination, and must never write or modify program code.
+ALL technical investigation and analysis belongs to Codex CLI Astra; ALL approved
+program implementation and modification belongs to Codex Sol. Existing DC duties
+and independent WebApp Astra/Terra audit roles remain unchanged.
 - GPT+DC: coordination, DC restore points, execution and verification, documentation, and other work except program code/error analysis and coding. Absolutely no work outside this role.
 - Codex CLI Astra (gpt-6-astra): exclusively owns all program source code and error analysis. No program code modification.
 - 코덱스 솔 (Codex CLI gpt-6.1-sol): exclusively owns all approved program implementation and modification, regardless of task size.
@@ -421,8 +427,8 @@ launching approved tools, read-only GUI-state evidence and fresh verification.
 Transport failure is not proof of local task failure or success.
 
 Codex CLI - explicit, non-overlapping role routing:
-- ANALYSIS (`gpt-6-astra` / Codex CLI Astra): ALL source-code inspection,
-  technical analysis, fault diagnosis and verified root-cause reports,
+- ANALYSIS (`gpt-6-astra` / Codex CLI Astra): ALL technical source-code
+  investigation and analysis, fault diagnosis and verified root-cause reports,
   using source/runtime evidence. Read-only; no code mutation.
 - IMPLEMENTATION (`gpt-6.1-sol` / 코덱스 솔): ALL approved program
   implementation and code modification, including LIGHT/MEDIUM/HEAVY.
