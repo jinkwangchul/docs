@@ -1,0 +1,30 @@
+{
+    "createdUtc":  "2026-11-20T11:59:36.1824990Z",
+    "unit":  "20261120_v5_initialization_guard",
+    "kind":  "docs",
+    "authorization":  "User approved a minimum pre-canvas initialization guard, followed by checking the actual weekly transmission result; preserve marker semantics and unrelated behavior",
+    "repo":  "C:\\Users\\JIN KWANG CHUL\\Documents\\docs",
+    "remote":  "https://github.com/jinkwangchul/docs.git",
+    "branch":  "agent/project-prompt-standard",
+    "baseHead":  "d8667b52f3bdd362a3140f26a73369b7b1d5f6ca",
+    "realIndexSha256":  "7BAE7B0654E85589D4EFD2DBDE45E789DAD54757BC9BF60D77705B72AAC7B1BA",
+    "files":  [
+                  {
+                      "path":  "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
+                      "beforeSha256":  "63B782CB7A17FA6405A9730366779B27AB5EA39059C4D83025F79DD7C6373781",
+                      "afterSha256":  "1F60FCE11ED18B7731C9E4F4686FC8DB81066E9235CAF40E210C956B07A28132"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md",
+                      "beforeSha256":  "464486DB77CA690B33C845DC81B0E2662CC10B3F42728E8D8B7414BCF4A4B42D",
+                      "afterSha256":  "9F913CD19BFE2C271523782D85E9F1BD8D81446CF60054E42B61AAA9AB55AC79"
+                  }
+              ],
+    "patchSha256":  "7FBE2FCBFB08CBC100E9CC903A2C4E81D2E43F8297EBD28D8DB8A4941AA8E3E2",
+    "replay":  "PASS: git -c core.autocrlf=false apply --check and apply --binary in disposable exact-baseline copy; every replay byte SHA equals after/live SHA",
+    "baseline":  "Exact scoped pre-change archived files. This is a delta requiring those exact before files; not a standalone runnable checkout or fresh full restore point.",
+    "restore":  "Use a disposable copy of exact before files outside any Git repository. Run git -c core.autocrlf=false apply --check --binary --whitespace=nowarn changes.patch, then apply --binary with the same config. Verify after SHA before any intentional live restoration.",
+    "evidenceRoot":  "C:\\Users\\JIN KWANG CHUL\\Documents\\project_backups\\v5_initialization_guard_20261120",
+    "verification":  "See final_validation.json and final_audits.json; source scope and preserved Git/INI in scope_check_final.json. No live GUI restart, TR, or orders.",
+    "scopeLimitation":  "Python path/length/mtime metadata check does not rule out same-length preserved-mtime content changes elsewhere."
+}
