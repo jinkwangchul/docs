@@ -1,0 +1,28 @@
+{
+    "status":  "DELTA_REPLAY_VERIFIED",
+    "repository":  "C:\\Users\\JIN KWANG CHUL\\Documents\\docs",
+    "remote":  "https://github.com/jinkwangchul/docs.git",
+    "branch":  "agent/project-prompt-standard",
+    "head":  "d8667b52f3bdd362a3140f26a73369b7b1d5f6ca",
+    "baseline":  "C:\\Users\\JIN KWANG CHUL\\Documents\\project_backups\\stoploss_guard_20261120_unit1\\docs_before",
+    "limitation":  "Delta only. Baseline file contents are local, not included remotely. This is not a runnable integrated implementation commit or a full device-loss backup.",
+    "restore":  "Use a disposable copy of the exact baseline files, preserve bytes and relative paths, apply changes.patch with git apply --binary --whitespace=nowarn, verify every afterSha256. Do not apply to unrelated HEAD or overwrite live working files automatically.",
+    "encoding":  "Patch is raw UTF-8 without BOM; source byte encoding and line endings preserved and verified by replay SHA256.",
+    "files":  [
+                  {
+                      "path":  "00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md",
+                      "beforeSha256":  "C6831E2F85445B99773EE8DD5320BF1180585F738CCCE00F577307FB8380ECFC",
+                      "afterSha256":  "AF184845CE920D2F1E211E7C2AA8A44A618E833351C258C9B56A571661A8624F"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
+                      "beforeSha256":  "156A9A4AF55D392A5FCE22C27000508EBB593259988D0AF984AD6CD5057EBEBE",
+                      "afterSha256":  "9D81F1BF3C087F152B44DC5ACC0BB071C62671D0EBDDFD7C60161D86038DC990"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md",
+                      "beforeSha256":  "4A2D010D61F9E9A74284BA4B816A32C823100BD7072926C229FDDF214C57CFDA",
+                      "afterSha256":  "98350E058CF1FD705C5442FF3F394F852330685346A242328A7B6101D0D4CC13"
+                  }
+              ]
+}
