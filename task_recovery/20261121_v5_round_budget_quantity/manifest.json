@@ -1,0 +1,37 @@
+{
+  "task": "V5 quantity-first contract and work status",
+  "artifact_kind": "This authorized three-document before-relative delta only",
+  "files": [
+    {
+      "path": "00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md",
+      "before_sha256": "8E1330DB8B2BA197E97C4EB6752586F3F1CEF8F6F7A648A589045C92C77B547F",
+      "after_sha256": "C5DA34F4268B6525DD6F3AF8C64A1226ECAE63C3F45BFF51F33E3127B7ACB780",
+      "patch_reconstructs_exact_bytes": true,
+      "added_lines": 3,
+      "removed_lines": 0
+    },
+    {
+      "path": "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
+      "before_sha256": "3739B36ADD4176FFA832A4BC54D8A8675AA0751B527BC90FA292BD69E4F78EDB",
+      "after_sha256": "D2FB8E7825563598D59322408F196CB2049D3C760663207BCFF5387A885BD91F",
+      "patch_reconstructs_exact_bytes": true,
+      "added_lines": 15,
+      "removed_lines": 5
+    },
+    {
+      "path": "00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md",
+      "before_sha256": "A95FB9F55996C290679D5C94DEEB3652E628EBFAB41DCE639F6FD53288FFDB1F",
+      "after_sha256": "EE204E281CC7A98B8C84CEDCF02A0CC5635CE490C3D3AD79202652B94E9987FB",
+      "patch_reconstructs_exact_bytes": true,
+      "added_lines": 17,
+      "removed_lines": 0
+    }
+  ],
+  "patch_sha256": "BB95CFF66B4B06E87F37510D24E4244EF3F2059D354D865572304BF3C220BCA4",
+  "code_checkpoint": "44448e2179cf9e0acd6a3eb011bd6d99e9191fd5",
+  "verification": "Focused offline PASS; live GUI pending; external runtime deletion time/actor unknown and whole-workspace preservation HOLD",
+  "base_head": "d8667b52f3bdd362a3140f26a73369b7b1d5f6ca",
+  "base_branch": "agent/project-prompt-standard",
+  "normal_index_sha256": "7BAE7B0654E85589D4EFD2DBDE45E789DAD54757BC9BF60D77705B72AAC7B1BA",
+  "canonical_scope": "Current SOR, non-contract work status, separate decision history; reusable startup prompt unchanged"
+}
