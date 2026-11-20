@@ -1,0 +1,31 @@
+{
+    "task":  "v5_average_management_off_refresh_20261120",
+    "repository_kind":  "docs",
+    "base_head":  "d8667b52f3bdd362a3140f26a73369b7b1d5f6ca",
+    "created_kst":  "2026-11-20 22:34:52",
+    "scope":  "Exact task delta only; apply to the recorded preimage hashes, not blindly to HEAD",
+    "files":  [
+                  {
+                      "path":  "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
+                      "before_sha256":  "02A7543383D7C17C0F3AFA9A9B23261175C3BD039E2F46256CB08DAF93A8D107",
+                      "after_sha256":  "8BE390B547D10A95243FB68A06D2DA3396B73A7D58B5B89C35C84FC2728CBB3B",
+                      "replay_sha256":  "8BE390B547D10A95243FB68A06D2DA3396B73A7D58B5B89C35C84FC2728CBB3B"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md",
+                      "before_sha256":  "C393D9B25611C0A5A5EA5B2A585780352B4CE7E80C1A22BF7E0AC6818714D77F",
+                      "after_sha256":  "B2B79A868482DD8AEACB145EB8A41DAA629A07C1A493333EC4CBBDE36F0B6EA3",
+                      "replay_sha256":  "B2B79A868482DD8AEACB145EB8A41DAA629A07C1A493333EC4CBBDE36F0B6EA3"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md",
+                      "before_sha256":  "6BA62CC702887897710C9CE9B351923FE9E5D16FBC75187EB6FE9081835DD475",
+                      "after_sha256":  "8E1330DB8B2BA197E97C4EB6752586F3F1CEF8F6F7A648A589045C92C77B547F",
+                      "replay_sha256":  "8E1330DB8B2BA197E97C4EB6752586F3F1CEF8F6F7A648A589045C92C77B547F"
+                  }
+              ],
+    "patch_sha256":  "1FD256E2C88A92174EE3E6510E61FDDDB11020C7B18BA6BBA3858556B4F4495B",
+    "replay_verified":  true,
+    "new_full_restore_point":  false,
+    "live_source_modified_by_packaging":  false
+}
