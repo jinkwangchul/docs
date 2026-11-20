@@ -1,0 +1,212 @@
+{
+    "status":  "DELTA_REPLAY_VERIFIED",
+    "repository":  "C:\\Users\\JIN KWANG CHUL\\Documents\\docs",
+    "remote":  "https://github.com/jinkwangchul/docs.git",
+    "branch":  "agent/project-prompt-standard",
+    "head":  "d8667b52f3bdd362a3140f26a73369b7b1d5f6ca",
+    "originalIndexSha256":  "7BAE7B0654E85589D4EFD2DBDE45E789DAD54757BC9BF60D77705B72AAC7B1BA",
+    "baseline":  "C:\\Users\\JIN KWANG CHUL\\Documents\\project_backups\\live_stoploss_execution_20261120_1504\\docs_before",
+    "limitation":  "Delta only. Exact original document contents are local, not included remotely. This is not a self-contained documentation checkout or a full device-loss backup.",
+    "restore":  "Use disposable exact baseline copies, apply changes.patch with git apply --binary --whitespace=nowarn, verify every afterSha256; do not overwrite unrelated working files automatically.",
+    "files":  [
+                  {
+                      "path":  "00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md",
+                      "beforeSha256":  "B0F83AA0F284DF61B7C67D9CAB96CCA6025D8C0E253FF842587A6CAC954CF447",
+                      "afterSha256":  "8A95C5203B8B57E2A773BEE9610ACC91CC1B428F25C6DF2D994B8562CA609438"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
+                      "beforeSha256":  "5FB3F6F12621E661DFBD2568E1296F2F0526A87627CA36FE7F54426EAAF5E2E9",
+                      "afterSha256":  "0ED9F0DE89CAD09CED62DE44E7B8C3837E6BD72DA069E7E44E6A6A62BD134008"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md",
+                      "beforeSha256":  "3642938F86EA557285718A7E6AB828D2E024BC0F037E6908D569EA48A7E39DB5",
+                      "afterSha256":  "162E0168A16CEA35F645BCA674AD4C0EC36030291AC00A6A41663CBD60402CCD"
+                  }
+              ],
+    "protected":  [
+
+                  ],
+    "sourceCodeRecoveryCommit":  "8d79148199152d18ca2ff1db9e1cefe3e3af4931",
+    "verification":  {
+                         "status":  "SCOPED_IMPLEMENTATION_AND_INDEPENDENT_TECHNICAL_REVIEW_COMPLETE",
+                         "approval":  "User approved production confirmed-full-close -\u003e actual False -\u003e strictly later True rearm, and original native wall/receipt-monotonic ages each0..2s for new stop. No activation or actual orders.",
+                         "mainWriter":  {
+                                            "pid":  59824,
+                                            "session":  "01a1f7a2-4238-79c2-8efa-13ae5275db84",
+                                            "model":  "gpt-6.1-sol",
+                                            "reasoning":  "high",
+                                            "exit":  0,
+                                            "runtimeSeconds":  3432.26,
+                                            "finalReport":  "sol_59824_final_report.txt"
+                                        },
+                         "testOnlyWriter":  {
+                                                "pid":  17984,
+                                                "sameSession":  true,
+                                                "model":  "gpt-6.1-sol",
+                                                "reasoning":  "high",
+                                                "exit":  0,
+                                                "runtimeSeconds":  202.5,
+                                                "changedFile":  "tests/test_execution_queue_writer.py",
+                                                "other21FilesUnchanged":  true,
+                                                "afterSha256":  "BCC31BDF403782A9262303BB829A90D095CC06ACED07959CA7B402F4B6984B5E"
+                                            },
+                         "testEnvironment":  {
+                                                 "python":  "Python3.11-32",
+                                                 "offscreen":  true,
+                                                 "bytecode":  false,
+                                                 "pytestCache":  false,
+                                                 "pluginAutoload":  false
+                                             },
+                         "scopedEightFileResults":  {
+                                                        "passed":  243,
+                                                        "subtests":  152,
+                                                        "exit":  0,
+                                                        "qualification":  "Three disjoint file batches on final production-source bytes. Subsequent one-test fixture-only correction verified separately; other21 files unchanged.",
+                                                        "groups":  [
+                                                                       {
+                                                                           "files":  [
+                                                                                         "tests/test_execution_queue_writer.py"
+                                                                                     ],
+                                                                           "passed":  100,
+                                                                           "subtests":  39,
+                                                                           "exit":  0,
+                                                                           "seconds":  7.32,
+                                                                           "source":  "DC59824 output212145-212151"
+                                                                       },
+                                                                       {
+                                                                           "files":  [
+                                                                                         "tests/test_realtime_shadow_operation_host.py",
+                                                                                         "tests/test_routine_macd_engine_composite_filter.py",
+                                                                                         "tests/test_indicator_follow_signal_selection_parity.py",
+                                                                                         "tests/test_routine_signal_probe_all_stocks.py"
+                                                                                     ],
+                                                                           "passed":  80,
+                                                                           "subtests":  101,
+                                                                           "exit":  0,
+                                                                           "seconds":  6.38,
+                                                                           "source":  "DC59824 output212147-212155"
+                                                                       },
+                                                                       {
+                                                                           "files":  [
+                                                                                         "tests/test_indicator_follow_ownership_boundary_normalization.py",
+                                                                                         "tests/test_indicator_follow_buy_execution_connection.py",
+                                                                                         "tests/test_execution_sell_final_exit.py"
+                                                                                     ],
+                                                                           "passed":  63,
+                                                                           "subtests":  12,
+                                                                           "exit":  0,
+                                                                           "seconds":  7.94,
+                                                                           "source":  "DC59824 output212043-212082"
+                                                                       }
+                                                                   ]
+                                                    },
+                         "finalTestOnly":  {
+                                               "passed":  2,
+                                               "subtests":  2,
+                                               "exit":  0,
+                                               "seconds":  2.43,
+                                               "nodes":  [
+                                                             "tests/test_execution_queue_writer.py::ExecutionQueueWriterPreviewTest::test_same_order_two_processes_only_one_send_order_attempt",
+                                                             "tests/test_execution_queue_writer.py::CycleExitQueueTest::test_stop_and_buy_claim_contend_on_same_lock_in_both_winner_orders"
+                                                         ],
+                                               "source":  "DC17984 output733-736; wrapper854-896",
+                                               "qualification":  "Overlaps earlier scoped suite; do not add to243 as distinct cases."
+                                           },
+                         "sharedV5":  {
+                                          "passed":  20,
+                                          "subtests":  14,
+                                          "deselected":  135,
+                                          "exit":  0,
+                                          "seconds":  3.92,
+                                          "files":  [
+                                                        "tests/test_v5_lot_limit_execution.py",
+                                                        "tests/test_indicator_follow_signal_validation_execution.py",
+                                                        "tests/test_indicator_follow_validation_replay.py"
+                                                    ],
+                                          "selector":  "stop_ or restart_observation or result_slice or actual_ or opt_in_buy_truth or real_replay_transports or expression_buy_observation or buy_events_remap_long or frozen_ui_stop or invalid_stoch",
+                                          "source":  "DC59824 output167649-167652"
+                                      },
+                         "adjacentResults":  [
+                                                 {
+                                                     "scope":  "Production price authority/native shadow/OCR/Bollinger four files",
+                                                     "passed":  64,
+                                                     "subtests":  45,
+                                                     "exit":  0,
+                                                     "seconds":  6.35,
+                                                     "source":  "DC59824 output167700-167705"
+                                                 },
+                                                 {
+                                                     "scope":  "300-bar warmup/routine package/unfilled cancel/lifecycle four files",
+                                                     "passed":  47,
+                                                     "failed":  1,
+                                                     "subtests":  10,
+                                                     "exit":  1,
+                                                     "seconds":  15.46,
+                                                     "source":  "DC59824 output212085-212112",
+                                                     "failure":  "test_ocr_zero_and_n_use_completed_transition_confirmation_bars",
+                                                     "classification":  "Baseline-source/current-fixture loader incompatibility. Current loader does not register module in sys.modules; identical preexisting dataclass/postponed annotations. Source-before reproduction was obtained in memory using current loader method. Not evidence of a historical full test-run failure; neighboring test unchanged."
+                                                 }
+                                             ],
+                         "intermittentHistory":  {
+                                                     "first":  "DC59824 212041-212077:99passed1failed, child raw setup read PermissionError before production call",
+                                                     "unchangedReruns":  [
+                                                                             "212115-212118:1passed",
+                                                                             "212145-212151:100passed"
+                                                                         ],
+                                                     "primary":  "astra_25932_queueworker_initialization_race_terminal_report.txt",
+                                                     "classification":  "Existing unsynchronized test setup read. Exact denying OS handle unproven; new production-source reading defect not established. Passing retries alone were not treated as a cause fix.",
+                                                     "correction":  "Only approved test file: parent-confirmed immutable inputs + Barrier(2) before real two-process mutation. Existing winner/state/revision/exit assertions retained."
+                                                 },
+                         "independentReview":  {
+                                                   "coreSource":  "Native Astra candidate3 PASS Critical0/Important0; exact core hashes recorded in candidate3_final_core_audit.txt",
+                                                   "testFixture":  "Final native Astra combined PASS Critical0/Important0; inspected exactly two changed test functions. Parent immutable confirmed inputs, Barrier(2), two real production calls, bothchildexit0/exactlyonewinner/SEND_ATTEMPTED/revision2 assertions preserved. Other21 hashes unchanged.",
+                                                   "scope":  "PASS: approved14production source and8existing test scope; native Terra read-only final3canonical document consistency PASS. Evidence numbers/overlap/known fixture failure/INI attribution limits/GUI not certified/LIVE_HOLD/delta-only restoration requirement consistent. No tests rerun by auditor.",
+                                                   "documentation":  "Native Terra PASS on actual final3canonical documents versus docs_before; afterward only the two factual audit verdict sentences were added."
+                                               },
+                         "runtimeConfigurationObservation":  {
+                                                                 "status":  "OBSERVED_CONFIGURATION_DIFFERENCE_PRESERVE_CURRENT",
+                                                                 "baselineSha256":  "432F9E21E84064E6D52F7398FFF90CF8DA019DB44574FAEFAFC209C3C4A91DB9",
+                                                                 "observedSha256":  "04DB5E18D38D12CA1A2E6D181165312CC50FCFBD5C6FBCAB6AB95C5A1FA69A2A",
+                                                                 "changedIniKeys":  [
+                                                                                        "ui/signal_validation_v5\\retained_settings"
+                                                                                    ],
+                                                                 "otherIniKeysEqual":  true,
+                                                                 "guiObservation":  {
+                                                                                        "pid":  41396,
+                                                                                        "parentName":  "explorer.exe",
+                                                                                        "parentPid":  62736,
+                                                                                        "createdUtc":  "2026-11-20T06:41:49.1818140Z"
+                                                                                    },
+                                                                 "attribution":  "Writing actor unconfirmed. An Explorer-parent GUI remains active. A later INI write occurred after all task coding/testing CLI processes had exited; keep external runtime state separate from source verification.",
+                                                                 "action":  "PRESERVE_CURRENT_NO_CONFIG_OR_GUI_MUTATION",
+                                                                 "limitation":  "Do not claim the INI was unchanged; no restore authorized or performed. Source scope verification is distinct from runtime configuration observation.",
+                                                                 "firstObservedSha256":  "403CD0B012C379651CD21BC316D5606A885AAEF3C534C992C4A65610128CE1EC",
+                                                                 "firstObservationNestedFields":  [
+                                                                                                      "ui_state.basic.basic_signal_interval_combo",
+                                                                                                      "buy_signal_expr_line",
+                                                                                                      "sell_signal_expr_line",
+                                                                                                      "ui_state.sell_ui.stop_loss"
+                                                                                                  ],
+                                                                 "latestObservedUtc":  "2026-11-20T07:40:57.3821247Z",
+                                                                 "latestLastWriteUtc":  "2026-11-20T07:40:08.2403090Z",
+                                                                 "taskWriterEndedUtc":  "2026-11-20T07:35:09.9397289Z",
+                                                                 "latestChangeAfterTaskWritersExited":  true,
+                                                                 "latestNestedFields":  "Not expanded again; exact full INI comparison still shows only the V5 retained_settings key differs."
+                                                             },
+                         "limits":  [
+                                        "No actual orders, TR, account/login/settings changes or operational activation by this work.",
+                                        "LIVE_HOLD owners and original approvals retained.",
+                                        "No full-project or liveGUI runtime certification.",
+                                        "Current GUI began separately through Explorer during implementation; it is not proof the final code was loaded."
+                                    ],
+                         "codeRecovery":  {
+                                              "status":  "REMOTE_VERIFIED",
+                                              "commit":  "8d79148199152d18ca2ff1db9e1cefe3e3af4931",
+                                              "recoveryRef":  "refs/heads/recovery/live-stoploss-20261120-01a1f7a2",
+                                              "patchSha256":  "137EEEEAADBF2DB20CCF5CBA4DD10580CA23A3C0C46D141ABE281B237E59507A",
+                                              "receipt":  "code_checkpoint_receipt.json"
+                                          }
+                     }
+}
