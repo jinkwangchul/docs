@@ -1,0 +1,38 @@
+{
+    "status":  "DELTA_REPLAY_VERIFIED",
+    "repository":  "C:\\Users\\JIN KWANG CHUL\\Documents\\docs",
+    "remote":  "https://github.com/jinkwangchul/docs.git",
+    "branch":  "agent/project-prompt-standard",
+    "head":  "d8667b52f3bdd362a3140f26a73369b7b1d5f6ca",
+    "originalIndexSha256":  "7BAE7B0654E85589D4EFD2DBDE45E789DAD54757BC9BF60D77705B72AAC7B1BA",
+    "baseline":  "C:\\Users\\JIN KWANG CHUL\\Documents\\project_backups\\v5_stoploss_execution_20261120\\docs_before",
+    "limitation":  "Delta only. Exact original document contents are local, not included remotely. This is not a self-contained documentation checkout or a full device-loss backup.",
+    "restore":  "Use disposable exact baseline copies, apply changes.patch with git apply --binary --whitespace=nowarn, verify every afterSha256; do not overwrite unrelated working files automatically.",
+    "files":  [
+                  {
+                      "path":  "00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md",
+                      "beforeSha256":  "AF184845CE920D2F1E211E7C2AA8A44A618E833351C258C9B56A571661A8624F",
+                      "afterSha256":  "B0F83AA0F284DF61B7C67D9CAB96CCA6025D8C0E253FF842587A6CAC954CF447"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
+                      "beforeSha256":  "9D81F1BF3C087F152B44DC5ACC0BB071C62671D0EBDDFD7C60161D86038DC990",
+                      "afterSha256":  "90C498ED56100A47439546BC2636C193941FDF194CD066CBB66DC21BD764E661"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md",
+                      "beforeSha256":  "98350E058CF1FD705C5442FF3F394F852330685346A242328A7B6101D0D4CC13",
+                      "afterSha256":  "FFEEE947FECB9CE8276E5D1A932F742DD52DF5CF6F489F790C607202AF13C22C"
+                  }
+              ],
+    "protected":  [
+
+                  ],
+    "sourceCodeRecoveryCommit":  "1e8d6b0839cec6ef4c877e29e68c731676bc8df8",
+    "verification":  {
+                         "implementation":  "V5 scoped code implementation; final focused20passed/14subtests/exit0; staticC0/I0",
+                         "existingFailures":  "Earlier3-file153passed/1failed and adjacent298passed/9failed preserved with exact baseline/fixture qualifications",
+                         "futureProposal":  "Production reading only. Existing routing/cancel/fill boundaries and ten-file candidate recorded; proposed tick age2s or5s not approved or measured; no live implementation/activation",
+                         "originalDocsBranchHeadIndexPreserved":  true
+                     }
+}
