@@ -17,12 +17,12 @@
                   {
                       "path":  "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
                       "beforeSha256":  "9D81F1BF3C087F152B44DC5ACC0BB071C62671D0EBDDFD7C60161D86038DC990",
-                      "afterSha256":  "90C498ED56100A47439546BC2636C193941FDF194CD066CBB66DC21BD764E661"
+                      "afterSha256":  "5FB3F6F12621E661DFBD2568E1296F2F0526A87627CA36FE7F54426EAAF5E2E9"
                   },
                   {
                       "path":  "00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md",
                       "beforeSha256":  "98350E058CF1FD705C5442FF3F394F852330685346A242328A7B6101D0D4CC13",
-                      "afterSha256":  "FFEEE947FECB9CE8276E5D1A932F742DD52DF5CF6F489F790C607202AF13C22C"
+                      "afterSha256":  "3642938F86EA557285718A7E6AB828D2E024BC0F037E6908D569EA48A7E39DB5"
                   }
               ],
     "protected":  [
@@ -32,7 +32,7 @@
     "verification":  {
                          "implementation":  "V5 scoped code implementation; final focused20passed/14subtests/exit0; staticC0/I0",
                          "existingFailures":  "Earlier3-file153passed/1failed and adjacent298passed/9failed preserved with exact baseline/fixture qualifications",
-                         "futureProposal":  "Production reading only. Existing routing/cancel/fill boundaries and ten-file candidate recorded; proposed tick age2s or5s not approved or measured; no live implementation/activation",
+                         "futureProposal":  "Production reading only. Existing routing/cancel/fill boundaries and ten-file candidate recorded; both production rearm rule and tick age2s or5s need user choice; proposals are not approved or measured; no live implementation/activation",
                          "originalDocsBranchHeadIndexPreserved":  true
                      }
 }

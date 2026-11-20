@@ -1,8 +1,8 @@
 diff --git a/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md b/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
-index 6681e3e..83d0614 100644
+index 6681e3e..fb60490 100644
 --- a/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
 +++ b/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
-@@ -932,3 +932,32 @@ M6_REAL_RUNTIME_COMMIT_ARCHITECTURE_DESIGN.md는 고유한 역사 설계로 유
+@@ -932,3 +932,37 @@ M6_REAL_RUNTIME_COMMIT_ARCHITECTURE_DESIGN.md는 고유한 역사 설계로 유
  - 실제 Sol 세션 `01a1f71e-e3f6-73b0-a16b-e8274242672b`에서 승인 후보 손절 검증과 복제 schema 검증을 보완했다. 초기 전체 UI 검증은 새 legacy 회귀 3건을 유발해 HOLD로 판정했으며, 실제 Astra 읽기 분석 `01a1f729-cb5a-7781-a37c-b140eeda609c`와 독립 사전 감사 후 손절 전용 검사로 교정했다. 기존 legacy 테스트의 기대값·mapper·주문 정책은 변경하지 않았다.
  - 최종 별도 실행 결과는 집중 5 passed·17 subtests와 기존 승인 성공/충돌/read-back rollback 3 passed, 각 exit 0이다. 독립 정적 검토 Critical 0 / Important 0이며 최종 4개 파일의 baseline→after patch 적용 후 SHA 일치를 확인했다. 결합 실행 1회의 요약 없는 exit 1과 기존 다른 실패는 통과로 바꾸지 않는다. V5 가상청산·실GUI·실매매 연결 완료의 증거가 아니다.
  - 최종 코드 차이·해시·재현 자료는 `C:/Users/JIN KWANG CHUL/Documents/project_backups/stoploss_guard_20261120_unit1/code_delta_final`이다. 원래 미커밋 작업이 포함된 기준 파일 본문과 이번 변경분을 구분하며, 변경분만 원격 복구 참조에 보관할 경우 로컬 기준본이 필요하다는 한계를 유지한다.
@@ -35,6 +35,11 @@ index 6681e3e..83d0614 100644
 +### 정리 전 SOR 세부 조항 원문
 +
 +> - **남은 구현 세부:** 기존 평균/종가의 가격 산출·입력 경로와 실제 매수 조건 평가 사건을 확인해 위 V5 규칙에 연결한다. 손절은 V5의 가상 지정가·일반 매매 처리보다 먼저 검사하며, 임계가격 체결이나 OHLC 봉 내부 선후관계를 새로 만들어 넣지 않는다. 체크박스 기본값·소수점 규칙 및 실매매의 사이클 사건·중복 틱·미체결·기존 미접수 주문 처리·주문 종류는 기존 계약·코드 근거 및 필요한 사용자 결정으로 확정한다. 이미 확정된 가격 설정 사용·V5 재개 기준·손절 전용 입력 의미·구현 순서를 다시 미결로 취급하지 않는다.
++
++
++### 실매매 후속 사전 검토 보완
++
++독립 Astra는 가격 경과시간 외에 **생산의 재개 기준도 사용자 선택이 필요**하다고 확인했다. 서로 다른 BASE identity는 실제 조건 해제·재성립의 증거가 아니므로, 기존 신규 사이클만으로 재개하는 안과 실제 False → 이후 True를 추가하는 안을 구분한다. WORK_STATUS에 두 미확정 항목과 V5에 맞춘 재개 기준 권고를 보강했다. 이 보강은 실제 Astra의 원래 읽기 보고를 지우거나 생산 구현·운영 활성화를 승인하는 변경이 아니다.
 diff --git a/00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md b/00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md
 index 09f7a4c..82f6197 100644
 --- a/00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md
@@ -55,7 +60,7 @@ index 09f7a4c..82f6197 100644
  
  ## V5 스냅샷·기간선택 계약
 diff --git a/00_CANONICAL/CURRENT/V5_WORK_STATUS.md b/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
-index 0ef7296..dfd9b7a 100644
+index 0ef7296..d903f00 100644
 --- a/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
 +++ b/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
 @@ -11,11 +11,12 @@
@@ -71,7 +76,7 @@ index 0ef7296..dfd9b7a 100644
 +- **V5 손절 실행 연결 — 한정 구현·검증 완료:** 실제 CLI Sol 세션 `01a1f747-c246-7241-8453-c92dd084da6d`에서 승인된 6개 소스·3개 테스트에 평균/종가 선택가격의 손절 우선 잔여 전량 청산, 손절 동일 봉 매수 차단, 실제 BUY False 이후 더 뒤 True의 신규 사이클 재개를 연결했다. 실제 context·결과·snapshot/cache·가격 전환·정규장 제외 경로를 검사했고, 최종 독립 정적 감사는 Critical 0 / Important 0, 범위 감사도 한정 PASS다. 이는 이번 V5 실행 변경분의 완료이며 전체 V5 정상화·실GUI·실매매 검증 완료와 구분한다.
 +- **V5 실행 연결의 최종 검사 증거:** 마지막 집중 실행은 `20 passed, 14 subtests, exit 0`다. 비정상 Stoch RSI threshold 7종의 실제 callback과 재개 잠금 회귀는 결함이 있는 중간 엔진을 메모리에 로드하면 7건 모두 잘못된 False 관측으로 실패하고, 현재 엔진에서는 통과했다. 앞선 3파일 실행은 `153 passed, 1 failed, 392 subtests`, 주변 계약 포함 실행은 `298 passed, 9 failed, 511 subtests`였다. 기존 CURRENT_PRICE 비교 실패는 기준본에서도 동일했고, 나머지 8건은 기준본 소스와 현재 fixture의 누락된 globals/method/timeframe 계약 불일치로 실제 CLI Astra가 분류했다. 실제 projection import와 window 소유 경로는 존재하며 해당 실패를 숨기기 위한 소스 우회나 테스트 약화는 하지 않았다. 실패 수치를 PASS로 바꾸지 않는다.
 +- **V5 확정 선택:** 사용자 `봉 종가가 아니라 설정 가격대로 청산. 평균/종가,`에 따라 가상 청산은 기존 평균/종가 선택값을 따른다. 이어서 '손절 후 매수 조건이 한 번 해제됐다가 다시 성립하면 재매수를 허용'하는지 확인한 질문에 `신규 사이클 재개 가능`으로 답했다. 실제 평가된 False 이후 나중 봉의 True에서 재개하며 손절 동일 봉 매수는 차단한다. 미평가·부적격·자료 부족 또는 실행 거절을 False로 만들지 않는다. V5 과거 OHLCV를 생산용 fresh/native tick 증거로 가장하지 않는다.
-+- **다음 작업 1순위 — 실매매 연결 방향 확정:** 실제 CLI Astra 후속 읽기 분석 `01a1f71f-a2b1-7b22-a981-107a5fb4e564`(DC 40988, exit 0)은 기존 lifecycle·주문 큐·잔량 MARKET 청산을 재사용하는 안을 특정했다. 틱 최대 허용 경과시간은 기존 확정값이 없어 사용자 결정이 필요하다. 2초 상한은 제안이며 측정된 기존 정책이 아니다. 구체적인 처리·파일 범위는 아래 후속 분석 절을 따른다. 생산 구현·운영 활성화·실주문 실행은 이 읽기 분석에서 수행하지 않았다.
++- **다음 작업 1순위 — 실매매 연결 방향 확정:** 실제 CLI Astra 후속 읽기 분석 `01a1f71f-a2b1-7b22-a981-107a5fb4e564`(DC 40988, exit 0)은 기존 lifecycle·주문 큐·잔량 MARKET 청산을 재사용하는 안을 특정했다. 생산의 재개 기준과 틱 최대 허용 경과시간 두 항목을 사용자에게 확인해야 한다. 다른 사이클 identity만으로 실제 매수 조건의 해제·재성립이 증명되지는 않는다. 2초 상한은 제안이며 측정된 기존 정책이 아니다. 구체적인 처리·파일 범위는 아래 후속 분석 절을 따른다. 생산 구현·운영 활성화·실주문 실행은 이 읽기 분석에서 수행하지 않았다.
  - **보조 감시기:** 사용자 복귀 지시에 따라 추가 작업을 중단했다. 오프라인 테스트 통과와 별개로 실제 표시의 런타임 검증은 미완이며 원래 손절 작업을 대체하지 않는다.
  - **기존 V5 잔여 확인:** 15:35 직접봉의 필터 계산/가상매매 제외와 선택 종료 가상청산 등 실제 화면 미확인 항목을 필요한 범위에서 후속 확인한다. 직전창에서 확인한 전체필터·초기화·13개 수신/표시를 무변경 상태로 반복 점검하지 않는다.
  
@@ -127,7 +132,7 @@ index 0ef7296..dfd9b7a 100644
 +
 +- 미전송 확정 BUY, 이미 claim된 BUY, Broker 접수·취소 중 BUY를 구분한다. 기존 취소 readiness만으로 취소 완료를 단정할 수 없다. 늦은 BUY 체결은 정지된 기존 사이클의 잔여 수량에 포함한다.
 +- 일반·추가·복구·분할·보충 BUY와 기존 intent를 같은 사이클 상태로 차단한다. 기존 SELL 예약·중복 명령 제한·거절/불확정 review 경로를 유지한다. 최종 SELL 후 잔량이 남으면 기존 review 동작을 유지하며 자동 재시도 정책을 신설하지 않는다.
-+- 생산 재개 후보는 청산 완료 후 새로 평가·승인된 다른 identity의 BASE/round-1 사건이다. 이전 사이클 intent·늦은 callback을 거부할 기록을 유지한다. 생산에 V5 False→True 재개가 이미 구현됐다는 뜻이 아니며 사용자 구현 방향 확인 전의 제안이다.
++- **생산 재개 기준 미확정:** 청산 완료 후 새로 평가·승인된 다른 identity의 BASE/round-1 사건만으로 재개하는 안과, 여기에 실제 BUY False → 이후 True를 추가로 요구하는 안을 구분해 사용자에게 확인한다. 다른 identity 자체는 조건의 해제·재성립 증거가 아니다. V5와 일관된 False → 이후 True를 추가하는 방향을 권고하되 아직 확정 계약이나 구현으로 기록하지 않는다. 이전 사이클 intent·늦은 callback 차단은 두 안 모두 유지한다. 선택 후 생산의 실제 BUY 관측 소유 경로와 필요한 테스트·파일 범위를 다시 한정한다.
 +- 가격 selector에는 경과시간 상한이 없어 결정이 필요하다. 제안은 거래소 시각 경과와 수신 후 평가 지연 모두 2초 이내, 대안은 5초 이내다. 둘 다 측정된 기존 정책·보장된 안전 한계가 아니다. 무효 가격은 새 트리거를 만들지 않으며 이미 확정된 청산 상태는 유지한다.
 +- 구현 중 LIVE_HOLD는 유지한다. 현재 HOLD 문구의 NXT 표현만으로 실제 주문 정책이 존재하지 않는다고 판단하지 않는다.
 +
