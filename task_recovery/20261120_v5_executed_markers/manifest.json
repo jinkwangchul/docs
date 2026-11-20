@@ -1,0 +1,35 @@
+{
+    "createdUtc":  "2026-11-20T11:13:53.3274931Z",
+    "unit":  "20261120_v5_executed_markers",
+    "kind":  "docs",
+    "authorization":  "User approved ordinary actual virtual executions as double arrows with outward stacking; exact existing special markers retained",
+    "repo":  "C:\\Users\\JIN KWANG CHUL\\Documents\\docs",
+    "remote":  "https://github.com/jinkwangchul/docs.git",
+    "branch":  "agent/project-prompt-standard",
+    "baseHead":  "d8667b52f3bdd362a3140f26a73369b7b1d5f6ca",
+    "realIndexSha256":  "7BAE7B0654E85589D4EFD2DBDE45E789DAD54757BC9BF60D77705B72AAC7B1BA",
+    "files":  [
+                  {
+                      "path":  "00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md",
+                      "beforeSha256":  "71EDABB5EBEBA605633B1BE1475AC21CE8FC605A6F5214B81491F6B7ABA456EA",
+                      "afterSha256":  "6BA62CC702887897710C9CE9B351923FE9E5D16FBC75187EB6FE9081835DD475"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
+                      "beforeSha256":  "EC1D1FF73E9C4867675258420E158C00C2227F9742843AD6C9889C32465DA231",
+                      "afterSha256":  "BCD59166FD018DBC72D9710C2D689415961842D0E9547AD943D009396014B317"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md",
+                      "beforeSha256":  "05ABAEDB047C19FE6C58F3FA9CDEE5D7969A47FDF5EF352079B705F3E3974632",
+                      "afterSha256":  "464486DB77CA690B33C845DC81B0E2662CC10B3F42728E8D8B7414BCF4A4B42D"
+                  }
+              ],
+    "patchSha256":  "5DB423FF6F4809EC851815FEB4DDDC5333EB1C085849D5330BC41FE5109BDD2A",
+    "replay":  "PASS: git -c core.autocrlf=false apply --check and apply --binary in disposable exact-baseline copy; every replay byte SHA equals after/live SHA",
+    "baseline":  "Exact scoped pre-change archived files. This is a delta requiring those exact before files; not a standalone runnable checkout or fresh full restore point.",
+    "restore":  "Use a disposable copy of exact before files outside any Git repository. Run git -c core.autocrlf=false apply --check --binary --whitespace=nowarn changes.patch, then apply --binary with the same config. Verify after SHA before any intentional live restoration.",
+    "evidenceRoot":  "C:\\Users\\JIN KWANG CHUL\\Documents\\project_backups\\v5_executed_markers_20261120",
+    "verification":  "See final_validation.json and final_audits.json; source scope and preserved Git/INI in scope_check_final.json. No live GUI restart, TR, or orders.",
+    "scopeLimitation":  "Python path/length/mtime metadata check does not rule out same-length preserved-mtime content changes elsewhere."
+}

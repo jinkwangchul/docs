@@ -1,0 +1,49 @@
+diff --git a/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md b/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
+index 374f1ee..50ced04 100644
+--- a/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
++++ b/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
+@@ -1059,3 +1059,12 @@ M6_REAL_RUNTIME_COMMIT_ARCHITECTURE_DESIGN.md는 고유한 역사 설계로 유
+ - **복원 기록:** 기존 archive의 정확한 수정 전 파일 1개를 재사용했고 새 전체 복원점을 만들지 않았다. 정확한 기준본·최종 변경분·검사·감사 및 code/docs checkpoint receipt는 `C:/Users/JIN KWANG CHUL/Documents/project_backups/v5_stoploss_layout_20261120_5_3`를 따른다. 이는 정확한 로컬 기준본이 필요한 delta이며 전체 실행 checkout이나 전체 디바이스 백업이 아니다.
+ 
+ - **최종 범위 감사·원격 기록:** WebApp Terra는 지정 receipt와 보고 경계를 한정 PASS로 확인했다. 코드 delta의 byte 단위 재적용을 확인한 뒤 `recovery/v5-stoploss-layout-20261120-5-3`의 원격 SHA `9cb0f8609c492c77c34d59375c51d0701e5ae169`를 확인했다. 원래 작업 branch/HEAD/index와 현재 소스를 유지했으며, 코드·문서별 실제 원격 기록은 해당 checkpoint receipt를 따른다.
++
++
++## 2026-11-20 — V5 유효 체결 2중 화살표·세로 배치 승인
++
++- 사용자는 신호만 발생한 지점과 실제 가상 매수·추가매수·매도 체결 표시를 구분하고, 2중 화살표를 위·아래로 쌓는 배치에 `ㄱㄱ`로 승인했다. 같은 봉의 x를 유지하며 매수는 캔들 아래에서 아래로, 매도는 위에서 위로 쌓고 한 체결의 두 화살표 간격은 다른 종류 간 간격보다 좁게 둔다.
++- 일반 기록의 양수 체결만 2중으로 표시하며 수량 0·거절·단순 조건 성립을 체결로 바꾸지 않는다. 목표비율의 일반 SELL 신호와 흰색 목표 지정가 체결은 별도 기록으로 보존한다. 흰색 목표 체결 및 빨간 손절/청산의 단일 특수표시와 회차 n [손절], 기존 종류별 합침을 유지한다.
++- 표시 변경 범위에서 가격·손절/재개·수량·손익·기간선택·필터·클릭 연결과 production을 보존한다. 프로그램 분석은 실제 CLI Astra, 구현은 실제 Sol 단일 작성자, 독립 기술·계약 감사는 기존 역할로 진행했다. 이 승인은 표시 변경이며 런타임 정상화나 실주문 승인이 아니다.
++- 구현·집중검증 완료: actual Sol PID 47612(exit 0)가 V5 window와 기존 baseline test 두 파일만 수정했다. 양수 일반 fill에만 총 두 화살표를 연결하고 BUY 아래/SELL 위 13px, 내부 빈 간격 3px로 배치하며 기존 유형 기준점 30px를 보존했다. 기존 LOT RANGE_END_LIQUIDATION의 주황색 잔여 단일 예외도 그대로 유지한다. Qt offscreen 집중검증 26 passed / 123 deselected / 21.12s, native Astra 기술감사 PASS(C0/I0), Terra 범위·보고 감사 한정 PASS다. 기존 plot 경계 클리핑은 유지하며 실제 GUI·TR·주문을 검증한 것은 아니다.
++- 원본 archive SHA 재사용과 byte 재적용 검증을 거친 코드 recovery ref는 `recovery/v5-executed-markers-20261120`, 원격 SHA는 `30e66719860da337884ec85eb66776ec0a8773d4`다. 기존 branch/HEAD/index·INI를 보존했으며 자세한 범위/한계·문서 checkpoint·다음 실화면 확인은 V5_WORK_STATUS와 `project_backups/v5_executed_markers_20261120`의 receipt를 기준으로 한다.
+diff --git a/00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md b/00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md
+index 838ce44..944d944 100644
+--- a/00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md
++++ b/00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md
+@@ -36,6 +36,8 @@
+ - **입력 의미:** 부호 선택 없이 양수의 손실폭을 입력하는 손절 전용 항목이다. 입력값을 양수 수익률 조건이나 익절로 해석하지 않는다.
+ - **V5 손절 표시 — 2026-11-20 승인:** 실제 가상 체결 사유가 손절인 청산은 기존 청산과 같은 **빨간색 역삼각형(▼)**으로 표시한다. 하단 집계표의 해당 완료 사이클 회차는 `1 [손절]`, `2 [손절]`처럼 **`n [손절]`** 형식으로 표시한다. 실제 손절 사유를 기준으로 연결하며 음수 손익·일반 매도신호·기간말 청산을 손절로 추정하지 않는다. 표시 스타일을 재사용하더라도 손절과 기간말 청산의 사유는 구분한다. 기존 가격 선택·손절 판정·재개·매매 계산 규칙은 유지한다.
+ - **V5 손절율 배치 — 2026-11-20 승인:** 매도 조건식의 `지움` 버튼 뒤에 구분자 `|`를 두고, 구분자 왼쪽은 5글자 폭·오른쪽은 3글자 폭으로 띄운 뒤 기존 `□ 손절율 [값] %` 묶음을 배치한다. 기존 위젯·값·연결을 재사용하며 가격·손절 판정·재개·표시 사유 및 다른 구분자 규칙은 유지한다.
++- **V5 신호·유효 체결 마킹 — 2026-11-20 승인:** 일반 매수·추가매수·일반 매도의 신호만 발생한 기록은 기존 단일 화살표로, 해당 기록에 연결된 양수 수량의 실제 가상 체결은 같은 색·방향의 2중 화살표로 구분한다. 목표비율 조건 성립이나 같은 봉의 다른 체결만으로 일반 신호를 체결 표시로 바꾸지 않는다. 목표 지정가 체결의 흰색 단일 표식과 손절·청산의 빨간색 단일 표식, 회차 `n [손절]`은 기존 의미를 유지한다. 같은 일반 기록의 표식은 총 두 개이며, 독립된 종류의 표시 기록은 합치지 않는다.
++- **V5 마커 세로 배치 — 2026-11-20 승인:** 같은 봉의 가로 위치를 유지하고 매수 ▲는 캔들 아래에서 아래쪽으로, 매도 ▼는 캔들 위에서 위쪽으로 쌓는다. 한 체결을 나타내는 2중 화살표는 좁은 간격으로 묶고, 서로 다른 종류의 표식 사이에는 더 큰 간격을 둔다. 기존 목표 체결의 종류별 합침·클릭 연결과 매매·가격·손절/재개·수량/손익·기간선택·필터 계산은 보존한다. 이는 V5 표시 변경이며 실제 주문이나 production 변경 승인이 아니다.
+ - **승인된 구현 순서:** V5 가상매매에서 손절 판정 → 잔여 전량 가상청산 → 해당 사이클의 추가매수·재매수 차단 → 다음 신규 사이클 허용을 먼저 연결·검증하고, 이어서 실매매 연결을 구현한다. 실매매 단계에서는 유효한 최신 네이티브 틱, 기존 주문 승인·시장/종목 적격성·Broker 경계, 미체결·미접수 매수와 청산 상태를 별도로 검증한다. 이 구현 순서는 운영 활성화나 실제 주문 실행 승인이 아니다. V5의 동결된 과거 봉을 실시간 틱 증거로 가장하지 않는다.
+ - **적용 세부·구현 경계:** V5는 기존 평균/종가 산출 경로와 실제 매수 조건 평가 사건을 사용하며 손절을 가상 지정가·일반 매매보다 먼저 검사한다. 임계가격 체결이나 OHLC 봉 내부 선후관계를 새로 만들지 않는다. 실매매의 실제 조건 관측·시각 근거·사이클 상태·중복 틱·미체결/미접수 주문 연결은 기존 계약과 코드 소유 경계를 보존해 구현한다. 체크박스 기본값·소수점 규칙과 운영 활성화는 이번 승인에 포함하지 않는다. 이미 확정된 V5 가격·재개 규칙 및 생산의 재개·2초 기준을 다시 미결로 취급하지 않는다.
+ - **구현/검증 상태:** 시점별 코드 조사·수정·테스트 결과와 다음 작업은 `V5_WORK_STATUS.md`에 기록한다. 설정 UI·판정 helper·일부 저장 가드의 존재만으로 V5 가상청산 연결이나 실매매 구현 완료를 선언하지 않으며, 과거 GUI 보고를 현재 코드의 검증으로 대체하지 않는다.
+diff --git a/00_CANONICAL/CURRENT/V5_WORK_STATUS.md b/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
+index 9d633d3..66ccd7f 100644
+--- a/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
++++ b/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
+@@ -6,7 +6,13 @@
+ 
+ ## 2026-11-20 직전창 연계 — 최신 확인 및 우선 작업
+ 
+-- **현재 작업 — V5 손절율 배치 구현·오프라인 검증 완료:** 사용자 `구분자 | 넣고 구분자 좌측 5글자폭 우측 3글자폭으로 ㄱㄱ` 승인에 따라 `지움 → 5글자 폭 → | → 3글자 폭 → 기존 손절율 묶음 → stretch`로 옮겼다. 실제 CLI Sol `gpt-6.1-sol/high`가 V5 window의 `_add_expression_backspace_buttons()` 매도 분기 한 곳만 수정했다(한 hunk·49줄 추가). 기존 손절 패널·자식 위젯·값·receiver·신호 연결을 재사용하고 다른 헤더·손절/재개·가격·매매 계산을 변경하지 않았다.
++- **현재 작업 — V5 유효 체결 2중 화살표·세로 배치 구현 및 오프스크린 집중검증 완료:** 사용자 `ㄱㄱ` 승인에 따라 실제 CLI Astra의 계획(PID 57676, exit 0), 독립 사전감사 후 actual Sol `gpt-6.1-sol/high/workspace-write` 단일 작성자(PID 47612, session `01a1f89f-012c-76b2-9cfd-78a7eee0701b`, native/process exit 0)가 구현했다. 프로그램 수정은 V5 window와 기존 baseline test 두 파일이다.
++- **표시와 연결:** 일반 매수·추가매수·매도 신호만이면 기존 단일, 해당 일반 기록에 연결된 양수 실제 가상 체결이면 같은 색·방향·x의 화살표 총 두 개다. BUY는 아래, SELL은 위로 13px 적층하여 내부 빈 간격 3px를 두고 기존 SELL/LIMIT_SELL 기준점 30px 분리를 유지한다. 기존 흰색 목표 체결·빨간 손절/청산 및 `n [손절]`, 기존 LOT `RANGE_END_LIQUIDATION`의 주황색 잔여 단일 예외를 보존했다. 두 화살표와 내부 간격은 같은 기존 key·툴팁·클릭으로 연결하며 다른 유형의 빈 간격·plot 밖으로 hit를 확대하지 않는다.
++- **검증·감사:** Windows Python 3.11.9 32-bit, Qt offscreen에서 지정 검증을 1회 실행해 **26 passed / 123 deselected / 21.12s, exit 0**을 확인했다(신규 parameterized 15건, 기존 baseline 8건, LOT UI 3건). 양수 fill의 side/index/time/reason 연결, 희소 인덱스, 단일/이중·유형 분리·클릭·캐시·라벨·범위/가격 기준 재게시를 확인했다. 독립 WebApp Astra 최종 기술감사는 **PASS, Critical 0 / Important 0**, Terra 범위·보고 감사는 한정 PASS다. 독립 AST 대조로 owner 기존 함수 7개 수정+Canvas 메서드 1개 추가, 기존 baseline 함수 변경 0+새 테스트 함수 3개를 확인했다. paint/hit의 시뮬레이션 추가 실행은 없다.
++- **보존과 증거:** Python 2,600개 경로의 크기·mtime 대조에서 두 지정 파일만 변경, 추가·삭제·범위 밖 변경 0이다. 이는 같은 크기·mtime으로 감춘 내용 변화까지 배제하는 전체 내용 해시 검사는 아니다. 양 저장소 원래 branch/HEAD/index/remote와 작업 상태 목록 7,760/225개, INI SHA `CC9751497AA4FE190162FD44FB117EEA979A2091EE984B40DC71D33E5ECB5918`를 유지했다. 최종 owner SHA는 `8A089AEDED3200FAB81A17F551286640A8B164BC02AB4A86878C66A9140EE309`, baseline test는 `D1B7F97D854C5B1FFF0D9689B0086B12E6099EC9A76CDB7171C0E583B02BD594`다. 원본·집중 로그·검증/감사·scope·회수 보고서는 `C:/Users/JIN KWANG CHUL/Documents/project_backups/v5_executed_markers_20261120`에 보존했다. 원래 구현 보고서의 한글 저장 손실은 원본을 유지하고 CLI 최종 요약을 UTF-8 별도 회수본으로 기록했으며 앱 문구 손상은 독립 감사에서 발견되지 않았다.
++- **복구와 다음 확인:** 기존 archive와 SHA가 일치한 두 원본을 부분 기준본으로 재사용했으며 새 전체 복원점을 만든 것은 아니다. 변경 patch를 정확한 원본의 별도 사본에 재적용해 최종 파일의 byte SHA 일치를 확인했다. 코드 recovery ref `recovery/v5-executed-markers-20261120`의 원격 commit은 `30e66719860da337884ec85eb66776ec0a8773d4`이며 코드·문서 receipt는 같은 evidence 경로의 최종 checkpoint 기록을 기준으로 한다. 상하단은 기존 plot clipping을 유지하므로 경계 밖 부분은 잘릴 수 있다. 이번 결과는 오프스크린 집중검증이며 실제 메인 GUI·TR·주문·production 검증이 아니다. GUI 종료·재시작·INI 변경을 하지 않았다. **다음은 사용자가 프로그램을 재시작한 뒤 실제 V5 화면에서 일반 단일/유효 체결 이중 및 특수 표식의 세로 분리를 확인하는 것**이다.
++
++- **직전 완료 — V5 손절율 배치 구현·오프라인 검증 완료:** 사용자 `구분자 | 넣고 구분자 좌측 5글자폭 우측 3글자폭으로 ㄱㄱ` 승인에 따라 `지움 → 5글자 폭 → | → 3글자 폭 → 기존 손절율 묶음 → stretch`로 옮겼다. 실제 CLI Sol `gpt-6.1-sol/high`가 V5 window의 `_add_expression_backspace_buttons()` 매도 분기 한 곳만 수정했다(한 hunk·49줄 추가). 기존 손절 패널·자식 위젯·값·receiver·신호 연결을 재사용하고 다른 헤더·손절/재개·가격·매매 계산을 변경하지 않았다.
+ - **최종 검증:** Windows Python 3.11 32-bit의 QImage/WA_DontShowOnScreen 관측에서 버튼의 보이는 오른쪽 외곽→`|` 왼쪽은 5자 목표 **80px/실측 80px**, `|` 오른쪽→체크박스 표시 경계는 3자 목표 **54px/실측 54px**, 잔차 **0/0px**다. 관측 조건은 Gulim(버튼 8pt·체크박스 9pt·구분자 10pt), DPR 1이다. 위젯 identity·값·receiver·stretch, 기존 header/local/panel spacing 8/0/4, 구분자 18×30을 확인했다. DC의 기존 header pipe 검사 **1 passed in 1.69s, exit 0**와 geometry5는 같은 최종 SHA `CAA5233A5F2FCB919D79E01AB2AD5984ABD0B4D1E89AEABE2DA9A5B3C949824B`에 결합돼 있다. 신규 테스트·기존 무관 fixture 수정은 없다.
+ - **실패 이력·독립 판단:** 최초 Sol PID 42244는 생성 중 glyph 측정 예외로 두 검증이 실패해 자신의 변경만 원본으로 복구했다. 실제 Astra PID 25356의 교정 근거와 버튼 외곽 기준에 따라 Sol PID 57664가 수정했으며, 중간 실패 관측 뒤 geometry5가 통과했다. 추가 추측 보정을 중단시키는 종료 요청 직전 geometry5는 이미 끝났고 PID 57664 자체는 **강제 종료 exit 1**이다. 정상 종료로 기록하지 않는다. 이후 실제 Astra PID 14560(read-only, exit 0)은 현재 분기를 더 수정할 근거가 없다고 판단했고, 독립 WebApp Astra 최종 기술감사는 **PASS, Critical 0 / Important 0**다. 최종 WebApp Terra 범위·보고 감사도 한정 PASS다. 이는 기술 구현을 별도로 재검사한 판정이 아니다.
+ - **보존·운영 관측:** 2,600개 Python 경로의 크기·수정시각 대조에서 변경은 해당 파일 1개, 추가·삭제·범위 밖 변경 0이다. 이는 같은 크기·수정시각으로 감춘 내용 변화까지 배제하는 전체 내용 해시 검사는 아니다. 양 저장소의 원래 branch/HEAD/index 및 작업 상태 목록 7,760/225개, 설정 INI SHA `CC9751497AA4FE190162FD44FB117EEA979A2091EE984B40DC71D33E5ECB5918`는 동일했다. 기존 GUI PID 2400는 마지막 조회에서 없어졌고, 19:14:47 KST에 Explorer 부모로 생성된 새 PID 9296을 확인했다. 종료·재실행 주체와 원인은 미확인이다. 명령 기록에는 해당 GUI 종료·실행 지시가 없고 강제 종료 대상은 Sol PID 57664뿐이다.
