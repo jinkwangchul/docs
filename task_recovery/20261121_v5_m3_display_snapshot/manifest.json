@@ -1,0 +1,21 @@
+{
+  "task": "V5 quantity user confirmation and approved M3 correction work status",
+  "artifact_kind": "One-document exact work-unit delta; no current SOR/startup/technical contract change",
+  "files": [
+    {
+      "path": "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
+      "before_sha256": "D2FB8E7825563598D59322408F196CB2049D3C760663207BCFF5387A885BD91F",
+      "after_sha256": "83270EFE1E50B4946809F4FF9C06F35A0BB3C661FC6550A734A72A2A2D62961E",
+      "patch_reconstructs_exact_bytes": true
+    }
+  ],
+  "patch_sha256": "0C756DC63E50671D5405DA67BADA31912A5DF5B68E616723BC474A048C4CFFB0",
+  "base_head": "d8667b52f3bdd362a3140f26a73369b7b1d5f6ca",
+  "base_branch": "agent/project-prompt-standard",
+  "normal_index_sha256": "7BAE7B0654E85589D4EFD2DBDE45E789DAD54757BC9BF60D77705B72AAC7B1BA",
+  "code_recovery_commit": "1dc3936a33d40218dbc917a2c4354c4a7328c02a",
+  "verification": "Code/spec C0/I0 and focused 34 PASS; live INI invariance not satisfied/actor unconfirmed; corrected M3 live GUI pending; terminal exhaustion receipt branch static only",
+  "checkpoint_authority": "Standing Workflow sections 10/12 DC-owned limited recovery policy; not an expansion of Codex Sol Git authority",
+  "concrete_recovery_need": "Preserve the exact approved work-status delta alongside the isolated code recovery record without committing or resetting unrelated existing documentation WIP. Full application completion is not claimed.",
+  "restore_requirement": "Exact local before document is required"
+}
