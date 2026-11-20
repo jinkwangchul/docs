@@ -1,0 +1,54 @@
+diff --git a/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md b/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
+index 2758e24..3b32da2 100644
+--- a/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
++++ b/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
+@@ -1019,3 +1019,18 @@ M6_REAL_RUNTIME_COMMIT_ARCHITECTURE_DESIGN.md는 고유한 역사 설계로 유
+ - 17:09:51~52 기간선택 1회에서 03/17~11/17 166봉, 완료 가상 사이클 4행, +217,698원/+3.91%가 표시됐다. 기본 trace의 보유 pool 재생 완료와 선택 전후 추가 V5 request_dispatch 0, 이번 확인 전후 INI 해시 동일을 기록했다. 설정·가격·기준봉·팬/휠·루틴 적용·운영 활성화·실주문 조작은 없었다.
+ - 상세 매도 사유 receipt가 없어 STOP_LOSS 개별 발동·실제 False→True 재개 또는 production 런타임 전체 PASS로 확대하지 않는다. LIVE_HOLD는 기존 가드의 정적 보존 확인에 한정한다. 앞선 구현 중 INI 차이 관측은 이 후속 구간의 INI 불변으로 지우지 않는다.
+ - 실제 Astra DC 30432/38104는 읽기 전용으로 종료했고 Terra는 제공 증거의 보고 범위를 한정 PASS로 검토했다. 상세 현재 상태와 증거 위치는 V5_WORK_STATUS의 17:09 GUI 확인 절을 따른다. 이번 보강은 관측 기록이며 신규 정책·소스 수정이 아니다.
++
++
++## 2026-11-20 — V5 손절 마커·회차 표시 승인 (당시 승인 단계 기록)
++
++- 사용자는 손절을 청산의 빨간색 역삼각형으로 표시하고 하단 집계표 회차를 `n [손절]`로 표시하도록 요청했다. 실제 손절로 청산된 사이클에 적용한다는 확인에 `ㄱㄱ`로 구현을 승인했다.
++- SOR에 실제 손절 사유 기반의 표시 계약을 추가했다. 손실 손익이나 일반 매도신호를 근거로 손절을 추정하지 않으며, 같은 마커 스타일을 써도 손절과 기간말 청산 사유는 구분한다. 가격·손절·재개·수량·손익·주문 정책 변경은 없다.
++- 실제 CLI Astra가 기존 사유 전달·렌더·집계표와 최소 테스트 범위를 분석한다. GPT는 조율·원본 보존·문서·실행 확인·Git을 맡고 구현은 실제 Sol 단일 작성자가 수행한다. 현재 실행 GUI·INI를 임의 변경하거나 재시작하지 않는다. 이번 단위 근거는 `C:/Users/JIN KWANG CHUL/Documents/project_backups/v5_stoploss_display_20261120`에 보존한다.
++
++## 2026-11-20 — V5 손절 마커·회차 표시의 한정 구현·오프라인 검증 완료
++
++- **구현:** 실제 CLI Sol `gpt-6.1-sol/high`, PID 51060, 세션 `01a1f7a2-4238-79c2-8efa-13ae5275db84`, exit 0. 실제 양수 closing SELL fill의 STOP_LOSS 사유만 기존 빨간 ▼와 회차 `n [손절]`에 연결했다. 승인된 V5 window 1개·기존 테스트 2개만 변경했다.
++- **검증:** 최종 신규 집중 12 passed·6 subtests(122 deselected), 기존 인접 청산 5 passed, 모두 exit 0. 앞선 부분 GREEN은 최종 수치에 다시 합산하지 않는다. 독립 Astra 기술 감사 PASS(Critical 0 / Important 0), Terra 범위·보고 감사 한정 PASS.
++- **보존:** 이번 변경 범위에서 가격·매매·손절/재개·회계·production 규칙을 수정하지 않았다. 관련 오프라인 회귀에서 기존 계산 값·정수 회차·행 순서·클릭 대상·기존 청산 표시 보존을 확인했다. 2,600개 Python 기준 목록 대조와 현재 경로/최종 SHA 확인에서 변경 3개, 추가·삭제·범위 밖 변경 0. INI 및 기존 코드 Git branch/HEAD/index·작업 상태 목록은 동일했다.
++- **한계:** 숨긴 offscreen viewport와 직접 population, evaluator 반환을 고정한 frozen 표시 재구성 검사다. 실GUI 이벤트·실주문/TR·전체 정상화 완료로 확대하지 않는다. GUI 종료·재실행 조작은 없었고 최종 조회에서 프로젝트 GUI는 없었다. 다음 확인은 최신 코드 V5의 실제 손절 마커·회차 표기다.
++- **복원:** 수정 전 3개 원본은 기존 archive와 정확한 해시 일치를 확인해 재사용했으며 새 전체 복원점을 만든 것이 아니다. byte 단위 패치 재적용 확인 후 코드 recovery ref `recovery/v5-stoploss-display-20261120-01a1f7a2`의 원격 SHA `d0f47aeb7059a89322991eaa8faec564304aa5db`를 확인했다. 코드·문서 receipt와 검사·감사 원문은 `C:/Users/JIN KWANG CHUL/Documents/project_backups/v5_stoploss_display_20261120`에 보존한다. 원격 기록은 task patch/manifest이며 복원에 정확한 로컬 기준본이 필요하다.
+diff --git a/00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md b/00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md
+index 8eaf6b1..bfef177 100644
+--- a/00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md
++++ b/00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md
+@@ -34,6 +34,7 @@
+ - **실매매 신규 손절 가격의 신선도 — 2026-11-20 승인:** 사용자 채택값은 2초 이내의 유효한 네이티브 틱이다. 기존 제안의 거래소 시각 경과와 수신 후 평가 지연을 각각 2초 상한으로 검사하며, 실제 원본 시각과 수신 근거를 사용한다. 시각 부재·오류·미래/역순·다른 세션 근거를 정상값으로 대체하지 않고 과거 종가나 scalar 가격으로 우회하지 않는다. 이 상한은 신규 손절 트리거의 가격 경과시간 검사에 적용한다. 근거가 무효해져도 이미 확정된 청산 상태는 유지한다. 2초는 사용자 선택 정책이며 실측된 지연 보장값으로 기록하지 않는다.
+ - **실매매 시각 근거의 표현:** 현재 native 정규화 경로의 시각은 원본 `HHMMSS`와 KST 수신일을 결합한 값이며 독립된 거래소 날짜 수신으로 표현하지 않는다. 신규 트리거는 초를 보존한 원본 market datetime에 대한 wall 경과와 같은 프로세스의 원본 receipt monotonic 경과가 각각 `0..2초`일 때만 허용한다. 누락된 시각을 현재 시각으로 채우지 않으며, reconnect/reset·restart 뒤에는 새 유효 native tick이 필요하다. 같은 초의 증가 sequence는 허용하되 역순·미래·세션 불일치·일자 불명확을 정상화하지 않는다. 최종 latch 기록 직전에도 원본 근거·시계 identity와 경과시간을 다시 확인한다.
+ - **입력 의미:** 부호 선택 없이 양수의 손실폭을 입력하는 손절 전용 항목이다. 입력값을 양수 수익률 조건이나 익절로 해석하지 않는다.
++- **V5 손절 표시 — 2026-11-20 승인:** 실제 가상 체결 사유가 손절인 청산은 기존 청산과 같은 **빨간색 역삼각형(▼)**으로 표시한다. 하단 집계표의 해당 완료 사이클 회차는 `1 [손절]`, `2 [손절]`처럼 **`n [손절]`** 형식으로 표시한다. 실제 손절 사유를 기준으로 연결하며 음수 손익·일반 매도신호·기간말 청산을 손절로 추정하지 않는다. 표시 스타일을 재사용하더라도 손절과 기간말 청산의 사유는 구분한다. 기존 가격 선택·손절 판정·재개·매매 계산 규칙은 유지한다.
+ - **승인된 구현 순서:** V5 가상매매에서 손절 판정 → 잔여 전량 가상청산 → 해당 사이클의 추가매수·재매수 차단 → 다음 신규 사이클 허용을 먼저 연결·검증하고, 이어서 실매매 연결을 구현한다. 실매매 단계에서는 유효한 최신 네이티브 틱, 기존 주문 승인·시장/종목 적격성·Broker 경계, 미체결·미접수 매수와 청산 상태를 별도로 검증한다. 이 구현 순서는 운영 활성화나 실제 주문 실행 승인이 아니다. V5의 동결된 과거 봉을 실시간 틱 증거로 가장하지 않는다.
+ - **적용 세부·구현 경계:** V5는 기존 평균/종가 산출 경로와 실제 매수 조건 평가 사건을 사용하며 손절을 가상 지정가·일반 매매보다 먼저 검사한다. 임계가격 체결이나 OHLC 봉 내부 선후관계를 새로 만들지 않는다. 실매매의 실제 조건 관측·시각 근거·사이클 상태·중복 틱·미체결/미접수 주문 연결은 기존 계약과 코드 소유 경계를 보존해 구현한다. 체크박스 기본값·소수점 규칙과 운영 활성화는 이번 승인에 포함하지 않는다. 이미 확정된 V5 가격·재개 규칙 및 생산의 재개·2초 기준을 다시 미결로 취급하지 않는다.
+ - **구현/검증 상태:** 시점별 코드 조사·수정·테스트 결과와 다음 작업은 `V5_WORK_STATUS.md`에 기록한다. 설정 UI·판정 helper·일부 저장 가드의 존재만으로 V5 가상청산 연결이나 실매매 구현 완료를 선언하지 않으며, 과거 GUI 보고를 현재 코드의 검증으로 대체하지 않는다.
+diff --git a/00_CANONICAL/CURRENT/V5_WORK_STATUS.md b/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
+index 1b85d88..ed9779e 100644
+--- a/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
++++ b/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
+@@ -6,6 +6,14 @@
+ 
+ ## 2026-11-20 직전창 연계 — 최신 확인 및 우선 작업
+ 
++- **현재 작업 — V5 손절 표시의 한정 구현·오프라인 검증 완료:** 사용자 요청과 `ㄱㄱ` 승인에 따라 실제 CLI Sol `gpt-6.1-sol/high/workspace-write`(PID 51060, 세션 `01a1f7a2-4238-79c2-8efa-13ae5275db84`)이 구현하고 exit 0으로 종료했다. 실제 손절 청산은 기존 청산의 **빨간 역삼각형(▼)**, 하단 집계표의 해당 회차는 **`n [손절]`**로 표시한다.
++- **적용 범위와 사유:** `gui_indicator_follow_signal_validation_v5_window.py`와 기존 테스트 `tests/test_v5_lot_limit_ui.py`, `tests/test_indicator_follow_signal_validation_v5_baseline.py`의 3개 파일만 변경했다. 실제 양수 closing SELL fill의 STOP_LOSS 사유를 표시 모델·offset/remap·재구성 경로에 보존하고, 원본 신호를 유지한 표시용 복사본에 기존 빨간 ▼ 스타일을 적용했다. 일반 손실 매도·기간말 청산을 손절로 추정하지 않으며 회차 문구 폭을 반영한다.
++- **최종 검사:** Windows Python 3.11 32-bit/PyQt offscreen에서 신규 집중 **12 passed·6 subtests·122 deselected**, 기존 인접 청산 **5 passed**, 모두 exit 0. 앞선 원인 전달 GREEN 4건은 최종 12건에 포함되므로 합산하지 않는다. 초기 UI 실패 8건 중 표시 누락 7건과 신규 frozen fixture identity 누락 1건을 구분했고, 후속 viewport·직접 갱신 fixture 보완에서도 원래 폭·빈 결과 단언을 유지했다.
++- **독립 감사:** 실제 CLI Astra의 최소 계획(PID 53424, exit 0)을 적용했으며, WebApp Astra 최종 기술 감사 **PASS, Critical 0 / Important 0**, WebApp Terra 범위·보고 감사 **한정 PASS**다. 변경 범위에서 매매·가격·손절/재개·회계·production 규칙을 수정하지 않았고, 관련 오프라인 회귀에서 재무 값·정수 회차·행 순서·클릭 대상·기존 청산 표시 보존을 확인했다.
++- **최종 보존 확인:** 실제 Sol의 최신 2,600개 Python 내용 해시 대조를 재사용하고 DC에서 전체 경로 목록과 최종 3개 SHA256을 확인했다. 2,600→2,600개, 승인된 3개 변경, 추가·삭제·범위 밖 변경 0. 설정 INI 해시는 `CC9751497AA4FE190162FD44FB117EEA979A2091EE984B40DC71D33E5ECB5918`로 동일하다. 원래 코드 branch/HEAD/index 및 7,760개 작업 상태 목록은 보존됐다. 17:58 KST 조회에서 프로젝트 GUI는 없었으며 이 작업에서 GUI 종료·실행 조작은 하지 않았다.
++- **원본·복원 기록:** 기존 보관본 3개의 SHA가 현재 수정 전 파일 및 최초 범위 목록과 일치해 `C:/Users/JIN KWANG CHUL/Documents/project_backups/v5_stoploss_display_20261120/code_before`에 보존했다. 새 전체 복원점을 만든 것은 아니다. 변경분 패치의 byte 단위 재적용을 확인했으며 코드 recovery ref `recovery/v5-stoploss-display-20261120-01a1f7a2`의 원격 커밋 `d0f47aeb7059a89322991eaa8faec564304aa5db`를 확인했다. 코드·문서별 실제 원격 기록은 같은 증거 폴더의 `code_checkpoint_receipt.json`, `docs_checkpoint_receipt.json`을 기준으로 한다. 패치 복원에는 정확한 로컬 기준본이 필요하며 독립 실행 가능한 전체 checkout은 아니다.
++- **검증 한계와 다음 작업:** 숨긴 offscreen viewport·직접 population 및 evaluator 결과를 고정한 frozen 재구성의 표시 연결을 확인했다. 실제 visible GUI 이벤트·실수신/TR·실주문·전체 프로젝트 정상화는 이번 검사 범위가 아니다. 다음 작업은 최신 코드로 V5를 열어 기존 데이터의 실제 손절 봉에 빨간 ▼가 하나만 표시되고 해당 회차가 `n [손절]`로 나타나는지 실화면에서 확인하는 것이다.
++
+ - **직전창 회수 근거:** 2026-11-19~20 같은 프로젝트 대화의 사용자 결정·작업 보고를 회수했다. 아래 과거 필터·실GUI 보고는 당시 보고 범위로 보존하며, 이번 창의 손절 CLI 조사·수정·테스트 증거와 별도로 구분한다.
+ - **필터 계약·수정:** 전체필터는 조건식 참조와 무관한 설정된 모든 필터·범례·Stoch RSI 실제 %D 패널과 BUY/SELL 기준선(기본 20/80, 설정값 우선)을 표시한다. 유효필터는 조건식 참여 필터를 강조하고 나머지 범례는 유지한다. 필터숨김은 시각 요소만 숨긴다. 직전창 보고상 Sol이 V5 window와 회귀테스트 2개 및 SOR 계약 충돌 조항을 수정했고 집중 확인 **11건·세부 15건 통과**, 독립 Astra **GO**를 받았다. 이는 당시 코드/오프라인 범위로 한정한다.
+ - **직전창 실GUI 보고:** 재시작 후 전체필터 Stoch RSI 패널·20/80 기준선·범례 확인, 초기화 반복 및 41봉 기간 재선택 확인, 스크롤 위치 **4,450→4,750** 복원과 추가 TR 없음, M1↔M3 전환 확인이 보고되었다. 13개 기준봉의 **실GUI 수신·표시 확인 보고**도 있다. 이 결과만으로 13개 전 구성의 모든 지표·필터·기간선택·장중 스냅샷·실매매 기능을 PASS로 확대하지 않는다.

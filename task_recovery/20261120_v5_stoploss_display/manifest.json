@@ -1,0 +1,146 @@
+{
+    "status":  "DELTA_REPLAY_VERIFIED",
+    "repository":  "C:\\Users\\JIN KWANG CHUL\\Documents\\docs",
+    "remote":  "https://github.com/jinkwangchul/docs.git",
+    "branch":  "agent/project-prompt-standard",
+    "head":  "d8667b52f3bdd362a3140f26a73369b7b1d5f6ca",
+    "originalIndexSha256":  "7BAE7B0654E85589D4EFD2DBDE45E789DAD54757BC9BF60D77705B72AAC7B1BA",
+    "baseline":  "C:\\Users\\JIN KWANG CHUL\\Documents\\project_backups\\v5_stoploss_display_20261120\\docs_before",
+    "limitation":  "Delta only. Exact original document contents are local, not included remotely. This is not a self-contained documentation checkout or a full device-loss backup.",
+    "restore":  "Use disposable exact baseline copies, apply changes.patch with git apply --binary --whitespace=nowarn, verify every afterSha256; do not overwrite unrelated working files automatically.",
+    "files":  [
+                  {
+                      "path":  "00_CANONICAL/CURRENT/2026-10-30_SOR_V5_CURRENT_PROMPT.md",
+                      "beforeSha256":  "8A95C5203B8B57E2A773BEE9610ACC91CC1B428F25C6DF2D994B8562CA609438",
+                      "afterSha256":  "7392FC988FC3D63DB482ED3848A3FD31235D8298FE683A2EAFD44B2D5C8B71CC"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
+                      "beforeSha256":  "8E656595FD1FA8AAE4CC17AB0C2A194274D0FE8AFBBFA498F678494FDA0BA486",
+                      "afterSha256":  "4D2523837C3FF97E825E8EBC39F7AB1C769FE3041B1156BA641FE648F2F78BD4"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md",
+                      "beforeSha256":  "7CE21A223A1D3F530D47C86423CC29E716EC558B8F71D8A19DB09B347C4CF75A",
+                      "afterSha256":  "F6DA2213E443F97B7018BB94A67CB7C4A90664F19A535FBE7D238597D8B0267B"
+                  }
+              ],
+    "protected":  [
+
+                  ],
+    "sourceCodeRecoveryCommit":  "d0f47aeb7059a89322991eaa8faec564304aa5db",
+    "verification":  {
+                         "unit":  "V5 actual STOP_LOSS red downward triangle and n [손절] cycle label",
+                         "status":  "SCOPED_IMPLEMENTATION_AND_OFFLINE_VERIFICATION_PASS",
+                         "approval":  "User ㄱㄱ after explicit display direction confirmation",
+                         "primaryAnalysis":  {
+                                                 "actualCli":  true,
+                                                 "pid":  53424,
+                                                 "model":  "gpt-6-astra",
+                                                 "effort":  "ultra",
+                                                 "mode":  "read-only",
+                                                 "exitCode":  0,
+                                                 "session":  "01a1f71f-a2b1-7b22-a981-107a5fb4e564",
+                                                 "evidence":  "primary_plan_53424.txt"
+                                             },
+                         "implementation":  {
+                                                "actualCli":  true,
+                                                "pid":  51060,
+                                                "model":  "gpt-6.1-sol",
+                                                "effort":  "high",
+                                                "mode":  "workspace-write",
+                                                "exitCode":  0,
+                                                "runtimeSeconds":  716.53,
+                                                "session":  "01a1f7a2-4238-79c2-8efa-13ae5275db84",
+                                                "evidence":  "sol_final_51060.txt"
+                                            },
+                         "focusedTestResults":  [
+                                                    {
+                                                        "suite":  "new projection and offscreen display regressions",
+                                                        "passed":  12,
+                                                        "subtestsPassed":  6,
+                                                        "deselected":  122,
+                                                        "exitCode":  0,
+                                                        "seconds":  14.12,
+                                                        "evidence":  "green_final_51060.txt",
+                                                        "selector":  "StopLossDisplayProjectionTest or stop_loss_display_labels or stop_loss_partial_sale_labels or stop_loss_red_glyph or stop_loss_reason_survives"
+                                                    },
+                                                    {
+                                                        "suite":  "existing adjacent liquidation regressions",
+                                                        "passed":  5,
+                                                        "exitCode":  0,
+                                                        "seconds":  4.06,
+                                                        "evidence":  "green_final_51060.txt",
+                                                        "overlapsFinalNewRegressions":  false
+                                                    }
+                                                ],
+                         "redEvidence":  [
+                                             {
+                                                 "pid":  51060,
+                                                 "offset":  3322,
+                                                 "length":  44,
+                                                 "selector":  "tests/test_v5_lot_limit_ui.py::StopLossDisplayProjectionTest",
+                                                 "reportedResult":  "6 failed, 2 passed, 2 subtests passed in 2.31s",
+                                                 "expectedFailBeforeSourceChange":  true,
+                                                 "subprocessExitCode":  1,
+                                                 "path":  "C:\\Users\\JIN KWANG CHUL\\Documents\\project_backups\\v5_stoploss_display_20261120\\red_projection_51060.txt"
+                                             },
+                                             {
+                                                 "pid":  51060,
+                                                 "offset":  4256,
+                                                 "length":  65,
+                                                 "selector":  "stop_loss_display_labels or stop_loss_partial_sale_labels or stop_loss_red_glyph or stop_loss_reason_survives",
+                                                 "reportedResult":  "8 failed, 101 deselected in 5.59s",
+                                                 "subprocessExitCode":  1,
+                                                 "qualification":  "Seven display omissions and one newly added frozen-fixture settings identity mismatch; do not count all eight as reproduced product defects.",
+                                                 "path":  "C:\\Users\\JIN KWANG CHUL\\Documents\\project_backups\\v5_stoploss_display_20261120\\red_ui_51060.txt"
+                                             },
+                                             {
+                                                 "stage":  "combined intermediate",
+                                                 "failed":  2,
+                                                 "passed":  10,
+                                                 "subtestsPassed":  6,
+                                                 "deselected":  122,
+                                                 "exitCode":  1,
+                                                 "evidence":  "sol_final_51060.txt",
+                                                 "qualification":  "Two new offscreen fixture issues (viewport and explicit refresh) corrected; independent technical audit found original assertions preserved. Frozen identity setup issue also corrected without weakening production identity checks."
+                                             }
+                                         ],
+                         "independentReview":  {
+                                                   "technical":  {
+                                                                     "reviewer":  "/root/stoploss_guard_audit",
+                                                                     "verdict":  "PASS",
+                                                                     "critical":  0,
+                                                                     "important":  0,
+                                                                     "evidence":  "final_independent_audits.txt"
+                                                                 },
+                                                   "scope":  {
+                                                                 "reviewer":  "/root/stoploss_scope_audit",
+                                                                 "verdict":  "PASS_WITH_REPORTING_LIMITS",
+                                                                 "evidence":  "final_independent_audits.txt",
+                                                                 "qualification":  "Do not equate unchanged trading-rule source scope and offline parity with full runtime proof. Final GUI and Git publication are separate."
+                                                             }
+                                               },
+                         "sourceScopeEvidence":  "final_source_scope_scan.json",
+                         "sourceCountBefore":  2600,
+                         "sourceCountAfter":  2600,
+                         "approvedChangedFiles":  [
+                                                      {
+                                                          "path":  "gui_indicator_follow_signal_validation_v5_window.py",
+                                                          "sha256":  "C58A229D4BB1C1E8E0A7D19F1AE1D4281534AB87F7B6813C7643905C398227AE"
+                                                      },
+                                                      {
+                                                          "path":  "tests\\test_indicator_follow_signal_validation_v5_baseline.py",
+                                                          "sha256":  "52FC1CC09AF43FC840F383A9B7F897C6DA1CEC59C686023A74A9F823149BD68D"
+                                                      },
+                                                      {
+                                                          "path":  "tests\\test_v5_lot_limit_ui.py",
+                                                          "sha256":  "DC7C1960DF6A3A6F01C2F494299BE8E457BAB5C994B3C58F357967F89363414A"
+                                                      }
+                                                  ],
+                         "baselineType":  "Exact existing archive source copies reused and hash-matched; not a new full project snapshot",
+                         "configurationQualification":  "INI SHA256 remained CC9751497AA4FE190162FD44FB117EEA979A2091EE984B40DC71D33E5ECB5918. No GUI/configuration operations; no project gui_main.py process observed at final metadata check.",
+                         "runtimeQualification":  "Windows Python 3.11 32-bit and PyQt offscreen only. Frozen-rebuild evaluator result was fixed to test presentation transport. No actual visible GUI event flow, live orders, TR, production activation or whole-project PASS claimed.",
+                         "countingQualification":  "Final new 12 tests and existing adjacent 5 tests are disjoint. Earlier projection 4-test GREEN is contained in the final 12 and must not be added again."
+                     }
+}
