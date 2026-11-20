@@ -1,0 +1,88 @@
+{
+    "status":  "DELTA_REPLAY_VERIFIED",
+    "repository":  "C:\\Users\\JIN KWANG CHUL\\Documents\\docs",
+    "remote":  "https://github.com/jinkwangchul/docs.git",
+    "branch":  "agent/project-prompt-standard",
+    "head":  "d8667b52f3bdd362a3140f26a73369b7b1d5f6ca",
+    "originalIndexSha256":  "7BAE7B0654E85589D4EFD2DBDE45E789DAD54757BC9BF60D77705B72AAC7B1BA",
+    "baseline":  "C:\\Users\\JIN KWANG CHUL\\Documents\\project_backups\\live_stoploss_execution_20261120_1504\\gui_restart_verification\\docs_before",
+    "limitation":  "Delta only. Exact original document contents are local, not included remotely. This is not a self-contained documentation checkout or a full device-loss backup.",
+    "restore":  "Use disposable exact baseline copies, apply changes.patch with git apply --binary --whitespace=nowarn, verify every afterSha256; do not overwrite unrelated working files automatically.",
+    "files":  [
+                  {
+                      "path":  "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
+                      "beforeSha256":  "0ED9F0DE89CAD09CED62DE44E7B8C3837E6BD72DA069E7E44E6A6A62BD134008",
+                      "afterSha256":  "8E656595FD1FA8AAE4CC17AB0C2A194274D0FE8AFBBFA498F678494FDA0BA486"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md",
+                      "beforeSha256":  "162E0168A16CEA35F645BCA674AD4C0EC36030291AC00A6A41663CBD60402CCD",
+                      "afterSha256":  "7CE21A223A1D3F530D47C86423CC29E716EC558B8F71D8A19DB09B347C4CF75A"
+                  }
+              ],
+    "protected":  [
+
+                  ],
+    "sourceCodeRecoveryCommit":  "8d79148199152d18ca2ff1db9e1cefe3e3af4931",
+    "verification":  {
+                         "status":  "BOUNDED_NON_ORDER_GUI_RESTART_CHECK_COMPLETE",
+                         "authorization":  "User 재시작 완료 ㄱㄱ after proposed latest-code non-order GUI verification",
+                         "pid":  34092,
+                         "restartedKst":  "2026-11-20 16:58:39",
+                         "sourceHashes22Match":  true,
+                         "sourceWritesBeforeRestart":  true,
+                         "symbol":  "000660",
+                         "timeframe":  "D1",
+                         "stopLoss":  {
+                                          "enabled":  true,
+                                          "percent":  0.5
+                                      },
+                         "priceMode":  "average",
+                         "selectedBars":  166,
+                         "completedCycles":  4,
+                         "virtualProfitKrw":  217698,
+                         "virtualProfitPercent":  3.91,
+                         "newRequestDispatch":  0,
+                         "iniUnchanged":  true,
+                         "directStopReasonReceipt":  0,
+                         "evidenceRoot":  "C:\\Users\\JIN KWANG CHUL\\Documents\\project_backups\\live_stoploss_execution_20261120_1504\\gui_restart_verification",
+                         "selectionStart":  "2026-03-17",
+                         "selectionEnd":  "2026-11-17",
+                         "signalCounts":  {
+                                              "buy":  11,
+                                              "sell":  12
+                                          },
+                         "notFillCounts":  true,
+                         "performedAction":  "One native double-click-second-press-hold-drag-release in existing visible middle-to-right D1 chart; no setting/price/timeframe/pan/wheel/apply/order action",
+                         "runtimeTrace":  {
+                                              "pid":  34092,
+                                              "prepareEntryKst":  "17:09:53.119",
+                                              "prepareDoneKst":  "17:09:56.674",
+                                              "additionalRequestDispatch":  0,
+                                              "scope":  "Only the observed before/after V5 trace interval; not a blanket future/all-program no-TR guarantee"
+                                          },
+                         "iniBeforeAfterSha256":  "CC9751497AA4FE190162FD44FB117EEA979A2091EE984B40DC71D33E5ECB5918",
+                         "sourceCodeRecoveryCommit":  "8d79148199152d18ca2ff1db9e1cefe3e3af4931",
+                         "priorDocsRecoveryCommit":  "4599ee894f2129eaac41bf8037024cfb1bfe2573",
+                         "primaryReadonly":  {
+                                                 "model":  "gpt-6-astra",
+                                                 "reasoning":  "ultra",
+                                                 "session":  "01a1f71f-a2b1-7b22-a981-107a5fb4e564",
+                                                 "pids":  [
+                                                              30432,
+                                                              38104
+                                                          ],
+                                                 "exitCodes":  [
+                                                                   0,
+                                                                   0
+                                                               ]
+                                             },
+                         "scopeAudit":  "Native Terra bounded report PASS based on supplied evidence; no independent GUI/test execution",
+                         "limits":  [
+                                        "No direct STOP_LOSS per-fill reason or False-to-True runtime sequence claim; detailed receipt absent.",
+                                        "No production tick/exit/rearm/live-order runtime certification.",
+                                        "LIVE_HOLD static guards preserved; no activation.",
+                                        "Previous implementation-period INI differences remain a separate recorded observation; current GUI interval hash equality does not erase them."
+                                    ]
+                     }
+}

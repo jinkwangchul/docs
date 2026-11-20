@@ -1,0 +1,53 @@
+diff --git a/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md b/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
+index c79f44d..2758e24 100644
+--- a/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
++++ b/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
+@@ -1011,3 +1011,11 @@ M6_REAL_RUNTIME_COMMIT_ARCHITECTURE_DESIGN.md는 고유한 역사 설계로 유
+ - 코드 ref `recovery/live-stoploss-20261120-01a1f7a2` / commit `8d79148199152d18ca2ff1db9e1cefe3e3af4931`은 정상 push 후 원격 SHA가 일치했다. 최종 patch SHA256은 `137EEEEAADBF2DB20CCF5CBA4DD10580CA23A3C0C46D141ABE281B237E59507A`다. 원격 기록은 task_recovery/20261120_live_stoploss의 patch와 manifest만이며 정확한 로컬 기준본이 필요하다. 실행 가능한 전체 소스 commit이나 완전 장치 백업으로 표현하지 않는다.
+ - 이번 단위의 원본·실행/감사·소스 scope·코드/문서 delta·원격 receipt 소유 위치는 `C:/Users/JIN KWANG CHUL/Documents/project_backups/live_stoploss_execution_20261120_1504`다. 상세 검증 수치와 잔여 한계의 현재 소유 문서는 V5_WORK_STATUS.md이며 SOR의 승인 정책을 새로 확대하지 않는다.
+ - 다음 작업은 최신 코드 로드가 확인되는 비주문 GUI 연결 확인이며 실행 방향을 확인한 뒤 진행한다. 현재 결과로 LIVE_HOLD 해제·실주문·실제 TR·전체 V5/실매매 정상 운영을 승인하거나 완료로 표시하지 않는다. 보조 감시기나 앞서 통과한 무관한 검사를 반복하지 않는다.
++
++
++## 2026-11-20 — 재시작 후 V5 비주문 현장 확인
++
++- 사용자 `재시작 완료 ㄱㄱ`에 따라 새 PID 34092(16:58:39 KST)와 최종 22개 파일 해시·재시작 이전 저장을 확인했다. 실제 V5 000660/D1의 손절율 ON 0.5%·평균가격 선택을 그대로 사용했다.
++- 17:09:51~52 기간선택 1회에서 03/17~11/17 166봉, 완료 가상 사이클 4행, +217,698원/+3.91%가 표시됐다. 기본 trace의 보유 pool 재생 완료와 선택 전후 추가 V5 request_dispatch 0, 이번 확인 전후 INI 해시 동일을 기록했다. 설정·가격·기준봉·팬/휠·루틴 적용·운영 활성화·실주문 조작은 없었다.
++- 상세 매도 사유 receipt가 없어 STOP_LOSS 개별 발동·실제 False→True 재개 또는 production 런타임 전체 PASS로 확대하지 않는다. LIVE_HOLD는 기존 가드의 정적 보존 확인에 한정한다. 앞선 구현 중 INI 차이 관측은 이 후속 구간의 INI 불변으로 지우지 않는다.
++- 실제 Astra DC 30432/38104는 읽기 전용으로 종료했고 Terra는 제공 증거의 보고 범위를 한정 PASS로 검토했다. 상세 현재 상태와 증거 위치는 V5_WORK_STATUS의 17:09 GUI 확인 절을 따른다. 이번 보강은 관측 기록이며 신규 정책·소스 수정이 아니다.
+diff --git a/00_CANONICAL/CURRENT/V5_WORK_STATUS.md b/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
+index 8d6b393..1b85d88 100644
+--- a/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
++++ b/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
+@@ -16,7 +16,7 @@
+ - **V5 손절 실행 연결 — 한정 구현·검증 완료:** 실제 CLI Sol 세션 `01a1f747-c246-7241-8453-c92dd084da6d`에서 승인된 6개 소스·3개 테스트에 평균/종가 선택가격의 손절 우선 잔여 전량 청산, 손절 동일 봉 매수 차단, 실제 BUY False 이후 더 뒤 True의 신규 사이클 재개를 연결했다. 실제 context·결과·snapshot/cache·가격 전환·정규장 제외 경로를 검사했고, 최종 독립 정적 감사는 Critical 0 / Important 0, 범위 감사도 한정 PASS다. 이는 이번 V5 실행 변경분의 완료이며 전체 V5 정상화·실GUI·실매매 검증 완료와 구분한다.
+ - **V5 실행 연결의 최종 검사 증거:** 마지막 집중 실행은 `20 passed, 14 subtests, exit 0`다. 비정상 Stoch RSI threshold 7종의 실제 callback과 재개 잠금 회귀는 결함이 있는 중간 엔진을 메모리에 로드하면 7건 모두 잘못된 False 관측으로 실패하고, 현재 엔진에서는 통과했다. 앞선 3파일 실행은 `153 passed, 1 failed, 392 subtests`, 주변 계약 포함 실행은 `298 passed, 9 failed, 511 subtests`였다. 기존 CURRENT_PRICE 비교 실패는 기준본에서도 동일했고, 나머지 8건은 기준본 소스와 현재 fixture의 누락된 globals/method/timeframe 계약 불일치로 실제 CLI Astra가 분류했다. 실제 projection import와 window 소유 경로는 존재하며 해당 실패를 숨기기 위한 소스 우회나 테스트 약화는 하지 않았다. 실패 수치를 PASS로 바꾸지 않는다.
+ - **V5 확정 선택:** 사용자 `봉 종가가 아니라 설정 가격대로 청산. 평균/종가,`에 따라 가상 청산은 기존 평균/종가 선택값을 따른다. 이어서 '손절 후 매수 조건이 한 번 해제됐다가 다시 성립하면 재매수를 허용'하는지 확인한 질문에 `신규 사이클 재개 가능`으로 답했다. 실제 평가된 False 이후 나중 봉의 True에서 재개하며 손절 동일 봉 매수는 차단한다. 미평가·부적격·자료 부족 또는 실행 거절을 False로 만들지 않는다. V5 과거 OHLCV를 생산용 fresh/native tick 증거로 가장하지 않는다.
+-- **실매매 손절 연결 — 승인 범위 구현·오프라인 검증 완료:** 실제 CLI Sol 세션 `01a1f7a2-4238-79c2-8efa-13ae5275db84`가 기존 소스 14개·테스트 8개에 전량 청산 확인 후 실제 BUY False → 이후 True 재개와 신규 손절의 원본 wall/receipt-monotonic 각 0..2초 검사를 연결했다. 8파일은 최종 생산 소스 기준 243 passed·152 subtests이며, 이후 테스트 초기화 교정은 별도 2 passed·2 subtests로 확인했다. 두 수치를 합산하지 않는다. 공유 V5 집중 20 passed·14 subtests, native Astra 최종 Critical 0 / Important 0이다. 인접 loader fixture 실패 1건과 실행 중 관측된 V5 설정 변화는 아래에 별도 기록했다. LIVE_HOLD는 유지하며 다음은 최신 코드 로드를 전제로 한 비주문 GUI 연결 확인이다.
++- **실매매 손절 연결 — 승인 범위 구현·오프라인 검증 완료:** 실제 CLI Sol 세션 `01a1f7a2-4238-79c2-8efa-13ae5275db84`가 기존 소스 14개·테스트 8개에 전량 청산 확인 후 실제 BUY False → 이후 True 재개와 신규 손절의 원본 wall/receipt-monotonic 각 0..2초 검사를 연결했다. 8파일은 최종 생산 소스 기준 243 passed·152 subtests이며, 이후 테스트 초기화 교정은 별도 2 passed·2 subtests로 확인했다. 두 수치를 합산하지 않는다. 공유 V5 집중 20 passed·14 subtests, native Astra 최종 Critical 0 / Important 0이다. 인접 loader fixture 실패 1건과 실행 중 관측된 V5 설정 변화는 아래에 별도 기록했다. 후속 재시작의 일봉 166봉 가상 재생·결과표 확인은 아래 17:09 GUI 기록을 따른다. LIVE_HOLD의 정적 가드는 유지되며 production 청산·재개 런타임은 별도 미확인이다.
+ - **보조 감시기:** 사용자 복귀 지시에 따라 추가 작업을 중단했다. 오프라인 테스트 통과와 별개로 실제 표시의 런타임 검증은 미완이며 원래 손절 작업을 대체하지 않는다.
+ - **기존 V5 잔여 확인:** 15:35 직접봉의 필터 계산/가상매매 제외와 선택 종료 가상청산 등 실제 화면 미확인 항목을 필요한 범위에서 후속 확인한다. 직전창에서 확인한 전체필터·초기화·13개 수신/표시를 무변경 상태로 반복 점검하지 않는다.
+ 
+@@ -207,10 +207,22 @@ $env:PYTEST_DISABLE_PLUGIN_AUTOLOAD='1'
+ - 소스 범위 검사와 앱 INI 상태는 별도로 기록한다. `kiwoom_auto.ini`는 작업 전 SHA256 `432F9E21E84064E6D52F7398FFF90CF8DA019DB44574FAEFAFC209C3C4A91DB9`와 달라졌다. 전체 key 비교에서 `ui/signal_validation_v5\retained_settings` 하나만 달랐고 나머지 key는 동일했다. 첫 관측의 내부 차이는 기준봉 선택·BUY/SELL 조건식·손절 UI 값이며, 두 번째 관측의 내부 필드는 다시 확장하지 않았다.
+ - GUI PID 41396은 15:41:49 KST에 기존 Explorer PID 62736의 자식으로 시작된 것이 관측됐다. INI 쓰기 시각은 15:45:55 KST와 16:40:08 KST이며, 후자는 작업 작성·테스트 CLI의 마지막 종료 16:35:09 KST 이후다. 정확한 작성 주체는 확인하지 못했다. 최신 캡처 SHA256은 `04DB5E18D38D12CA1A2E6D181165312CC50FCFBD5C6FBCAB6AB95C5A1FA69A2A`다. 이 작업은 현재 설정을 복원·덮어쓰거나 실행 GUI를 종료·재시작하지 않았다.
+ - **판정 한계:** LIVE_HOLD와 기존 승인 경계는 유지했다. 이번 결과는 실주문·실제 TR·운영 활성화·최종 코드가 로드된 GUI 검증을 포함하지 않는다. 구현 도중 시작된 GUI를 최종 소스 실행 증거로 사용하지 않는다. INI를 불변이라고 기록하거나 코드 범위 PASS로 설정 차이를 숨기지 않는다.
+-- **다음 작업:** 최신 코드 로드를 확인할 수 있는 비주문 GUI 연결 확인의 실행 방향을 사용자와 확정한 뒤 진행한다. 손절 설정 전달·선택 가격·사이클 상태 표시의 실제 연결을 필요한 범위에서 확인하고, 기존 통과한 V5 표시·13개 수신 확인이나 보조 감시기 작업을 반복하지 않는다. 위 loader fixture 1건은 별도 범위로 남긴다.
++- **후속 확인 상태:** 사용자 재시작 후 수행한 비주문 GUI의 설정·기간선택·가상 결과 확인은 아래 17:09 기록으로 갱신한다. 개별 손절 사유와 production 청산·재개 런타임은 아직 미확인이며, 이를 위해 임의의 실주문이나 새 사이클을 생성하지 않는다. 위 loader fixture 1건과 기존 V5 미확인 항목은 별도 범위로 남긴다.
+ 
+ ### 이번 실매매 연결의 복구 기록
+ 
+ - 코드 원격 ref `recovery/live-stoploss-20261120-01a1f7a2`, commit `8d79148199152d18ca2ff1db9e1cefe3e3af4931`을 정상 push한 뒤 원격 SHA 일치를 확인했다. 최종 patch SHA256은 `137EEEEAADBF2DB20CCF5CBA4DD10580CA23A3C0C46D141ABE281B237E59507A`다.
+ - 원격에는 `task_recovery/20261120_live_stoploss/changes.patch`와 `manifest.json`만 기록한다. 원래 작업 branch/HEAD/index는 변경하지 않았다. 복원에는 로컬의 정확한 기준본이 필요하며 실행 가능한 전체 소스 commit 또는 장치 손실에 대비한 완전 백업은 아니다.
+ - 증거 위치: `C:/Users/JIN KWANG CHUL/Documents/project_backups/live_stoploss_execution_20261120_1504`. 주요 파일은 `verification_evidence.json`, `final_source_scope_scan.json`, `code_delta_final/manifest.json`, `code_checkpoint_receipt.json`이며 문서 변경분·원격 결과는 후속 `docs_delta_final` 및 `docs_checkpoint_receipt.json`으로 기록한다. INI 원문·사적 diff는 원격 patch/manifest에 포함하지 않는다.
++
++
++## 2026-11-20 17:09 KST — 사용자 재시작 후 비주문 GUI 확인
++
++- 사용자 `재시작 완료 ㄱㄱ` 이후 새 GUI PID 34092, 시작 16:58:39 KST와 프로젝트의 절대 실행 경로를 확인했다. 승인된 22개 파일은 최종 after SHA256과 같고 모두 재시작 이전에 저장됐다. 16:59:11 로그에서 D1 5,600봉 snapshot·ready=true·필터 19개·하단 패널 3개가 확인됐다.
++- 실제 열린 V5는 000660 SK하이닉스/일봉, 손절율 ON 0.5%, 평균가격 ON, 청산 ON, 정규장만 마킹 OFF, 설정유지 ON이었다. 값을 바꾸지 않고 17:09:51~52에 차트 중간~오른쪽에서 더블클릭의 두 번째 누름을 유지한 드래그/해제 1회만 수행했다. 기준봉·가격·설정 토글·팬/휠·설정적용·주문 조작은 하지 않았다.
++- **실제 GUI 결과:** 03/17~11/17의 166봉 선택 음영·마커·완료 사이클 4행이 표시됐다. 화면의 가상 합계는 +217,698원/+3.91%, 매수신호 11·매도신호 12다. 이는 해당 설정·구간의 가상 결과이며 신호 수를 실제 체결 수로 표현하지 않는다.
++- 같은 PID의 기본 trace에서 `detail_replay_prepare_entry → detail_replay_view_ready → detail_replay_evaluate_entry → detail_replay_evaluate_done → detail_replay_prepare_done`을 확인했고 17:09:56 계산이 완료됐다. 선택 전후 비교 구간의 추가 `request_dispatch`는 0개다. 모든 후속 조작의 TR 없음이나 전체 프로그램 TR 0을 보장하는 표현으로 확대하지 않는다.
++- 이번 GUI 확인 전후 INI SHA256 `CC9751497AA4FE190162FD44FB117EEA979A2091EE984B40DC71D33E5ECB5918`은 동일했다. 앞서 생산 구현 중 관측된 INI 차이와 이번 재시작 후 확인의 불변 결과는 서로 다른 관측 구간이다.
++- **증명하지 않은 범위:** 기본 표에 매도 사유 열이 없고 이번 로그의 상세 `virtual_trade_receipt_v1`도 0개이므로, 각 SELL이 `STOP_LOSS`였는지와 개별 False→True 재개 사건은 이 GUI 결과로 확정하지 않는다. 신규 진단 플래그·운영 활성화·실주문은 수행하지 않았다. LIVE_HOLD는 기존 가드의 정적 보존 확인이며 production 틱 신선도·청산·재개·승인 거절의 런타임 증거는 별도다.
++- 실제 Astra 읽기 전용 DC 30432/38104는 각각 exit 0(153.57초/178.72초)으로 종료했다. Terra는 제공된 증거에 따른 보고 범위만 한정 PASS로 검토했으며 GUI나 테스트를 독립 재실행한 것은 아니다. 현재 결과 화면은 유지했다.
++- 근거: `C:/Users/JIN KWANG CHUL/Documents/project_backups/live_stoploss_execution_20261120_1504/gui_restart_verification`의 `restart_source_provenance.json`, `after_period_selection_observation.json`, `trace_after_selection.json`, `after_period_selection.png`. 현재 소스 변경은 없으며 인접 loader fixture 1건은 기존 별도 과제로 남긴다.
