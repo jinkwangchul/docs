@@ -1,0 +1,118 @@
+{
+    "status":  "DELTA_REPLAY_VERIFIED",
+    "repository":  "C:\\Users\\JIN KWANG CHUL\\Documents\\docs",
+    "remote":  "https://github.com/jinkwangchul/docs.git",
+    "branch":  "agent/project-prompt-standard",
+    "head":  "d8667b52f3bdd362a3140f26a73369b7b1d5f6ca",
+    "originalIndexSha256":  "7BAE7B0654E85589D4EFD2DBDE45E789DAD54757BC9BF60D77705B72AAC7B1BA",
+    "baseline":  "C:\\Users\\JIN KWANG CHUL\\Documents\\project_backups\\v5_stoploss_display_20261120\\gui_restart_verification\\docs_before",
+    "limitation":  "Delta only. Exact original document contents are local, not included remotely. This is not a self-contained documentation checkout or a full device-loss backup.",
+    "restore":  "Use disposable exact baseline copies, apply changes.patch with git apply --binary --whitespace=nowarn, verify every afterSha256; do not overwrite unrelated working files automatically.",
+    "files":  [
+                  {
+                      "path":  "00_CANONICAL/CURRENT/V5_WORK_STATUS.md",
+                      "beforeSha256":  "4D2523837C3FF97E825E8EBC39F7AB1C769FE3041B1156BA641FE648F2F78BD4",
+                      "afterSha256":  "59BB82E07FEAD0627850E32BBA0E2A151F47028618FC1B2CA1D86C35563A3489"
+                  },
+                  {
+                      "path":  "00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md",
+                      "beforeSha256":  "F6DA2213E443F97B7018BB94A67CB7C4A90664F19A535FBE7D238597D8B0267B",
+                      "afterSha256":  "41B0BFDFD7D6FC843AE7DC187F354B9D934C5E0A6BB139323B2A17E9705329FB"
+                  }
+              ],
+    "protected":  [
+
+                  ],
+    "sourceCodeRecoveryCommit":  "d0f47aeb7059a89322991eaa8faec564304aa5db",
+    "verification":  {
+                         "status":  "BOUNDED_ACTUAL_GUI_STOP_LOSS_DISPLAY_PASS",
+                         "authorization":  "User 재시작 완료. 확인하라",
+                         "gui":  {
+                                     "pid":  2400,
+                                     "startedKst":  "2026-11-20 18:07:46.579",
+                                     "windowHandle":  29035166,
+                                     "sourceSha256":  "C58A229D4BB1C1E8E0A7D19F1AE1D4281534AB87F7B6813C7643905C398227AE",
+                                     "sourceWriteBeforeRestart":  true,
+                                     "responding":  true
+                                 },
+                         "case":  {
+                                      "symbol":  "000660",
+                                      "name":  "SK하이닉스",
+                                      "timeframe":  "D1",
+                                      "priceMode":  "average",
+                                      "stopLossEnabled":  true,
+                                      "stopLossPercent":  0.5,
+                                      "selectionStart":  "2026-03-17",
+                                      "selectionEnd":  "2026-11-17",
+                                      "selectedCandles":  166
+                                  },
+                         "visibleResults":  {
+                                                "completedCycles":  4,
+                                                "cycleLabels":  [
+                                                                    "1",
+                                                                    "2 [손절]",
+                                                                    "3 [손절]",
+                                                                    "4 [손절]"
+                                                                ],
+                                                "redDownwardTriangles":  3,
+                                                "stopDisplaySellDates":  [
+                                                                             "2026-07-20",
+                                                                             "2026-08-03",
+                                                                             "2026-10-20"
+                                                                         ],
+                                                "labelsUnclipped":  true,
+                                                "virtualProfitKrw":  217698,
+                                                "virtualProfitPercent":  3.91,
+                                                "sameDisplayedTotalsAsPriorBoundedGuiCheck":  true,
+                                                "buySignalCount":  11,
+                                                "sellSignalCount":  12,
+                                                "signalCountsAreNotFillCounts":  true,
+                                                "screenshot":  "v5_after_period_selection.png",
+                                                "accessibilityEvidence":  "after_period_observation.json"
+                                            },
+                         "action":  {
+                                        "type":  "One native double-click-second-press-hold-drag-release",
+                                        "startedKst":  "2026-11-20 18:15:19.245",
+                                        "finishedKst":  "2026-11-20 18:15:20.425",
+                                        "record":  "period_selection_action.json",
+                                        "settingsEdited":  false,
+                                        "timeframeChanged":  false,
+                                        "priceModeToggled":  false,
+                                        "applyOrOrderClicked":  false
+                                    },
+                         "trace":  {
+                                       "primaryCliPid":  42716,
+                                       "primaryModel":  "gpt-6-astra",
+                                       "effort":  "ultra",
+                                       "mode":  "read-only",
+                                       "exitCode":  0,
+                                       "initialRequestDispatch":  1,
+                                       "initialReady":  true,
+                                       "afterStartByte":  10130711,
+                                       "afterEndByte":  10135352,
+                                       "appendedEvents":  15,
+                                       "eventsAfterAction":  5,
+                                       "additionalRequestDispatch":  0,
+                                       "actionReplayStartedKst":  "18:15:20.787",
+                                       "actionReplayDoneKst":  "18:15:24.025",
+                                       "preActionReplayBatches":  2,
+                                       "preActionAttribution":  "Unknown; not attributed to the root gesture",
+                                       "perFillStopLossReceiptAvailable":  false,
+                                       "evidence":  "runtime_and_ini_after.json"
+                                   },
+                         "iniBeforeAfterSha256":  "CC9751497AA4FE190162FD44FB117EEA979A2091EE984B40DC71D33E5ECB5918",
+                         "iniUnchanged":  true,
+                         "independentReview":  {
+                                                   "reviewer":  "/root/stoploss_scope_audit",
+                                                   "verdict":  "BOUNDED_PASS",
+                                                   "evidence":  "gui_scope_audit.txt",
+                                                   "basis":  "Direct screenshot and UIA/operation/INI records"
+                                               },
+                         "sourceCodeRecoveryCommit":  "d0f47aeb7059a89322991eaa8faec564304aa5db",
+                         "limits":  [
+                                        "Current SK하이닉스 D1/average/0.5%/166-candle display case only.",
+                                        "No independent per-fill actual STOP_LOSS cause verification because detailed receipt is absent.",
+                                        "No whole-program, all-timeframe, production order, actual tick, or future no-TR guarantee."
+                                    ]
+                     }
+}

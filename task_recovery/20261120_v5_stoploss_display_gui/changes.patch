@@ -1,0 +1,38 @@
+diff --git a/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md b/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
+index 3b32da2..63037b0 100644
+--- a/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
++++ b/00_CANONICAL/CHANGELOG/CONTRACT_DECISION_HISTORY.md
+@@ -1034,3 +1034,10 @@ M6_REAL_RUNTIME_COMMIT_ARCHITECTURE_DESIGN.md는 고유한 역사 설계로 유
+ - **보존:** 이번 변경 범위에서 가격·매매·손절/재개·회계·production 규칙을 수정하지 않았다. 관련 오프라인 회귀에서 기존 계산 값·정수 회차·행 순서·클릭 대상·기존 청산 표시 보존을 확인했다. 2,600개 Python 기준 목록 대조와 현재 경로/최종 SHA 확인에서 변경 3개, 추가·삭제·범위 밖 변경 0. INI 및 기존 코드 Git branch/HEAD/index·작업 상태 목록은 동일했다.
+ - **한계:** 숨긴 offscreen viewport와 직접 population, evaluator 반환을 고정한 frozen 표시 재구성 검사다. 실GUI 이벤트·실주문/TR·전체 정상화 완료로 확대하지 않는다. GUI 종료·재실행 조작은 없었고 최종 조회에서 프로젝트 GUI는 없었다. 다음 확인은 최신 코드 V5의 실제 손절 마커·회차 표기다.
+ - **복원:** 수정 전 3개 원본은 기존 archive와 정확한 해시 일치를 확인해 재사용했으며 새 전체 복원점을 만든 것이 아니다. byte 단위 패치 재적용 확인 후 코드 recovery ref `recovery/v5-stoploss-display-20261120-01a1f7a2`의 원격 SHA `d0f47aeb7059a89322991eaa8faec564304aa5db`를 확인했다. 코드·문서 receipt와 검사·감사 원문은 `C:/Users/JIN KWANG CHUL/Documents/project_backups/v5_stoploss_display_20261120`에 보존한다. 원격 기록은 task patch/manifest이며 복원에 정확한 로컬 기준본이 필요하다.
++
++## 2026-11-20 — 재시작 후 V5 손절 표시 실화면 한정 확인
++
++- **승인·대상:** 사용자 `재시작 완료. 확인하라`에 따라 PID 2400(18:07:46 KST 시작), 최종 V5 window source SHA 일치 상태를 확인했다. 새 코드 변경 없이 SK하이닉스 000660·일봉·평균·손절 0.5%·03/17~11/17의 166캔들을 검사했다.
++- **실화면 결과:** 집계표 `1`, `2 [손절]`, `3 [손절]`, `4 [손절]`, 손절로 표시된 07/20·08/03·10/20 매도봉의 빨간 ▼ 3개와 문구 잘림 없음을 확인했다. 표시 손익 +217,698원/+3.91%는 직전 같은 구간의 표시와 동일했다. WebApp Terra가 스크린샷·UIA·조작·INI 기록을 읽고 한정 PASS를 보고했다.
++- **실행·보존:** native 기간선택 제스처 1회(18:15:19~20), 해당 재생 완료 18:15:24.025. 확인한 후속 trace 구간의 추가 request_dispatch 0. 18:14의 사전 재생 2묶음은 이번 조작에 귀속하지 않는다. 전후 INI SHA는 동일하며 설정·가격·기준봉·적용·주문 조작 및 GUI 종료·재시작을 하지 않았다.
++- **범위 한계:** 현재 표시 사례의 확인이다. 상세 STOP_LOSS 체결 receipt는 없으므로 개별 실제 체결 사유의 독립 입증, 모든 기준봉·production·실주문 정상화로 확대하지 않는다. source 변경분의 원격 기록은 `d0f47aeb7059a89322991eaa8faec564304aa5db`, 이번 화면·로그·문서 복원 증거는 `C:/Users/JIN KWANG CHUL/Documents/project_backups/v5_stoploss_display_20261120/gui_restart_verification`에 보존한다.
+diff --git a/00_CANONICAL/CURRENT/V5_WORK_STATUS.md b/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
+index ed9779e..3edd93d 100644
+--- a/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
++++ b/00_CANONICAL/CURRENT/V5_WORK_STATUS.md
+@@ -6,13 +6,16 @@
+ 
+ ## 2026-11-20 직전창 연계 — 최신 확인 및 우선 작업
+ 
+-- **현재 작업 — V5 손절 표시의 한정 구현·오프라인 검증 완료:** 사용자 요청과 `ㄱㄱ` 승인에 따라 실제 CLI Sol `gpt-6.1-sol/high/workspace-write`(PID 51060, 세션 `01a1f7a2-4238-79c2-8efa-13ae5275db84`)이 구현하고 exit 0으로 종료했다. 실제 손절 청산은 기존 청산의 **빨간 역삼각형(▼)**, 하단 집계표의 해당 회차는 **`n [손절]`**로 표시한다.
++- **현재 작업 — V5 손절 표시 구현·검증 및 현재 사례의 실화면 확인 완료:** 사용자 요청과 `ㄱㄱ` 승인에 따라 실제 CLI Sol `gpt-6.1-sol/high/workspace-write`(PID 51060, 세션 `01a1f7a2-4238-79c2-8efa-13ae5275db84`)이 구현하고 exit 0으로 종료했다. 실제 손절 청산은 기존 청산의 **빨간 역삼각형(▼)**, 하단 집계표의 해당 회차는 **`n [손절]`**로 표시한다.
+ - **적용 범위와 사유:** `gui_indicator_follow_signal_validation_v5_window.py`와 기존 테스트 `tests/test_v5_lot_limit_ui.py`, `tests/test_indicator_follow_signal_validation_v5_baseline.py`의 3개 파일만 변경했다. 실제 양수 closing SELL fill의 STOP_LOSS 사유를 표시 모델·offset/remap·재구성 경로에 보존하고, 원본 신호를 유지한 표시용 복사본에 기존 빨간 ▼ 스타일을 적용했다. 일반 손실 매도·기간말 청산을 손절로 추정하지 않으며 회차 문구 폭을 반영한다.
+ - **최종 검사:** Windows Python 3.11 32-bit/PyQt offscreen에서 신규 집중 **12 passed·6 subtests·122 deselected**, 기존 인접 청산 **5 passed**, 모두 exit 0. 앞선 원인 전달 GREEN 4건은 최종 12건에 포함되므로 합산하지 않는다. 초기 UI 실패 8건 중 표시 누락 7건과 신규 frozen fixture identity 누락 1건을 구분했고, 후속 viewport·직접 갱신 fixture 보완에서도 원래 폭·빈 결과 단언을 유지했다.
+ - **독립 감사:** 실제 CLI Astra의 최소 계획(PID 53424, exit 0)을 적용했으며, WebApp Astra 최종 기술 감사 **PASS, Critical 0 / Important 0**, WebApp Terra 범위·보고 감사 **한정 PASS**다. 변경 범위에서 매매·가격·손절/재개·회계·production 규칙을 수정하지 않았고, 관련 오프라인 회귀에서 재무 값·정수 회차·행 순서·클릭 대상·기존 청산 표시 보존을 확인했다.
+ - **최종 보존 확인:** 실제 Sol의 최신 2,600개 Python 내용 해시 대조를 재사용하고 DC에서 전체 경로 목록과 최종 3개 SHA256을 확인했다. 2,600→2,600개, 승인된 3개 변경, 추가·삭제·범위 밖 변경 0. 설정 INI 해시는 `CC9751497AA4FE190162FD44FB117EEA979A2091EE984B40DC71D33E5ECB5918`로 동일하다. 원래 코드 branch/HEAD/index 및 7,760개 작업 상태 목록은 보존됐다. 17:58 KST 조회에서 프로젝트 GUI는 없었으며 이 작업에서 GUI 종료·실행 조작은 하지 않았다.
+ - **원본·복원 기록:** 기존 보관본 3개의 SHA가 현재 수정 전 파일 및 최초 범위 목록과 일치해 `C:/Users/JIN KWANG CHUL/Documents/project_backups/v5_stoploss_display_20261120/code_before`에 보존했다. 새 전체 복원점을 만든 것은 아니다. 변경분 패치의 byte 단위 재적용을 확인했으며 코드 recovery ref `recovery/v5-stoploss-display-20261120-01a1f7a2`의 원격 커밋 `d0f47aeb7059a89322991eaa8faec564304aa5db`를 확인했다. 코드·문서별 실제 원격 기록은 같은 증거 폴더의 `code_checkpoint_receipt.json`, `docs_checkpoint_receipt.json`을 기준으로 한다. 패치 복원에는 정확한 로컬 기준본이 필요하며 독립 실행 가능한 전체 checkout은 아니다.
+-- **검증 한계와 다음 작업:** 숨긴 offscreen viewport·직접 population 및 evaluator 결과를 고정한 frozen 재구성의 표시 연결을 확인했다. 실제 visible GUI 이벤트·실수신/TR·실주문·전체 프로젝트 정상화는 이번 검사 범위가 아니다. 다음 작업은 최신 코드로 V5를 열어 기존 데이터의 실제 손절 봉에 빨간 ▼가 하나만 표시되고 해당 회차가 `n [손절]`로 나타나는지 실화면에서 확인하는 것이다.
++- **오프라인 검증 범위:** 숨긴 offscreen viewport·직접 population 및 evaluator 반환을 고정한 frozen 표시 재구성을 검사했다. 아래 실화면 확인은 사용자 재시작 이후 별도로 수행한 현재 사례의 관측이다.
++- **재시작 후 실화면 확인 — 2026-11-20 18:16 KST 한정 PASS:** 사용자 `재시작 완료. 확인하라`에 따라 PID 2400(18:07:46 KST 시작)의 최종 source SHA 일치를 확인했다. SK하이닉스 000660·일봉·평균·손절 0.5%를 유지하고 03/17~11/17의 166캔들을 선택했다. 표의 `1`, `2 [손절]`, `3 [손절]`, `4 [손절]`과 07/20·08/03·10/20 매도봉의 빨간 ▼ 3개를 실제 화면에서 확인했다. 회차 문구 잘림이 없고 표시 손익은 직전 같은 구간과 동일한 +217,698원/+3.91%다. WebApp Terra도 스크린샷·UIA를 직접 확인해 한정 PASS를 보고했다.
++- **실행 기록과 보존:** 18:15:19~20에 native 기간선택 제스처 1회만 수행했고 설정·가격·기준봉·적용·주문 조작은 하지 않았다. 해당 동작 뒤 D1 재생 5개 기록은 18:15:20.787~24.025에 완료됐고, 확인한 후속 trace 구간의 추가 `request_dispatch`는 0이다. 그보다 앞선 18:14의 재생 2묶음은 이 제스처에 귀속하지 않는다. 전후 INI SHA는 동일하고 GUI 응답 상태를 확인했다.
++- **한계·증거:** 이 확인은 현재 SK하이닉스 D1/평균/손절 0.5%/166봉의 표시 사례에 한정한다. 상세 STOP_LOSS 체결 receipt가 없어 개별 실제 체결 사유를 별도로 입증한 것은 아니며, 모든 기준봉·실주문·production·전체 정상화로 확대하지 않는다. 스크린샷·UIA·동작·trace·INI·감사 증거는 `C:/Users/JIN KWANG CHUL/Documents/project_backups/v5_stoploss_display_20261120/gui_restart_verification`에 있다.
+ 
+ - **직전창 회수 근거:** 2026-11-19~20 같은 프로젝트 대화의 사용자 결정·작업 보고를 회수했다. 아래 과거 필터·실GUI 보고는 당시 보고 범위로 보존하며, 이번 창의 손절 CLI 조사·수정·테스트 증거와 별도로 구분한다.
+ - **필터 계약·수정:** 전체필터는 조건식 참조와 무관한 설정된 모든 필터·범례·Stoch RSI 실제 %D 패널과 BUY/SELL 기준선(기본 20/80, 설정값 우선)을 표시한다. 유효필터는 조건식 참여 필터를 강조하고 나머지 범례는 유지한다. 필터숨김은 시각 요소만 숨긴다. 직전창 보고상 Sol이 V5 window와 회귀테스트 2개 및 SOR 계약 충돌 조항을 수정했고 집중 확인 **11건·세부 15건 통과**, 독립 Astra **GO**를 받았다. 이는 당시 코드/오프라인 범위로 한정한다.
